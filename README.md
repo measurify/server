@@ -140,6 +140,31 @@ Remember the URL of the database server, if you are using the same machine for M
     sudo npm install 
     nmp run-script prod
 
+#### Setup environments
+
+Atmosphere can run in tree different modes: "prod" (to starn in production), "dev2 (to run the code using the [nodemon](https://www.npmjs.com/package/nodemon) tool) and "test" (to execute the unit test suite). It is possible to select the enviroment using a command line parameter:
+
+    npm run test
+    npm run dev
+    npm run prod
+
+Each environment has a configuration file "variable.dev.env", "variables.prod.env", "variables.test.env" which can be edited in order to specify several features:
+
+    VERSION=v1
+    ENV=development
+    DATABASE=mongodb://localhost:27017/atmosphere-dev
+    PORT=8084
+    ADMIN_USERNAME=admin 
+    ADMIN_PASSWORD=admin 
+    SECRET=secret-dev
+    EXPIRATIONTIME=30m 
+    LOG=enabled
+
+In particular, the connection string with the database and administrator credential (at startup Atmosphere will create a admin user with these credential), the expiration time of tokens, the log level and the secret word for the certificate file.
+
+
+
+
 #### Setup to run the API in production
 
 We suggest to use a process manager for NodeJS, lile [pm2](https://pm2.keymetrics.io/)
@@ -209,15 +234,15 @@ Atmosphere has been employed in three industrial research projects, one in the h
 
 ### Health at Home (H@H)
 
-H@H is a research project funded by the **Italian Ministry of Education and Research (MIUR)** and aimed at supporting the elderly with Chronic Health Failure (CHF) [1]. The project developed a complete IoT Cloud service consisting of the Home Monitoring Sensor System (front-end), the Home Gateway (middleware), and a Remote Cloud (back-end). Through the Gateway, several physiological quantities (electrocardiogram signal, heart rate, breathing waveform, breathing rate, oxygen saturation, blood pressure, glycemia, etc.) are collected and provided to the cloud. Through a web-based user interface, a clinician can view the measurements, and modify the pharmacological therapy according to the symptoms. Atmosphere acted as the backbone of the application in order to implement the H@H API described in [2]. The mapping of the H@H quantities onto the Atmosphere resources was straightforward: for each physiological signal, we create a corresponding “feature” and for each sensor a “device”, in order to collect information acquired on patients as “measurements” in Atmosphere.  
+[H@H]() is a research project funded by the **Italian Ministry of Education and Research (MIUR)** and aimed at supporting the elderly with Chronic Health Failure (CHF) [1]. The project developed a complete IoT Cloud service consisting of the Home Monitoring Sensor System (front-end), the Home Gateway (middleware), and a Remote Cloud (back-end). Through the Gateway, several physiological quantities (electrocardiogram signal, heart rate, breathing waveform, breathing rate, oxygen saturation, blood pressure, glycemia, etc.) are collected and provided to the cloud. Through a web-based user interface, a clinician can view the measurements, and modify the pharmacological therapy according to the symptoms. Atmosphere acted as the backbone of the application in order to implement the H@H API described in [2]. The mapping of the H@H quantities onto the Atmosphere resources was straightforward: for each physiological signal, we create a corresponding “feature” and for each sensor a “device”, in order to collect information acquired on patients as “measurements” in Atmosphere.  
 
 ### Fabric
 
-Frabri is **7th Framework Programme European industrial research project** which implemented an on-road testbed for  Dynamic Wireless Charging (DWC) of electrical vehicles [3]. In this context, we realized a charging process metering service for the vehicles passing through the charging lane [4]. The system senses and computes on the edge information about the charging process and stores it on Atmosphere’s cloud server to support new electro-mobility (e-mobility) services (e.g., billing, energy-aware car navigation) which can be implemented by relevant companies (e.g., energy providers, navigation providers). The road-side DWC sub-system sends to Atmosphere data representing the state of each consecutive charging grid. The vehicle-side DWC subsystem generates a stream of measurements recording the vehicle-coil alignment (which is key to power transfer efficiency) and the charging parameters and battery status. 
+[Fabric](https://www.fabric-project.eu/www.fabric-project.eu/index.html) is **7th Framework Programme European industrial research project** which implemented an on-road testbed for  Dynamic Wireless Charging (DWC) of electrical vehicles [3]. In this context, we realized a charging process metering service for the vehicles passing through the charging lane [4]. The system senses and computes on the edge information about the charging process and stores it on Atmosphere’s cloud server to support new electro-mobility (e-mobility) services (e.g., billing, energy-aware car navigation) which can be implemented by relevant companies (e.g., energy providers, navigation providers). The road-side DWC sub-system sends to Atmosphere data representing the state of each consecutive charging grid. The vehicle-side DWC subsystem generates a stream of measurements recording the vehicle-coil alignment (which is key to power transfer efficiency) and the charging parameters and battery status. 
 
 ### L3Pilot
 
-L3Pilot is a **Horizon 2020 research project** aimed at assessing the impact of automated driving (AD) on public roads, testing the Society of Automotive Engineers (SAE) Level 3 (and some Level 4) functions. The pilots will involve 1,000 test subjects, 100 cars, by 12 vehicle owners (either Original Equipment Manufacturers, or suppliers), across 10 European countries. The project uses the Field opErational teST support Action (FESTA) methodology, driven by a set of research questions and hypotheses on technical aspects, user acceptance, driving and travel behavior, as well as the impact on traffic and safety. In order to answer such research questions, the project has defined a data toolchain (now available open-source), that translates the proprietary vehicular signals to a shared format, and processes them to extract the driving scenario (e.g., “lane change”, “cut-in”) and other event information. Filtered data, aggregated from all the pilot sites, will be analyzed for an overall impact assessment. Atmosphere provides shared data storage back-end [5]. 
+[L3Pilot](https://www.l3pilot.eu/) is a **Horizon 2020 research project** aimed at assessing the impact of automated driving (AD) on public roads, testing the Society of Automotive Engineers (SAE) Level 3 (and some Level 4) functions. The pilots will involve 1,000 test subjects, 100 cars, by 12 vehicle owners (either Original Equipment Manufacturers, or suppliers), across 10 European countries. The project uses the Field opErational teST support Action (FESTA) methodology, driven by a set of research questions and hypotheses on technical aspects, user acceptance, driving and travel behavior, as well as the impact on traffic and safety. In order to answer such research questions, the project has defined a data toolchain (now available open-source), that translates the proprietary vehicular signals to a shared format, and processes them to extract the driving scenario (e.g., “lane change”, “cut-in”) and other event information. Filtered data, aggregated from all the pilot sites, will be analyzed for an overall impact assessment. Atmosphere provides shared data storage back-end [5]. 
 
 The following table shows the mapping between Atmosphere resources and projects concepts
 
@@ -230,12 +255,12 @@ The following table shows the mapping between Atmosphere resources and projects 
 
 ## References
 
-[1] A. Monteriù, M.R. Prist, E. Frontoni, S. Longhi, F. Pietroni, S. Casacci, L. Scalise, A. Cenci, L. Romeo, R. Berta, L. Pescosolido, G. Orlandi, G.M. Revel, “A smart sensing architecture for domestic moniotring: methodological approach and experimental validation”, Sensors, Vol. 18 Issue 7, July 2018
+[1] A. Monteriù, M.R. Prist, E. Frontoni, S. Longhi, F. Pietroni, S. Casacci, L. Scalise, A. Cenci, L. Romeo, R. Berta, L. Pescosolido, G. Orlandi, G.M. Revel, **A smart sensing architecture for domestic moniotring: methodological approach and experimental validation**, Sensors, Vol. 18 Issue 7, July 2018
 
-[2] L. Pescosolido, R. Berta, L. Scalise, G. M. Revel, A. De Gloria and G. Orlandi, “An IoT-inspired cloud-based web service architecture for e-Health applications”, 2016 IEEE International Smart Cities Conference (ISC2), Trento, 2016, pp. 1-4
+[2] L. Pescosolido, R. Berta, L. Scalise, G. M. Revel, A. De Gloria and G. Orlandi, **An IoT-inspired cloud-based web service architecture for e-Health applications**, 2016 IEEE International Smart Cities Conference (ISC2), Trento, 2016, pp. 1-4
 
-[3] V. Cirimele, M. Diana, F. Bellotti, R. Berta, A. Kobeissi, N. El Sayyed, J. Colussi, A. La Ganga, P. Guglielmi, and A. De Gloria, “The Fabric ICT platform for managing Wireless Dynamic Charging Road lanes”, in press of IEEE Transactions on Vehicular Technology (IEEE TVT), 2019
+[3] V. Cirimele, M. Diana, F. Bellotti, R. Berta, A. Kobeissi, N. El Sayyed, J. Colussi, A. La Ganga, P. Guglielmi, and A. De Gloria, **The Fabric ICT platform for managing Wireless Dynamic Charging Road lanes**, in press of IEEE Transactions on Vehicular Technology (IEEE TVT), 2019
 
-[4] A. Kobeissi, F. Bellotti, R. Berta, and A. De Gloria, “Towards an IoT-enabled Dynamic Wireless Charging Metering Service for Electrical Vehicles”, 4th AEIT International Conference of Electric and Electronic Technologies for Automotive, Turin, Italy, 2019
+[4] A. Kobeissi, F. Bellotti, R. Berta, and A. De Gloria, **Towards an IoT-enabled Dynamic Wireless Charging Metering Service for Electrical Vehicles**, 4th AEIT International Conference of Electric and Electronic Technologies for Automotive, Turin, Italy, 2019
 
-[5] F. Bellotti, R. Berta, A. Kobeissi, N. Osman, E. Arnold, M. Dianati, B. Nagy, A. De Gloria, “Designing an IoT Framework for Automated Driving Impact Analysis”, 30th IEEE Intelligent Vehicle Symposium, Paris, June 2019
+[5] F. Bellotti, R. Berta, A. Kobeissi, N. Osman, E. Arnold, M. Dianati, B. Nagy, A. De Gloria, **Designing an IoT Framework for Automated Driving Impact Analysis**, 30th IEEE Intelligent Vehicle Symposium, Paris, June 2019
