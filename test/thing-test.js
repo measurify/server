@@ -1,6 +1,9 @@
 // Import environmental variables from variables.test.env file
 require('dotenv').config({ path: 'variables.test.env' });
 
+// This line allow to test with the self signed certificate
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 // Import test tools
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -55,10 +58,10 @@ describe('/POST thing', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
         const thing = {}
         const res = await chai.request(server).post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing)
-        res.should.have.status(errors.thing_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.thing_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
     });
 
     it('it should not POST a thing with a fake tag', async () => {
@@ -66,10 +69,10 @@ describe('/POST thing', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
         const thing = { _id: "test-thing-2", tags: ["fake-tag"] };
         const res = await chai.request(server).post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
-        res.should.have.status(errors.thing_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.thing_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Tag not existent');
     });
 
@@ -78,10 +81,10 @@ describe('/POST thing', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
         const thing = { _id: "test-thing-2", relations: [ 'fake-Thing'] };
         const res = await chai.request(server).post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
-        res.should.have.status(errors.thing_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.thing_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Relation not existent');
     });
 
@@ -99,10 +102,10 @@ describe('/POST thing', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
         const thing = { _id: "test-thing-1" }
         const res = await chai.request(server).post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing)
-        res.should.have.status(errors.thing_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.be.eql(errors.thing_post_request_error.message);
+        res.body.message.should.be.eql(errors.post_request_error.message);
         res.body.details.should.contain('the _id is already used');
     });
 

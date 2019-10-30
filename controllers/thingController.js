@@ -1,17 +1,11 @@
 const mongoose = require('mongoose');
-const manager = require('../commons/manager');
+const manager = require('./manager');
 const Thing = mongoose.model('Thing');
 const Measurement = mongoose.model('Measurement');
 const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 
-exports.get = async (req, res) => {
-    try {
-        const things = await manager.getResourceList(req.query, '{ "timestamp": "desc" }', '{}', Thing);
-        return res.status(200).json(things);
-    } 
-    catch (err) { return errors.manage(res, errors.generic_request_error, err); } 
-};
+exports.get = async (req, res) => { return await manager.getResourceList(res, req, '{ "timestamp": "desc" }', '{}', Thing); };
 
 exports.getone = async (req, res) => {
     const thing = await Thing.findById(req.params.id);
@@ -20,23 +14,8 @@ exports.getone = async (req, res) => {
 };
 
 exports.post = async (req, res) => {
-    if (req.body.constructor == Array) {
-        const results = { things: [], errors: [] };
-        for (let element of req.body) {
-            element.owner = req.user._id;
-            try { results.things.push(await (new Thing(element)).save()); }
-            catch (err) { results.errors.push(err.message); }
-        }
-        if (results.errors.length === 0) return res.status(200).json(results);
-        else return res.status(202).json(results);
-    }
-    else {
-        try {
-            req.body.owner = req.user._id;
-            res.status(200).json(await (new Thing(req.body)).save());
-        }  
-        catch (err) { return errors.manage(res, errors.thing_post_request_error, err); }
-    }
+    if (req.body.constructor == Array) return await manager.postResourceList(req, res, Thing);
+    return await manager.postResource(req, res, Thing);
 };
 
 exports.delete = async (req, res) => {

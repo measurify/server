@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const manager = require('../commons/manager');
+const manager = require('./manager');
 const ObjectId = require('mongoose').Types.ObjectId;
 const User = mongoose.model('User');
 const Tag = mongoose.model('Tag');
@@ -10,21 +10,13 @@ const Measurement = mongoose.model('Measurement');
 const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 
-exports.get = async (req, res) => {
-    try {
-        if (!Authorization.isAdministrator(req.user)) return errors.manage(res, errors.user_authorization_error);
-        const users = await manager.getResourceList(req.query, '{ "username": "desc" }', '{}', User);
-        return res.status(200).json(users);
-    } 
-    catch (err) { return errors.manage(res, errors.generic_request_error, err); } 
+exports.get = async (req, res) => { 
+    if (!Authorization.isAdministrator(req.user)) return errors.manage(res, errors.user_authorization_error);
+    return await manager.getResourceList(res, req, '{ "timestamp": "desc" }', '{}', User); 
 };
 
-exports.getusernames = async (req, res) => {
-    try {
-        const usernames = await manager.getResourceList(req.query, '{ "username": "desc" }', '{ "type": "0", "_id": "0" }', User);
-        return res.status(200).json(usernames);
-    } 
-    catch (err) { return errors.manage(res, errors.generic_request_error, err); }
+exports.getusernames = async (req, res) => { 
+    return await manager.getResourceList(res, req, '{ "timestamp": "desc" }', '{ "type": "0", "_id": "0" }', User); 
 };
 
 exports.getone = async (req, res) => {
@@ -40,17 +32,8 @@ exports.getone = async (req, res) => {
 
 exports.post = async (req, res) => {
     if(!Authorization.isAdministrator(req.user)) return errors.manage(res, errors.user_authorization_error);
-    if (req.body.constructor == Array) {
-        const results = { users: [], errors: [] };
-        for (let element of req.body) {
-            try { results.users.push(await (new User(element)).save()); }
-            catch(err) { results.errors.push(err.message); }
-        }
-        if(results.errors.length === 0) return res.status(200).json(results);
-        else return res.status(202).json(results);
-    }
-    try { res.status(200).json(await (new User(req.body)).save()); }
-    catch (err) { return errors.manage(res, errors.user_post_request_error, err); }
+    if (req.body.constructor == Array) return await manager.postResourceList(req, res, User);
+    return await manager.postResource(req, res, User);
 };
 
 exports.delete = async (req, res) => {

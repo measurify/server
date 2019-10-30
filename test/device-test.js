@@ -57,10 +57,10 @@ describe('/POST device', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
         const device = {}
         const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
-        res.should.have.status(errors.device_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.device_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Please, supply an _id');
     });
 
@@ -69,10 +69,10 @@ describe('/POST device', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
         const device = { _id: "test-device-1", owner: user }
         const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
-        res.should.have.status(errors.device_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.device_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Please, supply at least one feature');
     });
 
@@ -81,10 +81,10 @@ describe('/POST device', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
         const device = { _id: "test-device-2", owner: user, features: ["fake-feature"] }
         const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
-        res.should.have.status(errors.device_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.device_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Feature not existent');
     });
 
@@ -93,10 +93,10 @@ describe('/POST device', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
         const device = { _id: "test-device-2", owner: user, tags: ["fake-tag"], features: [await factory.createFeature("test-device-2-feature-good", user)] }
         const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
-        res.should.have.status(errors.device_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.device_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Tag not existent');
     });
 
@@ -124,10 +124,10 @@ describe('/POST device', () => {
             features: [await factory.createFeature("test-device-1-feature-2", user)]
         }
         const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
-        res.should.have.status(errors.device_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.device_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('the _id is already used');
     });
 

@@ -1,17 +1,11 @@
 const mongoose = require('mongoose');
-const manager = require('../commons/manager');
+const manager = require('./manager');
 const Constraint = mongoose.model('Constraint');
 const Authorization = require('../security/authorization.js');
 const ObjectId = require('mongoose').Types.ObjectId;
 const errors = require('../commons/errors.js');
 
-exports.get = async (req, res) => {
-    try {
-        const constraints = await manager.getResourceList(req.query, '{ "timestamp": "desc" }', '{}', Constraint);
-        return res.status(200).json(constraints);
-    }
-    catch (err) { return errors.manage(res, errors.generic_request_error, err); }
-};
+exports.get = async (req, res) => { return await manager.getResourceList(res, req, '{ "timestamp": "desc" }', '{}', Constraint); };
 
 exports.getone = async (req, res) => {
     if(!ObjectId.isValid(req.params.id)) return errors.manage(res, errors.constraint_not_found, req.params.id);
@@ -21,31 +15,8 @@ exports.getone = async (req, res) => {
 };
 
 exports.post = async (req, res) => {
-    if (req.body.constructor == Array) {
-        const results = { constraints: [], errors: [] };
-        for (let [i, element] of req.body.entries()) {
-            try {
-                element.owner = req.user._id;
-                results.constraints.push(await (new Constraint(element)).save());
-            }
-            catch (err) { results.errors.push("Index: " + i+  " (" + err.message + ")"); }
-        }
-        if (req.query.verbose == 'true') {
-            if (results.errors.length === 0) { return res.status(200).json(results); }
-            else { return res.status(202).json(results); }
-        }
-        else {
-            if (results.errors.length === 0) { return res.status(200).json({ saved: results.constraints.length, errors: results.errors.length }); }
-            else { return res.status(202).json({ saved: results.constraints.length, errors: results.errors.length, Indexes: results.errors }); }
-        }
-    }
-    else {
-        try {
-            req.body.owner = req.user._id;
-            return res.status(200).json(await (new Constraint(req.body)).save());
-        }
-        catch (err) { return errors.manage(res, errors.constraint_post_request_error, err); }
-    }
+    if (req.body.constructor == Array) return await manager.postResourceList(req, res, Constraint);
+    return await manager.postResource(req, res, Constraint);
 };
 
 exports.delete = async (req, res) => {

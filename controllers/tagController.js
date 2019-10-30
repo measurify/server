@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const manager = require('../commons/manager');
+const manager = require('./manager');
 const Tag = mongoose.model('Tag');
 const Feature = mongoose.model('Feature');
 const Thing = mongoose.model('Thing');
@@ -8,13 +8,7 @@ const Measurement = mongoose.model('Measurement');
 const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 
-exports.get = async (req, res) => {
-    try {
-        const tags = await manager.getResourceList(req.query, '{ "timestamp": "desc" }', '{}', Tag);
-        return res.status(200).json(tags);
-    } 
-    catch (err) { return errors.manage(res, errors.generic_request_error, err); } 
-};
+exports.get = async (req, res) => { return await manager.getResourceList(res, req, '{ "timestamp": "desc" }', '{}', Tag); };
 
 exports.getone = async (req, res) => {
     const tag = await Tag.findById(req.params.id);
@@ -23,23 +17,8 @@ exports.getone = async (req, res) => {
 };
 
 exports.post = async (req, res) => {
-    if (req.body.constructor == Array) {
-        const results = { tags: [], errors: [] };
-        for (let element of req.body) {
-            element.owner = req.user._id;
-            try { results.tags.push(await (new Tag(element)).save()); }
-            catch (err) { results.errors.push(err.message); }
-        }
-        if (results.errors.length === 0) return res.status(200).json(results);
-        else return res.status(202).json(results);
-    }
-    else {
-        try {
-            req.body.owner = req.user._id;
-            res.status(200).json(await (new Tag(req.body)).save());
-        }
-        catch (err) { return errors.manage(res, errors.tag_post_request_error, err); }
-    }
+    if (req.body.constructor == Array) return await manager.postResourceList(req, res, Tag);
+    return await manager.postResource(req, res, Tag);
 };
 
 exports.delete = async (req, res) => {

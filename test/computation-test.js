@@ -1,6 +1,9 @@
 // Import environmental variables from variables.test.env file
 require('dotenv').config({ path: 'variables.test.env' });
 
+// This line allow to test with the self signed certificate
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 // Import test tools
 const chai = require('chai');
 const chaiHttp = require('chai-http');

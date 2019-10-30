@@ -1,6 +1,9 @@
 // Import environmental variables from variables.test.env file
 require('dotenv').config({ path: 'variables.test.env' });
 
+// This line allow to test with the self signed certificate
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 // Import test tools
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -56,10 +59,10 @@ describe('/POST script', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
         const script = {}
         const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
-        res.should.have.status(errors.script_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.script_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Please, supply an _id');
     });
 
@@ -68,10 +71,10 @@ describe('/POST script', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
         const script = { _id: "script-id" }
         const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
-        res.should.have.status(errors.script_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.script_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Please, supply the code');
     });
 
@@ -80,10 +83,10 @@ describe('/POST script', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
         const script = { _id: "test-script-a", code: "test-code-1", tags: ["fake-tag"] };
         const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script);
-        res.should.have.status(errors.script_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.script_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Tag not existent');
     });
 
@@ -102,10 +105,10 @@ describe('/POST script', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
         const script = { _id: "test-script-1", code: "test-code-1" };
         const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
-        res.should.have.status(errors.thing_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.be.eql(errors.script_post_request_error.message);
+        res.body.message.should.be.eql(errors.post_request_error.message);
         res.body.details.should.contain('the _id is already used');
     });
 
@@ -114,7 +117,7 @@ describe('/POST script', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
         const scripts = [{ _id: "test-script-1", code: "test-code-1" },
                          { _id: "test-script-2", code: "test-code-2" } ];
-        const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(scripts)
+        const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(scripts);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.scripts[0]._id.should.be.eql(scripts[0]._id);

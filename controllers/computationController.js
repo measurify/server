@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const manager = require('../commons/manager');
+const manager = require('./manager');
 const Computation = mongoose.model('Computation');
 const ObjectId = require('mongoose').Types.ObjectId;
 const Authorization = require('../security/authorization.js');
@@ -7,13 +7,7 @@ const errors = require('../commons/errors.js');
 const runner = require('../computations/runner.js'); 
 const ComputationStatusTypes = require('../models/computationStatusTypes.js'); 
 
-exports.get = async (req, res) => {
-    try {
-        const computations = await manager.getResourceList(req.query, '{ "timestamp": "desc" }', '{}', Computation);
-        return res.status(200).json(computations);
-    }
-    catch (err) { return errors.manage(res, errors.generic_request_error, err); }
-};
+exports.get = async (req, res) => { return await manager.getResourceList(res, req, '{ "timestamp": "desc" }', '{}', Computation); };
 
 exports.getone = async (req, res) => {
     let computation = null;

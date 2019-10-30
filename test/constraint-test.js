@@ -11,7 +11,7 @@ const server = require('../server.js');
 const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
-const Device = mongoose.model('Device');
+const User = mongoose.model('User');
 const Constraint = mongoose.model('Constraint');
 const UserTypes = require('../models/userTypes.js');
 const errors = require('../commons/errors.js');
@@ -65,10 +65,10 @@ describe('/POST constraint', () => {
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type2: "Feature", element1: tag._id, element2: feature._id, relationship: RelationshipTypes.dependency };
         const res = await chai.request(server).post('/v1/constraints').set("Authorization", await factory.getUserToken(user)).send(constraint)
-        res.should.have.status(errors.constraint_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.constraint_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Please, supply type1');
     });
 
@@ -79,10 +79,10 @@ describe('/POST constraint', () => {
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", element1: tag._id, element2: feature._id, relationship: RelationshipTypes.dependency };
         const res = await chai.request(server).post('/v1/constraints').set("Authorization", await factory.getUserToken(user)).send(constraint)
-        res.should.have.status(errors.constraint_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.constraint_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Please, supply type2');
     });
 
@@ -93,10 +93,10 @@ describe('/POST constraint', () => {
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", type2: "Feature", element2: feature._id, relationship: RelationshipTypes.dependency };
         const res = await chai.request(server).post('/v1/constraints').set("Authorization", await factory.getUserToken(user)).send(constraint)
-        res.should.have.status(errors.constraint_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.constraint_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Please, supply element1');
     });
 
@@ -107,10 +107,10 @@ describe('/POST constraint', () => {
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", type2: "Feature", element1: tag._id, relationship: RelationshipTypes.dependency };
         const res = await chai.request(server).post('/v1/constraints').set("Authorization", await factory.getUserToken(user)).send(constraint)
-        res.should.have.status(errors.constraint_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.constraint_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Please, supply element2');
     });
 
@@ -121,10 +121,10 @@ describe('/POST constraint', () => {
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", type2: "Feature", element1: tag._id, element2: feature._id }
         const res = await chai.request(server).post('/v1/constraints').set("Authorization", await factory.getUserToken(user)).send(constraint)
-        res.should.have.status(errors.constraint_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.constraint_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Please, supply a relationship');
     });
 
@@ -135,10 +135,10 @@ describe('/POST constraint', () => {
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "FakeType", type2: "Feature", element1: tag._id, element2: feature._id, relationship: RelationshipTypes.dependency };
         const res = await chai.request(server).post('/v1/constraints').set("Authorization", await factory.getUserToken(user)).send(constraint)
-        res.should.have.status(errors.constraint_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.constraint_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Unrecognized resource type');
     });
 
@@ -149,10 +149,10 @@ describe('/POST constraint', () => {
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", type2: "FakeType", element1: tag._id, element2: feature._id, relationship: RelationshipTypes.dependency };
         const res = await chai.request(server).post('/v1/constraints').set("Authorization", await factory.getUserToken(user)).send(constraint)
-        res.should.have.status(errors.constraint_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.constraint_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Unrecognized resource type');
     });
 
@@ -163,10 +163,10 @@ describe('/POST constraint', () => {
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", type2: "Feature", element1: tag._id, element2: feature._id, relationship: "fake-relationship" };
         const res = await chai.request(server).post('/v1/constraints').set("Authorization", await factory.getUserToken(user)).send(constraint)
-        res.should.have.status(errors.constraint_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.constraint_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Unrecognized relationship');
     });
 
@@ -177,10 +177,10 @@ describe('/POST constraint', () => {
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", type2: "Feature", element1: "fake-element-1", element2: feature._id, relationship: RelationshipTypes.dependency };
         const res = await chai.request(server).post('/v1/constraints').set("Authorization", await factory.getUserToken(user)).send(constraint)
-        res.should.have.status(errors.constraint_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.constraint_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Element 1 not found');
     });
 
@@ -191,10 +191,10 @@ describe('/POST constraint', () => {
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", type2: "Feature", element1: tag._id, element2: "fake-element-2", relationship: RelationshipTypes.dependency };
         const res = await chai.request(server).post('/v1/constraints').set("Authorization", await factory.getUserToken(user)).send(constraint)
-        res.should.have.status(errors.constraint_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.constraint_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Element 2 not found');
     });
 
@@ -205,10 +205,10 @@ describe('/POST constraint', () => {
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", type2: "Feature", element1: tag._id, element2: "fake-element-2", relationship: RelationshipTypes.dependency, tags: 'fake-tag' };
         const res = await chai.request(server).post('/v1/constraints').set("Authorization", await factory.getUserToken(user)).send(constraint)
-        res.should.have.status(errors.constraint_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.constraint_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Tag not existent');
     });
 
@@ -249,10 +249,10 @@ describe('/POST constraint', () => {
         const constraint = { owner: user, type1: "Tag", type2: "Feature", element1: tag._id, element2: feature._id, relationship: RelationshipTypes.dependency };
         let res = await chai.request(server).post('/v1/constraints').set("Authorization", await factory.getUserToken(user)).send(constraint);
         res = await chai.request(server).post('/v1/constraints').set("Authorization", await factory.getUserToken(user)).send(constraint);
-        res.should.have.status(errors.constraint_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.constraint_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('The constraint already exists');
     });
 

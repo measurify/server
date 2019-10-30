@@ -1,6 +1,9 @@
 // Import environmental variables from variables.test.env file
 require('dotenv').config({ path: 'variables.test.env' });
 
+// This line allow to test with the self signed certificate
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 // Import test tools
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -185,11 +188,11 @@ describe('/POST measurement', () => {
             ]
         }
         const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
-        res.should.have.status(errors.measurement_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.measurement_post_request_error.status);
-        res.body.message.should.contain(errors.measurement_post_request_error.message);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Please, supply a thing');
     });
 
@@ -215,11 +218,11 @@ describe('/POST measurement', () => {
             ]
         }
         const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
-        res.should.have.status(errors.measurement_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.measurement_post_request_error.status);
-        res.body.message.should.contain(errors.measurement_post_request_error.message);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Please, supply a device');
     });
 
@@ -246,11 +249,11 @@ describe('/POST measurement', () => {
             ]
         }
         const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
-        res.should.have.status(errors.measurement_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.measurement_post_request_error.status);
-        res.body.message.should.contain(errors.measurement_post_request_error.message);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Feature not existent');
     });
 
@@ -277,11 +280,11 @@ describe('/POST measurement', () => {
             ]
         }
         const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
-        res.should.have.status(errors.measurement_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.measurement_post_request_error.status);
-        res.body.message.should.contain(errors.measurement_post_request_error.message);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Device not existent');
     });
 
@@ -308,11 +311,11 @@ describe('/POST measurement', () => {
             ]
         }
         const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
-        res.should.have.status(errors.measurement_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.measurement_post_request_error.status);
-        res.body.message.should.contain(errors.measurement_post_request_error.message);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Thing not existent');
     });
 
@@ -339,11 +342,11 @@ describe('/POST measurement', () => {
             ]
         }
         const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
-        res.should.have.status(errors.measurement_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.measurement_post_request_error.status);
-        res.body.message.should.contain(errors.measurement_post_request_error.message);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('No match between sample values size and feature items size');
     });
 
@@ -371,11 +374,11 @@ describe('/POST measurement', () => {
             ]
         }
         const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
-        res.should.have.status(errors.measurement_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.measurement_post_request_error.status);
-        res.body.message.should.contain(errors.measurement_post_request_error.message);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('No match between sample value type and feature items type');
     });
 
@@ -403,11 +406,11 @@ describe('/POST measurement', () => {
             ]
         }
         const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
-        res.should.have.status(errors.measurement_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.measurement_post_request_error.status);
-        res.body.message.should.contain(errors.measurement_post_request_error.message);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('No match between sample value type and feature items type');
     });
 
@@ -432,11 +435,11 @@ describe('/POST measurement', () => {
             samples: [ { values: 10.4, delta: 200 } ]
         }
         const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
-        res.should.have.status(errors.measurement_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.measurement_post_request_error.status);
-        res.body.message.should.contain(errors.measurement_post_request_error.message);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('No match between device features and measurement feature');
     });
 
@@ -460,11 +463,11 @@ describe('/POST measurement', () => {
             samples: []
         }
         const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
-        res.should.have.status(errors.measurement_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.measurement_post_request_error.status);
-        res.body.message.should.contain(errors.measurement_post_request_error.message);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('No samples specified for this measurement');
     });
 
@@ -652,11 +655,11 @@ describe('/POST measurement', () => {
             ]
         }
         const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement);
-        res.should.have.status(errors.measurement_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.measurement_post_request_error.status);
-        res.body.message.should.contain(errors.measurement_post_request_error.message);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Tag not existent');
     });
 
@@ -688,11 +691,11 @@ describe('/POST measurement', () => {
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
         res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
-        res.should.have.status(errors.measurement_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.measurement_post_request_error.status);
-        res.body.message.should.contain(errors.measurement_post_request_error.message);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('The measurement already exists');
     });
 
@@ -735,11 +738,11 @@ describe('/POST measurement', () => {
                 ]
             }
         ];
-        let res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurements);
+        let res = await chai.request(server).post('/v1/measurements?verbose=false').set("Authorization", await factory.getUserToken(user)).send(measurements);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.saved.should.be.eql(2);
-        res = await chai.request(server).post('/v1/measurements?verbose=true').set("Authorization", await factory.getUserToken(user)).send(measurements);
+        res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurements);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.measurements[0].thing.should.be.eql("test-thing-7");
@@ -820,7 +823,7 @@ describe('/POST measurement', () => {
             ]
         }
         ];
-        let res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurements)
+        let res = await chai.request(server).post('/v1/measurements?verbose=false').set("Authorization", await factory.getUserToken(user)).send(measurements)
         res.should.have.status(202);
         res.body.should.be.a('object');
         res.body.saved.should.be.eql(1);

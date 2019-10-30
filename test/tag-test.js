@@ -1,6 +1,9 @@
 // Import environmental variables from variables.test.env file
 require('dotenv').config({ path: 'variables.test.env' });
 
+// This line allow to test with the self signed certificate
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 // Import test tools
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -57,10 +60,10 @@ describe('/POST tag', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
         const tag = {}
         const res = await chai.request(server).post('/v1/tags').set("Authorization", await factory.getUserToken(user)).send(tag)
-        res.should.have.status(errors.tag_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.be.eql(errors.tag_post_request_error.message);
+        res.body.message.should.be.eql(errors.post_request_error.message);
         res.body.details.should.contain('Please, supply an _id');
     });
 
@@ -98,10 +101,10 @@ describe('/POST tag', () => {
         const already_existant_tag = await factory.createTag("test-text", user);
         const tag = { _id: "test-text" }
         const res = await chai.request(server).post('/v1/tags').set("Authorization", await factory.getUserToken(user)).send(tag)
-        res.should.have.status(errors.tag_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.tag_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('the _id is already used');
     });
 
@@ -111,10 +114,10 @@ describe('/POST tag', () => {
         const already_existant_tag = await factory.createTag("test-text", user);
         const tag = { _id: "test-text", tags: [ "fake_tag" ] }
         const res = await chai.request(server).post('/v1/tags').set("Authorization", await factory.getUserToken(user)).send(tag)
-        res.should.have.status(errors.tag_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.tag_post_request_error.message);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Tag not existent');
     });
 

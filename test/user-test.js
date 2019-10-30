@@ -1,6 +1,9 @@
 // Import environmental variables from variables.test.env file
 require('dotenv').config({ path: 'variables.test.env' });
 
+// This line allow to test with the self signed certificate
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 // Import test tools
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -85,11 +88,11 @@ describe('/POST users', () => {
         await factory.dropContents();
         const user = { password : "test-password-1", usertype : "regular" };
         const res = await chai.request(server).post('/v1/users').set("Authorization", await factory.getAdminToken()).send(user);
-        res.should.have.status(errors.user_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.user_post_request_error.status);
-        res.body.message.should.contain(errors.user_post_request_error.message);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain("Path `username` is required");
     });
 
@@ -97,11 +100,11 @@ describe('/POST users', () => {
         await factory.dropContents();
         const user = { username: "test-username-1", usertype : "regular" };
         const res = await chai.request(server).post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
-        res.should.have.status(errors.user_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.user_post_request_error.status);
-        res.body.message.should.contain(errors.user_post_request_error.message);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain("Path `password` is required");
     });
 
@@ -109,11 +112,11 @@ describe('/POST users', () => {
         await factory.dropContents();
         const user = { username: "test-username-1", password : "test-password-1" };
         const res = await chai.request(server).post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
-        res.should.have.status(errors.user_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.user_post_request_error.status);
-        res.body.message.should.contain(errors.user_post_request_error.message);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain("Path `type` is required");
     });
 
@@ -121,11 +124,11 @@ describe('/POST users', () => {
         await factory.dropContents();
         const user = { username: "test-username-1", password : "test-password-1", type: "fake-type" };
         const res = await chai.request(server).post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
-        res.should.have.status(errors.user_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.user_post_request_error.status);
-        res.body.message.should.contain(errors.user_post_request_error.message);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain("unrecognized type");
     });
 
@@ -146,11 +149,11 @@ describe('/POST users', () => {
         await factory.createUser("test-username-1", "test-password-1");
         const user = { username : "test-username-1", password : "test-password-1", type : UserTypes.analyst};
         const res = await chai.request(server).post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
-        res.should.have.status(errors.user_post_request_error.status);
+        res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.user_post_request_error.status);
-        res.body.message.should.contain(errors.user_post_request_error.message);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain("a user with the same username already exists");
     });
 

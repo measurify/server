@@ -5,7 +5,6 @@ const passportJWT = require("passport-jwt");
 const strategy_jwt   = passportJWT.Strategy;
 const extractJWT = passportJWT.ExtractJwt;
 const jwt = require('jsonwebtoken');
-
 const User = mongoose.model('User');
 
 passport.use(new strategy_local({
