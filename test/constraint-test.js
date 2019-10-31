@@ -49,9 +49,9 @@ describe('/GET constraint', () => {
     it('it should not GET a fake constraint', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
         const res = await chai.request(server).get('/v1/constraints/fake-contraint').set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.constraint_not_found.status);
+        res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.constraint_not_found.message);
+        res.body.message.should.contain(errors.resource_not_found.message);
     });
 });
 
@@ -296,7 +296,7 @@ describe('/POST constraint', () => {
 });
 
 // Test the /DELETE route
-describe('/DELETE device', () => {
+describe('/DELETE constraint', () => {
     it('it should DELETE a constraint', async () => {
         await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
@@ -322,9 +322,9 @@ describe('/DELETE device', () => {
         const constraints_before = await Constraint.find();
         constraints_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/constraints/fake_constraint').set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.constraint_not_found.status);
+        res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.constraint_not_found.message);
+        res.body.message.should.contain(errors.resource_not_found.message);
         const constraints_after = await Constraint.find();
         constraints_after.length.should.be.eql(1);
     });
@@ -339,9 +339,9 @@ describe('/DELETE device', () => {
         const constraints_before = await Constraint.find();
         constraints_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/constraints/' + constraint._id).set("Authorization", await factory.getUserToken(user2));
-        res.should.have.status(errors.constraint_cannot_be_deleted_from_not_owner.status);
+        res.should.have.status(errors.not_yours.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.constraint_cannot_be_deleted_from_not_owner.message);
+        res.body.message.should.contain(errors.not_yours.message);
         const constraints_after = await Constraint.find();
         constraints_after.length.should.be.eql(1);
     });

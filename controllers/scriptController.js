@@ -1,33 +1,28 @@
 const mongoose = require('mongoose');
 const manager = require('./manager');
+const checker = require('./checker');
 const Script = mongoose.model('Script');
 const Device = mongoose.model('Device');
-const Tag = mongoose.model('Tag');
 const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 
-exports.get = async (req, res) => { return await manager.getResourceList(res, req, '{ "timestamp": "desc" }', '{}', Script); };
+exports.get = async (req, res) => { 
+    return await manager.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Script); 
+};
 
-exports.getone = async (req, res) => {
-    const script = await Script.findById(req.params.id);
-    if (script) return res.status(200).json(script);
-    else return errors.manage(res, errors.script_not_found, req.params.id);
+exports.getone = async (req, res) => { 
+    return await manager.getResource(req, res, null, Script); 
 };
 
 exports.post = async (req, res) => {
-    if (req.body.constructor == Array) return await manager.postResourceList(req, res, Script);
     return await manager.postResource(req, res, Script);
 };
 
 exports.delete = async (req, res) => {
-    const script = await Script.findById(req.params.id);
-    if(!script) return errors.manage(res, errors.script_not_found, req.params.id); 
-    if (!Authorization.isOwner(req.user, script)) return errors.manage(res, errors.script_cannot_be_deleted_from_not_owner, req.params.id);
-    const device = await Device.find({ scripts: req.params.id }).limit(1);
-    if (device.length != 0) return errors.manage(res, errors.script_cannot_be_deleted_with_devices, device); 
-    const result = await Script.deleteOne({ _id: req.params.id });
-    if (!result) return errors.manage(res, errors.script_not_found, req.params.id);
-    else return res.status(200).json(script);
+    let result = await checker.isAvailable(req, res, Script); if (result != true) return result;
+    result = await checker.isOwned(req, res); if (result != true) return result;
+    result = await checker.isNotUsed(req, res, Device, 'scripts'); if (result != true) return result;
+    return await manager.deleteResource(req, res, Script);
 };
 
 exports.put = async (req, res) => { 

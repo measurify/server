@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const manager = require('./manager');
+const checker = require('./checker');
 const Measurement = mongoose.model('Measurement');
 const Thing = mongoose.model('Thing');
 const Feature = mongoose.model('Feature');
@@ -9,28 +10,22 @@ const ObjectId = require('mongoose').Types.ObjectId;
 const paginate = require("paginate-array");
 const errors = require('../commons/errors.js');
 
-exports.get = async (req, res) => { return await manager.getResourceList(res, req, '{ "timestamp": "desc" }', '{}', Measurement); };
+exports.get = async (req, res) => { 
+    return await manager.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Measurement); 
+};
 
-exports.getone = async (req, res) => {
-    if (!ObjectId.isValid(req.params.id)) return errors.manage(res, errors.measurement_not_found, req.params.id);
-    const measurement = await Measurement.findById(req.params.id);
-    if(!measurement) return errors.manage(res, errors.measurement_not_found, req.params.id);
-    return res.status(200).json(measurement);
+exports.getone = async (req, res) => { 
+    return await manager.getResource(req, res, null, Measurement); 
 };
 
 exports.post = async (req, res) => {
-    if (req.body.constructor == Array) return await manager.postResourceList(req, res, Measurement);
     return await manager.postResource(req, res, Measurement);
 };
 
 exports.deleteOne = async (req, res) => {
-    if (!ObjectId.isValid(req.params.id)) return errors.manage(res, errors.measurement_not_found, req.params.id);
-    const measurement = await Measurement.findById(req.params.id);
-    if(!measurement) return errors.manage(res, errors.measurement_not_found, req.params.id); 
-    if (!Authorization.isOwner(req.user, measurement)) return errors.manage(res, errors.measurement_cannot_be_deleted_from_not_owner, req.params.id);
-    const result = await Measurement.deleteOne({ _id: req.params.id });
-    if (!result) return errors.manage(res, errors.measurement_not_found, req.params.id);
-    else return res.status(200).json(measurement);
+    let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
+    result = await checker.isOwned(req, res); if (result != true) return result;
+    return await manager.deleteResource(req, res, Measurement);
 }
 
 exports.delete = async (req, res) => {

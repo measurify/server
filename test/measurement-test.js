@@ -25,9 +25,9 @@ describe('/GET measurements', () => {
     it('it should not GET a fake measurement', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
         const res = await chai.request(server).get('/v1/measurements/fake-measurement').set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.measurement_not_found.status);
+        res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.measurement_not_found.message);
+        res.body.message.should.contain(errors.resource_not_found.message);
     });
 
     it('it should GET all the measurements', async () => {
@@ -861,9 +861,9 @@ describe('/DELETE measurement', () => {
         const measurements_before = await Measurement.find();
         measurements_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/measurements/fake_measurement').set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.measurement_not_found.status);
+        res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.measurement_not_found.message);
+        res.body.message.should.contain(errors.resource_not_found.message);
         const measurements_after = await Measurement.find();
         measurements_after.length.should.be.eql(1);
     });
@@ -880,9 +880,9 @@ describe('/DELETE measurement', () => {
         const measurements_before = await Measurement.find();
         measurements_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user2));
-        res.should.have.status(errors.measurement_cannot_be_deleted_from_not_owner.status);
+        res.should.have.status(errors.not_yours.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.measurement_cannot_be_deleted_from_not_owner.message);
+        res.body.message.should.contain(errors.not_yours.message);
         const measurements_after = await Measurement.find();
         measurements_after.length.should.be.eql(1);
     });

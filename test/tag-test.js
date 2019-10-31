@@ -47,9 +47,9 @@ describe('/GET tags', () => {
     it('it should not GET a fake tag', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
         const res = await chai.request(server).get('/v1/tags/fake-tag').set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.tag_not_found.status);
+        res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.tag_not_found.message);
+        res.body.message.should.contain(errors.resource_not_found.message);
     });
 });
 
@@ -178,9 +178,9 @@ describe('/DELETE tag', () => {
         const tags_before = await Tag.find();
         tags_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/tags/fake_tag').set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.tag_not_found.status);
+        res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.tag_not_found.message);
+        res.body.message.should.contain(errors.resource_not_found.message);
         const tags_after = await Tag.find();
         tags_after.length.should.be.eql(1);
     });
@@ -193,9 +193,9 @@ describe('/DELETE tag', () => {
         const tags_before = await Tag.find();
         tags_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user2));
-        res.should.have.status(errors.tag_cannot_be_deleted_from_not_owner.status);
+        res.should.have.status(errors.not_yours.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.tag_cannot_be_deleted_from_not_owner.message);
+        res.body.message.should.contain(errors.not_yours.message);
         const tags_after = await Tag.find();
         tags_after.length.should.be.eql(1);
     });
@@ -212,9 +212,9 @@ describe('/DELETE tag', () => {
         const tags_before = await Tag.find();
         tags_before.length.should.be.eql(2);
         const res = await chai.request(server).delete('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.tag_cannot_be_deleted_with_measurement.status);
+        res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.tag_cannot_be_deleted_with_measurement.message);
+        res.body.message.should.contain(errors.already_used.message);
         const tags_after = await Tag.find();
         tags_after.length.should.be.eql(2);
     });
@@ -229,9 +229,9 @@ describe('/DELETE tag', () => {
         const tags_before = await Tag.find();
         tags_before.length.should.be.eql(2);
         const res = await chai.request(server).delete('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.tag_cannot_be_deleted_with_device.status);
+        res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.tag_cannot_be_deleted_with_device.message);
+        res.body.message.should.contain(errors.already_used.message);
         const tags_after = await Tag.find();
         tags_after.length.should.be.eql(2);
     });
@@ -245,9 +245,9 @@ describe('/DELETE tag', () => {
         const tags_before = await Tag.find();
         tags_before.length.should.be.eql(2);
         const res = await chai.request(server).delete('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.tag_cannot_be_deleted_with_feature.status);
+        res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.tag_cannot_be_deleted_with_feature.message);
+        res.body.message.should.contain(errors.already_used.message);
         const tags_after = await Tag.find();
         tags_after.length.should.be.eql(2);
     });
@@ -261,9 +261,9 @@ describe('/DELETE tag', () => {
         const tags_before = await Tag.find();
         tags_before.length.should.be.eql(3);
         const res = await chai.request(server).delete('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.tag_cannot_be_deleted_with_tag.status);
+        res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.tag_cannot_be_deleted_with_tag.message);
+        res.body.message.should.contain(errors.already_used.message);
         const tags_after = await Tag.find();
         tags_after.length.should.be.eql(3);
     });
@@ -277,9 +277,9 @@ describe('/DELETE tag', () => {
         const tags_before = await Tag.find();
         tags_before.length.should.be.eql(2);
         const res = await chai.request(server).delete('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.tag_cannot_be_deleted_with_thing.status);
+        res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.tag_cannot_be_deleted_with_thing.message);
+        res.body.message.should.contain(errors.already_used.message);
         const tags_after = await Tag.find();
         tags_after.length.should.be.eql(2);
     });

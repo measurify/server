@@ -46,9 +46,9 @@ describe('/GET scripts', () => {
     it('it should not GET a fake script', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
         const res = await chai.request(server).get('/v1/scripts/fake-script').set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.script_not_found.status);
+        res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.script_not_found.message);
+        res.body.message.should.contain(errors.resource_not_found.message);
     });
 });
 
@@ -179,9 +179,9 @@ describe('/DELETE script', () => {
         const script_before = await Script.find();
         script_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/scripts/fake_script').set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.script_not_found.status);
+        res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.script_not_found.message);
+        res.body.message.should.contain(errors.resource_not_found.message);
         const scripts_after = await Script.find();
         scripts_after.length.should.be.eql(1);
     });
@@ -194,9 +194,9 @@ describe('/DELETE script', () => {
         const script_before = await Script.find();
         script_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user2));
-        res.should.have.status(errors.script_cannot_be_deleted_from_not_owner.status);
+        res.should.have.status(errors.not_yours.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.script_cannot_be_deleted_from_not_owner.message);
+        res.body.message.should.contain(errors.not_yours.message);
         const scripts_after = await Script.find();
         scripts_after.length.should.be.eql(1);
     });
@@ -210,9 +210,9 @@ describe('/DELETE script', () => {
         const script_before = await Script.find();
         script_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.script_cannot_be_deleted_with_devices.status);
+        res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.script_cannot_be_deleted_with_devices.message);
+        res.body.message.should.contain(errors.already_used.message);
         const scripts_after = await Script.find();
         scripts_after.length.should.be.eql(1);
     });

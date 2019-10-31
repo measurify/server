@@ -44,9 +44,9 @@ describe('/GET device', () => {
     it('it should not GET a fake device', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
         const res = await chai.request(server).get('/v1/devices/fake-device').set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.device_not_found.status);
+        res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.device_not_found.message);
+        res.body.message.should.contain(errors.resource_not_found.message);
     });
 });
 
@@ -215,9 +215,9 @@ describe('/DELETE device', () => {
         const devices_before = await Device.find();
         devices_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/devices/fake_device').set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.device_not_found.status);
+        res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.device_not_found.message);
+        res.body.message.should.contain(errors.resource_not_found.message);
         const devices_after = await Device.find();
         devices_after.length.should.be.eql(1);
     });
@@ -230,9 +230,9 @@ describe('/DELETE device', () => {
         const devices_before = await Device.find();
         devices_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user2));
-        res.should.have.status(errors.device_cannot_be_deleted_from_not_owner.status);
+        res.should.have.status(errors.not_yours.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.device_cannot_be_deleted_from_not_owner.message);
+        res.body.message.should.contain(errors.not_yours.message);
         const devices_after = await Device.find();
         devices_after.length.should.be.eql(1);
     });
@@ -248,9 +248,9 @@ describe('/DELETE device', () => {
         const devices_before = await Device.find();
         devices_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.device_cannot_be_deleted_with_measurement.status);
+        res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.device_cannot_be_deleted_with_measurement.message);
+        res.body.message.should.contain(errors.already_used.message);
         const devices_after = await Device.find();
         devices_after.length.should.be.eql(1);
     });

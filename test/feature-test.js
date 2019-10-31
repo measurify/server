@@ -45,9 +45,9 @@ describe('/GET feature', () => {
     it('it should not GET a fake feature', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
         const res = await chai.request(server).get('/v1/features/fake-feature').set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.feature_not_found.status);
+        res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.feature_not_found.message);
+        res.body.message.should.contain(errors.resource_not_found.message);
     });
 });
 
@@ -155,9 +155,9 @@ describe('/DELETE feature', () => {
         const features_before = await Feature.find();
         features_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user2));
-        res.should.have.status(errors.feature_cannot_be_deleted_from_not_owner.status);
+        res.should.have.status(errors.not_yours.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.feature_cannot_be_deleted_from_not_owner.message);
+        res.body.message.should.contain(errors.not_yours.message);
         const features_after = await Feature.find();
         features_after.length.should.be.eql(1);
     });
@@ -169,9 +169,9 @@ describe('/DELETE feature', () => {
         const features_before = await Feature.find();
         features_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/features/fake_feature').set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.feature_not_found.status);
+        res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.feature_not_found.message);
+        res.body.message.should.contain(errors.resource_not_found.message);
         const features_after = await Feature.find();
         features_after.length.should.be.eql(1);
     });
@@ -187,9 +187,9 @@ describe('/DELETE feature', () => {
         const features_before = await Feature.find();
         features_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.feature_cannot_be_deleted_with_measurement.status);
+        res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.feature_cannot_be_deleted_with_measurement.message);
+        res.body.message.should.contain(errors.already_used.message);
         const features_after = await Feature.find();
         features_after.length.should.be.eql(1);
     });
@@ -202,9 +202,9 @@ describe('/DELETE feature', () => {
         const features_before = await Feature.find();
         features_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.feature_cannot_be_deleted_with_device.status);
+        res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.feature_cannot_be_deleted_with_device.message);
+        res.body.message.should.contain(errors.already_used.message);
         const features_after = await Feature.find();
         features_after.length.should.be.eql(1);
     });

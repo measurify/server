@@ -45,9 +45,9 @@ describe('/GET thing', () => {
     it('it should not GET a fake thing', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
         const res = await chai.request(server).get('/v1/things/fake-thing').set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.thing_not_found.status);
+        res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.thing_not_found.message);
+        res.body.message.should.contain(errors.resource_not_found.message);
     });
 });
 
@@ -199,9 +199,9 @@ describe('/DELETE thing', () => {
         const things_before = await Thing.find();
         things_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/things/fake_thing').set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.thing_not_found.status);
+        res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.thing_not_found.message);
+        res.body.message.should.contain(errors.resource_not_found.message);
         const things_after = await Thing.find();
         things_after.length.should.be.eql(1);
     });
@@ -214,9 +214,9 @@ describe('/DELETE thing', () => {
         const thing_before = await Thing.find();
         thing_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user2));
-        res.should.have.status(errors.thing_cannot_be_deleted_from_not_owner.status);
+        res.should.have.status(errors.not_yours.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.thing_cannot_be_deleted_from_not_owner.message);
+        res.body.message.should.contain(errors.not_yours.message);
         const things_after = await Thing.find();
         things_after.length.should.be.eql(1);
     });
@@ -232,9 +232,9 @@ describe('/DELETE thing', () => {
         const things_before = await Thing.find();
         things_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.thing_cannot_be_deleted_with_measurement.status);
+        res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.thing_cannot_be_deleted_with_measurement.message);
+        res.body.message.should.contain(errors.already_used.message);
         const things_after = await Thing.find();
         things_after.length.should.be.eql(1);
     });
@@ -247,9 +247,9 @@ describe('/DELETE thing', () => {
         const things_before = await Thing.find();
         things_before.length.should.be.eql(2);
         const res = await chai.request(server).delete('/v1/things/' + relation._id).set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.thing_cannot_be_deleted_with_relations.status);
+        res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.thing_cannot_be_deleted_with_relations.message);
+        res.body.message.should.contain(errors.already_used.message);
         const things_after = await Thing.find();
         things_after.length.should.be.eql(2);
     });
