@@ -36,6 +36,10 @@ router.use('/' + process.env.VERSION + '/devices', passport.authenticate('jwt', 
 const scriptsRoute = require('./routes/scriptRoute');
 router.use('/' + process.env.VERSION + '/scripts', passport.authenticate('jwt', {session: false}), scriptsRoute);
 
+// right
+const rightsRoute = require('./routes/rightRoute');
+router.use('/' + process.env.VERSION + '/rights', passport.authenticate('jwt', {session: false}), rightsRoute);
+
 // thing
 const thingsRoute = require('./routes/thingRoute');
 router.use('/' + process.env.VERSION + '/things', passport.authenticate('jwt', {session: false}), thingsRoute);
