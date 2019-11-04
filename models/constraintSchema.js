@@ -7,8 +7,9 @@ const Feature = mongoose.model('Feature');
 const Tag = mongoose.model('Tag');
 const Device = mongoose.model('Device');
 const Thing = mongoose.model('Thing');
-const RelationshipTypes = require('./relationshipTypes.js');
-const RelationshipResources = require('./relationshipResources.js');
+const RelationshipTypes = require('../types/relationshipTypes.js');
+const RelationshipResources = require('../types/relationshipResources.js');
+const VisibilityTypes = require('../types/visibilityTypes.js'); 
  
 /**
  * @swagger
@@ -40,6 +41,7 @@ const constraintSchema = new mongoose.Schema({
     element1: { type: String, required: "Please, supply element1"  },
     element2: { type: String, required: "Please, supply element2"  },
     relationship: { type: String, required: "Please, supply a relationship"  },
+    visibility: {type: String, default: VisibilityTypes.public },
     tags: [{ type: String, ref: 'Tag' }],
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }

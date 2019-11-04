@@ -1,4 +1,4 @@
-const UserRoles = require('../models/UserRoles.js');
+const UserRoles = require('../types/UserRoles.js');
 
 exports.isAdministrator = function(user) {
     if (user.type == UserRoles.admin) return true;

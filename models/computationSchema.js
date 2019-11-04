@@ -4,7 +4,8 @@ mongoose.Promise = global.Promise;
 
 const Tag = mongoose.model('Tag');
 const User = mongoose.model('User');
-const ComputationStatusTypes = require('../models/computationStatusTypes.js'); 
+const ComputationStatusTypes = require('../types/computationStatusTypes.js'); 
+const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
 /**
  * @swagger
@@ -59,6 +60,7 @@ const computationSchema = new mongoose.Schema({
     progress: {type: Number, default: 0 },
     startDate: { type: Date,default: Date.now },
     endDate: { type: Date },
+    visibility: {type: String, default: VisibilityTypes.private },
     tags: { type: [String], ref: 'Tag' },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }

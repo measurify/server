@@ -1,6 +1,6 @@
 require('../models/userSchema');
 
-const UserRoles = require('../models/UserRoles');
+const UserRoles = require('../types/UserRoles');
 const crypto = require("crypto");
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
@@ -12,9 +12,9 @@ const Device = mongoose.model('Device');
 const Constraint = mongoose.model('Constraint');
 const Measurement = mongoose.model('Measurement');
 const Computation = mongoose.model('Computation');
-const RelationshipTypes = require('../models/relationshipTypes');
+const RelationshipTypes = require('../types/relationshipTypes');
 const jwt = require('jsonwebtoken');
-const ItemTypes = require('../models/itemTypes.js');
+const ItemTypes = require('../types/itemTypes.js');
 
 exports.uuid = function() { 
     return crypto.randomBytes(16).toString("hex"); 

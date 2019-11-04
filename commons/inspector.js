@@ -1,4 +1,4 @@
-const ItemTypes = require('../models/itemTypes.js');
+const ItemTypes = require('../types/itemTypes.js');
 
 function shouldBeNumber(item) {
     return item.type == ItemTypes.number;

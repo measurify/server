@@ -4,6 +4,7 @@ mongoose.Promise = global.Promise;
 
 const Tag = mongoose.model('Tag');
 const User = mongoose.model('User');
+const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
 /**
  * @swagger
@@ -29,6 +30,7 @@ const scriptSchema = new mongoose.Schema({
     _id: { type: String, required: "Please, supply an _id" },
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, autopopulate: true },
     code: { type: String, required: "Please, supply the code" },
+    visibility: {type: String, default: VisibilityTypes.private },
     tags: [{ type: String, ref: 'Tag' }],
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }

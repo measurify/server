@@ -3,7 +3,8 @@ const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
 const User = mongoose.model('User');
 const Tag = mongoose.model('Tag');
-const ItemTypes = require('../models/itemTypes.js');
+const ItemTypes = require('../types/itemTypes.js');
+const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
 /**
  * @swagger
@@ -25,6 +26,7 @@ const itemSchema = new mongoose.Schema({
     name: { type: String, required: "Please, supply a name" },
     unit: { type: String, required: "Please, supply a unit" },
     dimension: { type: Number, default: 0 },
+    visibility: {type: String, default: VisibilityTypes.public },
     type: { type: String, default: ItemTypes.number }, },
     { _id: false }  
 );

@@ -9,6 +9,7 @@ const Device = mongoose.model('Device');
 const Thing = mongoose.model('Thing');
 const User = mongoose.model('User');
 const inspector = require('../commons/inspector.js');
+const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
 /**
 * @swagger
@@ -104,6 +105,7 @@ const measurementSchema = new mongoose.Schema({
     device: { type: String, required: "Please, supply a device", ref: 'Device', index: true },
     feature: { type: String, required: "Please, supply a feature", ref: 'Feature', index: true },
     samples: [sampleSchema],
+    visibility: {type: String, default: VisibilityTypes.private },
     tags: [{ type: String, ref: 'Tag' }],
     timestamp: { type: Date, default: Date.now },
     lastmod: { type: Date, default: Date.now, select: false }

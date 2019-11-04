@@ -16,7 +16,7 @@ const Measurement = mongoose.model('Measurement');
 const Tag = mongoose.model('Tag');
 const Feature = mongoose.model('Feature');
 const User = mongoose.model('User');
-const UserRoles = require('../models/UserRoles.js');
+const UserRoles = require('../types/UserRoles.js');
 const errors = require('../commons/errors.js');
 
 chai.use(chaiHttp);

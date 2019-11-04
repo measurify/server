@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Computation = mongoose.model('Computation');
-const ComputationStatusTypes = require('../models/computationStatusTypes'); 
+const ComputationStatusTypes = require('../types/computationStatusTypes'); 
 const OutlierFinder = require('../computations/outliers');
 
 exports.progress = async function(computation, percentage) {

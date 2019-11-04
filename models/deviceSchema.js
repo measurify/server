@@ -6,6 +6,7 @@ const Tag = mongoose.model('Tag');
 const Feature = mongoose.model('Feature');
 const User = mongoose.model('User');
 const Script = mongoose.model('Script');
+const VisibilityTypes = require('../types/visibilityTypes.js'); 
  
 /**
  * @swagger
@@ -40,6 +41,7 @@ const deviceSchema = new mongoose.Schema({
     features: { type: [String], required: "Please, supply a feature array", ref:'Feature' },
     tags: { type: [String], ref:'Tag' },
     scripts: { type: [String], ref:'Script' },
+    visibility: {type: String, default: VisibilityTypes.private },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });

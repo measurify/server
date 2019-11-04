@@ -6,7 +6,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 const runner = require('../computations/runner.js'); 
-const ComputationStatusTypes = require('../models/computationStatusTypes.js'); 
+const ComputationStatusTypes = require('../types/computationStatusTypes.js'); 
 
 exports.get = async (req, res) => { 
     return await manager.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Computation); 
