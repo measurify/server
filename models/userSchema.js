@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const UserTypes = require('../models/userTypes.js');
+const UserRoles = require('../models/UserRoles.js');
 
 mongoose.Promise = global.Promise;
 
@@ -25,7 +25,7 @@ userSchema.pre('save', async function() {
 // check type
 userSchema.pre('save', async function() {
     if(!this.type) throw new Error('User validation failed: please specify the user type');  
-    if(!Object.values(UserTypes).includes(this.type)) throw new Error('User validation failed: unrecognized type');                      
+    if(!Object.values(UserRoles).includes(this.type)) throw new Error('User validation failed: unrecognized type');                      
 });
 
 module.exports = mongoose.models.User || mongoose.model('User', userSchema);

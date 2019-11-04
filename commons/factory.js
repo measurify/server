@@ -1,6 +1,6 @@
 require('../models/userSchema');
 
-const UserTypes = require('../models/userTypes');
+const UserRoles = require('../models/UserRoles');
 const crypto = require("crypto");
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
@@ -26,7 +26,7 @@ exports.dropContents = async function(){
 }
 
 exports.createSuperAdministrator = async function() {
-    return await this.createUser(process.env.ADMIN_USERNAME, process.env.ADMIN_USERNAME, UserTypes.admin);
+    return await this.createUser(process.env.ADMIN_USERNAME, process.env.ADMIN_USERNAME, UserRoles.admin);
 };
 
 exports.getAdminToken = async function() {
@@ -42,8 +42,8 @@ exports.getUserToken = async function(user) {
 
 exports.createDemoContent = async function() {
     const users = [];
-    users.push(await this.createUser('user-provider-name-1', 'provider-password-1', UserTypes.provider));
-    users.push(await this.createUser('user-analyst-name-1', 'analyst-password-1', UserTypes.analyst));
+    users.push(await this.createUser('user-provider-name-1', 'provider-password-1', UserRoles.provider));
+    users.push(await this.createUser('user-analyst-name-1', 'analyst-password-1', UserRoles.analyst));
 
     const tags = [];
     tags.push(await this.createTag('diesel', users[0]));
@@ -101,7 +101,7 @@ exports.createUser = async function(username, password, type) {
         const req = { 
             username: username || uuid(),
             password: password ||  uuid(),
-            type: type || UserTypes.provider };
+            type: type || UserRoles.provider };
         user = new User(req);
         await user.save();
     }

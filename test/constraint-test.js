@@ -13,7 +13,7 @@ const should = chai.should();
 const factory = require('../commons/factory.js');
 const User = mongoose.model('User');
 const Constraint = mongoose.model('Constraint');
-const UserTypes = require('../models/userTypes.js');
+const UserRoles = require('../models/UserRoles.js');
 const errors = require('../commons/errors.js');
 const RelationshipTypes = require('../models/relationshipTypes.js');
 
@@ -23,7 +23,7 @@ chai.use(chaiHttp);
 describe('/GET constraint', () => {
     it('it should GET all the constraint', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         await factory.createConstraint(user, "Tag", "Feature", tag._id, feature._id, RelationshipTypes.dependency);
@@ -36,7 +36,7 @@ describe('/GET constraint', () => {
 
     it('it should GET a specific constraint', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         const constraint = await factory.createConstraint(user, "Tag", "Feature", tag._id, feature._id, RelationshipTypes.dependency);
@@ -47,7 +47,7 @@ describe('/GET constraint', () => {
     });
 
     it('it should not GET a fake constraint', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const res = await chai.request(server).get('/v1/constraints/fake-contraint').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
@@ -60,7 +60,7 @@ describe('/POST constraint', () => {
 
     it('it should not POST a constraint without type1 field', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type2: "Feature", element1: tag._id, element2: feature._id, relationship: RelationshipTypes.dependency };
@@ -74,7 +74,7 @@ describe('/POST constraint', () => {
 
     it('it should not POST a constraint without type2 field', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", element1: tag._id, element2: feature._id, relationship: RelationshipTypes.dependency };
@@ -88,7 +88,7 @@ describe('/POST constraint', () => {
 
     it('it should not POST a constraint without element1 field', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", type2: "Feature", element2: feature._id, relationship: RelationshipTypes.dependency };
@@ -102,7 +102,7 @@ describe('/POST constraint', () => {
 
     it('it should not POST a constraint without element2 field', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", type2: "Feature", element1: tag._id, relationship: RelationshipTypes.dependency };
@@ -116,7 +116,7 @@ describe('/POST constraint', () => {
 
     it('it should not POST a constraint without relationship field', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", type2: "Feature", element1: tag._id, element2: feature._id }
@@ -130,7 +130,7 @@ describe('/POST constraint', () => {
 
     it('it should not POST a constraint with a fake type1', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "FakeType", type2: "Feature", element1: tag._id, element2: feature._id, relationship: RelationshipTypes.dependency };
@@ -144,7 +144,7 @@ describe('/POST constraint', () => {
 
     it('it should not POST a constraint with a fake type2', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", type2: "FakeType", element1: tag._id, element2: feature._id, relationship: RelationshipTypes.dependency };
@@ -158,7 +158,7 @@ describe('/POST constraint', () => {
 
     it('it should not POST a constraint with a fake relatioship', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", type2: "Feature", element1: tag._id, element2: feature._id, relationship: "fake-relationship" };
@@ -172,7 +172,7 @@ describe('/POST constraint', () => {
 
     it('it should not POST a constraint with a fake element1', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", type2: "Feature", element1: "fake-element-1", element2: feature._id, relationship: RelationshipTypes.dependency };
@@ -186,7 +186,7 @@ describe('/POST constraint', () => {
 
     it('it should not POST a constraint with a fake element2', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", type2: "Feature", element1: tag._id, element2: "fake-element-2", relationship: RelationshipTypes.dependency };
@@ -200,7 +200,7 @@ describe('/POST constraint', () => {
 
     it('it should not POST a constraint with a fake tag', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", type2: "Feature", element1: tag._id, element2: "fake-element-2", relationship: RelationshipTypes.dependency, tags: 'fake-tag' };
@@ -214,7 +214,7 @@ describe('/POST constraint', () => {
 
     it('it should POST a constraint', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", type2: "Feature", element1: tag._id, element2: feature._id, relationship: RelationshipTypes.dependency };
@@ -228,7 +228,7 @@ describe('/POST constraint', () => {
 
     it('it should POST a tagged constraint', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature1 = await factory.createFeature("test-feature1", user);
         const feature2 = await factory.createFeature("test-feature2", user);
@@ -243,7 +243,7 @@ describe('/POST constraint', () => {
 
     it('it should not POST a constraint with already exist', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         const constraint = { owner: user, type1: "Tag", type2: "Feature", element1: tag._id, element2: feature._id, relationship: RelationshipTypes.dependency };
@@ -258,7 +258,7 @@ describe('/POST constraint', () => {
 
     it('it should POST a list of constraint', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user);
         const constraints = [
                             { owner: user, type1: "Tag", type2: "Feature", element1: tag._id, element2: (await factory.createFeature("test-feature-1", user))._id, relationship: RelationshipTypes.dependency },   
@@ -274,7 +274,7 @@ describe('/POST constraint', () => {
 
     it('it should POST only not existing constraint from a list', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user);
         const feature1 = await factory.createFeature("test-feature-1", user);
         const feature2 = await factory.createFeature("test-feature-2", user);
@@ -299,7 +299,7 @@ describe('/POST constraint', () => {
 describe('/DELETE constraint', () => {
     it('it should DELETE a constraint', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         const constraint1 = await factory.createConstraint(user, "Tag", "Feature", tag._id, feature._id, RelationshipTypes.dependency);
@@ -315,7 +315,7 @@ describe('/DELETE constraint', () => {
 
     it('it should not DELETE a fake constraint', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         const constraint = await factory.createConstraint(user, "Tag", "Feature", tag._id, feature._id, RelationshipTypes.dependency);
@@ -331,8 +331,8 @@ describe('/DELETE constraint', () => {
     
     it('it should not DELETE a constraint by non-owner', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
-        const user2= await factory.createUser("test-username-2", "test-password-2", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user2= await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         const constraint = await factory.createConstraint(user, "Tag", "Feature", tag._id, feature._id, RelationshipTypes.dependency);

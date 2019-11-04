@@ -1,17 +1,17 @@
-const UserTypes = require('../models/userTypes.js');
+const UserRoles = require('../models/UserRoles.js');
 
 exports.isAdministrator = function(user) {
-    if (user.type == UserTypes.admin) return true;
+    if (user.type == UserRoles.admin) return true;
     else return false;
 }
 
 exports.isProvider = function(user) {
-    if (user.type == UserTypes.provider) return true;
+    if (user.type == UserRoles.provider) return true;
     else return false;
 }
 
 exports.isAnalyst = function(user) {
-    if (user.type == UserTypes.analyst) return true;
+    if (user.type == UserRoles.analyst) return true;
     else return false;
 }
 

@@ -13,7 +13,7 @@ const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
 const User = mongoose.model('User');
-const UserTypes = require('../models/userTypes.js');
+const UserRoles = require('../models/UserRoles.js');
 const errors = require('../commons/errors.js');
 
 chai.use(chaiHttp);
@@ -32,7 +32,7 @@ describe('/GET users', () => {
 
     it('it should GET all the usernames', async () => {
         await factory.dropContents();
-        const user = await factory.createUser("test-username-0", "test-password-0", UserTypes.regular);
+        const user = await factory.createUser("test-username-0", "test-password-0", UserRoles.regular);
         await factory.createUser("test-username-1", "test-password-1");
         await factory.createUser("test-username-2", "test-password-2");
         const res = await chai.request(server).get('/v1/usernames').set('Authorization', await factory.getUserToken(user));
@@ -43,7 +43,7 @@ describe('/GET users', () => {
 
     it('it should not GET all the users as a regular user', async () => {
         await factory.dropContents();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         await factory.createUser("test-username-1", "test-password-1");
         await factory.createUser("test-username-2", "test-password-2");
         const res = await chai.request(server).get('/v1/users').set('Authorization', await factory.getUserToken(user));
@@ -64,7 +64,7 @@ describe('/GET users', () => {
 
     it('it should not GET a specific user as a regular user', async () => {
         await factory.dropContents();
-        const regular = await factory.createUser("test-username-1", "test-password-1", UserTypes.regular);
+        const regular = await factory.createUser("test-username-1", "test-password-1", UserRoles.regular);
         const user = await factory.createUser("test-username-1", "test-password-1");
         const res = await chai.request(server).get('/v1/users/' + user._id).set('Authorization', await factory.getUserToken(regular));
         res.should.have.status(errors.user_authorization_error.status);
@@ -134,7 +134,7 @@ describe('/POST users', () => {
 
     it('it should POST a user', async () => {
         await factory.dropContents();
-        const user = { username : "test-username-1", password : "test-password-1", type: UserTypes.analyst };
+        const user = { username : "test-username-1", password : "test-password-1", type: UserRoles.analyst };
         const res = await chai.request(server).post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -147,7 +147,7 @@ describe('/POST users', () => {
     it('it should not POST a user with already existant username field', async () => {
         await factory.dropContents();
         await factory.createUser("test-username-1", "test-password-1");
-        const user = { username : "test-username-1", password : "test-password-1", type : UserTypes.analyst};
+        const user = { username : "test-username-1", password : "test-password-1", type : UserRoles.analyst};
         const res = await chai.request(server).post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -159,8 +159,8 @@ describe('/POST users', () => {
 
     it('it should POST a list of users', async () => {
         await factory.dropContents();
-        const users = [ { username : "test-username-1", password : "test-password-1", type: UserTypes.analyst }, 
-                        { username : "test-username-2", password : "test-password-2", type: UserTypes.analyst } ]; 
+        const users = [ { username : "test-username-1", password : "test-password-1", type: UserRoles.analyst }, 
+                        { username : "test-username-2", password : "test-password-2", type: UserRoles.analyst } ]; 
         const res = await chai.request(server).post('/v1/users').set('Authorization', await factory.getAdminToken()).send(users)
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -172,11 +172,11 @@ describe('/POST users', () => {
         await factory.dropContents();
         await factory.createUser("test-username-1", "test-password-1");
         await factory.createUser("test-username-2", "test-password-2");
-        const users = [ { username : "test-username-1", password : "test-password-1", type: UserTypes.analyst },
-                        { username : "test-username-1", password : "test-password-2", type: UserTypes.analyst },
-                        { username : "test-username-3", password : "test-password-3", type: UserTypes.analyst },
-                        { username : "test-username-4", password : "test-password-4", type: UserTypes.analyst },
-                        { username : "test-username-5", password : "test-password-5", type: UserTypes.analyst } ]; 
+        const users = [ { username : "test-username-1", password : "test-password-1", type: UserRoles.analyst },
+                        { username : "test-username-1", password : "test-password-2", type: UserRoles.analyst },
+                        { username : "test-username-3", password : "test-password-3", type: UserRoles.analyst },
+                        { username : "test-username-4", password : "test-password-4", type: UserRoles.analyst },
+                        { username : "test-username-5", password : "test-password-5", type: UserRoles.analyst } ]; 
         const res = await chai.request(server).post('/v1/users').set('Authorization', await factory.getAdminToken()).send(users)
         res.should.have.status(202);
         res.body.should.be.a('object');
@@ -222,7 +222,7 @@ describe('/DELETE users', () => {
     it('it should not DELETE a by non-admin', async () => {
         await factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1");
-        const no_admin = await factory.createUser("test-username-1", "test-password-1", UserTypes.admin);
+        const no_admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const users_before = await User.find();
         users_before.length.should.be.eql(2);
         const res = await chai.request(server).delete('/v1/users/' + user._id).set('Authorization', await factory.getUserToken(no_admin));
@@ -235,7 +235,7 @@ describe('/DELETE users', () => {
 
     it('it should not DELETE a user owner of a device', async () => {
         await factory.dropContents();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
         const users_before = await User.find();
@@ -250,7 +250,7 @@ describe('/DELETE users', () => {
 
     it('it should not DELETE a user owner of a feature', async () => {
         await factory.dropContents();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const users_before = await User.find();
         users_before.length.should.be.eql(2);
@@ -264,7 +264,7 @@ describe('/DELETE users', () => {
 
     it('it should not DELETE a user owner of a tag', async () => {
         await factory.dropContents();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user);
         const users_before = await User.find();
         users_before.length.should.be.eql(2);
@@ -278,7 +278,7 @@ describe('/DELETE users', () => {
 
     it('it should not DELETE a user owner of a thing', async () => {
         await factory.dropContents();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = await factory.createThing("thing-tag", user);
         const users_before = await User.find();
         users_before.length.should.be.eql(2);
@@ -292,7 +292,7 @@ describe('/DELETE users', () => {
 
     it('it should not DELETE a user owner of a measurement', async () => {
         await factory.dropContents();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user);
         const device = await factory.createDevice("test-device-4", user, [feature]);
         const thing = await factory.createThing("test-thing", user);

@@ -14,8 +14,7 @@ const should = chai.should();
 const factory = require('../commons/factory.js');
 const Computation = mongoose.model('Computation');
 const User = mongoose.model('User');
-const UserTypes = require('../models/userTypes.js');
-
+const UserRoles = require('../models/UserRoles.js');
 
 chai.use(chaiHttp);
 /*
@@ -23,7 +22,7 @@ chai.use(chaiHttp);
 describe('/GET computation', () => {
     it('it should GET all the computations', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         await factory.createComputation('test-computation-1', user, 'stdev()');
         await factory.createComputation('test-computation-2', user, 'avg()');
         const res = await chai.request(server).get('/v1/computations').set("Authorization", await factory.getUserToken(user));
@@ -34,7 +33,7 @@ describe('/GET computation', () => {
 
     it('it should GET a specific computation', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const computation = await factory.createComputation("test-computation-1", user, "max()");
         const res = await chai.request(server).get('/v1/computations/' + computation._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -43,7 +42,7 @@ describe('/GET computation', () => {
     });
 
     it('it should not GET a fake computation', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const res = await chai.request(server).get('/v1/computations/fake-computation').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(404);
         res.body.should.be.a('object');
@@ -55,7 +54,7 @@ describe('/GET computation', () => {
 describe('/POST computation', () => {
     it('it should not POST a computation without code field', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const computation = { owner: user }
         const res = await chai.request(server).post('/v1/computations').set("Authorization", await factory.getUserToken(user)).send(computation)
         res.should.have.status(400);
@@ -66,7 +65,7 @@ describe('/POST computation', () => {
 
     it('it should not POST a computation with a fake code', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const computation = { _id: "test-computation-2", owner: user, code: "fake-code" }
         const res = await chai.request(server).post('/v1/computations').set("Authorization", await factory.getUserToken(user)).send(computation)
         res.should.have.status(404);
@@ -78,7 +77,7 @@ describe('/POST computation', () => {
 
     it('it should not POST a computation with a fake feature', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const computation = { _id: "test-computation-2", owner: user, code: "max()", featureId: "fake-id" }
         const res = await chai.request(server).post('/v1/computations').set("Authorization", await factory.getUserToken(user)).send(computation)
         res.should.have.status(404);
@@ -90,7 +89,7 @@ describe('/POST computation', () => {
 
     it('it should not POST a computation with a fake tag', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const computation = { _id: "test-computation-2", owner: user, code: "max()", tags: ["fake-tag"] }
         const res = await chai.request(server).post('/v1/computations').set("Authorization", await factory.getUserToken(user)).send(computation)
         res.should.have.status(404);
@@ -102,7 +101,7 @@ describe('/POST computation', () => {
 
     it('it should not POST a computation with a fake thing', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const feature = await factory.createFeature("test-feature-2", user);
         const tag = await factory.createTag("test-tag", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
@@ -119,7 +118,7 @@ describe('/POST computation', () => {
 
     it('it should POST a Computation', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const feature = await factory.createFeature("test-feature-2", user, [{ name: "dimension-name-1", unit: "dimension-unit-1" }, { name: "dimension-name-2", unit: "dimension-unit-2" }]);
         const tag = await factory.createTag("test-tag", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
@@ -139,7 +138,7 @@ describe('/POST computation', () => {
     });
 
     it('it should GET the computation posted before', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const res = await chai.request(server).get('/v1/computations').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
@@ -149,7 +148,7 @@ describe('/POST computation', () => {
 
     it('it should POST a Computation with code column maximum', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const feature = await factory.createFeature("test-feature-2", user);
         const tag = await factory.createTag("test-tag", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
@@ -171,7 +170,7 @@ describe('/POST computation', () => {
 
     it('it should POST a Computation with code row maximum', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const feature = await factory.createFeature("test-feature-2", user);
         const tag = await factory.createTag("test-tag", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
@@ -193,7 +192,7 @@ describe('/POST computation', () => {
 
     it('it should POST a Computation with code total minimum', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const feature = await factory.createFeature("test-feature-2", user);
         const tag = await factory.createTag("test-tag", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
@@ -215,7 +214,7 @@ describe('/POST computation', () => {
 
     it('it should POST a Computation with code column minimum', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const feature = await factory.createFeature("test-feature-2", user);
         const tag = await factory.createTag("test-tag", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
@@ -237,7 +236,7 @@ describe('/POST computation', () => {
 
     it('it should POST a Computation with code row minimum', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const feature = await factory.createFeature("test-feature-2", user);
         const tag = await factory.createTag("test-tag", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
@@ -259,7 +258,7 @@ describe('/POST computation', () => {
     /*
         it('it should POST a Computation with code average column per samples', async () => {
             await mongoose.connection.dropDatabase();
-            const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+            const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
             const feature = await factory.createFeature("test-feature-2", user, [{ name: "dimension-name-1", unit: "dimension-unit-1" }, { name: "dimension-name-2", unit: "dimension-unit-2" }]);
             const tag = await factory.createTag("test-tag", user);
             const device = await factory.createDevice("test-device-2", user, [feature]);
@@ -281,7 +280,7 @@ describe('/POST computation', () => {
     *//*
     it('it should not POST a Computation with code unknown', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const feature = await factory.createFeature("test-feature-2", user);
         const tag = await factory.createTag("test-tag", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
@@ -303,7 +302,7 @@ describe('/POST computation', () => {
 
     it('it should POST a computation with tags', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const feature = await factory.createFeature("test-feature-2", user);
         const tag = await factory.createTag("test-tag", user);
         const newTag = await factory.createTag("new-tag", user)
@@ -326,7 +325,7 @@ describe('/POST computation', () => {
 
     it('it should POST a computation with things', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const feature = await factory.createFeature("test-feature-2", user);
         const tag = await factory.createTag("test-tag", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
@@ -351,7 +350,7 @@ describe('/POST computation', () => {
 describe('/DELETE computation', () => {
     it('it should DELETE a computation', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const computation = await factory.createComputation('test-computation-1', user, 'max()');
         const computations_before = await Computation.find();
         computations_before.length.should.be.eql(1);
@@ -364,7 +363,7 @@ describe('/DELETE computation', () => {
 
     it('it should not DELETE a fake computation', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
         const computation = await factory.createComputation('test-computation-2', user, 'max()');
         const computations_before = await Computation.find();
         computations_before.length.should.be.eql(1);

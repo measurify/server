@@ -14,14 +14,14 @@ const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
 const User = mongoose.model('User');
-const UserTypes = require('../models/userTypes.js');
+const UserRoles = require('../models/UserRoles.js');
 
 chai.use(chaiHttp);
 
 describe('encode and decode', () => {
     it('it should decode a previus encoded string', async () => {
         await factory.dropContents();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.admin);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const encoded = Authentication.encode(user);
         encoded.should.contain('JWT');
         const decoded = Authentication.decode(encoded)

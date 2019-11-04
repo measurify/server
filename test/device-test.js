@@ -12,7 +12,7 @@ const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
 const Device = mongoose.model('Device');
-const UserTypes = require('../models/userTypes.js');
+const UserRoles = require('../models/UserRoles.js');
 const errors = require('../commons/errors.js');
 
 chai.use(chaiHttp);
@@ -21,7 +21,7 @@ chai.use(chaiHttp);
 describe('/GET device', () => {
     it('it should GET all the devices', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         await factory.createDevice("test-device-1", user);
         await factory.createDevice("test-device-2", user);
         const res = await chai.request(server).get('/v1/devices').set("Authorization", await factory.getUserToken(user));
@@ -32,7 +32,7 @@ describe('/GET device', () => {
 
     it('it should GET a specific device', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user);
         const device = await factory.createDevice("test-device-1", user, [feature]);
         const res = await chai.request(server).get('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user));
@@ -42,7 +42,7 @@ describe('/GET device', () => {
     });
 
     it('it should not GET a fake device', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const res = await chai.request(server).get('/v1/devices/fake-device').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
@@ -54,7 +54,7 @@ describe('/GET device', () => {
 describe('/POST device', () => {
     it('it should not POST a device without _id field', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = {}
         const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
         res.should.have.status(errors.post_request_error.status);
@@ -66,7 +66,7 @@ describe('/POST device', () => {
 
     it('it should not POST a device without features field', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = { _id: "test-device-1", owner: user }
         const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
         res.should.have.status(errors.post_request_error.status);
@@ -78,7 +78,7 @@ describe('/POST device', () => {
 
     it('it should not POST a device with a fake feature', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = { _id: "test-device-2", owner: user, features: ["fake-feature"] }
         const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
         res.should.have.status(errors.post_request_error.status);
@@ -90,7 +90,7 @@ describe('/POST device', () => {
 
     it('it should not POST a device with a fake tag', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = { _id: "test-device-2", owner: user, tags: ["fake-tag"], features: [await factory.createFeature("test-device-2-feature-good", user)] }
         const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
         res.should.have.status(errors.post_request_error.status);
@@ -101,7 +101,7 @@ describe('/POST device', () => {
     });
 
     it('it should POST a device', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = {
             _id: "test-device-1",
             owner: user,
@@ -117,7 +117,7 @@ describe('/POST device', () => {
     });
 
     it('it should not POST a device with already existant _id field', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = {
             _id: "test-device-1",
             owner: user,
@@ -132,7 +132,7 @@ describe('/POST device', () => {
     });
 
     it('it should GET the device posted before', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const res = await chai.request(server).get('/v1/devices').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
@@ -141,7 +141,7 @@ describe('/POST device', () => {
     });
 
     it('it should POST a list of devices', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const devices = [
                             { _id: "test-device-3", owner: user, features: [await factory.createFeature("test-device-3-feature-1", user)] },
                             { _id: "test-device-4", features: [await factory.createFeature("test-device-4-feature-2", user)] }
@@ -154,7 +154,7 @@ describe('/POST device', () => {
     });
 
     it('it should POST only not existing devices from a list', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const devices = [
                             { _id: "test-device-1", owner: user, features: [await factory.createFeature("test-device-1-feature-new", user)] },
                             { _id: "test-device-2", user, features: [await factory.createFeature("test-device-2-feature-new", user)] },
@@ -177,7 +177,7 @@ describe('/POST device', () => {
 
     it('it should POST a device with tags', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = {
             _id: "test-device-1",
             owner: user,
@@ -197,7 +197,7 @@ describe('/POST device', () => {
 describe('/DELETE device', () => {
     it('it should DELETE a device', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = await factory.createDevice("test-device-1", user);
         const devices_before = await Device.find();
         devices_before.length.should.be.eql(1);
@@ -210,7 +210,7 @@ describe('/DELETE device', () => {
 
     it('it should not DELETE a fake device', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = await factory.createDevice("test-device-2", user);
         const devices_before = await Device.find();
         devices_before.length.should.be.eql(1);
@@ -224,8 +224,8 @@ describe('/DELETE device', () => {
     
     it('it should not DELETE a device by non-owner', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
-        const user2 = await factory.createUser("test-username-2", "test-password-2", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const device = await factory.createDevice("test-device-2", user);
         const devices_before = await Device.find();
         devices_before.length.should.be.eql(1);
@@ -239,7 +239,7 @@ describe('/DELETE device', () => {
 
     it('it should not DELETE a device already used in a measurement', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserTypes.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const tag = await factory.createTag("test-tag", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
