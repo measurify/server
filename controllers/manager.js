@@ -69,7 +69,7 @@ exports.postResourceList = async function(req, res, model) {
     }
 };
 
-exports.deleteResource = async function(req, res, model) {
+exports.deleteResource = async function(req, res, model) {  
     try {
         const result = await model.findOneAndDelete({ _id: req.params.id });
         if (!result) return errors.manage(res, errors.resource_not_found, req.params.id);
@@ -81,15 +81,39 @@ exports.deleteResource = async function(req, res, model) {
     }
 }
 
-exports.modifyTagList = async function(resource, tags) {
-    if(tags.remove) {
-        for (let value of tags.remove) { if (!await Tag.findById(value)) throw new Error('Tag to be removed not found: ' + value); };
-        resource.tags = resource.tags.filter(value => !tags.remove.includes(value));
+exports.modifyList = async function(list, list_model, resource, field) {
+    if(list.remove) {
+        for (let value of list.remove) { if (!await list_model.findById(value)) return 'Resource to be removed from list not found: ' + value; };
+        resource[field] = resource[field].filter(value => !list.remove.includes(value));
     }
-    if(tags.add) {
-        for (let value of tags.add) { if (!await Tag.findById(value))  throw new Error('Tag to be added not found: ' + value); };
-        resource.tags.push(...tags.add);
+    if(list.add) {
+        for (let value of list.add) { if (!await list_model.findById(value))  return 'Resource to be added to the list not found: ' + value; };
+        resource[field].push(...list.add);
     }
-    resource.tags = [...new Set(resource.tags)];
+    resource[field] = [...new Set(resource[field])];
     return true;
+}
+
+exports.updateResource = async function(req, res, fields, model) {
+    try {
+        for (let field of fields) {
+            if(req.body[field]) {  
+                if(typeof req.body[field] === 'object') {
+                    let field_model = null;
+                    const field_model_name = field[0].toUpperCase() + field.slice(1, -1);
+                    try { field_model = await mongoose.model(field_model_name) } catch(err) {};
+                    if(!field_model) return errors.manage(res, errors.put_request_error, 'Unrecognized field type (' + field_model_name + ')');
+                    const result = await this.modifyList(req.body[field], field_model, req.resource, field);
+                    if (result != true ) return errors.manage(res, errors.put_request_error, result);
+                }
+                else 
+                    req.resource[field] = req.body[field];
+            }
+        }
+    }
+    catch (err) { return errors.manage(res, errors.put_request_error, err); }
+
+    req.resource.lastmod = Date.now();
+    const modified_resource = await model.findOneAndUpdate({_id: req.resource._id}, req.resource, { new: true });
+    return res.status(200).json(modified_resource);
 }

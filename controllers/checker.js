@@ -16,6 +16,11 @@ exports.isAvailable = async function(req, res, model) {
     }
 }
 
+exports.isFilled = async function(req, res, values ) {
+    if(!values.some(function (element) { return req.body[element] !== null; }) ) return res.status(errors.missing_info.status).json(errors.missing_info);
+    else return true;
+}
+
 exports.isNotUsed = async function(req, res, model, field) {
     let references = [];
     if(model.schema.path(field).instance === 'Array') references = await model.find({ [field] : { $elemMatch : {$in: [req.resource._id]}  } }).limit(1);

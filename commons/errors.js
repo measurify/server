@@ -26,9 +26,6 @@ exports.measurement_delete_needs_filter      = { status: 403, value: 39, message
 
 exports.user_authorization_error             = { status: 401, value: 41, message: 'Only the administrator can manage users' };
 
-exports.script_missing_info                  = { status: 401, value: 55, message: 'Please, provide some info (code or tags) to modify the script' }; 
-exports.script_put_request_error             = { status: 400, value: 52, message: 'Script not updated' }
-
 exports.manage = function(res, error, more) {
     if( typeof more === 'object' && more !== null) more = more.toString();
     if(!error) error = this.internal_server_error;

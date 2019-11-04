@@ -5,6 +5,7 @@ mongoose.Promise = global.Promise;
 const User = mongoose.model('User');
 const Tag = mongoose.model('Tag');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
+const AccessTypes = require('../types/accessTypes.js'); 
  
 /**
  * @swagger
@@ -33,7 +34,7 @@ const rightSchema = new mongoose.Schema({
     resource: { type: String, required: "Please, supply a resource" },
     type: { type: String, required: "Please, supply the resource type" },
     user: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true, autopopulate: true },
-    access: { },
+    access: [{ type: String }],
     owner: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true, autopopulate: true },
     visibility: {type: String, default: VisibilityTypes.private },
     tags: [{ type: String, ref: 'Tag' }],
@@ -60,6 +61,16 @@ rightSchema.path('user').validate({
     validator: async function (value) {
         let user = await User.findById(value);
         if (!user) throw new Error('User not existent (' + value + ')');
+        return true;
+    }
+});
+
+// validate access type
+rightSchema.path('access').validate({
+    validator: async function (values) {
+        for (let i = 0; i < values.length; i++) {
+            if(!Object.values(AccessTypes).includes(value)) throw new Error('Unrecognized access type (' + value + ')');
+        };
         return true;
     }
 });

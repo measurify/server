@@ -289,11 +289,11 @@ describe('/PUT script', () => {
         const script = await factory.createScript("test-script-1", user, "test-code-1", [tag_1, tag_2]);
         const modification = { tags: { add: ["fake_tag"] } };
         const res = await chai.request(server).put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
-        res.should.have.status(errors.script_put_request_error.status);
+        res.should.have.status(errors.put_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.script_put_request_error.message);
-        res.body.details.should.contain('Tag to be added not found');
+        res.body.message.should.contain(errors.put_request_error.message);
+        res.body.details.should.contain('Resource to be added to the list not found');
     });
 
     it('it should not PUT a script removing a fake tag', async () => {
@@ -304,11 +304,11 @@ describe('/PUT script', () => {
         const script = await factory.createScript("test-script-1", user, "test-code-1", [tag_1, tag_2]);
         const modification = { tags: { remove: ["fake_tag"] } };
         const res = await chai.request(server).put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
-        res.should.have.status(errors.script_put_request_error.status);
+        res.should.have.status(errors.put_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.script_put_request_error.message);
-        res.body.details.should.contain('Tag to be removed not found');
+        res.body.message.should.contain(errors.put_request_error.message);
+        res.body.details.should.contain('Resource to be removed from list not found');
     });
 
     it('it should not PUT a fake script', async () => {
