@@ -30,3 +30,4 @@ require('./models/measurementSchema');
 require('./models/errorSchema');
 require('./models/computationSchema');
 require('./models/constraintSchema');
+require('./models/rightSchema');

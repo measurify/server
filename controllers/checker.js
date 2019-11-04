@@ -3,9 +3,9 @@ const Tag = mongoose.model('Tag');
 const errors = require('../commons/errors.js');
 const authorizator = require('../security/authorization.js');
 
-exports.isAvailable = async function(req, res, resource) {
+exports.isAvailable = async function(req, res, model) {
     try {
-        const item = await resource.findById(req.params.id);
+        const item = await model.findById(req.params.id);
         if(!item) return errors.manage(res, errors.resource_not_found, req.params.id); 
         req.resource = item;
         return true;
@@ -22,7 +22,7 @@ exports.isNotUsed = async function(req, res, model, field) {
     else references = await model.find({ [field]: req.params.id }).limit(1);
     if (references.length != 0) return errors.manage(res, errors.already_used, 'Used in ' + references._id + ' ' + model.modelName);
     return true;
-}
+} 
 
 exports.isAdminitrator = async function(req, res) {
     if(!authorizator.isAdministrator(req.user)) return errors.manage(res, errors.admin_restricted_access, req.resource._id);

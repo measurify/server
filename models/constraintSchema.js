@@ -8,7 +8,6 @@ const Tag = mongoose.model('Tag');
 const Device = mongoose.model('Device');
 const Thing = mongoose.model('Thing');
 const RelationshipTypes = require('../types/relationshipTypes.js');
-const RelationshipResources = require('../types/relationshipResources.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
  
 /**
@@ -73,22 +72,6 @@ constraintSchema.path('tags').validate({
     message: 'Tag not existent'
 });
 
-// validate type1
-constraintSchema.path('type1').validate({
-    validator: async function (value) {
-        if(!Object.values(RelationshipResources).includes(value)) throw new Error('Unrecognized resource type (' + value + ')');
-        return true;
-    }
-});
-
-// validate type2
-constraintSchema.path('type2').validate({
-    validator: async function (value) {
-        if(!Object.values(RelationshipResources).includes(value)) throw new Error('Unrecognized resource type (' + value + ')');
-        return true;
-    }
-});
-
 // validate relationship
 constraintSchema.path('relationship').validate({
     validator: async function (value) {
@@ -97,24 +80,22 @@ constraintSchema.path('relationship').validate({
     }
 });
 
-// validate element1
+// validate element 1
 constraintSchema.pre('save', async function() {
-    let element = null;
-    if(this.type1 === 'Feature') element = await Feature.findById(this.element1);
-    if(this.type1 === 'Device') element = await Device.findById(this.element1);
-    if(this.type1 === 'Tag') element = await Tag.findById(this.element1);
-    if(this.type1 === 'Thing') element = await Thing.findById(this.element1);
-    if(!element) throw new Error('Element 1 not found (' + this.element1 + ')');                   
+    let model = null;
+    try { model = mongoose.model(this.type1) } catch(err) {};
+    if(!model) throw new Error('Unrecognized resource type (' + this.type1 + ')');
+    const resource = await model.findById(this.element1);
+    if(!resource) throw new Error('Element 1 not found (' + this.element1 + ')');                   
 });
 
-// validate element2
+// validate element 2
 constraintSchema.pre('save', async function() {
-    let element = null;
-    if(this.type2 === 'Feature') element = await Feature.findById(this.element2);
-    if(this.type2 === 'Device') element = await Device.findById(this.element2);
-    if(this.type2 === 'Tag') element = await Tag.findById(this.element2);
-    if(this.type2 === 'Thing') element = await Thing.findById(this.element2);
-    if(!element) throw new Error('Element 2 not found (' + this.element2 + ')');                   
+    let model = null;
+    try { model = mongoose.model(this.type2) } catch(err) {};
+    if(!model) throw new Error('Unrecognized resource type (' + this.type2 + ')');
+    const resource = await model.findById(this.element2);
+    if(!resource) throw new Error('Element 2 not found (' + this.element2 + ')');                   
 });
 
 // check if already have a similar constraint (idempotent)
