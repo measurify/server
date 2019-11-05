@@ -52,7 +52,7 @@
 					"response": []
 				},
 				{
-					"name": "POST demo contents (tags, features, things, devices, measurements, constraints, scripts)",
+					"name": "POST demo contents (tags, features, things, devices, measurements, constraints, scripts, rights)",
 					"event": [
 						{
 							"listen": "test",
@@ -68,7 +68,8 @@
 									"if(data.things) pm.environment.set('things', JSON.stringify(data.things));",
 									"if(data.measurements) pm.environment.set('measurements', JSON.stringify(data.measurements));",
 									"if(data.constraints) pm.environment.set('measurements', JSON.stringify(data.constraints));",
-									"if(data.scripts) pm.environment.set('scripts', JSON.stringify(data.scripts));"
+									"if(data.scripts) pm.environment.set('scripts', JSON.stringify(data.scripts));",
+									"if(data.rights) pm.environment.set('rights', JSON.stringify(data.rights));"
 								],
 								"type": "text/javascript"
 							}
@@ -1370,267 +1371,6 @@
 			]
 		},
 		{
-			"name": "SCRIPTS",
-			"item": [
-				{
-					"name": "LOGIN as admin",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
-								"exec": [
-									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
-						},
-						"url": {
-							"raw": "{{url}}/v1/login",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET all scripts",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "a7324839-b51b-4903-b355-dbef14f112b8",
-								"exec": [
-									"var data = JSON.parse(responseBody);",
-									"if(data.docs) pm.environment.set('script', data.docs[0]._id);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"type": "text",
-								"value": "{{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{url}}/v1/scripts",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"scripts"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get one script",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "{{token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{url}}/v1/scripts/{{script}}",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"scripts",
-								"{{script}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POST a new thing",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
-								"exec": [
-									"pm.environment.set(\"script\", JSON.parse(responseBody)._id);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "{{token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n  \"_id\": \"script-test\",\r\n  \"code\": \"this is my test code\"\r\n}"
-						},
-						"url": {
-							"raw": "{{url}}/v1/scripts/",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"scripts",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POST a list of new scripts",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "e0b58b11-cc9a-4f7b-9e75-32f1f239da49",
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "{{token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "[\r\n\t{ \"_id\": \"script-test-1\", \"code\": \"code test 1\" },\r\n\t{ \"_id\": \"script-test-2\", \"code\": \"code test 2\" },\r\n\t{ \"_id\": \"script-test-3\", \"code\": \"code test 3\" },\r\n\t{ \"_id\": \"script-test-4\", \"code\": \"code test 4\" }\r\n]"
-						},
-						"url": {
-							"raw": "{{url}}/v1/scripts",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"scripts"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "DELETE a script",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"type": "text",
-								"value": "{{token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{url}}/v1/scripts/{{script}}",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"scripts",
-								"{{script}}"
-							]
-						}
-					},
-					"response": []
-				}
-			],
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"id": "d1485609-c27d-45f7-ae95-28528344c308",
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"id": "c5825004-8324-4962-8058-cf927abe398c",
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				}
-			],
-			"protocolProfileBehavior": {}
-		},
-		{
 			"name": "DEVICES",
 			"item": [
 				{
@@ -2665,6 +2405,326 @@
 			]
 		},
 		{
+			"name": "SCRIPTS",
+			"item": [
+				{
+					"name": "LOGIN as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET all scripts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a7324839-b51b-4903-b355-dbef14f112b8",
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"if(data.docs) pm.environment.set('script', data.docs[0]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/scripts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"scripts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get one script",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/scripts/{{script}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"scripts",
+								"{{script}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new script",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
+								"exec": [
+									"var tags = JSON.parse(pm.environment.get(\"tags\"));",
+									"pm.environment.set('tag1', tags[0]._id);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
+								"exec": [
+									"pm.environment.set(\"script\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"_id\": \"script-test\",\r\n  \"code\": \"this is my test code\",\r\n  \"tags\": [\"{{tag1}}\"]\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/scripts/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"scripts",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT to modify of a script",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
+								"exec": [
+									"var tags = JSON.parse(pm.environment.get(\"tags\"));",
+									"pm.environment.set('tag1', tags[0]._id);",
+									"pm.environment.set('tag2', tags[1]._id);",
+									"pm.environment.set('tag3', tags[2]._id);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"code\": \"this is my modified test code\",\r\n  \"tags\": {\r\n\t\"remove\": [\"{{tag1}}\"],\r\n  \t\"add\": [\"{{tag2}}\",\"{{tag3}}\"]\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/scripts/{{script}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"scripts",
+								"{{script}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a list of new scripts",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e0b58b11-cc9a-4f7b-9e75-32f1f239da49",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n\t{ \"_id\": \"script-test-1\", \"code\": \"code test 1\" },\r\n\t{ \"_id\": \"script-test-2\", \"code\": \"code test 2\" },\r\n\t{ \"_id\": \"script-test-3\", \"code\": \"code test 3\" },\r\n\t{ \"_id\": \"script-test-4\", \"code\": \"code test 4\" }\r\n]"
+						},
+						"url": {
+							"raw": "{{url}}/v1/scripts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"scripts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE a script",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/v1/scripts/{{script}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"scripts",
+								"{{script}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d1485609-c27d-45f7-ae95-28528344c308",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "c5825004-8324-4962-8058-cf927abe398c",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "COMPUTATIONS (OUTLIERS)",
 			"item": [
 				{
@@ -3100,6 +3160,332 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "RIGHTS",
+			"item": [
+				{
+					"name": "LOGIN as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET all rights",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a7324839-b51b-4903-b355-dbef14f112b8",
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"if(data.docs) pm.environment.set('right', data.docs[0]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/rights",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"rights"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get one right",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/rights/{{right}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"rights",
+								"{{right}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new right",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
+								"exec": [
+									"var things = JSON.parse(pm.environment.get(\"things\"));",
+									"var users = JSON.parse(pm.environment.get(\"users\"));",
+									"pm.environment.set('user', users[0]._id);",
+									"pm.environment.set('thing', things[0]._id);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
+								"exec": [
+									"pm.environment.set(\"right\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"resource\": \"{{thing}}\",\r\n  \"type\": \"Thing\",\r\n  \"user\": \"{{user}}\",\r\n  \"access\": [\"read\", \"delete\"]\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/rights/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"rights",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT to modify of a right",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
+								"exec": [
+									"var tags = JSON.parse(pm.environment.get(\"tags\"));",
+									"pm.environment.set('tag1', tags[0]._id);",
+									"pm.environment.set('tag2', tags[1]._id);",
+									"pm.environment.set('tag3', tags[2]._id);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"visibility\": \"public\",\r\n  \"access\": {\r\n\t\"remove\": [\"read\"],\r\n  \t\"add\": [\"create\",\"update\"]\r\n  },\r\n  \"tags\": {\r\n\t\"remove\": [\"{{tag1}}\"],\r\n  \t\"add\": [\"{{tag2}}\",\"{{tag3}}\"]\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/rights/{{right}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"rights",
+								"{{right}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a list of new rights",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e0b58b11-cc9a-4f7b-9e75-32f1f239da49",
+								"exec": [
+									"var things = JSON.parse(pm.environment.get(\"things\"));",
+									"var users = JSON.parse(pm.environment.get(\"users\"));",
+									"pm.environment.set('user', users[0]._id);",
+									"pm.environment.set('thing1', things[1]._id);",
+									"pm.environment.set('thing2', things[2]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n\t{\r\n\t  \"resource\": \"{{thing1}}\",\r\n\t  \"type\": \"Thing\",\r\n\t  \"user\": \"{{user}}\",\r\n\t  \"access\": [\"read\", \"delete\"]\r\n\t},\r\n\t{\r\n\t  \"resource\": \"{{thing2}}\",\r\n\t  \"type\": \"Thing\",\r\n\t  \"user\": \"{{user}}\",\r\n\t  \"access\": [\"read\", \"delete\"]\r\n\t}\r\n]"
+						},
+						"url": {
+							"raw": "{{url}}/v1/rights",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"rights"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE a rights",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/v1/rights/{{right}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"rights",
+								"{{right}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d1485609-c27d-45f7-ae95-28528344c308",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "c5825004-8324-4962-8058-cf927abe398c",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "LOGS",

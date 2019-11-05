@@ -6,6 +6,7 @@ const Feature = mongoose.model('Feature');
 const Device = mongoose.model('Device');
 const Script = mongoose.model('Script');
 const Thing = mongoose.model('Thing');
+const Right = mongoose.model('Right');
 const Measurement = mongoose.model('Measurement');
 const Constraint = mongoose.model('Constraint');
 const Authorization = require('../security/authorization.js');
@@ -21,7 +22,8 @@ exports.get = async (req, res) => {
     const measurements = await Measurement.find({});
     const constraints = await Constraint.find({});
     const scripts = await Script.find({});
-    res.status(200).json({users: users, tags: tags, features:features, devices:devices, things:things, measurements:measurements, constraints:constraints, script:scripts });
+    const rights = await Right.find({});
+    res.status(200).json({users: users, tags: tags, features:features, devices:devices, things:things, measurements:measurements, constraints:constraints, scripts:scripts, rights:rights });
 };
 
 exports.post = async (req, res) => {
@@ -37,7 +39,8 @@ exports.post = async (req, res) => {
     const measurements = await Measurement.find({});
     const constraints = await Constraint.find({});
     const scripts = await Script.find({});
-    res.status(200).json({users: users, tags: tags, features:features, devices:devices, things:things, measurements:measurements, constraints:constraints, script:scripts });
+    const rights = await Right.find({});
+    res.status(200).json({users: users, tags: tags, features:features, devices:devices, things:things, measurements:measurements, constraints:constraints, script:scripts, rights:rights });
 };
 
 exports.delete = async (req, res) => {
@@ -51,5 +54,6 @@ exports.delete = async (req, res) => {
     const measurements = await Measurement.find({});
     const constraints = await Constraint.find({});
     const scripts = await Script.find({});
-    res.status(200).json({users: users, tags: tags, features:features, devices:devices, things:things, measurements:measurements, constraints:constraints, script:scripts });
+    const rights = await Right.find({});
+    res.status(200).json({users: users, tags: tags, features:features, devices:devices, things:things, measurements:measurements, constraints:constraints, script:scripts, rights:rights });
 };
