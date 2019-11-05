@@ -23,7 +23,7 @@ chai.use(chaiHttp);
 describe('/GET thing', () => {
     it('it should GET all the things', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         await factory.createThing("test-thing-1", user, [], null, [], null, null);
         await factory.createThing("test-thing-2", user, [], null, [], null, null);
         const res = await chai.request(server).get('/v1/things').set("Authorization", await factory.getUserToken(user));
@@ -34,7 +34,7 @@ describe('/GET thing', () => {
 
     it('it should GET a specific thing', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = await factory.createThing("test-thing-2", user, [], null, []);
         const res = await chai.request(server).get('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -43,7 +43,7 @@ describe('/GET thing', () => {
     });
 
     it('it should not GET a fake thing', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const res = await chai.request(server).get('/v1/things/fake-thing').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
@@ -55,7 +55,7 @@ describe('/GET thing', () => {
 describe('/POST thing', () => {
     it('it should not POST a thing without _id field', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = {}
         const res = await chai.request(server).post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing)
         res.should.have.status(errors.post_request_error.status);
@@ -66,7 +66,7 @@ describe('/POST thing', () => {
 
     it('it should not POST a thing with a fake tag', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = { _id: "test-thing-2", tags: ["fake-tag"] };
         const res = await chai.request(server).post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
         res.should.have.status(errors.post_request_error.status);
@@ -78,7 +78,7 @@ describe('/POST thing', () => {
 
     it('it should not POST a device with a fake relation', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = { _id: "test-thing-2", relations: [ 'fake-Thing'] };
         const res = await chai.request(server).post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
         res.should.have.status(errors.post_request_error.status);
@@ -89,7 +89,7 @@ describe('/POST thing', () => {
     });
 
     it('it should POST a thing', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = { _id: "test-thing-1" }
         const res = await chai.request(server).post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing)
         res.should.have.status(200);
@@ -99,7 +99,7 @@ describe('/POST thing', () => {
     });
 
     it('it should not POST a thing with already existant _id field', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = { _id: "test-thing-1" }
         const res = await chai.request(server).post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing)
         res.should.have.status(errors.post_request_error.status);
@@ -110,7 +110,7 @@ describe('/POST thing', () => {
     });
 
     it('it should GET the thing posted before', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const res = await chai.request(server).get('/v1/things').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
@@ -119,7 +119,7 @@ describe('/POST thing', () => {
     });
 
     it('it should POST a list of thing', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const things = [{ _id: "test-thing-3" },
         { _id: "test-thing-4" }];
         const res = await chai.request(server).post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(things)
@@ -130,7 +130,7 @@ describe('/POST thing', () => {
     });
 
     it('it should POST only not existing things from a list', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const things = [{ _id: "test-thing-1" },
         { _id: "test-thing-2" },
         { _id: "test-thing-3" },
@@ -150,7 +150,7 @@ describe('/POST thing', () => {
 
     it('it should POST a thing with tags', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-2", user);
         const thing = { _id: "test-thing-2", tags: [tag] };
         const res = await chai.request(server).post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing)
@@ -163,7 +163,7 @@ describe('/POST thing', () => {
 
     it('it should POST a thing with relations', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-2", user);
         const relation1 = await factory.createThing("relation-1", user);
         const relation2 = await factory.createThing("relation-2", user);
@@ -181,7 +181,7 @@ describe('/POST thing', () => {
 describe('/DELETE thing', () => {
     it('it should DELETE a thing', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", user, [], null, []);
         const things_before = await Thing.find();
         things_before.length.should.be.eql(1);
@@ -194,7 +194,7 @@ describe('/DELETE thing', () => {
 
     it('it should not DELETE a fake thing', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = await factory.createThing("test-thing-2", user, [], null, []);
         const things_before = await Thing.find();
         things_before.length.should.be.eql(1);
@@ -208,8 +208,8 @@ describe('/DELETE thing', () => {
 
     it('it should not DELETE a thing by non-owner', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
-        const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", user);
         const thing_before = await Thing.find();
         thing_before.length.should.be.eql(1);
@@ -223,7 +223,7 @@ describe('/DELETE thing', () => {
 
     it('it should not DELETE a thing already used in a measurement', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const tag = await factory.createTag("test-tag", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
@@ -241,7 +241,7 @@ describe('/DELETE thing', () => {
 
     it('it should not DELETE a thing already used as a relation', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const relation = await factory.createThing("test-relation-1", user);
         const thing = await factory.createThing("test-thing-1", user, null, null, [relation]);
         const things_before = await Thing.find();

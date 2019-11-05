@@ -81,7 +81,7 @@ exports.deleteResource = async function(req, res, model) {
     }
 }
 
-exports.modifyList = async function(list, list_model, resource, field) {
+exports.modifyResourceList = async function(list, list_model, resource, field) {
     if(list.remove) {
         for (let value of list.remove) { if (!await list_model.findById(value)) return 'Resource to be removed from list not found: ' + value; };
         resource[field] = resource[field].filter(value => !list.remove.includes(value));
@@ -94,22 +94,53 @@ exports.modifyList = async function(list, list_model, resource, field) {
     return true;
 }
 
+exports.modifyCategoricalValueList = async function(list, list_type, resource, field) {
+    if(list.remove) {
+        for (let value of list.remove) { if (!Object.values(list_type).includes(value)) return 'Type to be removed from list not found: ' + value; };
+        resource[field] = resource[field].filter(value => !list.remove.includes(value));
+    }
+    if(list.add) {
+        for (let value of list.add) { if (!Object.values(list_type).includes(value))  return 'Type to be added to the list not found: ' + value; };
+        resource[field].push(...list.add);
+    }
+    resource[field] = [...new Set(resource[field])];
+    return true;
+}
+
 exports.updateResource = async function(req, res, fields, model) {
     try {
         for (let field of fields) {
-            if(req.body[field]) {  
-                if(typeof req.body[field] === 'object') {
+
+            if (typeof req.body[field] != 'object') { req.resource[field] = req.body[field]; continue; }
+
+            if (typeof req.body[field] == 'object') {
+                do {
+                    let result = null;
+
+                    // List of resources
                     let field_model = null;
                     const field_model_name = field[0].toUpperCase() + field.slice(1, -1);
                     try { field_model = await mongoose.model(field_model_name) } catch(err) {};
-                    if(!field_model) return errors.manage(res, errors.put_request_error, 'Unrecognized field type (' + field_model_name + ')');
-                    const result = await this.modifyList(req.body[field], field_model, req.resource, field);
-                    if (result != true ) return errors.manage(res, errors.put_request_error, result);
-                }
-                else 
-                    req.resource[field] = req.body[field];
+                    if (field_model) result = await this.modifyResourceList(req.body[field], field_model, req.resource, field);
+                    if (result == true) break;
+                    else if (result) return errors.manage(res, errors.put_request_error, result);
+                
+                    // List of categorical data
+                    let field_type = null;
+                    const field_type_name = field[0].toUpperCase() + field.slice(1) + "Types";
+                    try { field_type = require('../types/' + field_type_name + '.js'); } catch(err) {};
+                    if (field_type) result = await this.modifyCategoricalValueList(req.body[field], field_type, req.resource, field);
+                    if (result == true) break;
+                    else if (result) return errors.manage(res, errors.put_request_error, result);
+
+                    // Other lists? TBD
+                    return errors.manage(res, errors.put_request_error, 'Cannot manage the field (' + field + ')');
+                    break;
+                } while(true);
+                continue;
             }
-        }
+
+        } 
     }
     catch (err) { return errors.manage(res, errors.put_request_error, err); }
 

@@ -25,7 +25,7 @@ chai.use(chaiHttp);
 describe('/GET tags', () => {
     it('it should GET all the tags', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         await factory.createTag("test-tag-1", user);
         await factory.createTag("test-tag-2", user);
         const res = await chai.request(server).get('/v1/tags').set("Authorization", await factory.getUserToken(user));
@@ -36,7 +36,7 @@ describe('/GET tags', () => {
 
     it('it should GET a specific tag', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user);
         const res = await chai.request(server).get('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -45,7 +45,7 @@ describe('/GET tags', () => {
     });
 
     it('it should not GET a fake tag', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const res = await chai.request(server).get('/v1/tags/fake-tag').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
@@ -57,7 +57,7 @@ describe('/GET tags', () => {
 describe('/POST tag', () => {
     it('it should not POST a tag without _id field', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = {}
         const res = await chai.request(server).post('/v1/tags').set("Authorization", await factory.getUserToken(user)).send(tag)
         res.should.have.status(errors.post_request_error.status);
@@ -68,7 +68,7 @@ describe('/POST tag', () => {
     });
 
     it('it should POST a tag', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = { _id: "test-text" }
         const res = await chai.request(server).post('/v1/tags').set("Authorization", await factory.getUserToken(user)).send(tag)
         res.should.have.status(200);
@@ -80,7 +80,7 @@ describe('/POST tag', () => {
 
     it('it should POST a tagged tag', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
         const tag = { _id: "test-text", tags: [ tag_1._id, tag_2._id ] };
@@ -97,7 +97,7 @@ describe('/POST tag', () => {
 
     it('it should not POST a tag with already existant _id field', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const already_existant_tag = await factory.createTag("test-text", user);
         const tag = { _id: "test-text" }
         const res = await chai.request(server).post('/v1/tags').set("Authorization", await factory.getUserToken(user)).send(tag)
@@ -110,7 +110,7 @@ describe('/POST tag', () => {
 
     it('it should not POST a tag with a fake tag', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const already_existant_tag = await factory.createTag("test-text", user);
         const tag = { _id: "test-text", tags: [ "fake_tag" ] }
         const res = await chai.request(server).post('/v1/tags').set("Authorization", await factory.getUserToken(user)).send(tag)
@@ -122,7 +122,7 @@ describe('/POST tag', () => {
     });
 
     it('it should GET the tag posted before', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const res = await chai.request(server).get('/v1/tags').set("Authorization", await factory.getUserToken(user))
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
@@ -131,7 +131,7 @@ describe('/POST tag', () => {
     });
 
     it('it should POST a list of tags', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tags = [{ _id: "test-text-1", user }, { _id: "test-text-2", user }];
         const res = await chai.request(server).post('/v1/tags').set("Authorization", await factory.getUserToken(user)).send(tags)
         res.should.have.status(200);
@@ -141,7 +141,7 @@ describe('/POST tag', () => {
     });
 
     it('it should POST only not existing tags from a list', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tags = [{ _id: "test-text-1", user }, { _id: "test-text-2", user }, { _id: "test-text-3", user }, { _id: "test-text-4", user }, { _id: "test-text-5", user }];
         const res = await chai.request(server).post('/v1/tags').set("Authorization", await factory.getUserToken(user)).send(tags)
         res.should.have.status(202);
@@ -160,7 +160,7 @@ describe('/POST tag', () => {
 describe('/DELETE tag', () => {
     it('it should DELETE a tag', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", user);
         const tags_before = await Tag.find();
         tags_before.length.should.be.eql(1);
@@ -173,7 +173,7 @@ describe('/DELETE tag', () => {
 
     it('it should not DELETE a fake tag', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-2", user);
         const tags_before = await Tag.find();
         tags_before.length.should.be.eql(1);
@@ -187,8 +187,8 @@ describe('/DELETE tag', () => {
 
     it('it should not DELETE a tag by non-owner', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
-        const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const tag = await factory.createTag("test-tag-2", user);
         const tags_before = await Tag.find();
         tags_before.length.should.be.eql(1);
@@ -202,7 +202,7 @@ describe('/DELETE tag', () => {
 
     it('it should not DELETE a tag already used in a measurement', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user);
         const device = await factory.createDevice("test-device-4", user, [feature]);
         const tag = await factory.createTag("test-tag", user);
@@ -221,7 +221,7 @@ describe('/DELETE tag', () => {
 
     it('it should not DELETE a tag already used in a device', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user);
         const tag = await factory.createTag("test-tag", user);
         const tag2 = await factory.createTag("test-tag-2", user);
@@ -238,7 +238,7 @@ describe('/DELETE tag', () => {
 
     it('it should not DELETE a tag already used in a feature', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user);
         const tag2 = await factory.createTag("test-tag-2", user);
         const feature = await factory.createFeature("test-feature", user, null, [tag]);
@@ -254,7 +254,7 @@ describe('/DELETE tag', () => {
 
     it('it should not DELETE a tag already used in a tag', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user);
         const tag2 = await factory.createTag("test-tag-2", user);
         const tagged_tag = await factory.createTag("test-tag-3", user, [tag]);
@@ -270,7 +270,7 @@ describe('/DELETE tag', () => {
 
     it('it should not DELETE a tag already used in a thing', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user);
         const tag2 = await factory.createTag("test-tag-2", user);
         const thing = await factory.createThing("test-thing", user, [tag]);

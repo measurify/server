@@ -24,7 +24,7 @@ chai.use(chaiHttp);
 describe('/GET scripts', () => {
     it('it should GET all the script', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         await factory.createScript("test-script-2", user, "test-code-2", []);
         await factory.createScript("test-script-1", user, "test-code-1", []);
         const res = await chai.request(server).get('/v1/scripts').set("Authorization", await factory.getUserToken(user));
@@ -35,7 +35,7 @@ describe('/GET scripts', () => {
 
     it('it should GET a specific script', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = await factory.createScript("test-script-1", user, "test-code-2", []);
         const res = await chai.request(server).get('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -44,7 +44,7 @@ describe('/GET scripts', () => {
     });
 
     it('it should not GET a fake script', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const res = await chai.request(server).get('/v1/scripts/fake-script').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
@@ -56,7 +56,7 @@ describe('/GET scripts', () => {
 describe('/POST script', () => {
     it('it should not POST a script without _id field', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = {}
         const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
         res.should.have.status(errors.post_request_error.status);
@@ -68,7 +68,7 @@ describe('/POST script', () => {
 
     it('it should not POST a script without code field', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = { _id: "script-id" }
         const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
         res.should.have.status(errors.post_request_error.status);
@@ -80,7 +80,7 @@ describe('/POST script', () => {
 
     it('it should not POST a script with a fake tag', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = { _id: "test-script-a", code: "test-code-1", tags: ["fake-tag"] };
         const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script);
         res.should.have.status(errors.post_request_error.status);
@@ -92,7 +92,7 @@ describe('/POST script', () => {
 
     it('it should POST a script', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = { _id: "test-script-1", code: "test-code-1" };
         const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
         res.should.have.status(200);
@@ -102,7 +102,7 @@ describe('/POST script', () => {
     });
 
     it('it should not POST a script with already existant _id field', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = { _id: "test-script-1", code: "test-code-1" };
         const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
         res.should.have.status(errors.post_request_error.status);
@@ -114,7 +114,7 @@ describe('/POST script', () => {
 
     it('it should POST a list of script', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const scripts = [{ _id: "test-script-1", code: "test-code-1" },
                          { _id: "test-script-2", code: "test-code-2" } ];
         const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(scripts);
@@ -125,7 +125,7 @@ describe('/POST script', () => {
     });
 
     it('it should POST only not existing scripts from a list', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const scripts = [{ _id: "test-script-3", code: "test-code-3" },
                          { _id: "test-script-4", code: "test-code-4" },
                          { _id: "test-script-1", code: "test-code-1" },
@@ -145,7 +145,7 @@ describe('/POST script', () => {
 
     it('it should POST a script with tags', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-2", user);
         const script = { _id: "test-script-1", code: "test-code-1", tags: [tag] };
         const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
@@ -161,7 +161,7 @@ describe('/POST script', () => {
 describe('/DELETE script', () => {
     it('it should DELETE a script', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = await factory.createScript("test-script-1", user, "test-code-1", []);
         const script_before = await Script.find();
         script_before.length.should.be.eql(1);
@@ -174,7 +174,7 @@ describe('/DELETE script', () => {
 
     it('it should not DELETE a fake script', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = await factory.createScript("test-script-1", user, "test-code-1", []);
         const script_before = await Script.find();
         script_before.length.should.be.eql(1);
@@ -188,8 +188,8 @@ describe('/DELETE script', () => {
 
     it('it should not DELETE a script by non-owner', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
-        const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const script = await factory.createScript("test-script-1", user, "test-code-1", []);
         const script_before = await Script.find();
         script_before.length.should.be.eql(1);
@@ -203,7 +203,7 @@ describe('/DELETE script', () => {
 
     it('it should not DELETE a script already used in a device', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = await factory.createScript("test-script-1", user, "test-code-1", []);
         const feature = await factory.createFeature("test-feature-1", user);
         const device = await factory.createDevice("test-device-1", user, [feature], [], [script]);
@@ -222,7 +222,7 @@ describe('/DELETE script', () => {
 describe('/PUT script', () => {
     it('it should PUT a script to modify code', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = await factory.createScript("test-script-1", user, "test-code-1", []);
         const modification = { code: "this is the new code"}
         const res = await chai.request(server).put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
@@ -234,7 +234,7 @@ describe('/PUT script', () => {
 
     it('it should PUT a script to add a tag', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
         const tag_3 = await factory.createTag("test-tag-3", user);
@@ -249,7 +249,7 @@ describe('/PUT script', () => {
 
     it('it should PUT a script to remove a tag', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
         const tag_3 = await factory.createTag("test-tag-3", user);
@@ -264,7 +264,7 @@ describe('/PUT script', () => {
 
     it('it should PUT a script to add and remove tags', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
         const tag_3 = await factory.createTag("test-tag-3", user);
@@ -283,7 +283,7 @@ describe('/PUT script', () => {
 
     it('it should not PUT a script adding a fake tag', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
         const script = await factory.createScript("test-script-1", user, "test-code-1", [tag_1, tag_2]);
@@ -298,7 +298,7 @@ describe('/PUT script', () => {
 
     it('it should not PUT a script removing a fake tag', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
         const script = await factory.createScript("test-script-1", user, "test-code-1", [tag_1, tag_2]);
@@ -312,5 +312,15 @@ describe('/PUT script', () => {
     });
 
     it('it should not PUT a fake script', async () => {
+        await mongoose.connection.dropDatabase();
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag_1 = await factory.createTag("test-tag-1", user);
+        const tag_2 = await factory.createTag("test-tag-2", user);
+        const script = await factory.createScript("test-script-1", user, "test-code-1", [tag_1, tag_2]);
+        const modification = { tags: { remove: ["fake_tag"] } };
+        const res = await chai.request(server).put('/v1/scripts/fake-script').set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(errors.resource_not_found.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.resource_not_found.message);
     });
 });

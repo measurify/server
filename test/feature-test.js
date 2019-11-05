@@ -23,7 +23,7 @@ chai.use(chaiHttp);
 describe('/GET feature', () => {
     it('it should GET all the features', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         await factory.createFeature("test-feature-1", user);
         await factory.createFeature("test-feature-2", user);
         const res = await chai.request(server).get('/v1/features').set("Authorization", await factory.getUserToken(user));
@@ -34,7 +34,7 @@ describe('/GET feature', () => {
 
     it('it should GET a specific feature', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user);
         const res = await chai.request(server).get('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -43,7 +43,7 @@ describe('/GET feature', () => {
     });
 
     it('it should not GET a fake feature', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const res = await chai.request(server).get('/v1/features/fake-feature').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
@@ -55,7 +55,7 @@ describe('/GET feature', () => {
 describe('/POST feature', () => {
     it('it should not POST a feature without _id field', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = {}
         const res = await chai.request(server).post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(feature)
         res.should.have.status(errors.post_request_error.status);
@@ -66,7 +66,7 @@ describe('/POST feature', () => {
     });
 
     it('it should POST a feature', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = {
             _id: "feature-name-text",
             items: [
@@ -85,7 +85,7 @@ describe('/POST feature', () => {
     });
 
     it('it should not POST a feature with already existant _id field', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = { _id: "feature-name-text", owner: user }
         const res = await chai.request(server).post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(feature)
         res.should.have.status(errors.post_request_error.status);
@@ -96,7 +96,7 @@ describe('/POST feature', () => {
     });
 
     it('it should GET the feature posted before', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const res = await chai.request(server).get('/v1/features').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
@@ -105,7 +105,7 @@ describe('/POST feature', () => {
     });
 
     it('it should POST a list of features', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const features = [{ _id: "test-text-1", dimensions: [] }, { _id: "test-text-2", dimensions: [] }];
         const res = await chai.request(server).post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(features)
         res.should.have.status(200);
@@ -115,7 +115,7 @@ describe('/POST feature', () => {
     });
 
     it('it should POST only not existing features from a list', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const features = [{ _id: "test-text-1", dimensions: [] }, { _id: "test-text-2", dimensions: [] },
         { _id: "test-text-3", dimensions: [] }, { _id: "test-text-4", dimensions: [] },
         { _id: "test-text-5", dimensions: [] }];
@@ -136,7 +136,7 @@ describe('/POST feature', () => {
 describe('/DELETE feature', () => {
     it('it should DELETE a feature', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user);
         const features_before = await Feature.find();
         features_before.length.should.be.eql(1);
@@ -149,8 +149,8 @@ describe('/DELETE feature', () => {
 
     it('it should not DELETE a feature by non-owner', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
-        const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user);
         const features_before = await Feature.find();
         features_before.length.should.be.eql(1);
@@ -164,7 +164,7 @@ describe('/DELETE feature', () => {
 
     it('it should not DELETE a fake feature', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const features_before = await Feature.find();
         features_before.length.should.be.eql(1);
@@ -178,7 +178,7 @@ describe('/DELETE feature', () => {
     
     it('it should not DELETE a feature already used in a measurement', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
         const tag = await factory.createTag("test-tag", user);
@@ -196,7 +196,7 @@ describe('/DELETE feature', () => {
 
     it('it should not DELETE a feature already used in a device', async () => {
         await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.authority);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
         const features_before = await Feature.find();

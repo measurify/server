@@ -12,6 +12,7 @@ const Device = mongoose.model('Device');
 const Constraint = mongoose.model('Constraint');
 const Measurement = mongoose.model('Measurement');
 const Computation = mongoose.model('Computation');
+const Right = mongoose.model('Right');
 const RelationshipTypes = require('../types/relationshipTypes');
 const jwt = require('jsonwebtoken');
 const ItemTypes = require('../types/itemTypes.js');
@@ -112,81 +113,101 @@ exports.createSamples = function (value, delta) {
     return [ { values: [value], delta: delta } ]
 }
 
-exports.createTag = async function(name, owner, tags) {
+exports.createTag = async function(name, owner, tags, visibility) {
     let tag = await Tag.findOne( { _id: name });
     if(!tag) {
-        const req = { _id: name , owner: owner, tags: tags }
+        const req = { _id: name , owner: owner, tags: tags, visibility: visibility }
         tag = new Tag(req);
         await tag.save();
     }
     return tag._doc;
 };
 
-exports.createFeature = async function(name, owner, items, tags) {
+exports.createFeature = async function(name, owner, items, tags, visibility) {
     const req = { 
         _id: name,
         owner: owner,
         items: items || [ { name: "item-name-1", unit: "items-unit-1", type: ItemTypes.number  } ],
-        tags: tags
+        tags: tags,
+        visibility: visibility
     }
     const feature = new Feature(req);
     await feature.save();
     return feature._doc;
 };
 
-exports.createDevice = async function(name, owner, features, tags, scripts) {
+exports.createDevice = async function(name, owner, features, tags, scripts, visibility) {
     const req = { 
         _id: name,
         owner: owner,
         tags: tags,
         scripts: scripts,
-        features: features || [await this.createFeature(name + '-feature', owner)]
+        features: features || [await this.createFeature(name + '-feature', owner)],
+        visibility: visibility
     }
     const device = new Device(req);
     await device.save();
     return device._doc;
 };
 
-exports.createConstraint = async function(owner, type1, type2, element1, element2, relationship) {
+exports.createConstraint = async function(owner, type1, type2, element1, element2, relationship, visibility) {
     const req = { 
         owner: owner,
         type1: type1,
         type2: type2,
         element1: element1,
         element2: element2,
-        relationship: relationship
+        relationship: relationship,
+        visibility
     }
     const constraint = new Constraint(req);
     await constraint.save();
     return constraint._doc;
 };
 
-exports.createThing = async function(name, owner, tags, metadata, relations) {
+exports.createThing = async function(name, owner, tags, metadata, relations, visibility) {
     const req = { 
         _id: name,
         owner: owner,
         tags: tags,
         metadata: metadata,
-        relations: relations
+        relations: relations,
+        visibility: visibility
     }
     const thing = new Thing(req);
     await thing.save();
     return thing._doc;
 };
 
-exports.createScript = async function(name, owner, code, tags) {
+exports.createScript = async function(name, owner, code, tags, visibility) {
     const req = { 
         _id: name,
         owner: owner,
         tags: tags,
-        code: code
+        code: code,
+        visibility: visibility
     }
     const script = new Script(req);
     await script.save();
     return script._doc;
 };
 
-exports.createMeasurement = async function(owner, feature, device, thing, tags, samples, startdate, enddate, location) {
+exports.createRight = async function(resource, type, user, access, owner, tags, visibility) {
+    const req = { 
+        resource: resource,
+        type: type,
+        user: user,
+        access: access,
+        owner: owner,
+        tags: tags,
+        visibility: visibility
+    }
+    const right = new Right(req);
+    await right.save();
+    return right._doc;
+};
+
+exports.createMeasurement = async function(owner, feature, device, thing, tags, samples, startdate, enddate, location, visibility) {
     const req = {
         owner: owner,
         startDate: startdate || Date.now(),
@@ -196,7 +217,8 @@ exports.createMeasurement = async function(owner, feature, device, thing, tags, 
         feature: feature,
         device: device,
         samples: samples || [ { values: [10.4], delta: 200 } ],
-        tags: tags
+        tags: tags,
+        visibility: visibility
     }
     const measurement = new Measurement(req);
     await measurement.save();
@@ -210,7 +232,8 @@ exports.createComputation = async function(name, owner, code, target, tags, feat
         code: code,
         target: target,
         tags: tags,
-        features: features
+        features: features,
+        visibility: visibility
     }
     const computation = new Computation(req);
     await computation.save();

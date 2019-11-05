@@ -26,8 +26,9 @@ exports.delete = async (req, res) => {
 };
 
 exports.put = async (req, res) => { 
+    const fields = ['code', 'tags'];
     let result = await checker.isAvailable(req, res, Script); if (result != true) return result;
-    result = await checker.isFilled(req, res, ['code', 'tags']); if (result != true) return result;
+    result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.isOwned(req, res); if (result != true) return result;
-    return await manager.updateResource(req, res, ['code', 'tags'], Script);
+    return await manager.updateResource(req, res, fields, Script);
 }

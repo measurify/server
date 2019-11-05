@@ -33,7 +33,7 @@ const AccessTypes = require('../types/accessTypes.js');
 const rightSchema = new mongoose.Schema({ 
     resource: { type: String, required: "Please, supply a resource" },
     type: { type: String, required: "Please, supply the resource type" },
-    user: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true, autopopulate: true },
+    user: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: "Please, supply the user", autopopulate: true },
     access: [{ type: String }],
     owner: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true, autopopulate: true },
     visibility: {type: String, default: VisibilityTypes.private },
@@ -68,7 +68,7 @@ rightSchema.path('user').validate({
 // validate access type
 rightSchema.path('access').validate({
     validator: async function (values) {
-        for (let i = 0; i < values.length; i++) {
+        for (let value of values) {
             if(!Object.values(AccessTypes).includes(value)) throw new Error('Unrecognized access type (' + value + ')');
         };
         return true;
