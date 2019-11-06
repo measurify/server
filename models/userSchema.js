@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const UserRoles = require('../types/UserRoles.js');
+const UserRoles = require('../types/userRoles.js');
 
 mongoose.Promise = global.Promise;
 

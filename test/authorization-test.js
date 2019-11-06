@@ -15,7 +15,7 @@ const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
 const User = mongoose.model('User');
-const UserRoles = require('../types/UserRoles.js');
+const UserRoles = require('../types/userRoles.js');
 
 chai.use(chaiHttp);
 

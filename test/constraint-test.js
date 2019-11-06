@@ -13,7 +13,7 @@ const should = chai.should();
 const factory = require('../commons/factory.js');
 const User = mongoose.model('User');
 const Constraint = mongoose.model('Constraint');
-const UserRoles = require('../types/UserRoles.js');
+const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 const RelationshipTypes = require('../types/relationshipTypes.js');
 

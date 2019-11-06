@@ -3,6 +3,7 @@ const manager = require('./manager');
 const checker = require('./checker');
 const Thing = mongoose.model('Thing');
 const Measurement = mongoose.model('Measurement');
+const AccessTypes = require('../types/accessTypes.js'); 
 const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 
@@ -11,7 +12,9 @@ exports.get = async (req, res) => {
 };
 
 exports.getone = async (req, res) => { 
-    return await manager.getResource(req, res, null, Thing); 
+    let result = await checker.isAvailable(req, res, Thing); if (result != true) return result;
+    result = await checker.canAccess(req, res, AccessTypes.read); if (result != true) return result;
+    return res.status(200).json(req.resource);
 };
 
 exports.post = async (req, res) => {

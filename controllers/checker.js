@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
-const Tag = mongoose.model('Tag');
+const Right = mongoose.model('Right');
 const errors = require('../commons/errors.js');
 const authorizator = require('../security/authorization.js');
+const AccessTypes = require('../types/accessTypes.js'); 
+const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
 exports.isAvailable = async function(req, res, model) {
     try {
@@ -33,6 +35,14 @@ exports.isAdminitrator = async function(req, res) {
     if(!authorizator.isAdministrator(req.user)) return errors.manage(res, errors.admin_restricted_access, req.resource._id);
     return true;
 }
+
+exports.canAccess = async function(req, res, access) {
+    if (authorizator.isAdministrator(req.user)) return true;
+    if (authorizator.isOwner(req.user, req.resource)) return true;
+    const rights = await Right.findOne({resource: req.resource._id, user: req.user._id})
+    if (authorizator.hasRights(req.user, req.resource, rights, access)) return true;
+    return errors.manage(res, errors.restricted_access, req.resource._id);
+} 
 
 exports.isOwned = async function(req, res) {
     if (!authorizator.isOwner(req.user, req.resource)) return errors.manage(res, errors.not_yours, req.resource._id);

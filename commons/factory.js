@@ -1,6 +1,6 @@
 require('../models/userSchema');
 
-const UserRoles = require('../types/UserRoles');
+const UserRoles = require('../types/userRoles');
 const crypto = require("crypto");
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
@@ -196,6 +196,12 @@ exports.createScript = async function(name, owner, code, tags, visibility) {
     await script.save();
     return script._doc;
 };
+
+exports.modifyRight = async function(right, access) {
+    right.access = access;
+    const modified = await Right.findOneAndUpdate({_id: right._id}, right, { new: true });
+    return modified;
+} 
 
 exports.createRight = async function(resource, type, user, access, owner, tags, visibility) {
     const req = { 

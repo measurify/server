@@ -12,7 +12,7 @@ const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
 const Device = mongoose.model('Device');
-const UserRoles = require('../types/UserRoles.js');
+const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 
 chai.use(chaiHttp);
