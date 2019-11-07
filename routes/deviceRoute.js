@@ -114,4 +114,6 @@ router.post('/', catchErrors(deviceController.post));
  */
 router.delete('/:id',  catchErrors(deviceController.delete));
 
+router.put('/:id',  catchErrors(deviceController.put));
+
 module.exports = router;

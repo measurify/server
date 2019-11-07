@@ -109,6 +109,9 @@ exports.modifyCategoricalValueList = async function(list, list_type, resource, f
 
 exports.updateResource = async function(req, res, fields, model) {
     try {
+
+        for (let field in req.body) if(!fields.includes(field)) return errors.manage(res, errors.put_request_error, "Request field cannot be updated (" + field + ')');
+
         for (let field of fields) {
 
             if (typeof req.body[field] != 'object') { req.resource[field] = req.body[field]; continue; }

@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const Right = mongoose.model('Right');
 const errors = require('../commons/errors.js');
 const authorizator = require('../security/authorization.js');
-const AccessTypes = require('../types/accessTypes.js'); 
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
 exports.isAvailable = async function(req, res, model) {
@@ -36,15 +35,38 @@ exports.isAdminitrator = async function(req, res) {
     return true;
 }
 
-exports.canAccess = async function(req, res, access) {
-    if (authorizator.isAdministrator(req.user)) return true;
-    if (authorizator.isOwner(req.user, req.resource)) return true;
-    const rights = await Right.findOne({resource: req.resource._id, user: req.user._id})
-    if (authorizator.hasRights(req.user, req.resource, rights, access)) return true;
-    return errors.manage(res, errors.restricted_access, req.resource._id);
-} 
+// Check rights TBD
+//const rights = await Right.findOne({resource: req.resource._id, user: req.user._id})
 
 exports.isOwned = async function(req, res) {
     if (!authorizator.isOwner(req.user, req.resource)) return errors.manage(res, errors.not_yours, req.resource._id);
     return true;
 }
+
+exports.canCreate = async function(req, res) {
+    if (authorizator.isAdministrator(req.user)) return true;
+    if (authorizator.isProvider(req.user)) return true;
+    return errors.manage(res, errors.restricted_access_create, "You cannot create new resources");
+}
+
+exports.canRead = async function(req, res) {
+    if (!req.resource.visibility) req.resource.visibility = VisibilityTypes.private;
+    if (req.resource.visibility == VisibilityTypes.public) return true;
+    if (authorizator.isAdministrator(req.user)) return true;
+    if (authorizator.isAnalyst(req.user)) return true;
+    if (authorizator.isProvider(req.user) && authorizator.isOwner(req.user, req.resource)) return true;
+    return errors.manage(res, errors.restricted_access_read, req.resource._id);
+} 
+
+exports.canModify = async function(req, res) {
+    if (authorizator.isAdministrator(req.user)) return true;
+    if (authorizator.isProvider(req.user) && authorizator.isOwner(req.user, req.resource)) return true;
+    return errors.manage(res, errors.restricted_access_modify, req.resource._id);
+} 
+
+exports.canDelete = async function(req, res) {
+    if (authorizator.isAdministrator(req.user)) return true;
+    if (authorizator.isProvider(req.user) && authorizator.isOwner(req.user, req.resource)) return true;
+    return errors.manage(res, errors.restricted_access_delete, req.resource._id);
+} 
+

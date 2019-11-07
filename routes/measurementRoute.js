@@ -132,31 +132,6 @@ router.post('/', catchErrors(measurementController.post));
  */
 router.delete('/:id',  catchErrors(measurementController.deleteOne));
 
-/**
- * @swagger
- * /measurements:
- *   delete:
- *     summary: deletes a many measurements according to filter
- *     tags: 
- *       - Measurement
- *     produces:
- *       - application/json
- *     parameters:
- *       - filter: string
- *         description: mongo db query
- *         in: path
- *         required: true
- *         type: string
- *     responses:
- *       200:
- *          description: the deleted measurements
- *          schema:
- *              $ref: '#/paths/definitions/measurement'
- *       404:
- *          description: measurements to be deleted not found
- *          schema:
- *              $ref: '#/paths/definitions/error'
- */
 router.delete('/',  catchErrors(measurementController.delete));
 
 /**
@@ -189,34 +164,5 @@ router.delete('/',  catchErrors(measurementController.delete));
  */
 router.put('/:id', catchErrors(measurementController.put));
 
-/**
- * @swagger
- * /measurements:
- *   put:
- *     summary: updates one measurement
- *     tags:
- *       - Measurement
- *     produces:
- *       - application/json
- *     parameters:
- *       - name: filter
- *         description: w.r.t feature, tags, etc...
- *         in: body
- *         required: true
- *         schema:
- *              type: array
- *              items:
- *                  $ref: '#/paths/definitions/measurement'
- *     responses:
- *       200:
- *          description: the upserted measurement
- *          schema:
- *              $ref: '#/paths/definitions/measurement'
- *       404:
- *          description: Filter resulted in multiple measurements
- *          schema:
- *              $ref: '#/paths/definitions/error'
- */
-router.put('/', catchErrors(measurementController.put));
 
 module.exports = router;

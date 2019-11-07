@@ -8,6 +8,7 @@ const Tag = mongoose.model('Tag');
 const Device = mongoose.model('Device');
 const Thing = mongoose.model('Thing');
 const User = mongoose.model('User');
+const Script = mongoose.model('Script');
 const inspector = require('../commons/inspector.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
@@ -104,6 +105,7 @@ const measurementSchema = new mongoose.Schema({
     thing: { type: String, required: "Please, supply a thing", ref: 'Thing', index: true },
     device: { type: String, required: "Please, supply a device", ref: 'Device', index: true },
     feature: { type: String, required: "Please, supply a feature", ref: 'Feature', index: true },
+    script: { type: String, ref: 'Script', index: true },
     samples: [sampleSchema],
     visibility: {type: String, default: VisibilityTypes.private },
     tags: [{ type: String, ref: 'Tag' }],
@@ -121,6 +123,15 @@ measurementSchema.path('feature').validate({
     validator: async function (value) {
         const feature = await Feature.findById(value);
         if (!feature) throw new Error('Feature not existent (' + value + ')');
+        return true;
+    }
+});
+
+// validate script
+measurementSchema.path('script').validate({
+    validator: async function (value) {
+        const script = await Script.findById(value);
+        if (!script) throw new Error('Script not existent (' + value + ')');
         return true;
     }
 });

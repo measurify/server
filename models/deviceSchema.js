@@ -42,6 +42,7 @@ const deviceSchema = new mongoose.Schema({
     tags: { type: [String], ref:'Tag' },
     scripts: { type: [String], ref:'Script' },
     visibility: {type: String, default: VisibilityTypes.private },
+    period: {type: Number, default: 10 },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });

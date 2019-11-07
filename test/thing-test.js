@@ -57,7 +57,7 @@ describe('/POST thing', () => {
         await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = {}
-        const res = await chai.request(server).post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing)
+        const res = await chai.request(server).post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -91,7 +91,7 @@ describe('/POST thing', () => {
     it('it should POST a thing', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = { _id: "test-thing-1" }
-        const res = await chai.request(server).post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing)
+        const res = await chai.request(server).post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -206,21 +206,6 @@ describe('/DELETE thing', () => {
         things_after.length.should.be.eql(1);
     });
 
-    it('it should not DELETE a thing by non-owner', async () => {
-        await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
-        const thing = await factory.createThing("test-thing-1", user);
-        const thing_before = await Thing.find();
-        thing_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user2));
-        res.should.have.status(errors.not_yours.status);
-        res.body.should.be.a('object');
-        res.body.message.should.contain(errors.not_yours.message);
-        const things_after = await Thing.find();
-        things_after.length.should.be.eql(1);
-    });
-
     it('it should not DELETE a thing already used in a measurement', async () => {
         await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
@@ -252,5 +237,114 @@ describe('/DELETE thing', () => {
         res.body.message.should.contain(errors.already_used.message);
         const things_after = await Thing.find();
         things_after.length.should.be.eql(2);
+    });
+});
+
+// Test the /PUT route
+describe('/PUT thing', () => {
+    it('it should PUT a thing to add a tag', async () => {
+        await mongoose.connection.dropDatabase();
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag_1 = await factory.createTag("test-tag-1", user);
+        const tag_2 = await factory.createTag("test-tag-2", user);
+        const tag_3 = await factory.createTag("test-tag-3", user);
+        const thing = await factory.createThing("test-thing-1", user, [tag_1, tag_2]);
+        const modification = { tags: { add: [tag_3._id] } };
+        const res = await chai.request(server).put('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body.tags.length.should.be.eql(3);
+    });
+
+    it('it should PUT a thing to remove a tag', async () => {
+        await mongoose.connection.dropDatabase();
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag_1 = await factory.createTag("test-tag-1", user);
+        const tag_2 = await factory.createTag("test-tag-2", user);
+        const tag_3 = await factory.createTag("test-tag-3", user);
+        const thing = await factory.createThing("test-thing-1", user, [tag_1, tag_2, tag_3]);
+        const modification = { tags: { remove: [tag_2._id] } };
+        const res = await chai.request(server).put('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body.tags.length.should.be.eql(2);
+    });
+
+    it('it should PUT a thing to add and remove tags', async () => {
+        await mongoose.connection.dropDatabase();
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag_1 = await factory.createTag("test-tag-1", user);
+        const tag_2 = await factory.createTag("test-tag-2", user);
+        const tag_3 = await factory.createTag("test-tag-3", user);
+        const tag_4 = await factory.createTag("test-tag-4", user);
+        const tag_5 = await factory.createTag("test-tag-5", user);
+        const tag_6 = await factory.createTag("test-tag-6", user);
+        const tag_7 = await factory.createTag("test-tag-7", user);
+        const thing = await factory.createThing("test-thing-1", user, [tag_1, tag_2, tag_3, tag_4]);
+        const modification = { tags: { remove: [tag_2._id, tag_3._id], add: [tag_5._id, tag_6._id, tag_7._id] } };
+        const res = await chai.request(server).put('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body.tags.length.should.be.eql(5);
+    });
+
+    it('it should not PUT a thing adding a fake tag', async () => {
+        await mongoose.connection.dropDatabase();
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag_1 = await factory.createTag("test-tag-1", user);
+        const tag_2 = await factory.createTag("test-tag-2", user);
+        const thing = await factory.createThing("test-thing-1", user, [tag_1, tag_2]);
+        const modification = { tags: { add: ["fake_tag"] } };
+        const res = await chai.request(server).put('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(errors.put_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.put_request_error.message);
+        res.body.details.should.contain('Resource to be added to the list not found');
+    });
+
+    it('it should not PUT a thing removing a fake tag', async () => {
+        await mongoose.connection.dropDatabase();
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag_1 = await factory.createTag("test-tag-1", user);
+        const tag_2 = await factory.createTag("test-tag-2", user);
+        const thing = await factory.createThing("test-thing-1", user, [tag_1, tag_2]);
+        const modification = { tags: { remove: ["fake_tag"] } };
+        const res = await chai.request(server).put('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(errors.put_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.put_request_error.message);
+        res.body.details.should.contain('Resource to be removed from list not found');
+    });
+
+    it('it should not PUT a fake thing', async () => {
+        await mongoose.connection.dropDatabase();
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag_1 = await factory.createTag("test-tag-1", user);
+        const tag_2 = await factory.createTag("test-tag-2", user);
+        const thing = await factory.createThing("test-thing-1", user, [tag_1, tag_2]);
+        const modification = { tags: { remove: ["fake_tag"] } };
+        const res = await chai.request(server).put('/v1/things/fake-thing').set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(errors.resource_not_found.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.resource_not_found.message);
+    });
+
+    it('it should not PUT a thing with a wrong field', async () => {
+        await mongoose.connection.dropDatabase();
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag_1 = await factory.createTag("test-tag-1", user);
+        const tag_2 = await factory.createTag("test-tag-2", user);
+        const thing = await factory.createThing("test-thing-1", user, [tag_1, tag_2]);
+        const modification = { fakefield: "fake-value" };
+        const res = await chai.request(server).put('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(errors.put_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.put_request_error.message);
+        res.body.details.should.contain('Request field cannot be updated ');
     });
 });

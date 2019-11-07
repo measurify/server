@@ -23,9 +23,7 @@ exports.isOwner = function(user, element) {
     return element.owner._id.equals(user._id); 
 }
 
-exports.hasRights = function(user, element, rights, access) {
-    if(element.visibility == VisibilityTypes.public && access == AccessTypes.read) return true;
-    if(user.type == UserRoles.analyst && access != AccessTypes.read) return false;
-    if(rights) if(rights.access.includes(access)) return true;
+exports.hasRights = function(rights, access) {
+    if(rights) if(!rights.access.includes(access)) return false;
     return false;
 }

@@ -323,4 +323,18 @@ describe('/PUT script', () => {
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
     });
+
+    it('it should not PUT a script with a wrong field', async () => {
+        await mongoose.connection.dropDatabase();
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag_1 = await factory.createTag("test-tag-1", user);
+        const tag_2 = await factory.createTag("test-tag-2", user);
+        const script = await factory.createScript("test-script-1", user, "test-code-1", [tag_1, tag_2]);
+        const modification = { fakefield: "fake-value" };
+        const res = await chai.request(server).put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(errors.put_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.put_request_error.message);
+        res.body.details.should.contain('Request field cannot be updated ');
+    });
 });

@@ -20,3 +20,11 @@ exports.delete = async (req, res) => {
     result = await checker.isNotUsed(req, res, Measurement, 'device'); if (result != true) return result;
     return await manager.deleteResource(req, res, Device);
 };
+
+exports.put = async (req, res) => { 
+    const fields = ['features', 'scripts', 'tags'];
+    let result = await checker.isAvailable(req, res, Device); if (result != true) return result;
+    result = await checker.isFilled(req, res, fields); if (result != true) return result;
+    result = await checker.isOwned(req, res); if (result != true) return result;
+    return await manager.updateResource(req, res, fields, Device);
+}

@@ -18,13 +18,6 @@ exports.post = async (req, res) => {
     return await manager.postResource(req, res, Script);
 };
 
-exports.delete = async (req, res) => {
-    let result = await checker.isAvailable(req, res, Script); if (result != true) return result;
-    result = await checker.isOwned(req, res); if (result != true) return result;
-    result = await checker.isNotUsed(req, res, Device, 'scripts'); if (result != true) return result;
-    return await manager.deleteResource(req, res, Script);
-};
-
 exports.put = async (req, res) => { 
     const fields = ['code', 'tags'];
     let result = await checker.isAvailable(req, res, Script); if (result != true) return result;
@@ -32,3 +25,12 @@ exports.put = async (req, res) => {
     result = await checker.isOwned(req, res); if (result != true) return result;
     return await manager.updateResource(req, res, fields, Script);
 }
+
+exports.delete = async (req, res) => {
+    let result = await checker.isAvailable(req, res, Script); if (result != true) return result;
+    result = await checker.isOwned(req, res); if (result != true) return result;
+    result = await checker.isNotUsed(req, res, Device, 'scripts'); if (result != true) return result;
+    return await manager.deleteResource(req, res, Script);
+};
+
+

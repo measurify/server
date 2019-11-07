@@ -1498,9 +1498,7 @@
 							"script": {
 								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
 								"exec": [
-									"var features = JSON.parse(pm.environment.get(\"features\"));",
-									"pm.environment.set('feature1', features[0]._id);",
-									"pm.environment.set('feature2', features[1]._id);"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -1531,7 +1529,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"_id\": \"device_test\",\r\n    \"features\": [ \"{{feature1}}\", \"{{feature2}}\" ]\r\n}\r\n"
+							"raw": "{\r\n\t\"_id\": \"gps\",\r\n    \"features\": [ \"position\" ]\r\n}\r\n"
 						},
 						"url": {
 							"raw": "{{url}}/v1/devices/",
@@ -2163,7 +2161,7 @@
 					"response": []
 				},
 				{
-					"name": "POST a new measurement (location point)",
+					"name": "POST a new measurement",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -2192,59 +2190,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\r\n\t{\r\n\t\t\"startDate\": \"2018-10-20T00:00:00.000Z\",\r\n\t\t\"endDate\": \"{{current_timestamp}}\",\r\n\t\t\"thing\": \"firstTrip\",\r\n\t\t\"feature\": \"Stat\",\r\n\t\t\"baseFeatures\": [\"Speed\"],\r\n\t\t\"device\": \"Speedometer\",\r\n\t\t\"values\": [\r\n\t\t\t{\r\n\t\t\t\t\"value\": [\"80\",\"10\",\"0\",\"140\",\"80\", \"1000\", \"5\", \"Infinity\"]\r\n\t\t\t\t}\r\n\t\t\t],\r\n\t\t\"tags\":[\" \"]\r\n\t}\r\n]"
-						},
-						"url": {
-							"raw": "{{url}}/v1/measurements",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"measurements"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POST a new measurement (location multi-point)",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "981648d0-4153-4d98-9273-49fbcfd23e04",
-								"exec": [
-									"var current_timestamp = new Date();",
-									"postman.setEnvironmentVariable(\"current_timestamp\", current_timestamp.toISOString());"
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"id": "22e1c321-d76f-4302-a498-8e67cf7453e2",
-								"exec": [
-									"var jsonData = JSON.parse(responseBody);",
-									"postman.setEnvironmentVariable(\"measurement\", jsonData._id);",
-									"tests[\"measurement = \" + jsonData._id] = true;"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
+							"raw": "{\r\n\t\"startDate\": \"{{current_timestamp}}\",\r\n\t\"endDate\": \"{{current_timestamp}}\",\r\n\t\"thing\": \"car-test\",\r\n\t\"feature\": \"position\",\r\n\t\"device\": \"gps\",\r\n\t\"samples\": [\r\n\t\t{\r\n\t\t\t\"values\": [80, 10]\r\n\t\t\t}\r\n\t\t],\r\n\t\"tags\":[]\r\n}\r\n"
 						},
 						"url": {
 							"raw": "{{url}}/v1/measurements",
@@ -2289,7 +2235,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\r\n\t{\r\n\t\t\"startDate\": \"2018-10-20T00:00:00.000Z\",\r\n\t\t\"endDate\": \"{{current_timestamp}}\",\r\n\t\t\"thing\": \"firstTrip\",\r\n\t\t\"feature\": \"Stat\",\r\n\t\t\"baseFeatures\": [\"Speed\"],\r\n\t\t\"device\": \"Speedometer\",\r\n\t\t\"values\": [\r\n\t\t\t{\r\n\t\t\t\t\"value\": [\"80\",\"10\",\"0\",\"140\",\"80\", \"1000\"]\r\n\t\t\t\t}\r\n\t\t\t],\r\n\t\t\"tags\":[\" \"]\r\n\t}\r\n]"
+							"raw": "[\r\n\t{\r\n\t\t\"thing\": \"car-test\",\r\n\t\t\"feature\": \"position\",\r\n\t\t\"device\": \"gps\",\r\n\t\t\"samples\": [\r\n\t\t\t{\r\n\t\t\t\t\"values\": [80, 10]\r\n\t\t\t\t}\r\n\t\t\t],\r\n\t\t\"tags\":[]\r\n\t},\r\n\t{\r\n\t\t\"thing\": \"car-test\",\r\n\t\t\"feature\": \"position\",\r\n\t\t\"device\": \"gps\",\r\n\t\t\"samples\": [\r\n\t\t\t{\r\n\t\t\t\t\"values\": [81, 10]\r\n\t\t\t\t}\r\n\t\t\t],\r\n\t\t\"tags\":[]\r\n\t}\r\n\t\r\n]"
 						},
 						"url": {
 							"raw": "{{url}}/v1/measurements",
@@ -2311,35 +2257,6 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "{{token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{url}}/v1/measurements/5c054084b2595daf14b8ce58",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"measurements",
-								"5c054084b2595daf14b8ce58"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "PUT a measurement by filter",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
 								"type": "text",
 								"value": "{{token}}"
 							},
@@ -2352,51 +2269,17 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"feature\":\"Histogram\",\n\t\"baseFeatures\":\"Speed\",\n\t\"thing\": \"secondTrip\",\n\t\"tags\": [\"ADF_ON\", \"UNINFLUENCEDDRIVING_OFF\"],\n\t\"values\": [\n\t\t\t{\n\t\t\t\t\"value\": [\"100\",\"0\",\"5\",\"5\"]\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"value\": [\"10\",\"30\",\"40\",\"20\"]\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"value\": [\"30\",\"Infinity\",\"20\",\"55\"]\n\t\t\t\t}\n\t\t\t]\n}"
+							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/v1/measurements",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"measurements"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "PUT a measurement by id",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "{{token}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"values\": [\n\t\t\t{\n\t\t\t\t\"value\": [\"0\",\"10\",\"5\",\"5\"]\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"value\": [\"10\",\"30\",\"40\",\"20\"]\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"value\": [\"30\",\"Infinity\",\"20\",\"55\"]\n\t\t\t\t}\n\t\t\t]\n}"
-						},
-						"url": {
-							"raw": "{{url}}/v1/measurements/5c505a1962e8eb25e44c9e92",
+							"raw": "{{url}}/v1/measurements/{{measurement}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"v1",
 								"measurements",
-								"5c505a1962e8eb25e44c9e92"
+								"{{measurement}}"
 							]
 						}
 					},
