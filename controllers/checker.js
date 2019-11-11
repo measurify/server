@@ -70,3 +70,10 @@ exports.canDelete = async function(req, res) {
     return errors.manage(res, errors.restricted_access_delete, req.resource._id);
 } 
 
+exports.whatCanRead = async function(req, res) {
+    if (authorizator.isAdministrator(req.user)) return null;
+    if (authorizator.isAnalyst(req.user)) return null;
+    if (authorizator.isProvider(req.user)) return { $or: [ { owner: req.user._id }, { visibility: VisibilityTypes.public } ] };
+    return null;
+} 
+

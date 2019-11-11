@@ -110,7 +110,7 @@ describe('/POST thing', () => {
     });
 
     it('it should GET the thing posted before', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.analyst);
         const res = await chai.request(server).get('/v1/things').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');

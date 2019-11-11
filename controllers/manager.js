@@ -17,7 +17,7 @@ exports.getResource = async function(req, res, field, model) {
     }
 };
 
-exports.getResourceList = async function(req, res, sort, select, model) {
+exports.getResourceList = async function(req, res, sort, select, model, restriction) {
     try {
         const query = req.query;
         if (!query.page) query.page = '1';
@@ -27,6 +27,10 @@ exports.getResourceList = async function(req, res, sort, select, model) {
         if (!query.select) query.select = select;
         if (query.filter.startsWith("[")) { query.filter = "{ \"$or\": " + query.filter + " }" };
         const filter = JSON.parse(query.filter);
+        if(restriction) {
+            if(!filter["$or"]) filter["$or"]=restriction["$or"];
+            else filter["$or"].concat(restriction["$or"]);
+        } 
         const options = {
             select: JSON.parse(query.select),
             sort: JSON.parse(query.sort),

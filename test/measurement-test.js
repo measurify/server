@@ -868,25 +868,6 @@ describe('/DELETE measurement', () => {
         measurements_after.length.should.be.eql(1);
     });
 
-    it('it should not DELETE a measurement by non-owner', async () => {
-        await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
-        const feature = await factory.createFeature("test-feature", user);
-        const device = await factory.createDevice("test-device-4", user, [feature]);
-        const tag = await factory.createTag("test-tag", user);
-        const thing = await factory.createThing("test-thing", user);
-        const measurement = await factory.createMeasurement(user, feature, device, thing, [tag]);
-        const measurements_before = await Measurement.find();
-        measurements_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user2));
-        res.should.have.status(errors.not_yours.status);
-        res.body.should.be.a('object');
-        res.body.message.should.contain(errors.not_yours.message);
-        const measurements_after = await Measurement.find();
-        measurements_after.length.should.be.eql(1);
-    });
-
     it('it should not DELETE a list of measurement without a filter', async () => {
         await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
@@ -905,7 +886,7 @@ describe('/DELETE measurement', () => {
         measurements_after.length.should.be.eql(1);
     });
 
-    it('it should DELETE only the filtered measurements of the user', async () => {
+    it('it should DELETE only the filtered measurements', async () => {
         await mongoose.connection.dropDatabase();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const other = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);

@@ -8,7 +8,8 @@ const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 
 exports.get = async (req, res) => { 
-    return await manager.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Thing); 
+    const restriction = await checker.whatCanRead(req, res);
+    return await manager.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Thing, restriction); 
 };
 
 exports.getone = async (req, res) => { 
