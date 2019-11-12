@@ -24,7 +24,7 @@ passport.use(new strategy_local({
 
 passport.use(new strategy_jwt({
         jwtFromRequest: extractJWT.fromAuthHeaderWithScheme("jwt"),
-        secretOrKey   : process.env.SECRET
+        secretOrKey   : process.env.JWTSECRET
     },
     function (jwtPayload, done) {
         return User.findById(jwtPayload._id)
@@ -37,11 +37,11 @@ passport.use(new strategy_jwt({
 ));
 
 exports.encode = function(obj) {
-    return 'JWT ' + jwt.sign(obj.toJSON(), process.env.SECRET, {expiresIn: process.env.EXPIRATIONTIME});
+    return 'JWT ' + jwt.sign(obj.toJSON(), process.env.JWTSECRET, {expiresIn: process.env.EXPIRATIONTIME});
 };
 
 exports.decode = function(token) {
     token = token.replace('JWT ', '');
-    try {  return jwt.verify(token, process.env.SECRET); }
+    try {  return jwt.verify(token, process.env.JWTSECRET); }
     catch(error) { return "invalid token"; }  
 }

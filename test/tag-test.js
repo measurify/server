@@ -185,21 +185,6 @@ describe('/DELETE tag', () => {
         tags_after.length.should.be.eql(1);
     });
 
-    it('it should not DELETE a tag by non-owner', async () => {
-        await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
-        const tag = await factory.createTag("test-tag-2", user);
-        const tags_before = await Tag.find();
-        tags_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user2));
-        res.should.have.status(errors.not_yours.status);
-        res.body.should.be.a('object');
-        res.body.message.should.contain(errors.not_yours.message);
-        const tags_after = await Tag.find();
-        tags_after.length.should.be.eql(1);
-    });
-
     it('it should not DELETE a tag already used in a measurement', async () => {
         await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);

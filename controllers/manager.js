@@ -17,6 +17,15 @@ exports.getResource = async function(req, res, field, model) {
     }
 };
 
+exports.prepareFilter = function(filter, restriction) {
+        var object = JSON.parse(filter);
+        if(restriction) { 
+            if(object.$and) object.$and.push(restriction);
+            else object = { $and: [ object, restriction ] };
+        }
+        return object;
+}
+
 exports.getResourceList = async function(req, res, sort, select, model, restriction) {
     try {
         const query = req.query;
@@ -25,12 +34,7 @@ exports.getResourceList = async function(req, res, sort, select, model, restrict
         if (!query.filter) query.filter = '{}';
         if (!query.sort) query.sort = sort;
         if (!query.select) query.select = select;
-        if (query.filter.startsWith("[")) { query.filter = "{ \"$or\": " + query.filter + " }" };
-        const filter = JSON.parse(query.filter);
-        if(restriction) {
-            if(!filter["$or"]) filter["$or"]=restriction["$or"];
-            else filter["$or"].concat(restriction["$or"]);
-        } 
+        const filter = this.prepareFilter(query.filter, restriction);
         const options = {
             select: JSON.parse(query.select),
             sort: JSON.parse(query.sort),

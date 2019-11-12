@@ -173,6 +173,33 @@ describe('Access read a list of measurements', () => {
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(4);
     });
+
+    it('it should get own or public measurements only of a specific tag AND (of a specific feature OR a specific device)', async () => {
+        await mongoose.connection.dropDatabase();
+        const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin); 
+        const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
+        const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
+        const feature1 = await factory.createFeature("test-feature-1", owner);
+        const feature2 = await factory.createFeature("test-feature-2", owner);
+        const tag1 = await factory.createTag("test-tag-1", owner);
+        const tag2 = await factory.createTag("test-tag-2", owner);
+        const device1 = await factory.createDevice("test-device-1", owner, [feature1, feature2]);
+        const device2 = await factory.createDevice("test-device-2", owner, [feature1, feature2]);
+        const thing = await factory.createThing("test-thing-1", owner);
+        const measurement1 = await factory.createMeasurement(owner, feature1, device2, thing, [tag1], factory.createSamples(1), null, null, null, VisibilityTypes.public);
+        const measurement2 = await factory.createMeasurement(user_provider, feature2, device1, thing, [tag1], factory.createSamples(2), null, null, null, VisibilityTypes.private);
+        const measurement3 = await factory.createMeasurement(owner, feature1, device1, thing, [tag1], factory.createSamples(3), null, null, null, VisibilityTypes.private);
+        const measurement4 = await factory.createMeasurement(owner, feature2, device2, thing, [tag1, tag2], factory.createSamples(4), null, null, null, VisibilityTypes.public);
+        const measurement5 = await factory.createMeasurement(user_provider, feature2, device2, thing, [tag1], factory.createSamples(5), null, null, null, VisibilityTypes.private);
+        let res = await chai.request(server).get('/v1/measurements?filter={"$and":[{"tags":"test-tag-1"}, {"$or":[{"feature":"test-feature-1"},{"device":"test-device-1"}]}]}').set("Authorization", await factory.getUserToken(user_admin));
+        res.should.have.status(200);
+        res.body.docs.should.be.a('array');
+        res.body.docs.length.should.be.eql(3);
+        res = await chai.request(server).get('/v1/measurements?filter={"$and":[{"tags":"test-tag-1"}, {"$or":[{"feature":"test-feature-1"},{"device":"test-device-1"}]}]}').set("Authorization", await factory.getUserToken(user_provider));
+        res.should.have.status(200);
+        res.body.docs.should.be.a('array');
+        res.body.docs.length.should.be.eql(2);
+    });
 });
 
 // READ

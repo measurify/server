@@ -244,23 +244,6 @@ describe('/DELETE rights', () => {
         const rights_after = await Right.find();
         rights_after.length.should.be.eql(1);
     });
-
-    it('it should not DELETE a script by non-owner', async () => {
-        await mongoose.connection.dropDatabase();
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const not_owner = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
-        const user = await factory.createUser("test-username-3", "test-password-3", UserRoles.provider);
-        const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
-        const right = await factory.createRight(resource, "Tag", user, [AccessTypes.create], owner, [], VisibilityTypes.public);
-        const rights_before = await Right.find();
-        rights_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(not_owner));
-        res.should.have.status(errors.not_yours.status);
-        res.body.should.be.a('object');
-        res.body.message.should.contain(errors.not_yours.message);
-        const rights_after = await Right.find();
-        rights_after.length.should.be.eql(1);
-    });
 });
 
 // Test the /PUT route

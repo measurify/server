@@ -150,15 +150,15 @@ describe('/GET measurements', () => {
         const measurement3 = await factory.createMeasurement(owner, feature2, device, thing, [tag1], factory.createSamples(3));
         const measurement4 = await factory.createMeasurement(owner, feature1, device, thing, [tag1, tag2], factory.createSamples(4));
         const measurement5 = await factory.createMeasurement(owner, feature2, device, thing, [tag1], factory.createSamples(5));
-        let res = await chai.request(server).get('/v1/measurements?filter=[{"feature":"test-feature-1"}, {"tags":"test-tag-1"}]').set("Authorization", await factory.getUserToken(owner));
+        let res = await chai.request(server).get('/v1/measurements?filter={"$or":[{"feature":"test-feature-1"}, {"tags":"test-tag-1"}]}').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(5);
-        res = await chai.request(server).get('/v1/measurements?filter=[{"feature":"test-feature-1"}, {"tags":"test-tag-2"}]').set("Authorization", await factory.getUserToken(owner));
+        res = await chai.request(server).get('/v1/measurements?filter={"$or":[{"feature":"test-feature-1"},{"tags":"test-tag-2"}]}').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(3);
-        res = await chai.request(server).get('/v1/measurements?filter=[{"feature":"test-feature-2"}, {"tags":"test-tag-2"}]').set("Authorization", await factory.getUserToken(owner));
+        res = await chai.request(server).get('/v1/measurements?filter={"$or":[{"feature":"test-feature-2"},{"tags":"test-tag-2"}]}').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(4);
@@ -866,49 +866,5 @@ describe('/DELETE measurement', () => {
         res.body.message.should.contain(errors.resource_not_found.message);
         const measurements_after = await Measurement.find();
         measurements_after.length.should.be.eql(1);
-    });
-
-    it('it should not DELETE a list of measurement without a filter', async () => {
-        await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const feature = await factory.createFeature("test-feature", user);
-        const device = await factory.createDevice("test-device-4", user, [feature]);
-        const tag = await factory.createTag("test-tag", user);
-        const thing = await factory.createThing("test-thing", user);
-        const measurement = await factory.createMeasurement(user, feature, device, thing, [tag]);
-        const measurements_before = await Measurement.find();
-        measurements_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/measurements/').set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.measurement_delete_needs_filter.status);
-        res.body.should.be.a('object');
-        res.body.message.should.contain(errors.measurement_delete_needs_filter.message);
-        const measurements_after = await Measurement.find();
-        measurements_after.length.should.be.eql(1);
-    });
-
-    it('it should DELETE only the filtered measurements', async () => {
-        await mongoose.connection.dropDatabase();
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const other = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
-        const feature = await factory.createFeature("test-feature", owner);
-        const device = await factory.createDevice("test-device-4", owner, [feature]);
-        const tag1 = await factory.createTag("test-tag-1", owner);
-        const tag2 = await factory.createTag("test-tag-2", owner);
-        const thing = await factory.createThing("test-thing", owner);
-        const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(1));
-        const measurement2 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(2));
-        const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag2], factory.createSamples(3));
-        const measurement4 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(3));
-        const measurement5 = await factory.createMeasurement(owner, feature, device, thing, [tag2], factory.createSamples(3));
-        const measurement6 = await factory.createMeasurement(other, feature, device, thing, [tag1], factory.createSamples(3));
-        const measurement7 = await factory.createMeasurement(other, feature, device, thing, [tag2], factory.createSamples(3));
-        const measurement8 = await factory.createMeasurement(other, feature, device, thing, [tag1], factory.createSamples(3));
-        const measurements_before = await Measurement.find();
-        measurements_before.length.should.be.eql(8);
-        const res = await chai.request(server).delete('/v1/measurements?filter={"tags":"test-tag-1"}').set("Authorization", await factory.getUserToken(owner));
-        res.should.have.status(200);
-        res.body.should.be.a('object');
-        const measurements_after = await Measurement.find();
-        measurements_after.length.should.be.eql(5);
     });
 });

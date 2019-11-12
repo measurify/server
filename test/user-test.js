@@ -47,10 +47,10 @@ describe('/GET users', () => {
         await factory.createUser("test-username-1", "test-password-1");
         await factory.createUser("test-username-2", "test-password-2");
         const res = await chai.request(server).get('/v1/users').set('Authorization', await factory.getUserToken(user));
-        res.should.have.status(errors.user_authorization_error.status);
+        res.should.have.status(errors.admin_restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.be.eql(errors.user_authorization_error.message);
+        res.body.message.should.be.eql(errors.admin_restricted_access.message);
     });
 
     it('it should GET a specific user', async () => {
@@ -67,10 +67,10 @@ describe('/GET users', () => {
         const regular = await factory.createUser("test-username-1", "test-password-1", UserRoles.regular);
         const user = await factory.createUser("test-username-1", "test-password-1");
         const res = await chai.request(server).get('/v1/users/' + user._id).set('Authorization', await factory.getUserToken(regular));
-        res.should.have.status(errors.user_authorization_error.status);
+        res.should.have.status(errors.admin_restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.be.eql(errors.user_authorization_error.message);
+        res.body.message.should.be.eql(errors.admin_restricted_access.message);
     });
 
     it('it should not GET a fake user', async () => {

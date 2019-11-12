@@ -328,21 +328,4 @@ describe('/DELETE constraint', () => {
         const constraints_after = await Constraint.find();
         constraints_after.length.should.be.eql(1);
     });
-    
-    it('it should not DELETE a constraint by non-owner', async () => {
-        await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user2= await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
-        const tag = await factory.createTag("test-tag", user); 
-        const feature = await factory.createFeature("test-feature", user);
-        const constraint = await factory.createConstraint(user, "Tag", "Feature", tag._id, feature._id, RelationshipTypes.dependency);
-        const constraints_before = await Constraint.find();
-        constraints_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/constraints/' + constraint._id).set("Authorization", await factory.getUserToken(user2));
-        res.should.have.status(errors.not_yours.status);
-        res.body.should.be.a('object');
-        res.body.message.should.contain(errors.not_yours.message);
-        const constraints_after = await Constraint.find();
-        constraints_after.length.should.be.eql(1);
-    });
 });

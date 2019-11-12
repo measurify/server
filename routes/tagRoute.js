@@ -114,4 +114,7 @@ router.post('/', catchErrors(tagController.post));
  *              $ref: '#/paths/definitions/error'
  */
 router.delete('/:id',  catchErrors(tagController.delete));
+
+router.put('/:id', catchErrors(tagController.put));
+
 module.exports = router;

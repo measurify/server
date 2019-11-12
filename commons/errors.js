@@ -21,13 +21,8 @@ exports.already_used                         = { status: 403, value: 18, message
 exports.missing_info                         = { status: 401, value: 19, message: 'Please, provide some info to modify the resource' }; 
 exports.user_authorization_error             = { status: 401, value: 20, message: 'Only the administrator can manage users' };
 exports.cannot_create                        = { status: 401, value: 21, message: 'Only administrators and provides can create new resources' };
-
-exports.computation_code_required            = { status: 404, value: 22, message: 'Please, provide the code to execute for the computation' };
-exports.computation_filter_required          = { status: 403, value: 23, message: 'Only the owner can delete' };
-exports.computation_code_unknown             = { status: 404, value: 24, message: 'The provided code is not recognized as valid' };      
-
-exports.measurement_authorization_error      = { status: 401, value: 25, message: 'Only the owner can access a measurement' };
-exports.measurement_delete_needs_filter      = { status: 403, value: 26, message: 'To delete multiple measurement you have to provide a filter' };
+exports.filter_required                      = { status: 403, value: 22, message: 'The request needs a valid filter' };
+exports.invalid_code                         = { status: 400, value: 23, message: 'The code is not recognized as valid' };      
 
 exports.manage = function(res, error, more) {
     if( typeof more === 'object' && more !== null) more = more.toString();

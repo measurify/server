@@ -31,7 +31,10 @@ exports.isNotUsed = async function(req, res, model, field) {
 } 
 
 exports.isAdminitrator = async function(req, res) {
-    if(!authorizator.isAdministrator(req.user)) return errors.manage(res, errors.admin_restricted_access, req.resource._id);
+    if(!authorizator.isAdministrator(req.user)) {  
+        if (req.resource) return errors.manage(res, errors.admin_restricted_access, req.resource._id);
+        else return errors.manage(res, errors.admin_restricted_access);
+    }
     return true;
 }
 
@@ -73,7 +76,7 @@ exports.canDelete = async function(req, res) {
 exports.whatCanRead = async function(req, res) {
     if (authorizator.isAdministrator(req.user)) return null;
     if (authorizator.isAnalyst(req.user)) return null;
-    if (authorizator.isProvider(req.user)) return { $or: [ { owner: req.user._id }, { visibility: VisibilityTypes.public } ] };
+    if (authorizator.isProvider(req.user)) return { $or: [  { owner: req.user._id }, { visibility: VisibilityTypes.public } ] };
     return null;
 } 
 

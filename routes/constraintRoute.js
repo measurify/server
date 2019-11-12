@@ -114,4 +114,6 @@ router.post('/', catchErrors(constraintController.post));
  */
 router.delete('/:id',  catchErrors(constraintController.delete));
 
+router.put('/:id', catchErrors(constraintController.put));
+
 module.exports = router;

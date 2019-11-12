@@ -33,12 +33,12 @@ exports.createSuperAdministrator = async function() {
 
 exports.getAdminToken = async function() {
     const admin = await User.findOne({ username: process.env.ADMIN_USERNAME });
-    const token = jwt.sign(admin.toJSON(), process.env.SECRET);
+    const token = jwt.sign(admin.toJSON(), process.env.JWTSECRET);
     return 'JWT ' + token;
 };
 
 exports.getUserToken = async function(user) {
-    const token = jwt.sign(user.toJSON(), process.env.SECRET);
+    const token = jwt.sign(user.toJSON(), process.env.JWTSECRET);
     return 'JWT ' + token;
 };
 

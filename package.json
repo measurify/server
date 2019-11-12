@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://riccardoberta@bitbucket.org/wondertech/atmosphere-measurement-api.git"
+    "url": "git+https://github.com/Atmosphere-IoT-Framework/api.git"
   },
   "keywords": [
     "API",

@@ -12,7 +12,7 @@ const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 
 exports.get = async (req, res) => { 
-    if (!Authorization.isAdministrator(req.user)) return errors.manage(res, errors.user_authorization_error);
+    const result = await checker.isAdminitrator(req, res); if (result != true) return result;
     return await manager.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', User); 
 };
 
@@ -21,14 +21,23 @@ exports.getusernames = async (req, res) => {
 };
 
 exports.getone = async (req, res) => {
-    if(!Authorization.isAdministrator(req.user)) return errors.manage(res, errors.user_authorization_error);
-    return await manager.getResource(req, res, null, User);
+    let result = await checker.isAvailable(req, res, User); if (result != true) return result;
+    result = await checker.isAdminitrator(req, res); if (result != true) return result;
+    return res.status(200).json(req.resource);
 };
 
 exports.post = async (req, res) => {
-    if(!Authorization.isAdministrator(req.user)) return errors.manage(res, errors.user_authorization_error);
+    let result = await checker.isAdminitrator(req, res); if (result != true) return result;
     return await manager.postResource(req, res, User);
 };
+
+exports.put = async (req, res) => { 
+    const fields = ['tags'];
+    let result = await checker.isAvailable(req, res, User); if (result != true) return result;
+    result = await checker.isFilled(req, res, fields); if (result != true) return result;
+    result = await checker.isAdminitrator(req, res); if (result != true) return result;
+    return await manager.updateResource(req, res, fields, User);
+};  
 
 exports.delete = async (req, res) => {
     let result = await checker.isAvailable(req, res, User); if (result != true) return result;

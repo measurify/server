@@ -186,21 +186,6 @@ describe('/DELETE script', () => {
         scripts_after.length.should.be.eql(1);
     });
 
-    it('it should not DELETE a script by non-owner', async () => {
-        await mongoose.connection.dropDatabase();
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
-        const script = await factory.createScript("test-script-1", user, "test-code-1", []);
-        const script_before = await Script.find();
-        script_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user2));
-        res.should.have.status(errors.not_yours.status);
-        res.body.should.be.a('object');
-        res.body.message.should.contain(errors.not_yours.message);
-        const scripts_after = await Script.find();
-        scripts_after.length.should.be.eql(1);
-    });
-
     it('it should not DELETE a script already used in a device', async () => {
         await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);

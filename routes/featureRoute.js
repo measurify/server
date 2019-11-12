@@ -114,4 +114,6 @@ router.post('/', catchErrors(featureController.post));
  */
 router.delete('/:id',  catchErrors(featureController.delete));
 
+router.put('/:id', catchErrors(featureController.put));
+
 module.exports = router;

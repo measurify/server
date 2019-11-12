@@ -6,14 +6,14 @@ const errorHandlers = require('./commons/errorHandlers.js');
 const swagger = require('swagger-jsdoc');
 const info = require('./package.json');
 const cors = require('cors');
-var https = require('https');
-var http = require('http');
-var fs = require('fs');
-var compression = require('compression');
+const https = require('https');
+const http = require('http');
+const fs = require('fs');
+const compression = require('compression');
 
 // https credentials
-var cert_file;
-var key_file
+let cert_file;
+let key_file;
 // self-signed no ssl on local
 if (process.env.ENV === 'development' || process.env.ENV === 'test') {
     cert_file = './resources/caCert.pem'; // The certificate
@@ -103,8 +103,7 @@ else app.use(errorHandlers.productionErrors);
 // Create HTTP or HTTPS server
 let server = null;
 try {
-    const passphrase = 'atmospherePass';  // The password of the private key
-    const config = { key: fs.readFileSync(key_file), cert: fs.readFileSync(cert_file), passphrase: passphrase };
+    const config = { key: fs.readFileSync(key_file), cert: fs.readFileSync(cert_file), passphrase: process.env.HTTPSSECRET };
     server = https.createServer(config, app );
     const instance = server.listen(443, () => { console.log('Atmosphere Measurement API are running on port ' +  instance.address().port); });
 }
