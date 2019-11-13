@@ -168,7 +168,7 @@ describe('/POST thing', () => {
         const relation1 = await factory.createThing("relation-1", user);
         const relation2 = await factory.createThing("relation-2", user);
         const thing = { _id: "test-thing-2", relations: [relation1, relation2] };
-        const res = await chai.request(server).post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing)
+        const res = await chai.request(server).post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');

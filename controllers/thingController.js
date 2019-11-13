@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const manager = require('./manager');
+const controller = require('./controller');
 const checker = require('./checker');
 const Thing = mongoose.model('Thing');
 const Measurement = mongoose.model('Measurement');
@@ -9,7 +9,7 @@ const errors = require('../commons/errors.js');
 
 exports.get = async (req, res) => { 
     const restriction = await checker.whatCanRead(req, res);
-    return await manager.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Thing, restriction); 
+    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Thing, restriction); 
 };
 
 exports.getone = async (req, res) => { 
@@ -20,7 +20,7 @@ exports.getone = async (req, res) => {
 
 exports.post = async (req, res) => {
     let result = await checker.canCreate(req, res); if (result != true) return result;
-    return await manager.postResource(req, res, Thing);
+    return await controller.postResource(req, res, Thing);
 };
 
 exports.put = async (req, res) => { 
@@ -28,7 +28,7 @@ exports.put = async (req, res) => {
     let result = await checker.isAvailable(req, res, Thing); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.canModify(req, res); if (result != true) return result;
-    return await manager.updateResource(req, res, fields, Thing);
+    return await controller.updateResource(req, res, fields, Thing);
 };   
 
 exports.delete = async (req, res) => {
@@ -36,5 +36,5 @@ exports.delete = async (req, res) => {
     result = await checker.isNotUsed(req, res, Measurement, 'thing'); if (result != true) return result;
     result = await checker.isNotUsed(req, res, Thing, 'relations'); if (result != true) return result;
     result = await checker.canDelete(req, res); if (result != true) return result;
-    return await manager.deleteResource(req, res, Thing);
+    return await controller.deleteResource(req, res, Thing);
 };

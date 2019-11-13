@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const manager = require('./manager');
+const controller = require('./controller');
 const checker = require('./checker');
 const Computation = mongoose.model('Computation');
 const ObjectId = require('mongoose').Types.ObjectId;
@@ -10,7 +10,7 @@ const ComputationStatusTypes = require('../types/computationStatusTypes.js');
 
 exports.get = async (req, res) => { 
     const restriction = await checker.whatCanRead(req, res);
-    return await manager.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Computation, restriction); 
+    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Computation, restriction); 
 };
 
 exports.getone = async (req, res) => { 
@@ -20,14 +20,12 @@ exports.getone = async (req, res) => {
 };
 
 exports.post = async (req, res) => {
-    // TBD
-    if(!req.body.code) return res.status(errors.computation_code_required.status).json(errors.computation_code_required.message);
-    if(!req.body.filter) return res.status(errors.computation_filter_required.status).json(errors.computation_filter_required.message);
-    req.body.owner = req.user._id;
-    req.body.status = ComputationStatusTypes.running;
-    const filter = JSON.parse(req.body.filter);
+    const fields = ['code','filter'];
+    let result = await checker.isFilled(req, res, fields); if (result != true) return result;
+    const restriction = await checker.whatCanRead(req, res);
+    const filter = JSON.parse(req.body.filter)
     const computation = new Computation(req.body);
-    if(runner.go(filter, computation)) {
+    if(runner.go(computation, filter, restriction)) {
         await computation.save();
         return res.status(200).json(computation);
     }
@@ -39,11 +37,11 @@ exports.put = async (req, res) => {
     let result = await checker.isAvailable(req, res, Computation); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.canModify(req, res); if (result != true) return result;
-    return await manager.updateResource(req, res, fields, Computation);
+    return await controller.updateResource(req, res, fields, Computation);
 };
 
 exports.delete = async (req, res) => {
     let result = await checker.isAvailable(req, res, Computation); if (result != true) return result;
     result = await checker.canDelete(req, res); if (result != true) return result;
-    return await manager.deleteResource(req, res, Computation);
+    return await controller.deleteResource(req, res, Computation);
 }

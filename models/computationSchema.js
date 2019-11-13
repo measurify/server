@@ -52,9 +52,10 @@ const VisibilityTypes = require('../types/visibilityTypes.js');
  */
 
 const computationSchema = new mongoose.Schema({
-    name: { type: String, default: null },
+    _id: { type: String, required: "Please, supply an _id" },
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, autopopulate: true },
-    code: { type: String },
+    code: { type: String, required: 'Please, supply the code'  },
+    feature: { type: String, required: 'Please, supply a feature', ref: 'Feature', autopopulate: true },
     filter: { type: String },
     status: { type: String, default: ComputationStatusTypes.running },
     progress: {type: Number, default: 0 },

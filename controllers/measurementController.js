@@ -1,29 +1,22 @@
 const mongoose = require('mongoose');
-const manager = require('./manager');
+const controller = require('./controller');
 const checker = require('./checker');
 const Measurement = mongoose.model('Measurement');
-const Thing = mongoose.model('Thing');
-const Feature = mongoose.model('Feature');
-const User = mongoose.model('User');
-const Authorization = require('../security/authorization.js');
-const ObjectId = require('mongoose').Types.ObjectId;
-const paginate = require("paginate-array");
-const errors = require('../commons/errors.js');
 
 exports.get = async (req, res) => { 
     const restriction = await checker.whatCanRead(req, res);
-    return await manager.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Measurement, restriction); 
+    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Measurement, restriction); 
 };
 
 exports.getone = async (req, res) => { 
     let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
-    return await manager.getResource(req, res, null, Measurement); 
+    return await controller.getResource(req, res, null, Measurement); 
 };
 
 exports.post = async (req, res) => {
     let result = await checker.canCreate(req, res); if (result != true) return result;
-    return await manager.postResource(req, res, Measurement);
+    return await controller.postResource(req, res, Measurement);
 };
 
 exports.put = async (req, res) => { 
@@ -31,12 +24,12 @@ exports.put = async (req, res) => {
     let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.canModify(req, res); if (result != true) return result;
-    return await manager.updateResource(req, res, fields, Measurement);
+    return await controller.updateResource(req, res, fields, Measurement);
 };
 
 exports.delete = async (req, res) => {
     let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
     result = await checker.canDelete(req, res); if (result != true) return result;
-    return await manager.deleteResource(req, res, Measurement);
+    return await controller.deleteResource(req, res, Measurement);
 } 
 

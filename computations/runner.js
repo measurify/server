@@ -15,9 +15,10 @@ exports.complete = async function(computation) {
     await Computation.findByIdAndUpdate(computation._id, { $set: { status: ComputationStatusTypes.concluded } });
 }
 
-exports.go = function(filter, computation) { 
+exports.go = function(req, res, computation) { 
     switch (computation.code) {
-        case "outliers()": OutlierFinder.run(filter, computation); return true; break;
+        case "max": MaxFinder.run(req, res, computation); return true; break;
+        case "outliers": OutlierFinder.run(req, res, computation); return true; break;
         default: return false;
     }
 }

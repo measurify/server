@@ -93,7 +93,7 @@ describe('is owner?', () => {
         await factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const device = await factory.createDevice("test-device-1", user);
-        const result = Authorization.isOwner(user, device);
+        const result = Authorization.isOwner(device, user);
         result.should.equal(true);
     });
 
@@ -102,7 +102,7 @@ describe('is owner?', () => {
         const user_not_owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user_owner = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const device = await factory.createDevice("test-device-1", user_owner);
-        const result = Authorization.isOwner(user_not_owner, device);
+        const result = Authorization.isOwner(device, user_not_owner);
         result.should.equal(false);
     });
 });

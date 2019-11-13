@@ -26,7 +26,6 @@ const itemSchema = new mongoose.Schema({
     name: { type: String, required: "Please, supply a name" },
     unit: { type: String, required: "Please, supply a unit" },
     dimension: { type: Number, default: 0 },
-    visibility: {type: String, default: VisibilityTypes.public },
     type: { type: String, default: ItemTypes.number }, },
     { _id: false }  
 );
@@ -70,6 +69,7 @@ const featureSchema = new mongoose.Schema({
     timestamp: {type: Date, default: Date.now, select: false },
     tags: { type: [String], ref:'Tag' },
     description: {type: String},
+    visibility: {type: String, default: VisibilityTypes.public },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });
