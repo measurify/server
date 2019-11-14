@@ -28,8 +28,12 @@ exports.put = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
+    const restriction = await checker.whatCanDelete(req, res);
+    return await controller.deleteResourceList(req, res, Measurement, restriction); 
+};
+
+exports.deleteone = async (req, res) => {
     let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
     result = await checker.canDelete(req, res); if (result != true) return result;
     return await controller.deleteResource(req, res, Measurement);
 } 
-

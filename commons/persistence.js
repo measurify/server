@@ -79,10 +79,18 @@ exports.update = async function(body, fields, resource, model) {
     return modified_resource;
 }
 
+exports.deletemore = async function(filter, restriction, model) {  
+    if (!filter) filter = '{}'; 
+    filter = prepareFilter(filter, restriction);
+    const result = await model.deleteMany(filter);
+    return result.n;
+}
+
 
 // local functions 
 
 const prepareFilter = function(filter, restriction) {
+    if(filter.charAt( 0 ) == '[') filter = '{ "$or":' + filter + '}'; 
     let object = JSON.parse(filter);
     if(restriction) { 
         if(object.$and) object.$and.push(restriction);

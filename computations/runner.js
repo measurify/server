@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Computation = mongoose.model('Computation');
 const ComputationStatusTypes = require('../types/computationStatusTypes'); 
 const OutlierFinder = require('../computations/outliers');
+const MaxFinder = require('../computations/max');
 
 exports.progress = async function(computation, percentage) {
     await Computation.findByIdAndUpdate(computation._id, { $set: { progress: percentage } });

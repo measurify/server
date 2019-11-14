@@ -81,3 +81,9 @@ exports.whatCanRead = function(user) {
     if (this.isProvider(user)) return { $or: [  { owner: user._id }, { visibility: VisibilityTypes.public } ] };
     return null;
 } 
+
+exports.whatCanDelete = function(user) {
+    if (this.isAdministrator(user)) return null;
+    if (this.isProvider(user)) return { owner: user._id };
+    return null;
+} 

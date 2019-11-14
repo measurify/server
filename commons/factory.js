@@ -23,6 +23,10 @@ exports.uuid = function() {
     return crypto.randomBytes(16).toString("hex"); 
 }
 
+exports.random = function(max) {
+    return Math.floor(Math.random() * max);
+}
+
 exports.dropContents = async function(){  
     await mongoose.connection.dropDatabase(); 
     await this.createSuperAdministrator();
@@ -156,7 +160,7 @@ exports.createDevice = async function(name, owner, features, tags, scripts, visi
     return device._doc;
 };
 
-exports.createConstraint = async function(owner, type1, type2, element1, element2, relationship, visibility) {
+exports.createConstraint = async function(owner, type1, type2, element1, element2, relationship, visibility, tags) {
     const req = { 
         owner: owner,
         type1: type1,
@@ -164,7 +168,8 @@ exports.createConstraint = async function(owner, type1, type2, element1, element
         element1: element1,
         element2: element2,
         relationship: relationship,
-        visibility
+        visibility: visibility,
+        tags: tags
     }
     const constraint = new Constraint(req);
     await constraint.save();

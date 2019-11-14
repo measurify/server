@@ -64,3 +64,7 @@ exports.canDelete = async function(req, res) {
 exports.whatCanRead = async function(req, res) {
     return authorizator.whatCanRead(req.user);
 } 
+
+exports.whatCanDelete = async function(req, res) {
+    return authorizator.whatCanDelete(req.user);
+} 

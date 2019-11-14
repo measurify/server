@@ -130,7 +130,9 @@ router.post('/', catchErrors(measurementController.post));
  *          schema:
  *              $ref: '#/paths/definitions/error'
  */
-router.delete('/:id',  catchErrors(measurementController.delete));
+router.delete('/:id',  catchErrors(measurementController.deleteone));
+
+router.delete('/',  catchErrors(measurementController.delete));
 
 
 /**

@@ -20,8 +20,9 @@ exports.getone = async (req, res) => {
 };
 
 exports.post = async (req, res) => {
-    const fields = ['code','filter'];
+    const fields = ['code','feature'];
     let result = await checker.isFilled(req, res, fields); if (result != true) return result;
+    req.body.owner = req.user._id;
     const computation = new Computation(req.body);
     if(runner.go(computation)) {
         await computation.save();

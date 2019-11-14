@@ -59,6 +59,15 @@ exports.deleteResource = async function(req, res, model) {
     }
 }
 
+exports.deleteResourceList = async function(req, res, model, restriction) {  
+    try {
+        const result = await persistence.deletemore(req.query.filter, restriction, model);
+        if (result == 0) return errors.manage(res, errors.resource_not_found);
+        else return res.status(200).json({ deleted: result });
+    }
+    catch (err) { return errors.manage(res, errors.delete_request_error, err); }
+}
+
 exports.updateResource = async function(req, res, fields, model) {
     try {
         const modified_resource = await persistence.update(req.body, fields, req.resource, model);

@@ -1,19 +1,14 @@
 // Based on http://en.wikipedia.org/wiki/Interquartile_range#Interquartile_range_and_outliers
 
-const mongoose = require('mongoose');
-const persistence = require('../commons/persistence');
-const authorization = require('../security/authorization');
-const Measurement = mongoose.model('Measurement');
-const Buncher = equire('./buncher');
+const Buncher = require('./buncher');
 const runner = require('../computations/runner');
 
 exports.run = async function(computation) { 
     const bunch_size = 3
-    const buncher = new Boucher(computation, runner, bunch_size);
+    const buncher = new Buncher(computation, runner, bunch_size);
     await buncher.init();
-
-    while(measurements = buncher.next())
-        console.log(measurements);
-    
+    let measurements = null;
+    while(measurements = await buncher.next())
+        console.log(measurements.page);
     runner.complete(computation);
 }
