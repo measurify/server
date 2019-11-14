@@ -8,6 +8,13 @@ exports.get = async function(id, field, model) {
     return item;
 };
 
+exports.getSize = async function(filter, restriction, model) {
+    if (!filter) filter = '{}';
+    filter = prepareFilter(filter, restriction);
+    const size = await model.countDocuments(filter);
+    return size;
+}
+
 exports.getList = async function(filter, sort, select, page, limit, restriction, model) {
     if (!page) page = '1';
     if (!limit) limit = '10';

@@ -76,7 +76,11 @@ if(process.env.LOG === 'enabled') {
 // Anything in public/ or api-doc/ foldes will just be served up as the file it is
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'api-doc')));
-app.get('/v1', (req, res, next) => { res.redirect(req.baseUrl + '/'); });
+app.get('/' + process.env.VERSION, (req, res, next) => { res.redirect(req.baseUrl + '/'); });
+
+// Provide API version information
+const { version } = require('./package.json');
+app.get('/' + process.env.VERSION + '/version', (req, res, next) => { return res.status(200).json({ version: version}); });
 
 // Takes the raw requests and turns them into usable properties on req.body
 app.use(bodyParser.json({limit: '50mb'}));

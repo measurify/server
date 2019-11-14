@@ -22,7 +22,8 @@ exports.missing_info                         = { status: 401, value: 19, message
 exports.user_authorization_error             = { status: 401, value: 20, message: 'Only the administrator can manage users' };
 exports.cannot_create                        = { status: 401, value: 21, message: 'Only administrators and provides can create new resources' };
 exports.filter_required                      = { status: 403, value: 22, message: 'The request needs a valid filter' };
-exports.invalid_code                         = { status: 400, value: 23, message: 'The code is not recognized as valid' };      
+exports.invalid_code                         = { status: 400, value: 23, message: 'The code is not recognized as valid' };  
+exports.computation_error                    = { status: 500, value: 24, message: 'The computation is not working' };
 
 exports.manage = function(res, error, more) {
     if( typeof more === 'object' && more !== null) more = more.toString();

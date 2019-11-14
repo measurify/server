@@ -17,6 +17,7 @@ const RelationshipTypes = require('../types/relationshipTypes');
 const jwt = require('jsonwebtoken');
 const ItemTypes = require('../types/itemTypes.js');
 const AccessTypes = require('../types/accessTypes.js'); 
+const ComputationStatusTypes = require('../types/computationStatusTypes.js'); 
 
 exports.uuid = function() { 
     return crypto.randomBytes(16).toString("hex"); 
@@ -236,17 +237,19 @@ exports.createMeasurement = async function(owner, feature, device, thing, tags, 
     return measurement._doc;
 };
 
-exports.createComputation = async function(name, owner, code, target, tags, features) {
+exports.createComputation = async function(id, owner, code, feature, filter, tags, features) {
     const req = { 
-        name: name,
+        _id: id,
         owner: owner,
         code: code,
-        target: target,
-        tags: tags,
-        features: features,
-        visibility: visibility
+        feature: feature,
+        filter: filter,
+        status: ComputationStatusTypes.running,
+        progress: 0,
+        tags: tags
     }
     const computation = new Computation(req);
     await computation.save();
     return computation._doc;
 };
+

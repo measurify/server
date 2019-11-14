@@ -158,14 +158,12 @@ Each environment has a configuration file "variable.dev.env", "variables.prod.en
     PORT=8084
     ADMIN_USERNAME=admin 
     ADMIN_PASSWORD=admin 
-    SECRET=secret-dev
+    JWTSECRET=secret-dev
+    HTTPSSECRET=atmospherePass
     EXPIRATIONTIME=30m 
     LOG=enabled
 
-In particular, the connection string with the database and administrator credential (at startup Atmosphere will create a admin user with these credential), the expiration time of tokens, the log level and the secret word for the certificate file.
-
-
-
+In particular, the connection string with the database and administrator credential (at startup Atmosphere will create a admin user with these credential), the expiration time of tokens, the log level, the secret word for the HTTPS certificate file and the secret word for the JWT token.
 
 #### Setup to run the API in production
 

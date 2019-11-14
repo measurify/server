@@ -22,14 +22,12 @@ exports.getone = async (req, res) => {
 exports.post = async (req, res) => {
     const fields = ['code','filter'];
     let result = await checker.isFilled(req, res, fields); if (result != true) return result;
-    const restriction = await checker.whatCanRead(req, res);
-    const filter = JSON.parse(req.body.filter)
     const computation = new Computation(req.body);
-    if(runner.go(computation, filter, restriction)) {
+    if(runner.go(computation)) {
         await computation.save();
         return res.status(200).json(computation);
     }
-    else return res.status(errors.computation_code_unknown.status).json(errors.computation_code_unknown.message);
+    else return res.status(errors.computation_error.status).json(errors.computation_error.message);
 }
 
 exports.put = async (req, res) => { 
