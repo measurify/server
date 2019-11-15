@@ -86,7 +86,6 @@ exports.deletemore = async function(filter, restriction, model) {
     return result.n;
 }
 
-
 // local functions 
 
 const prepareFilter = function(filter, restriction) {
