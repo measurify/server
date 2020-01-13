@@ -242,12 +242,13 @@ exports.createMeasurement = async function(owner, feature, device, thing, tags, 
     return measurement._doc;
 };
 
-exports.createComputation = async function(id, owner, code, feature, filter, tags, features) {
+exports.createComputation = async function(id, owner, code, feature, items, filter, tags, features) {
     const req = { 
         _id: id,
         owner: owner,
         code: code,
         feature: feature,
+        items: items || [],
         filter: filter,
         status: ComputationStatusTypes.running,
         progress: 0,

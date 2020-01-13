@@ -2,11 +2,9 @@ const mongoose = require('mongoose');
 const controller = require('./controller');
 const checker = require('./checker');
 const Computation = mongoose.model('Computation');
-const ObjectId = require('mongoose').Types.ObjectId;
-const Authorization = require('../security/authorization.js');
+const Feature = mongoose.model('Computation');
 const errors = require('../commons/errors.js');
 const runner = require('../computations/runner.js'); 
-const ComputationStatusTypes = require('../types/computationStatusTypes.js'); 
 
 exports.get = async (req, res) => { 
     const restriction = await checker.whatCanRead(req, res);
@@ -22,7 +20,7 @@ exports.getone = async (req, res) => {
 exports.post = async (req, res) => {
     const fields = ['code','feature'];
     let result = await checker.isFilled(req, res, fields); if (result != true) return result;
-    req.body.owner = req.user._id;
+    result = await checker.isComputable(req, res, Feature); if (result != true) return result;
     const computation = new Computation(req.body);
     if(runner.go(computation)) {
         await computation.save();

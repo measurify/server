@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const errors = require('../commons/errors.js');
 const authorizator = require('../security/authorization.js');
-const VisibilityTypes = require('../types/visibilityTypes.js'); 
+const inspector = require('../commons/inspector.js');
 
 exports.isAvailable = async function(req, res, model) {
     try {
@@ -21,6 +21,12 @@ exports.isFilled = async function(req, res, values ) {
     else return true;
 }
 
+exports.isComputable = async function(req, res, model){
+    const result = await inspector.isComputable(req.body.feature, req.body.items, model);
+    if(result != true) return errors.manage(res, errors.post_request_error, result);
+    return true;
+}
+
 exports.isNotUsed = async function(req, res, model, field) {
     const result = await authorizator.isNotUsed(req.resource, model, field);
     if(result != true) return errors.manage(res, errors.already_used, result);
@@ -34,7 +40,6 @@ exports.isAdminitrator = async function(req, res) {
     }
     return true;
 }
-
 
 exports.isOwned = async function(req, res) {
     if (!authorizator.isOwner(req.resource, req.user)) return errors.manage(res, errors.not_yours, req.resource._id);

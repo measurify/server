@@ -224,7 +224,7 @@ provide your domain name: (e.g. apil3p.atmosphere.tools)
 
 #### Restart API
 
-   sudo pm2 stop api
+    sudo pm2 stop api
     sudo pm2 start api
     It should run on HTTPS: sudo netstat -tulpn
 

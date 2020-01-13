@@ -29,7 +29,7 @@ exports.hasRights = function(rights, access) {
     return false;
 }
 
-exports.isAvailable = async function(id,field, model) {
+exports.isAvailable = async function(id, field, model) {
     const item = await persistence.get(id, field, model);
     if(!item) return null; 
     return item;
