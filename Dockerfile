@@ -13,4 +13,4 @@ COPY . .
 
 EXPOSE 8084
 
-CMD [ "npm", "run", "prod" ]
+CMD [ "npm", "run", "docker" ]
