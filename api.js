@@ -8,8 +8,8 @@ if (major < 7 || (major === 7 && minor <= 5)) {
 
 // Import environmental variables from variables.[ENVIRONMENT].env file (default dev)
 if(process.argv[2] === undefined) process.argv[2] = 'dev';
-if(!['dev', 'prod', 'test'].includes(process.argv[2])) {
-  console.log('Unknown environment (' + process.argv[2] + '), please run with dev, prod, test or http \n');
+if(!['dev', 'prod', 'test', 'docker'].includes(process.argv[2])) {
+  console.log('Unknown environment (' + process.argv[2] + '), please run with dev, prod, test, docker or http \n');
   process.exit();
 }
 require('dotenv').config({ path: 'variables.' + process.argv[2] + '.env' });

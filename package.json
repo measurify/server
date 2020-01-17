@@ -8,6 +8,7 @@
     "test": "mocha --timeout 20000 --exit --use_strict",
     "dev": "nodemon ./api.js dev",
     "prod": "node ./api.js prod",
+    "docker": "node ./api.js docker",
     "start": "node api.js",
     "debug": "nodemon --inspect api.js dev"
   },

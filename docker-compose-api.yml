@@ -1,9 +1,11 @@
 version: "2"
 services:
-  web:
-    image: wondertech/atmosphere:0.1
+  atmosphere:
+    image: atmosphereframework/atmosphere-api:latest
     ports:
       - "8084:8084"
+    depends_on:
+      - mongo 
   mongo:
     image: mongo
     volumes:
