@@ -33,7 +33,7 @@ exports.dropContents = async function(){
 }
 
 exports.createSuperAdministrator = async function() {
-    return await this.createUser(process.env.ADMIN_USERNAME, process.env.ADMIN_USERNAME, UserRoles.admin);
+    return await this.createUser(process.env.ADMIN_USERNAME, process.env.ADMIN_PASSWORD, UserRoles.admin);
 };
 
 exports.getAdminToken = async function() {
