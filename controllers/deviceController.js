@@ -38,7 +38,7 @@ exports.delete = async (req, res) => {
 };
 
 exports.put = async (req, res) => { 
-    const fields = ['features', 'scripts', 'tags'];
+    const fields = ['features', 'scripts', 'tags', 'period', 'cycle', 'retryTime'];
     let result = await checker.isAvailable(req, res, Device); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.isOwned(req, res); if (result != true) return result;
