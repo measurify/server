@@ -11,6 +11,7 @@ const Feature = mongoose.model('Feature');
 const Device = mongoose.model('Device');
 const Constraint = mongoose.model('Constraint');
 const Measurement = mongoose.model('Measurement');
+const Alert = mongoose.model('Alert');
 const Computation = mongoose.model('Computation');
 const Right = mongoose.model('Right');
 const RelationshipTypes = require('../types/relationshipTypes');
@@ -18,6 +19,8 @@ const jwt = require('jsonwebtoken');
 const ItemTypes = require('../types/itemTypes.js');
 const AccessTypes = require('../types/accessTypes.js'); 
 const ComputationStatusTypes = require('../types/computationStatusTypes.js'); 
+const AlertTypes = require('../types/alertTypes.js');
+
 
 exports.uuid = function() { 
     return crypto.randomBytes(16).toString("hex"); 
@@ -158,6 +161,20 @@ exports.createDevice = async function(name, owner, features, tags, scripts, visi
     const device = new Device(req);
     await device.save();
     return device._doc;
+};
+
+exports.createAlert = async function(owner, device, date, message, type) {
+    const req = { 
+        owner: owner,
+        device: device,
+        date: date || Date.now(),
+        message: message || "this is a message",
+        type: type || AlertTypes.generic,
+        typestamp: Date.now()
+    }
+    const alert = new Alert(req);
+    await alert.save();
+    return alert._doc;
 };
 
 exports.createConstraint = async function(owner, type1, type2, element1, element2, relationship, visibility, tags) {

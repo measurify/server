@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const controller = require('./controller');
 const checker = require('./checker');
+const emitter = require('../commons/emitter');
 const Device = mongoose.model('Device');
 const Measurement = mongoose.model('Measurement');
 const Authorization = require('../security/authorization.js');
@@ -13,9 +14,15 @@ exports.get = async (req, res) => {
 
 exports.getone = async (req, res) => { 
     let result = await checker.isAvailable(req, res, Device); if (result != true) return result;
-    
     result = await checker.canRead(req, res); if (result != true) return result;
     return res.status(200).json(req.resource);
+};
+
+exports.getstream = async (req, res) => { 
+    let result = await checker.isAvailable(req, res, Device); if (result != true) return result;
+    result = await checker.canRead(req, res); if (result != true) return result;
+    res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' });
+    emitter.on('device-' + req.resource._id, function(data) { res.write('data: ' + JSON.stringify(data) + '\n\n'); });
 };
 
 exports.post = async (req, res) => {

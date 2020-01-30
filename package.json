@@ -5,6 +5,7 @@
   "main": "server.js",
   "host": "localhost",
   "scripts": {
+    "mongo": "mongod --config /usr/local/etc/mongod.conf",
     "test": "mocha --timeout 20000 --exit --use_strict",
     "dev": "nodemon ./api.js dev",
     "prod": "node ./api.js prod",

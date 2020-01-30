@@ -70,6 +70,10 @@ exports.whatCanRead = async function(req, res) {
     return authorizator.whatCanRead(req.user);
 } 
 
+exports.readJustOwned = async function(req, res) {
+    return authorizator.readJustOwned(req.user);
+} 
+
 exports.whatCanDelete = async function(req, res) {
     return authorizator.whatCanDelete(req.user);
 } 

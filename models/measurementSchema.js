@@ -204,6 +204,7 @@ measurementSchema.pre('save', async function() {
                                                   startDate: this.startDate,
                                                   endDate: this.endDate,
                                                   thing:  this.thing,
+                                                  script: this.script,
                                                   device: this.device });
     if(res) throw new Error('The measurement already exists');                       
 });

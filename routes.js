@@ -14,6 +14,10 @@ router.use('/' + process.env.VERSION + '/demo', passport.authenticate('jwt', {se
 const logRoute = require('./routes/logRoute');
 router.use('/' + process.env.VERSION + '/log', passport.authenticate('jwt', {session: false}), logRoute);
 
+// errors
+const errorRoute = require('./routes/errorRoute');
+router.use('/' + process.env.VERSION + '/errors', errorRoute);
+
 // user
 const userRoute = require('./routes/userRoute');
 router.use('/' + process.env.VERSION + '/users', passport.authenticate('jwt', {session: false}), userRoute);
@@ -27,6 +31,10 @@ router.use('/' + process.env.VERSION + '/measurements', passport.authenticate('j
 // tag
 const tagsRoute = require('./routes/tagRoute');
 router.use('/' + process.env.VERSION + '/tags', passport.authenticate('jwt', {session: false}), tagsRoute);
+
+// Alert
+const alertsRoute = require('./routes/alertRoute');
+router.use('/' + process.env.VERSION + '/alerts', passport.authenticate('jwt', {session: false}), alertsRoute);
 
 // device
 const devicesRoute = require('./routes/deviceRoute');
@@ -55,5 +63,9 @@ router.use('/' + process.env.VERSION + '/computations', passport.authenticate('j
 // constraint
 const constraintsRoute = require('./routes/constraintRoute');
 router.use('/' + process.env.VERSION + '/constraints', passport.authenticate('jwt', {session: false}), constraintsRoute);
+
+// info 
+const infoRoute = require('./routes/infoRoute');
+router.use('/' + process.env.VERSION + '/info', passport.authenticate('jwt', {session: false}), infoRoute);
 
 module.exports = router;

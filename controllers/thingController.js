@@ -1,10 +1,9 @@
 const mongoose = require('mongoose');
 const controller = require('./controller');
 const checker = require('./checker');
+const emitter = require('../commons/emitter');
 const Thing = mongoose.model('Thing');
 const Measurement = mongoose.model('Measurement');
-const AccessTypes = require('../types/accessTypes.js'); 
-const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 
 exports.get = async (req, res) => { 
@@ -16,6 +15,13 @@ exports.getone = async (req, res) => {
     let result = await checker.isAvailable(req, res, Thing); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
     return res.status(200).json(req.resource);
+};
+
+exports.getstream = async (req, res) => { 
+    let result = await checker.isAvailable(req, res, Thing); if (result != true) return result;
+    result = await checker.canRead(req, res); if (result != true) return result;
+    res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' });
+    emitter.on('thing-' + req.resource._id, function(data) { res.write('data: ' + JSON.stringify(data) + '\n\n'); });
 };
 
 exports.post = async (req, res) => {

@@ -82,6 +82,11 @@ exports.whatCanRead = function(user) {
     return null;
 } 
 
+exports.readJustOwned = function(user) {
+    if (this.isAdministrator(user)) return null;
+    return { owner: user._id };
+} 
+
 exports.whatCanDelete = function(user) {
     if (this.isAdministrator(user)) return null;
     if (this.isProvider(user)) return { owner: user._id };
