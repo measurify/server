@@ -1645,6 +1645,239 @@
 			]
 		},
 		{
+			"name": "ALERTS",
+			"item": [
+				{
+					"name": "LOGIN as a provider",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "44025a2f-7f86-402f-8415-2bdb26e380bb",
+								"exec": [
+									"var users = JSON.parse(pm.environment.get(\"users\"));",
+									"pm.environment.set('provider_username', users[1].username);",
+									"pm.environment.set('provider_password', users[1].password);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"{{provider_username}}\",\n\t\"password\" : \"{{provider_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new alert",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
+								"exec": [
+									"var devices = JSON.parse(pm.environment.get(\"devices\"));",
+									"pm.environment.set('device_id', devices[0]._id);",
+									"var current_timestamp = new Date();",
+									"postman.setEnvironmentVariable(\"current_timestamp\", current_timestamp.toISOString());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "bf934b5a-b6e0-41dd-bd48-bdf0559f4d97",
+								"exec": [
+									"pm.environment.set(\"device\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"device\": \"{{device_id}}\",\r\n    \"date\": \"{{current_timestamp}}\",\r\n    \"message\": \"this is a message\",\r\n    \"type\": \"generic\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/alerts/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"alerts",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET all his alerts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7a842a86-4aad-493d-bcc5-2550c20d5d9f",
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"if(data.docs) pm.environment.set('alert', data.docs[0]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/alerts",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"alerts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET the list of alert types",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "bf934b5a-b6e0-41dd-bd48-bdf0559f4d97",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/v1/alerts/types",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"alerts",
+								"types"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ce4981b5-c96d-4a5c-addf-fe25424c5391",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "23a90929-2746-4cef-a360-fd4858ef9b4a",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "CONSTRAINTS",
 			"item": [
 				{
@@ -2034,7 +2267,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{url}}/v1/measurements?filter={\"tags\":\" \"}",
+							"raw": "{{url}}/v1/measurements?filter={\"tags\":\"urban\"}",
 							"host": [
 								"{{url}}"
 							],
@@ -2045,7 +2278,7 @@
 							"query": [
 								{
 									"key": "filter",
-									"value": "{\"tags\":\" \"}"
+									"value": "{\"tags\":\"urban\"}"
 								}
 							]
 						}
@@ -2056,30 +2289,6 @@
 					"name": "GET measurements only from a specific feature (filtered)",
 					"request": {
 						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{url}}/v1/measurements?filter={\"feature\":\"speed-statistics\"}",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"measurements"
-							],
-							"query": [
-								{
-									"key": "filter",
-									"value": "{\"feature\":\"speed-statistics\"}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET measurements only from a specific feature and a with a specific tag (filtered)",
-					"request": {
-						"method": "GET",
 						"header": [
 							{
 								"key": "Authorization",
@@ -2088,7 +2297,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{url}}/v1/measurements?filter={\"feature\":\"Stat\", \"tags\":\" \"}",
+							"raw": "{{url}}/v1/measurements?filter={\"feature\":\"speed\"}",
 							"host": [
 								"{{url}}"
 							],
@@ -2099,7 +2308,37 @@
 							"query": [
 								{
 									"key": "filter",
-									"value": "{\"feature\":\"Stat\", \"tags\":\" \"}"
+									"value": "{\"feature\":\"speed\"}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET measurements only from a specific feature AND a with a specific tag (filtered)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/measurements?filter=\"$and\":[{\"feature\":\"speed\"}, {\"tags\":\"urban\"}]",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "\"$and\":[{\"feature\":\"speed\"}, {\"tags\":\"urban\"}]"
 								}
 							]
 						}
@@ -3484,6 +3723,151 @@
 					],
 					"path": [
 						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API error codes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6d2ffb23-3edf-49a5-bd66-1b69012c7ef6",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"demo\", jsonData);",
+							"tests[\"demo = \" + jsonData] = true;"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/v1/errors",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v1",
+						"errors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API version",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6d2ffb23-3edf-49a5-bd66-1b69012c7ef6",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"demo\", jsonData);",
+							"tests[\"demo = \" + jsonData] = true;"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/v1/version",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v1",
+						"version"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LOGIN as SuperAdmin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+						"exec": [
+							"postman.setEnvironmentVariable(\"token\", JSON.parse(responseBody).token);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+				},
+				"url": {
+					"raw": "{{url}}/v1/login",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6d2ffb23-3edf-49a5-bd66-1b69012c7ef6",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"demo\", jsonData);",
+							"tests[\"demo = \" + jsonData] = true;"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/v1/info",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v1",
+						"info"
 					]
 				}
 			},
