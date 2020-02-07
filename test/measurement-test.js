@@ -108,6 +108,25 @@ describe('/GET measurements', () => {
         res.body.docs.length.should.be.eql(2);
     });
 
+    it('it should GET the size of measurements only of a specific tag', async () => {
+        await mongoose.connection.dropDatabase();
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature", owner);
+        const tag1 = await factory.createTag("test-tag-1", owner);
+        const tag2 = await factory.createTag("test-tag-2", owner);
+        const device = await factory.createDevice("test-device-1", owner, [feature]);
+        const thing = await factory.createThing("test-thing-1", owner);
+        const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(1));
+        const measurement2 = await factory.createMeasurement(owner, feature, device, thing, [tag2], factory.createSamples(2));
+        const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(3));
+        const measurement4 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(4));
+        const measurement5 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(5));
+        let res = await chai.request(server).get('/v1/measurements/count?filter={"tags":"test-tag-1"}').set("Authorization", await factory.getUserToken(owner));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.size.should.be.eql(4);
+    });
+
     it('it should GET measurements only of a specific tag AND a of a specific feature', async () => {
         await mongoose.connection.dropDatabase();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
@@ -134,6 +153,25 @@ describe('/GET measurements', () => {
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(1);
+    });
+
+    it('it should GET the size measurements only of a specific tag AND a of a specific feature', async () => {
+        await mongoose.connection.dropDatabase();
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature1 = await factory.createFeature("test-feature-1", owner);
+        const feature2 = await factory.createFeature("test-feature-2", owner);
+        const tag1 = await factory.createTag("test-tag-1", owner);
+        const tag2 = await factory.createTag("test-tag-2", owner);
+        const device = await factory.createDevice("test-device-1", owner, [feature1, feature2]);
+        const thing = await factory.createThing("test-thing-1", owner);
+        const measurement1 = await factory.createMeasurement(owner, feature1, device, thing, [tag1], factory.createSamples(1));
+        const measurement2 = await factory.createMeasurement(owner, feature1, device, thing, [tag2], factory.createSamples(2));
+        const measurement3 = await factory.createMeasurement(owner, feature2, device, thing, [tag1], factory.createSamples(3));
+        const measurement4 = await factory.createMeasurement(owner, feature1, device, thing, [tag1, tag2], factory.createSamples(4));
+        const measurement5 = await factory.createMeasurement(owner, feature2, device, thing, [tag2], factory.createSamples(5));
+        let res = await chai.request(server).get('/v1/measurements/count?filter={"feature":"test-feature-1", "tags":"test-tag-1"}').set("Authorization", await factory.getUserToken(owner));
+        res.body.should.be.a('object');
+        res.body.size.should.be.eql(2);
     });
 
     it('it should GET measurements only of a specific tag OR a of a specific feature', async () => {

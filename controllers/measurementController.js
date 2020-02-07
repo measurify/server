@@ -8,6 +8,11 @@ exports.get = async (req, res) => {
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Measurement, restriction); 
 };
 
+exports.count = async (req, res) => { 
+    const restriction = await checker.whatCanRead(req, res);
+    return await controller.getResourceListSize(req, res, Measurement, restriction); 
+};
+
 exports.getone = async (req, res) => { 
     let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;

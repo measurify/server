@@ -26,6 +26,15 @@ exports.getResourceList = async function(req, res, sort, select, model, restrict
     catch (err) { return errors.manage(res, errors.get_request_error, err); }
 }
 
+exports.getResourceListSize = async function(req, res, model, restriction) {
+    try {
+        const query = req.query;
+        const size = await persistence.getSize(query.filter, restriction, model);
+        return res.status(200).json({size: size});
+    }
+    catch (err) { return errors.manage(res, errors.get_request_error, err); }
+}
+
 exports.postResource = async function(req, res, model) {
     try { 
         req.body.owner = req.user._id;

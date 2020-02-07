@@ -57,6 +57,40 @@ router.get('/',  catchErrors(measurementController.get));
 
 /**
  * @swagger
+ * /measurements/count:
+ *  get:
+ *     summary: returns a the size of a list of filtered measurements
+ *     tags:
+ *       - Measurement 
+ *     parameters:
+ *       - name: query
+ *         description: query criteria for the filter specified using mongo rules https://docs.mongodb.com/manual/tutorial/query-documents/
+ *         in: query
+ *         example: { feature: average-speed }
+ *         required: false
+ *         type: json
+ *       - name: sort
+ *         description: specifies the field(s) to sort by and the respective sort order (asc or desc)
+ *         in: query
+ *         example: { startDate: desc } 
+ *         required: false
+ *         type: json
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: the list of measurements
+ *         schema:
+ *           $ref: '#/paths/definitions/measurements'
+ *       400:
+ *         description: errors in the request
+ *         schema:
+ *           $ref: '#/paths/definitions/error'
+ */
+router.get('/count',  catchErrors(measurementController.count));
+
+/**
+ * @swagger
  * /measurements/{id}:
  *  get:
  *      summary: returns a single measurement
