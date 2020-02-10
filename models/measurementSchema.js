@@ -209,4 +209,8 @@ measurementSchema.pre('save', async function() {
     if(res) throw new Error('The measurement already exists');                       
 });
 
+measurementSchema.methods.toCSV = function toCSV() {
+    return this.samples.map(sample => sample.values.join(',')).join('\n');
+};
+
 module.exports = mongoose.models.Measurement || mongoose.model('Measurement', measurementSchema);

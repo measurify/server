@@ -20,8 +20,14 @@ exports.getResourceList = async function(req, res, sort, select, model, restrict
         const query = req.query;
         if (!query.sort) query.sort = sort;
         if (!query.select) query.select = select;
-        const list = await persistence.getList(query.filter, query.sort, query.select, query.page, query.limit, restriction, model);
-        return res.status(200).json(list);
+        let list = await persistence.getList(query.filter, query.sort, query.select, query.page, query.limit, restriction, model);
+        if(req.headers.accept == 'text/csv') {
+            res.header('Content-Type', 'text/csv');
+            let result = '';
+            list.docs.forEach(async (doc) => result += doc.toCSV() + '\n');
+            return res.status(200).json(result);
+        }
+        else return res.status(200).json(list);
     }
     catch (err) { return errors.manage(res, errors.get_request_error, err); }
 }

@@ -123,7 +123,13 @@ exports.createUser = async function(username, password, type) {
 };
 
 exports.createSamples = function (value, delta) {
-    return [ { values: [value], delta: delta } ]
+    if (Array.isArray(value)) return [ { values: value, delta: delta } ]
+    else return [ { values: [value], delta: delta } ]
+}
+
+exports.createSample = function (value, delta) {
+    if (Array.isArray(value)) return { values: value, delta: delta }
+    else return { values: [value], delta: delta }
 }
 
 exports.createTag = async function(name, owner, tags, visibility) {

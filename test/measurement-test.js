@@ -47,6 +47,21 @@ describe('/GET measurements', () => {
         res.body.docs.length.should.be.eql(3);
     });
 
+    it('it should GET all the measurements as CSV', async () => {
+        await mongoose.connection.dropDatabase();
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature", owner, [ { name: "item-name-1", unit: "items-unit-1", type: ItemTypes.number  }, { name: "item-name-2", unit: "items-unit-2", type: ItemTypes.number  }, { name: "item-name-3", unit: "items-unit-3", type: ItemTypes.number  } ]);
+        const tag1 = await factory.createTag("test-tag-1", owner);
+        const tag2 = await factory.createTag("test-tag-2", owner);
+        const device = await factory.createDevice("test-device-1", owner, [feature]);
+        const thing = await factory.createThing("test-thing-1", owner);
+        const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], [factory.createSample([1.8,5.3,6.2]), factory.createSample([9.7,2.1,5.2])]);
+        const measurement2 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples([4.4,7.3,3.6]));
+        const res = await chai.request(server).get('/v1/measurements').set('Authorization', await factory.getUserToken(owner)).set('Accept', 'text/csv');
+        res.should.have.status(200);
+        res.text.should.be.a('string');
+    });
+
     it('it should GET a specific measurement', async () => {
         await mongoose.connection.dropDatabase();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);

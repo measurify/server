@@ -5,7 +5,7 @@ const Measurement = mongoose.model('Measurement');
 
 exports.get = async (req, res) => { 
     const restriction = await checker.whatCanRead(req, res);
-    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Measurement, restriction); 
+    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Measurement, restriction);
 };
 
 exports.count = async (req, res) => { 
