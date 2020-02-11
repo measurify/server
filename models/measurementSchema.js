@@ -209,8 +209,16 @@ measurementSchema.pre('save', async function() {
     if(res) throw new Error('The measurement already exists');                       
 });
 
-measurementSchema.methods.toCSV = function toCSV() {
-    return this.samples.map(sample => sample.values.join(',')).join('\n');
+measurementSchema.methods.toCSV = function toCSV(delimiter) {
+    let csv = '';
+    this.samples.forEach(sample => {
+        sample.values.forEach(value => {
+            if (Array.isArray(value) && value.length != 1) csv += '[' + value + ']' + delimiter;
+            else csv += value + delimiter;
+        });
+        csv += '\n';
+    });
+    return csv;
 };
 
 module.exports = mongoose.models.Measurement || mongoose.model('Measurement', measurementSchema);

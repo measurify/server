@@ -24,7 +24,7 @@ exports.getResourceList = async function(req, res, sort, select, model, restrict
         if(req.headers.accept == 'text/csv') {
             res.header('Content-Type', 'text/csv');
             let result = '';
-            list.docs.forEach(async (doc) => result += doc.toCSV() + '\n');
+            list.docs.forEach(async (doc) => result += doc.toCSV(',') + '\n');
             return res.status(200).json(result);
         }
         else return res.status(200).json(list);
