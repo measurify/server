@@ -18,7 +18,7 @@ const RelationshipTypes = require('../types/relationshipTypes');
 const jwt = require('jsonwebtoken');
 const ItemTypes = require('../types/itemTypes.js');
 const ComputationStatusTypes = require('../types/computationStatusTypes.js'); 
-const IssueTypes = require('../types/IssueTypes.js');
+const IssueTypes = require('../types/issueTypes.js');
 
 
 exports.uuid = function() { 
