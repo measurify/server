@@ -11,15 +11,14 @@ const Feature = mongoose.model('Feature');
 const Device = mongoose.model('Device');
 const Constraint = mongoose.model('Constraint');
 const Measurement = mongoose.model('Measurement');
-const Alert = mongoose.model('Alert');
+const Issue = mongoose.model('Issue');
 const Computation = mongoose.model('Computation');
 const Right = mongoose.model('Right');
 const RelationshipTypes = require('../types/relationshipTypes');
 const jwt = require('jsonwebtoken');
 const ItemTypes = require('../types/itemTypes.js');
-const AccessTypes = require('../types/accessTypes.js'); 
 const ComputationStatusTypes = require('../types/computationStatusTypes.js'); 
-const AlertTypes = require('../types/alertTypes.js');
+const IssueTypes = require('../types/IssueTypes.js');
 
 
 exports.uuid = function() { 
@@ -169,18 +168,18 @@ exports.createDevice = async function(name, owner, features, tags, scripts, visi
     return device._doc;
 };
 
-exports.createAlert = async function(owner, device, date, message, type) {
+exports.createIssue = async function(owner, device, date, message, type) {
     const req = { 
         owner: owner,
         device: device,
         date: date || Date.now(),
         message: message || "this is a message",
-        type: type || AlertTypes.generic,
+        type: type || IssueTypes.generic,
         typestamp: Date.now()
     }
-    const alert = new Alert(req);
-    await alert.save();
-    return alert._doc;
+    const issue = new Issue(req);
+    await issue.save();
+    return issue._doc;
 };
 
 exports.createConstraint = async function(owner, type1, type2, element1, element2, relationship, visibility, tags) {
@@ -226,21 +225,13 @@ exports.createScript = async function(name, owner, code, tags, visibility) {
     return script._doc;
 };
 
-exports.modifyRight = async function(right, access) {
-    right.access = access;
-    const modified = await Right.findOneAndUpdate({_id: right._id}, right, { new: true });
-    return modified;
-} 
-
-exports.createRight = async function(resource, type, user, access, owner, tags, visibility) {
+exports.createRight = async function(resource, type, user, owner, tags) {
     const req = { 
         resource: resource,
         type: type,
         user: user,
-        access: access,
         owner: owner,
-        tags: tags,
-        visibility: visibility
+        tags: tags
     }
     const right = new Right(req);
     await right.save();

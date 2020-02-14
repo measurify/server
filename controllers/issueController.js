@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
 const controller = require('./controller');
 const checker = require('./checker');
-const Alert = mongoose.model('Alert');
-const AlertTypes = require('../types/alertTypes');
+const Issue = mongoose.model('Issue');
+const IssueTypes = require('../types/issueTypes');
 
 exports.get = async (req, res) => { 
     const restriction = await checker.readJustOwned(req, res);
-    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Alert, restriction); 
+    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Issue, restriction); 
 };
 
 exports.post = async (req, res) => {
-    return await controller.postResource(req, res, Alert);
+    return await controller.postResource(req, res, Issue);
 };
 
 exports.getTypes = async (req, res) => {
-    return res.status(200).json(AlertTypes);
+    return res.status(200).json(IssueTypes);
 };

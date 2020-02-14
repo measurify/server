@@ -1,12 +1,10 @@
 const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
-
+const RightTypes  = require('../types/rightTypes.js');
 const User = mongoose.model('User');
 const Tag = mongoose.model('Tag');
-const VisibilityTypes = require('../types/visibilityTypes.js'); 
-const AccessTypes = require('../types/accessTypes.js'); 
- 
+
 /**
  * @swagger
  * definitions:
@@ -31,12 +29,10 @@ const AccessTypes = require('../types/accessTypes.js');
  *       
  */
 const rightSchema = new mongoose.Schema({ 
-    resource: { type: String, required: "Please, supply a resource" },
     type: { type: String, required: "Please, supply the resource type" },
+    resource: { type: String, required: "Please, supply a resource" },
     user: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: "Please, supply the user", autopopulate: true },
-    access: [{ type: String }],
     owner: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true, autopopulate: true },
-    visibility: {type: String, default: VisibilityTypes.private },
     tags: [{ type: String, ref: 'Tag' }],
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
@@ -65,16 +61,6 @@ rightSchema.path('user').validate({
     }
 });
 
-// validate access type
-rightSchema.path('access').validate({
-    validator: async function (values) {
-        for (let value of values) {
-            if(!Object.values(AccessTypes).includes(value)) throw new Error('Unrecognized access type (' + value + ')');
-        };
-        return true;
-    }
-});
-
 // validate tags
 rightSchema.path('tags').validate({
     validator: async function (values) {
@@ -94,6 +80,14 @@ rightSchema.pre('save', async function() {
     if(!model) throw new Error('Unrecognized resource type (' + this.type + ')');
     const resource = await model.findById(this.resource);
     if(!resource) throw new Error('Resource not found (' + this.resource + ')');                   
+});
+
+// check type
+rightSchema.pre('save', async function() {
+    if(!this.type) throw new Error('Right validation failed: supply an right type');  
+    if(!Object.values(RightTypes).includes(this.type)) throw new Error('Right validation failed: resource type ' + this.type + ' not valid'); 
+    this.type = this.type.toLowerCase();
+    if(this.type == 'tag') this.type = 'tags';                     
 });
 
 // check if already have a similar right (idempotent)

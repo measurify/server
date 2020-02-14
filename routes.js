@@ -32,9 +32,9 @@ router.use('/' + process.env.VERSION + '/measurements', passport.authenticate('j
 const tagsRoute = require('./routes/tagRoute');
 router.use('/' + process.env.VERSION + '/tags', passport.authenticate('jwt', {session: false}), tagsRoute);
 
-// Alert
-const alertsRoute = require('./routes/alertRoute');
-router.use('/' + process.env.VERSION + '/alerts', passport.authenticate('jwt', {session: false}), alertsRoute);
+// Issue
+const issuesRoute = require('./routes/issueRoute');
+router.use('/' + process.env.VERSION + '/issues', passport.authenticate('jwt', {session: false}), issuesRoute);
 
 // device
 const devicesRoute = require('./routes/deviceRoute');

@@ -209,12 +209,12 @@ measurementSchema.pre('save', async function() {
     if(res) throw new Error('The measurement already exists');                       
 });
 
-measurementSchema.methods.toCSV = function toCSV(delimiter) {
+measurementSchema.methods.toCSV = function toCSV() {
     let csv = '';
     this.samples.forEach(sample => {
         sample.values.forEach(value => {
-            if (Array.isArray(value) && value.length != 1) csv += '[' + value + ']' + delimiter;
-            else csv += value + delimiter;
+            if (Array.isArray(value) && value.length != 1) csv += process.env.CSVVECTORSTART + value + process.env.CSVVECTOREND + process.env.CSVDELIMITER;
+            else csv += value + process.env.CSVDELIMITER;
         });
         csv += '\n';
     });

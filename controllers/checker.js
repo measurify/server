@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const errors = require('../commons/errors.js');
 const authorizator = require('../security/authorization.js');
 const inspector = require('../commons/inspector.js');
+const Right = mongoose.model('Right');
 
 exports.isAvailable = async function(req, res, model) {
     try {
@@ -68,6 +69,17 @@ exports.canDelete = async function(req, res) {
 
 exports.whatCanRead = async function(req, res) {
     return authorizator.whatCanRead(req.user);
+} 
+
+exports.addRights = async function(req, res) {
+    const rights = await Right.find({user: req.user._id});
+    return authorizator.addRights(req.user, rights);
+} 
+
+exports.hasRights = async function(req, res, element) {
+    const rights = await Right.find({user: req.user._id});
+    if(!authorizator.hasRights(req.user, rights, element)) return errors.manage(res, errors.restricted_access, element._id);
+    return true;
 } 
 
 exports.readJustOwned = async function(req, res) {

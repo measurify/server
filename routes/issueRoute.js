@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const alertController = require('../controllers/alertController.js');
+const issueController = require('../controllers/issueController.js');
 const { catchErrors } = require('../commons/errorHandlers.js');
 
  /**
@@ -20,9 +20,9 @@ const { catchErrors } = require('../commons/errorHandlers.js');
  *              items:
  *                  $ref: '#/paths/definitions/thing'
  */
-router.get('/',  catchErrors(alertController.get));
+router.get('/',  catchErrors(issueController.get));
 
-router.get('/types',  catchErrors(alertController.getTypes));
+router.get('/types',  catchErrors(issueController.getTypes));
 
 /**
  * @swagger
@@ -54,6 +54,6 @@ router.get('/types',  catchErrors(alertController.getTypes));
  *              items:
  *                  $ref: '#/paths/definitions/thing'
  */
-router.post('/', catchErrors(alertController.post));
+router.post('/', catchErrors(issueController.post));
 
 module.exports = router;

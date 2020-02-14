@@ -1645,7 +1645,7 @@
 			]
 		},
 		{
-			"name": "ALERTS",
+			"name": "ALERT",
 			"item": [
 				{
 					"name": "LOGIN as a provider",

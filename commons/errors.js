@@ -24,6 +24,7 @@ exports.cannot_create                        = { status: 401, value: 21, message
 exports.filter_required                      = { status: 403, value: 22, message: 'The request needs a valid filter' };
 exports.invalid_code                         = { status: 400, value: 23, message: 'The code is not recognized as valid' };  
 exports.computation_error                    = { status: 500, value: 24, message: 'The computation is not working' };
+exports.restricted_access                    = { status: 403, value: 25, message: 'You cannot access this resource' };
 
 exports.manage = function(res, error, more) {
     if( typeof more === 'object' && more !== null) more = more.toString();

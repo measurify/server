@@ -1,6 +1,5 @@
 
 const UserRoles = require('../types/userRoles.js');
-const AccessTypes = require('../types/accessTypes.js'); 
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 const persistence = require('../commons/persistence.js');
 
@@ -76,11 +75,38 @@ exports.canDelete = function(resource, user) {
 } 
 
 exports.whatCanRead = function(user) {
-    if (this.isAdministrator(user)) return null;
-    if (this.isAnalyst(user)) return null;
-    if (this.isProvider(user)) return { $or: [  { owner: user._id }, { visibility: VisibilityTypes.public } ] };
-    return null;
+    let result = {};
+    if (this.isAdministrator(user)) return result;
+    if (this.isAnalyst(user)) return result;
+    if (this.isProvider(user)) result = { $or: [  { owner: user._id }, { visibility: VisibilityTypes.public } ] };
+    return result;
 } 
+
+exports.addRights = function(user, rights) {
+    let result = {};
+    if (this.isAdministrator(user)) return result;
+    rights.forEach(right => { 
+        if(!result[right.type]) result[right.type] = { $in: [] };
+        result[right.type].$in.push(right.resource) 
+    });
+    return result;
+}
+
+exports.hasRights = function(user, rights, element) {
+    return true;
+//    let admitted = {};
+//    rights.forEach(right => { 
+//        if(!admitted[right.type]) admitted[right.type] = { $in: [] };
+//        admitted[right.type].push(right.resource) 
+//    });
+
+//    admitted.forEach( => {
+//        if(Array.isArray(element[right.type])) if(!element[right.type].includes(right.resource)) return false;
+//        else if(element[right.type] != right.resource) return false
+//
+//    });
+//    return true;
+}
 
 exports.readJustOwned = function(user) {
     if (this.isAdministrator(user)) return null;

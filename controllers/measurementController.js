@@ -4,8 +4,10 @@ const checker = require('./checker');
 const Measurement = mongoose.model('Measurement');
 
 exports.get = async (req, res) => { 
-    const restriction = await checker.whatCanRead(req, res);
-    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Measurement, restriction);
+    const restriction_1 = await checker.whatCanRead(req, res);
+    const restriction_2 = await checker.addRights(req, res);
+    const restrictions = {...restriction_1, ...restriction_2};
+    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Measurement, restrictions);
 };
 
 exports.count = async (req, res) => { 
@@ -16,7 +18,9 @@ exports.count = async (req, res) => {
 exports.getone = async (req, res) => { 
     let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
-    return await controller.getResource(req, res, null, Measurement); 
+    const measurement = await controller.getResource(req, res, null, Measurement); 
+    result = await checker.hasRights(req, res, measurement); if (result != true) return result;
+    return measurement;
 };
 
 exports.post = async (req, res) => {

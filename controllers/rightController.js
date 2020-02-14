@@ -2,8 +2,6 @@ const mongoose = require('mongoose');
 const controller = require('./controller');
 const checker = require('./checker');
 const Right = mongoose.model('Right');
-const Authorization = require('../security/authorization.js');
-const errors = require('../commons/errors.js');
 
 exports.get = async (req, res) => { 
     const restriction = await checker.whatCanRead(req, res);
@@ -22,7 +20,7 @@ exports.post = async (req, res) => {
 };
 
 exports.put = async (req, res) => { 
-    const fields = ['access','visibility','tags'];
+    const fields = ['tags'];
     let result = await checker.isAvailable(req, res, Right); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.isOwned(req, res); if (result != true) return result;

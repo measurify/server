@@ -45,7 +45,7 @@ require('./models/scriptSchema');
 require('./models/featureSchema');
 require('./models/thingSchema');
 require('./models/deviceSchema');
-require('./models/alertSchema');
+require('./models/issueSchema');
 require('./models/measurementSchema');
 require('./models/errorSchema');
 require('./models/computationSchema');

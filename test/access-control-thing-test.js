@@ -16,7 +16,6 @@ const factory = require('../commons/factory.js');
 const User = mongoose.model('User');
 const UserRoles = require('../types/userRoles.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
-const AccessTypes = require('../types/accessTypes.js');
 const errors = require('../commons/errors.js');
 
 chai.use(chaiHttp);

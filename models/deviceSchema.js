@@ -7,6 +7,7 @@ const Feature = mongoose.model('Feature');
 const User = mongoose.model('User');
 const Script = mongoose.model('Script');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
+const MeasurementBufferPolicyTypes = require('../types/measurementBufferPolicyTypes.js'); 
  
 /**
  * @swagger
@@ -45,6 +46,13 @@ const deviceSchema = new mongoose.Schema({
     period: {type: String, default: "5s" },
     cycle: {type: String, default: "10m" },
     retryTime: {type: String, default: "10s" },
+    scriptListMaxSize: {type: Number, default: 5 },
+    measurementBufferSize: {type: Number, default: 20 },
+    issueBufferSize: {type: Number, default: 20 },
+    sendBufferSize: {type: Number, default: 20 },
+    scriptStatementMaxSize: {type: Number, default: 5 },
+    statementBufferSize: {type: Number, default: 10 },
+    measurementBufferPolicy: {type: String, default: MeasurementBufferPolicyTypes.newest },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });
@@ -85,6 +93,12 @@ deviceSchema.path('tags').validate({
         return true;
     },
     message: 'Tag not existent'
+});
+
+// check buffer policy
+deviceSchema.pre('save', async function() {
+    if(!this.measurementBufferPolicy) throw new Error('Issue validation failed: supply an measurement buffer policy');  
+    if(!Object.values(MeasurementBufferPolicyTypes).includes(this.measurementBufferPolicy)) throw new Error('Issue validation failed: unrecognized measurement buffer policy');                      
 });
 
 // validate scripts

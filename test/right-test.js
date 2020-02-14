@@ -15,8 +15,7 @@ const factory = require('../commons/factory.js');
 const Right = mongoose.model('Right');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
-const VisibilityTypes = require('../types/visibilityTypes.js'); 
-const AccessTypes = require('../types/accessTypes.js'); 
+const VisibilityTypes = require('../types/visibilityTypes.js');  
 
 chai.use(chaiHttp);
 
@@ -29,9 +28,9 @@ describe('/GET rights', () => {
         const resource1 = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const resource2 = await factory.createTag("tag-test-2", owner, [], VisibilityTypes.private);
         const resource3 = await factory.createTag("tag-test-3", owner, [], VisibilityTypes.private);
-        await factory.createRight(resource1, "Tag", user, [AccessTypes.create], owner, [], VisibilityTypes.public);
-        await factory.createRight(resource2, "Tag", user, [AccessTypes.create], owner, [], VisibilityTypes.public);
-        await factory.createRight(resource3, "Tag", user, [AccessTypes.create], owner, [], VisibilityTypes.public);
+        await factory.createRight(resource1, "Tag", user, owner, []);
+        await factory.createRight(resource2, "Tag", user, owner, []);
+        await factory.createRight(resource3, "Tag", user, owner, []);
         const res = await chai.request(server).get('/v1/rights').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
@@ -43,7 +42,7 @@ describe('/GET rights', () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
-        const right = await factory.createRight(resource, "Tag", user, [AccessTypes.create], owner, [], VisibilityTypes.public);
+        const right = await factory.createRight(resource, "Tag", user, owner, []);
         const res = await chai.request(server).get('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -66,7 +65,7 @@ describe('/POST rights', () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
-        const right = { type: "Tag", user: user._id, access: [AccessTypes.create] };
+        const right = { type: "Tag", user: user._id };
         const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -75,12 +74,26 @@ describe('/POST rights', () => {
         res.body.details.should.contain('Please, supply a resource');
     });
 
+    it('it should not POST a right with a not permitted resource type', async () => {
+        await mongoose.connection.dropDatabase();
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
+        const resource = await factory.createScript("test-script-1", owner, "code", [], VisibilityTypes.private);
+        const right = { type: "Script", resource: resource._id, user: user._id };
+        const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.post_request_error.message);
+        res.body.details.should.contain('resource type Script not valid');
+    });
+
     it('it should not POST a right without type field', async () => {
         await mongoose.connection.dropDatabase();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
-        const right = { resource: resource._id, user: user._id, access: [AccessTypes.create] };
+        const right = { resource: resource._id, user: user._id };
         const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -94,7 +107,7 @@ describe('/POST rights', () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
-        const right = { resource: resource._id, type: "Tag", access: [AccessTypes.create] };
+        const right = { resource: resource._id, type: "Tag" };
         const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -108,7 +121,7 @@ describe('/POST rights', () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
-        const right = { resource: resource._id, type: "Feature", user: user._id, access: [AccessTypes.create] };
+        const right = { resource: resource._id, type: "Feature", user: user._id };
         const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -122,7 +135,7 @@ describe('/POST rights', () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
-        const right = { resource: resource._id, type: "Tag", user: user._id, access: [AccessTypes.create], tags: ["fake-tag"] };
+        const right = { resource: resource._id, type: "Tag", user: user._id, tags: ["fake-tag"] };
         const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -136,7 +149,7 @@ describe('/POST rights', () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
-        const right = { resource: resource._id, type: "Tag", user: user._id, access: [AccessTypes.create] };
+        const right = { resource: resource._id, type: "Tag", user: user._id };
         const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -149,7 +162,7 @@ describe('/POST rights', () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
-        const right = { resource: resource._id, type: "Tag", user: user._id, access: [AccessTypes.create] };
+        const right = { resource: resource._id, type: "Tag", user: user._id };
         await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         res.should.have.status(errors.post_request_error.status);
@@ -166,9 +179,9 @@ describe('/POST rights', () => {
         const resource1 = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const resource2 = await factory.createTag("tag-test-2", owner, [], VisibilityTypes.private);
         const resource3 = await factory.createTag("tag-test-3", owner, [], VisibilityTypes.private);
-        const rights = [ { resource: resource1._id, type: "Tag", user: user._id, access: [AccessTypes.create] },
-                         { resource: resource2._id, type: "Tag", user: user._id, access: [AccessTypes.create] },
-                         { resource: resource3._id, type: "Tag", user: user._id, access: [AccessTypes.create] } ];
+        const rights = [ { resource: resource1._id, type: "Tag", user: user._id },
+                         { resource: resource2._id, type: "Tag", user: user._id },
+                         { resource: resource3._id, type: "Tag", user: user._id } ];
         const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(rights);
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -184,9 +197,9 @@ describe('/POST rights', () => {
         const resource1 = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const resource2 = await factory.createTag("tag-test-2", owner, [], VisibilityTypes.private);
         const resource3 = await factory.createTag("tag-test-3", owner, [], VisibilityTypes.private);
-        const rights = [ { resource: resource1._id, type: "Tag", user: user._id, access: [AccessTypes.create] },
-                         { resource: resource1._id, type: "Tag", user: user._id, access: [AccessTypes.create] },
-                         { resource: resource3._id, type: "Tag", user: user._id, access: [AccessTypes.create] } ];
+        const rights = [ { resource: resource1._id, type: "Tag", user: user._id },
+                         { resource: resource1._id, type: "Tag", user: user._id },
+                         { resource: resource3._id, type: "Tag", user: user._id } ];
         const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(rights);
         res.should.have.status(202);
         res.body.should.be.a('object');
@@ -203,7 +216,7 @@ describe('/POST rights', () => {
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const tag = await factory.createTag("tag-test-2", owner, [], VisibilityTypes.private);
-        const right = { resource: resource._id, type: "Tag", user: user._id, access: [AccessTypes.create], tags:[tag] };
+        const right = { resource: resource._id, type: "Tag", user: user._id, tags:[tag] };
         const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -219,7 +232,7 @@ describe('/DELETE rights', () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
-        const right = await factory.createRight(resource, "Tag", user, [AccessTypes.create], owner, [], VisibilityTypes.public);
+        const right = await factory.createRight(resource, "Tag", user, owner, []);
         const rights_before = await Right.find();
         rights_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner));
@@ -234,7 +247,7 @@ describe('/DELETE rights', () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
-        const right = await factory.createRight(resource, "Tag", user, [AccessTypes.create], owner, [], VisibilityTypes.public);
+        const right = await factory.createRight(resource, "Tag", user, owner, []);
         const rights_before = await Right.find();
         rights_before.length.should.be.eql(1);
         const res = await chai.request(server).delete('/v1/rights/fake_right').set("Authorization", await factory.getUserToken(owner));
@@ -248,21 +261,6 @@ describe('/DELETE rights', () => {
 
 // Test the /PUT route
 describe('/PUT rights', () => {
-    it('it should PUT a right to modify visibility', async () => {
-        await mongoose.connection.dropDatabase();
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
-        const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
-        const right = await factory.createRight(resource, "Tag", user, [AccessTypes.create], owner, [], VisibilityTypes.private);
-        right.visibility.should.be.eql(VisibilityTypes.private);
-        const modification = { visibility: VisibilityTypes.public} ;
-        const res = await chai.request(server).put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
-        res.should.have.status(200);
-        res.body.should.be.a('object');
-        res.body.should.have.property('_id');
-        res.body.visibility.should.be.eql(VisibilityTypes.public);
-    });
-
     it('it should PUT a right to add a tag', async () => {
         await mongoose.connection.dropDatabase();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
@@ -271,7 +269,7 @@ describe('/PUT rights', () => {
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
         const tag_3 = await factory.createTag("test-tag-3", user);
-        const right = await factory.createRight(resource, "Tag", user, [AccessTypes.create], owner, [tag_1, tag_2], VisibilityTypes.private);
+        const right = await factory.createRight(resource, "Tag", user, owner, [tag_1, tag_2]);
         const modification = { tags: { add: [tag_3._id] } };
         const res = await chai.request(server).put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
         res.should.have.status(200);
@@ -288,7 +286,7 @@ describe('/PUT rights', () => {
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
         const tag_3 = await factory.createTag("test-tag-3", user);
-        const right = await factory.createRight(resource, "Tag", user, [AccessTypes.create], owner, [tag_1, tag_2, tag_3], VisibilityTypes.private);
+        const right = await factory.createRight(resource, "Tag", user, owner, [tag_1, tag_2, tag_3]);
         const modification = { tags: { remove: [tag_2._id] } };
         const res = await chai.request(server).put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
         res.should.have.status(200);
@@ -309,7 +307,7 @@ describe('/PUT rights', () => {
         const tag_5 = await factory.createTag("test-tag-5", user);
         const tag_6 = await factory.createTag("test-tag-6", user);
         const tag_7 = await factory.createTag("test-tag-7", user);
-        const right = await factory.createRight(resource, "Tag", user, [AccessTypes.create], owner, [tag_1, tag_2, tag_3, tag_4], VisibilityTypes.private);
+        const right = await factory.createRight(resource, "Tag", user, owner, [tag_1, tag_2, tag_3, tag_4]);
         const modification = { tags: { remove: [tag_2._id, tag_3._id], add: [tag_5._id, tag_6._id, tag_7._id] } };
         const res = await chai.request(server).put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
         res.should.have.status(200);
@@ -325,7 +323,7 @@ describe('/PUT rights', () => {
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
-        const right = await factory.createRight(resource, "Tag", user, [AccessTypes.create], owner, [tag_1, tag_2], VisibilityTypes.private);
+        const right = await factory.createRight(resource, "Tag", user, owner, [tag_1, tag_2]);
         const modification = { tags: { add: ["fake_tag"] } };
         const res = await chai.request(server).put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
         res.should.have.status(errors.put_request_error.status);
@@ -342,7 +340,7 @@ describe('/PUT rights', () => {
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
-        const right = await factory.createRight(resource, "Tag", user, [AccessTypes.create], owner, [tag_1, tag_2], VisibilityTypes.private);
+        const right = await factory.createRight(resource, "Tag", user, owner, [tag_1, tag_2]);
         const modification = { tags: { remove: ["fake_tag"] } };
         const res = await chai.request(server).put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
         res.should.have.status(errors.put_request_error.status);
@@ -352,84 +350,12 @@ describe('/PUT rights', () => {
         res.body.details.should.contain('Resource to be removed from list not found');
     });
 
-    it('it should PUT a right to add a access', async () => {
-        await mongoose.connection.dropDatabase();
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
-        const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
-        const right = await factory.createRight(resource, "Tag", user, [AccessTypes.create], owner, [], VisibilityTypes.private);
-        const modification = { access: { add: [AccessTypes.read] } };
-        const res = await chai.request(server).put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
-        res.should.have.status(200);
-        res.body.should.be.a('object');
-        res.body.should.have.property('_id');
-        res.body.access.length.should.be.eql(2);
-    });
-
-    it('it should PUT a right to remove a access', async () => {
-        await mongoose.connection.dropDatabase();
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
-        const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
-        const right = await factory.createRight(resource, "Tag", user, [AccessTypes.create, AccessTypes.delete], owner, [], VisibilityTypes.private);
-        const modification = { access: { remove: [AccessTypes.create] } };
-        const res = await chai.request(server).put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
-        res.should.have.status(200);
-        res.body.should.be.a('object');
-        res.body.should.have.property('_id');
-        res.body.access.length.should.be.eql(1);
-    });
-
-    it('it should PUT a right to add and remove a access', async () => {
-        await mongoose.connection.dropDatabase();
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
-        const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
-        const right = await factory.createRight(resource, "Tag", user, [AccessTypes.update], owner, [], VisibilityTypes.private);
-        const modification = { access: { add: [AccessTypes.delete, AccessTypes.create], remove: [AccessTypes.update] } };
-        const res = await chai.request(server).put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
-        res.should.have.status(200);
-        res.body.should.be.a('object');
-        res.body.should.have.property('_id');
-        res.body.access.length.should.be.eql(2);
-    });
-
-    it('it should not PUT a right adding a fake access', async () => {
-        await mongoose.connection.dropDatabase();
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
-        const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
-        const right = await factory.createRight(resource, "Tag", user, [AccessTypes.create], owner, [], VisibilityTypes.private);
-        const modification = { access: { add: ["fake_access"] } };
-        const res = await chai.request(server).put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
-        res.should.have.status(errors.put_request_error.status);
-        res.body.should.be.a('object');
-        res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.put_request_error.message);
-        res.body.details.should.contain('Type to be added to the list not found');
-    });
-
-    it('it should not PUT a right removing a fake tag', async () => {
-        await mongoose.connection.dropDatabase();
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
-        const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
-        const right = await factory.createRight(resource, "Tag", user, [AccessTypes.create], owner, [], VisibilityTypes.private);
-        const modification = { access: { remove: ["fake_access"] } };
-        const res = await chai.request(server).put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
-        res.should.have.status(errors.put_request_error.status);
-        res.body.should.be.a('object');
-        res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.put_request_error.message);
-        res.body.details.should.contain('Type to be removed from list not found');
-    });
-
     it('it should not PUT a fake right', async () => {
         await mongoose.connection.dropDatabase();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
-        const right = await factory.createRight(resource, "Tag", user, [AccessTypes.create], owner, [], VisibilityTypes.private);
+        const right = await factory.createRight(resource, "Tag", user, owner, []);
         const modification = { access: { remove: ["fake_access"] } };
         const res = await chai.request(server).put('/v1/rights/fake-right').set("Authorization", await factory.getUserToken(owner)).send(modification);
         res.should.have.status(errors.resource_not_found.status);
