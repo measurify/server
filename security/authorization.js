@@ -23,11 +23,6 @@ exports.isOwner = function(resource, user) {
     return resource.owner._id.equals(user._id); 
 }
 
-exports.hasRights = function(rights, access) {
-    if(rights) if(!rights.access.includes(access)) return false;
-    return false;
-}
-
 exports.isAvailable = async function(id, field, model) {
     const item = await persistence.get(id, field, model);
     if(!item) return null; 
@@ -92,20 +87,19 @@ exports.addRights = function(user, rights) {
     return result;
 }
 
-exports.hasRights = function(user, rights, element) {
+exports.hasMeasurementRights = function(user, rights, element) {
+    let admitted = {};
+    rights.forEach(right => { 
+        right.type = right.type.toLowerCase();
+        if(right.type == 'tag') right.type = right.type + 's';
+        if(!admitted[right.type]) admitted[right.type] = [];        
+            admitted[right.type].push(right.resource) 
+    });
+    for(let key in admitted) {
+        if (Array.isArray(element[key])) { if(!element[key].some(item => admitted[key].includes(item))) return false; }
+        else if(!admitted[key].includes(element[key])) return false;
+    }
     return true;
-//    let admitted = {};
-//    rights.forEach(right => { 
-//        if(!admitted[right.type]) admitted[right.type] = { $in: [] };
-//        admitted[right.type].push(right.resource) 
-//    });
-
-//    admitted.forEach( => {
-//        if(Array.isArray(element[right.type])) if(!element[right.type].includes(right.resource)) return false;
-//        else if(element[right.type] != right.resource) return false
-//
-//    });
-//    return true;
 }
 
 exports.readJustOwned = function(user) {

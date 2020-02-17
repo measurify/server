@@ -25,7 +25,7 @@
     {
         "type": "node",
         "request": "launch",
-        "name": "One tests",
+       "name": "One tests",
         "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
         "args": [
             "-u",

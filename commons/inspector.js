@@ -42,6 +42,11 @@ exports.areCoherent = function(measurement, feature) {
     return true;
 }
 
+exports.hasNewMeasurementRights = function(item, rights) {
+    if(!authorizator.hasMeasurementRights(item.owner, rights, item)) return false;
+    return true;
+} 
+
 exports.hasSamples = function(measurement) { 
     if (measurement.samples.length == 0) return false;
     return true;

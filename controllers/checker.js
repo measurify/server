@@ -76,9 +76,10 @@ exports.addRights = async function(req, res) {
     return authorizator.addRights(req.user, rights);
 } 
 
-exports.hasRights = async function(req, res, element) {
+exports.hasMeasurementRights = async function(req, res, model) {
+    const item = await authorizator.isAvailable(req.params.id, null, model);
     const rights = await Right.find({user: req.user._id});
-    if(!authorizator.hasRights(req.user, rights, element)) return errors.manage(res, errors.restricted_access, element._id);
+    if(!authorizator.hasMeasurementRights(req.user, rights, item)) return errors.manage(res, errors.restricted_access, item._id);
     return true;
 } 
 
