@@ -184,12 +184,6 @@ measurementSchema.pre('save', async function () {
     this.samples.remove(removes);
 });
 
-// check rights
-measurementSchema.pre('save', async function () {
-    const rights = await Right.find({user: this.owner});
-    if(!inspector.hasNewMeasurementRights(this, rights)) throw new Error('You miss rigths on some resources');
-});
-
 // check consistency between samples and feature
 measurementSchema.pre('save', async function () {
     const feature = (await Feature.findById(this.feature));

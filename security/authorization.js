@@ -77,29 +77,62 @@ exports.whatCanRead = function(user) {
     return result;
 } 
 
-exports.addRights = function(user, rights) {
+exports.whichRights = function(user, rights, where) {
     let result = {};
     if (this.isAdministrator(user)) return result;
     rights.forEach(right => { 
-        if(!result[right.type]) result[right.type] = { $in: [] };
-        result[right.type].$in.push(right.resource) 
+        if(where == 'type') {
+            if(!result[right.type]) result[right.type] = { $in: [] };
+            result[right.type].$in.push(right.resource)
+        }
+        else {
+            if(!result['_id']) result['_id'] = { $in: [] };
+            result['_id'].$in.push(right.resource) 
+        } 
     });
     return result;
 }
 
-exports.hasMeasurementRights = function(user, rights, element) {
+exports.hasRightsToCreate = function(user, rights, element, fields) {
+    if (this.isAdministrator(user)) return true;
+    if(!rights || rights.length == 0) return true;
     let admitted = {};
     rights.forEach(right => { 
         right.type = right.type.toLowerCase();
         if(right.type == 'tag') right.type = right.type + 's';
         if(!admitted[right.type]) admitted[right.type] = [];        
-            admitted[right.type].push(right.resource) 
+        admitted[right.type].push(right.resource) 
     });
-    for(let key in admitted) {
-        if (Array.isArray(element[key])) { if(!element[key].some(item => admitted[key].includes(item))) return false; }
-        else if(!admitted[key].includes(element[key])) return false;
-    }
+    for(let field of fields) {
+        if(admitted[field] != null && admitted[field].length !=0 && element[field] != null) {
+            if(Array.isArray(element[field])) {if(!admitted[field].some(r => element[field].includes(r))) return false; }
+            else { if(!admitted[field].includes(element[field])) return false; }
+        }
+    };
     return true;
+} 
+
+exports.hasRights = function(user, rights, element, where) {
+    if (this.isAdministrator(user)) return true;
+    if(where == 'type') {
+        let admitted = {};
+        rights.forEach(right => { 
+            right.type = right.type.toLowerCase();
+            if(right.type == 'tag') right.type = right.type + 's';
+            if(!admitted[right.type]) admitted[right.type] = [];        
+                admitted[right.type].push(right.resource) 
+        });
+        for(let key in admitted) {
+            if (Array.isArray(element[key])) { if(!element[key].some(item => admitted[key].includes(item))) return false; }
+            else if(!admitted[key].includes(element[key])) return false;
+        }
+        return true;
+    }
+    else {
+        if(!rights || rights.length == 0) return true;
+        if(rights.map(right => right.resource).includes(element._id)) return true;
+        return false;
+    }
 }
 
 exports.readJustOwned = function(user) {

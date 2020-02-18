@@ -71,15 +71,38 @@ exports.whatCanRead = async function(req, res) {
     return authorizator.whatCanRead(req.user);
 } 
 
-exports.addRights = async function(req, res) {
-    const rights = await Right.find({user: req.user._id});
-    return authorizator.addRights(req.user, rights);
+exports.whichRights = async function(req, res, model) {
+    if(model.modelName == "Measurement") {
+        const rights = await Right.find({user: req.user._id});
+        return authorizator.whichRights(req.user, rights, 'type');
+    }
+    else {
+        let type = model.modelName.toLowerCase();
+        if(type == 'tag') type = 'tags';
+        const rights = await Right.find({user: req.user._id, type: type});
+        return authorizator.whichRights(req.user, rights, 'inside');
+    }
 } 
 
-exports.hasMeasurementRights = async function(req, res, model) {
+exports.hasRights = async function(req, res, model) {
     const item = await authorizator.isAvailable(req.params.id, null, model);
+    if(model.modelName == "Measurement") {
+        const rights = await Right.find({user: req.user._id});
+        if(!authorizator.hasRights(req.user, rights, item, 'type')) return errors.manage(res, errors.restricted_access, item._id);
+        return true;
+    }
+    else {
+        let type = model.modelName.toLowerCase();
+        if(type == 'tag') type = 'tags';
+        const rights = await Right.find({user: req.user._id, type: type});
+        if(!authorizator.hasRights(req.user, rights, item, 'inside')) return errors.manage(res, errors.restricted_access, item._id);
+        return true;
+    }
+} 
+
+exports.hasRightsToCreate = async function(req, res, fields) {
     const rights = await Right.find({user: req.user._id});
-    if(!authorizator.hasMeasurementRights(req.user, rights, item)) return errors.manage(res, errors.restricted_access, item._id);
+    if(!authorizator.hasRightsToCreate(req.user, rights, req.body, fields)) return errors.manage(res, errors.restricted_access, 'You miss rigths on some resources');
     return true;
 } 
 

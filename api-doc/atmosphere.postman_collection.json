@@ -1529,7 +1529,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"_id\": \"gps\",\r\n    \"features\": [ \"position\" ]\r\n}\r\n"
+							"raw": "{\r\n\t\"_id\": \"gps\",\r\n    \"features\": [ \"position\" ],\r\n    \"period\": \"5s\",\r\n    \"cycle\": \"10m\",\r\n    \"retryTime\": \"10s\",\r\n    \"scriptListMaxSize\": 5,\r\n    \"measurementBufferSize\": 20,\r\n    \"issueBufferSize\": 20,\r\n    \"sendBufferSize\": 20,\r\n    \"scriptStatementMaxSize\": 5,\r\n    \"statementBufferSize\": 10,\r\n    \"measurementBufferPolicy\": \"decimation\"\r\n}\r\n"
 						},
 						"url": {
 							"raw": "{{url}}/v1/devices/",
@@ -1645,7 +1645,7 @@
 			]
 		},
 		{
-			"name": "ALERT",
+			"name": "ISSUES",
 			"item": [
 				{
 					"name": "LOGIN as a provider",
@@ -1700,7 +1700,7 @@
 					"response": []
 				},
 				{
-					"name": "POST a new alert",
+					"name": "POST a new issue",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -1735,8 +1735,8 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "{{token}}",
-								"type": "text"
+								"type": "text",
+								"value": "{{token}}"
 							}
 						],
 						"body": {
@@ -1744,13 +1744,13 @@
 							"raw": "{\r\n\t\"device\": \"{{device_id}}\",\r\n    \"date\": \"{{current_timestamp}}\",\r\n    \"message\": \"this is a message\",\r\n    \"type\": \"generic\"\r\n}\r\n"
 						},
 						"url": {
-							"raw": "{{url}}/v1/alerts/",
+							"raw": "{{url}}/v1/issues/",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"v1",
-								"alerts",
+								"issues",
 								""
 							]
 						}
@@ -1758,7 +1758,7 @@
 					"response": []
 				},
 				{
-					"name": "GET all his alerts",
+					"name": "GET all his issues",
 					"event": [
 						{
 							"listen": "test",
@@ -1766,7 +1766,7 @@
 								"id": "7a842a86-4aad-493d-bcc5-2550c20d5d9f",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
-									"if(data.docs) pm.environment.set('alert', data.docs[0]._id);"
+									"if(data.docs) pm.environment.set('issue', data.docs[0]._id);"
 								],
 								"type": "text/javascript"
 							}
@@ -1782,20 +1782,20 @@
 							}
 						],
 						"url": {
-							"raw": "{{url}}/v1/alerts",
+							"raw": "{{url}}/v1/issues",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"v1",
-								"alerts"
+								"issues"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "GET the list of alert types",
+					"name": "GET the list of issue types",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -1830,8 +1830,8 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "{{token}}",
-								"type": "text"
+								"type": "text",
+								"value": "{{token}}"
 							}
 						],
 						"body": {
@@ -1839,13 +1839,13 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/v1/alerts/types",
+							"raw": "{{url}}/v1/issues/types",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"v1",
-								"alerts",
+								"issues",
 								"types"
 							]
 						}
@@ -2167,6 +2167,92 @@
 					"response": []
 				},
 				{
+					"name": "GET all measurements with CSV format",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "11f2ec22-be75-49e1-8378-53150d88f0c5",
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"if(data.docs) pm.environment.set('measurement', data.docs[0]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "text/csv",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/measurements",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET all measurements size",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "11f2ec22-be75-49e1-8378-53150d88f0c5",
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"if(data.docs) pm.environment.set('measurement', data.docs[0]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/measurements/count",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements",
+								"count"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "GET one measurement",
 					"request": {
 						"method": "GET",
@@ -2274,6 +2360,37 @@
 							"path": [
 								"v1",
 								"measurements"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "{\"tags\":\"urban\"}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET measurements size only from a specific tag (filtered)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/measurements/count?filter={\"tags\":\"urban\"}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements",
+								"count"
 							],
 							"query": [
 								{
@@ -3433,7 +3550,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"resource\": \"{{thing}}\",\r\n  \"type\": \"Thing\",\r\n  \"user\": \"{{user}}\",\r\n  \"access\": [\"read\", \"delete\"]\r\n}"
+							"raw": "{\r\n  \"resource\": \"{{thing}}\",\r\n  \"type\": \"Thing\",\r\n  \"user\": \"{{user}}\"\r\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/rights/",
@@ -3491,7 +3608,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"visibility\": \"public\",\r\n  \"access\": {\r\n\t\"remove\": [\"read\"],\r\n  \t\"add\": [\"create\",\"update\"]\r\n  },\r\n  \"tags\": {\r\n\t\"remove\": [\"{{tag1}}\"],\r\n  \t\"add\": [\"{{tag2}}\",\"{{tag3}}\"]\r\n  }\r\n}"
+							"raw": "{\r\n  \"visibility\": \"public\",\r\n  \"tags\": {\r\n\t\"remove\": [\"{{tag1}}\"],\r\n  \t\"add\": [\"{{tag2}}\",\"{{tag3}}\"]\r\n  }\r\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/rights/{{right}}",
@@ -3540,7 +3657,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\r\n\t{\r\n\t  \"resource\": \"{{thing1}}\",\r\n\t  \"type\": \"Thing\",\r\n\t  \"user\": \"{{user}}\",\r\n\t  \"access\": [\"read\", \"delete\"]\r\n\t},\r\n\t{\r\n\t  \"resource\": \"{{thing2}}\",\r\n\t  \"type\": \"Thing\",\r\n\t  \"user\": \"{{user}}\",\r\n\t  \"access\": [\"read\", \"delete\"]\r\n\t}\r\n]"
+							"raw": "[\r\n\t{\r\n\t  \"resource\": \"{{thing1}}\",\r\n\t  \"type\": \"Thing\",\r\n\t  \"user\": \"{{user}}\"\r\n\t},\r\n\t{\r\n\t  \"resource\": \"{{thing2}}\",\r\n\t  \"type\": \"Thing\",\r\n\t  \"user\": \"{{user}}\"\r\n\t}\r\n]"
 						},
 						"url": {
 							"raw": "{{url}}/v1/rights",
@@ -3696,6 +3813,735 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "ACCESS CONTROL",
+			"item": [
+				{
+					"name": "LOGIN as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST tags",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "981648d0-4153-4d98-9273-49fbcfd23e04",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "4ec82747-a423-4ab5-b8e3-2e24cd7f56fc",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n  { \"_id\": \"tag-1\", \"tags\": [] },\r\n  { \"_id\": \"tag-2\", \"tags\": [] }\r\n]"
+						},
+						"url": {
+							"raw": "{{url}}/v1/tags",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"tags"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST things ",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e0b58b11-cc9a-4f7b-9e75-32f1f239da49",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n\t{ \"_id\": \"thing-1\", \"tags\": [\"tag-1\", \"tag-2\"] },\r\n\t{ \"_id\": \"thing-2\", \"tags\": [\"tag-2\"] }\r\n]"
+						},
+						"url": {
+							"raw": "{{url}}/v1/things",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"things"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST features",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "981648d0-4153-4d98-9273-49fbcfd23e04",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[ \r\n  { \"_id\": \"feature-1\", \"items\": [{\"name\": \"value\", \"unit\": \"unit\", \"type\": \"number\", \"dimension\": 0}], \"tags\": [\"tag-1\", \"tag-2\"] },\r\n  { \"_id\": \"feature-2\", \"items\": [{\"name\": \"value\", \"unit\": \"unit\", \"type\": \"number\", \"dimension\": 0}], \"tags\": [\"tag-1\"] }\r\n]"
+						},
+						"url": {
+							"raw": "{{url}}/v1/features",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"features"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST devices",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e0b58b11-cc9a-4f7b-9e75-32f1f239da49",
+								"exec": [
+									"var tags = JSON.parse(pm.environment.get(\"tags\"));",
+									"pm.environment.set('tag1', tags[0]._id);",
+									"pm.environment.set('tag2', tags[1]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n\t{ \"_id\": \"device-1\", \"features\": [\"feature-1\", \"feature-2\"], \"tags\": [\"tag-1\", \"tag-2\"] },\r\n\t{ \"_id\": \"device-2\", \"features\": [\"feature-1\"], \"tags\": [\"tag-2\"] }\r\n]"
+						},
+						"url": {
+							"raw": "{{url}}/v1/devices",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"devices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "031a7bf6-1907-4e98-928d-c8ac62bf00d6",
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"pm.environment.set('analyst-1', data.users[0]._id);",
+									"pm.environment.set('analyst-2', data.users[1]._id);",
+									"pm.environment.set('provider-1', data.users[2]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[ \n\t{ \"username\" : \"analyst-1\", \"password\" : \"analyst-1\", \"type\" : \"analyst\" },\n\t{ \"username\" : \"analyst-2\", \"password\" : \"analyst-2\", \"type\" : \"analyst\" },\n\t{ \"username\" : \"provider-1\", \"password\" : \"provider-1\", \"type\" : \"provider\" }\n]"
+						},
+						"url": {
+							"raw": "{{url}}/v1/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST rights",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e0b58b11-cc9a-4f7b-9e75-32f1f239da49",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n\t{ \"resource\": \"thing-1\",   \"type\": \"Thing\",   \"user\": \"{{analyst-1}}\" },\r\n\t{ \"resource\": \"device-1\",  \"type\": \"Device\",  \"user\": \"{{analyst-1}}\" },\r\n\t{ \"resource\": \"feature-1\", \"type\": \"Feature\", \"user\": \"{{analyst-2}}\" },\r\n\t{ \"resource\": \"tag-1\",\t   \"type\": \"Tag\",     \"user\": \"{{analyst-2}}\" },\r\n\t{ \"resource\": \"feature-2\", \"type\": \"Feature\", \"user\": \"{{provider-1}}\" }\r\n]"
+						},
+						"url": {
+							"raw": "{{url}}/v1/rights",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"rights"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST measurements",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "981648d0-4153-4d98-9273-49fbcfd23e04",
+								"exec": [
+									"var current_timestamp = new Date();",
+									"postman.setEnvironmentVariable(\"current_timestamp\", current_timestamp.toISOString());"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n\t{ \"thing\": \"thing-1\", \"feature\": \"feature-1\", \"device\": \"device-1\", \"samples\": [{\"values\":[10]}], \"tags\":[\"tag-1\", \"tag-2\"], \"visibility\": \"private\" },\r\n\t{ \"thing\": \"thing-1\", \"feature\": \"feature-2\", \"device\": \"device-1\", \"samples\": [{\"values\":[10]}], \"tags\":[\"tag-2\"], \"visibility\": \"public\" },\r\n\t{ \"thing\": \"thing-1\", \"feature\": \"feature-1\", \"device\": \"device-2\", \"samples\": [{\"values\":[10]}], \"tags\":[\"tag-1\"], \"visibility\": \"private\" },\r\n\t{ \"thing\": \"thing-1\", \"feature\": \"feature-1\", \"device\": \"device-2\", \"samples\": [{\"values\":[10]}], \"tags\":[\"tag-1\", \"tag-2\"], \"visibility\": \"private\" },\r\n\t{ \"thing\": \"thing-1\", \"feature\": \"feature-1\", \"device\": \"device-1\", \"samples\": [{\"values\":[10]}], \"tags\":[\"tag-1\"], \"visibility\": \"private\" },\r\n\t{ \"thing\": \"thing-2\", \"feature\": \"feature-1\", \"device\": \"device-1\", \"samples\": [{\"values\":[10]}], \"tags\":[\"tag-1\", \"tag-2\"], \"visibility\": \"private\" },\r\n\t{ \"thing\": \"thing-2\", \"feature\": \"feature-2\", \"device\": \"device-1\", \"samples\": [{\"values\":[10]}], \"tags\":[\"tag-2\"], \"visibility\": \"private\" },\r\n\t{ \"thing\": \"thing-2\", \"feature\": \"feature-1\", \"device\": \"device-2\", \"samples\": [{\"values\":[10]}], \"tags\":[\"tag-1\"], \"visibility\": \"private\" },\r\n\t{ \"thing\": \"thing-2\", \"feature\": \"feature-1\", \"device\": \"device-2\", \"samples\": [{\"values\":[10]}], \"tags\":[\"tag-1\", \"tag-2\"], \"visibility\": \"private\" },\r\n\t{ \"thing\": \"thing-2\", \"feature\": \"feature-1\", \"device\": \"device-1\", \"samples\": [{\"values\":[10]}], \"tags\":[\"tag-1\"], \"visibility\": \"private\" }\r\n]"
+						},
+						"url": {
+							"raw": "{{url}}/v1/measurements",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin get all measurements (10)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "11f2ec22-be75-49e1-8378-53150d88f0c5",
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"if(data.docs) pm.environment.set('measurement', data.docs[0]._id);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/measurements",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LOGIN as analyst-1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "44025a2f-7f86-402f-8415-2bdb26e380bb",
+								"exec": [
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"analyst-1\",\n\t\"password\" : \"analyst-1\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Analist-1 gets just measurements of thing-1 and device-1 (3)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "11f2ec22-be75-49e1-8378-53150d88f0c5",
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"if(data.docs) pm.environment.set('measurement', data.docs[0]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/measurements",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LOGIN as analyst-2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "44025a2f-7f86-402f-8415-2bdb26e380bb",
+								"exec": [
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"analyst-2\",\n\t\"password\" : \"analyst-2\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Analist-2 gets just measurements of feature-1 and tag-1 (8)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "11f2ec22-be75-49e1-8378-53150d88f0c5",
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"if(data.docs) pm.environment.set('measurement', data.docs[0]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/measurements",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LOGIN as provider-1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "44025a2f-7f86-402f-8415-2bdb26e380bb",
+								"exec": [
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"provider-1\",\n\t\"password\" : \"provider-1\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST provider-1 measurements",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "981648d0-4153-4d98-9273-49fbcfd23e04",
+								"exec": [
+									"var current_timestamp = new Date();",
+									"postman.setEnvironmentVariable(\"current_timestamp\", current_timestamp.toISOString());"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n\t{ \"thing\": \"thing-1\", \"feature\": \"feature-1\", \"device\": \"device-1\", \"samples\": [{\"values\":[10]}], \"tags\":[\"tag-1\", \"tag-2\"], \"visibility\": \"private\" },\r\n\t{ \"thing\": \"thing-1\", \"feature\": \"feature-2\", \"device\": \"device-1\", \"samples\": [{\"values\":[10]}], \"tags\":[\"tag-2\"], \"visibility\": \"public\" },\r\n\t{ \"thing\": \"thing-2\", \"feature\": \"feature-2\", \"device\": \"device-1\", \"samples\": [{\"values\":[10]}], \"tags\":[\"tag-2\"], \"visibility\": \"private\" }\r\n]"
+						},
+						"url": {
+							"raw": "{{url}}/v1/measurements",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Provider-1 gets just his own or public measurements of feature-2 (3)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "11f2ec22-be75-49e1-8378-53150d88f0c5",
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"if(data.docs) pm.environment.set('measurement', data.docs[0]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/measurements",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "API docs",

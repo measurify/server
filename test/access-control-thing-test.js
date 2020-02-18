@@ -255,16 +255,13 @@ describe('Access modify things', () => {
 });
 
 // DELETE
-
 describe('Access delete things', () => {
     it('it should delete a thing as admin', async () => {
         await mongoose.connection.dropDatabase();
         const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing = await factory.createThing("test-thing-public", owner, [], null, [], VisibilityTypes.private);
-        const tag = await factory.createTag("test-tag-1", owner);
-        const modification = { tags: { add: [tag._id] } };
-        let res = await chai.request(server).delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_admin)).send(modification);
+        let res = await chai.request(server).delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_admin));
         res.should.have.status(200);
         res.body.should.be.a('object');
     });
@@ -273,9 +270,7 @@ describe('Access delete things', () => {
         await mongoose.connection.dropDatabase();
         const user_provide_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const thing = await factory.createThing("test-thing-public", user_provide_owner, [], null, [], VisibilityTypes.private);
-        const tag = await factory.createTag("test-tag-1", user_provide_owner);
-        const modification = { tags: { add: [tag._id] } };
-        let res = await chai.request(server).delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_provide_owner)).send(modification);
+        let res = await chai.request(server).delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_provide_owner));
         res.should.have.status(200);
         res.body.should.be.a('object');
     });
@@ -285,12 +280,10 @@ describe('Access delete things', () => {
         const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing = await factory.createThing("test-thing-public", owner, [], null, [], VisibilityTypes.private);
-        const tag = await factory.createTag("test-tag-1", owner);
-        const modification = { tags: { add: [tag._id] } };
-        let res = await chai.request(server).delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_analyst)).send(modification);
-        res.should.have.status(errors.restricted_access_modify.status);
+        let res = await chai.request(server).delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_analyst));
+        res.should.have.status(errors.not_yours.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_delete.message);
+        res.body.message.should.contain(errors.not_yours.message);
     });
 
     it('it should not delete a thing as provider not owner', async () => {
@@ -298,11 +291,192 @@ describe('Access delete things', () => {
         const user_provider = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing = await factory.createThing("test-thing-public", owner, [], null, [], VisibilityTypes.private);
-        const tag = await factory.createTag("test-tag-1", owner);
-        const modification = { tags: { add: [tag._id] } };
-        let res = await chai.request(server).delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_provider)).send(modification);
-        res.should.have.status(errors.restricted_access_modify.status);
+        let res = await chai.request(server).delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_provider));
+        res.should.have.status(errors.not_yours.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_delete.message);
+        res.body.message.should.contain(errors.not_yours.message);
     });
 });
+
+// RIGTHS
+describe('Access things with rights', () => {
+    it('it should get all the public/private things with rights as analyst', async () => {
+        await mongoose.connection.dropDatabase();
+        const user_admin = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.admin);
+        const user_analyst = await factory.createUser("test-username-user-2", "test-password-user-2", UserRoles.analyst);
+        const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
+        const thing_public_1 = await factory.createThing("test-thing-1-public", owner, [], null, null, VisibilityTypes.public);
+        const thing_public_2 = await factory.createThing("test-thing-2-public", owner, [], null, null, VisibilityTypes.public);
+        const thing_public_3 = await factory.createThing("test-thing-3-public", owner, [], null, null, VisibilityTypes.public);
+        const thing_public_4 = await factory.createThing("test-thing-4-public", owner, [], null, null, VisibilityTypes.public);
+        const thing_public_5 = await factory.createThing("test-thing-5-public", owner, [], null, null, VisibilityTypes.public);
+        const thing_private_1 = await factory.createThing("test-thing-1-private", owner, [], null, null, VisibilityTypes.private);
+        const thing_private_2 = await factory.createThing("test-thing-2-private", owner, [], null, null, VisibilityTypes.private);
+        const thing_private_3 = await factory.createThing("test-thing-3-private", owner, [], null, null, VisibilityTypes.private);
+        const right_1 = await factory.createRight(thing_public_1, "Thing", user_analyst, owner, []);
+        const right_2 = await factory.createRight(thing_public_2, "Thing", user_analyst, owner, []);
+        const right_3 = await factory.createRight(thing_private_1, "Thing", user_analyst, owner, []);
+        let res = await chai.request(server).get('/v1/things/').set("Authorization", await factory.getUserToken(user_admin));
+        res.should.have.status(200);
+        res.body.docs.should.be.a('array');
+        res.body.docs.length.should.be.eql(8);
+        res = await chai.request(server).get('/v1/things/').set("Authorization", await factory.getUserToken(user_analyst));
+        res.should.have.status(200);
+        res.body.docs.should.be.a('array');
+        res.body.docs.length.should.be.eql(3);
+    });
+
+    it('it should get all the public owned things with rights as provider', async () => {
+        await mongoose.connection.dropDatabase();
+        const user_admin = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.admin);
+        const user_provider = await factory.createUser("test-username-user-2", "test-password-user-2", UserRoles.provider);
+        const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
+        const thing_public_1 = await factory.createThing("test-thing-1-public", owner, [], null, null, VisibilityTypes.public);
+        const thing_public_2 = await factory.createThing("test-thing-2-public", owner, [], null, null, VisibilityTypes.public);
+        const thing_public_3 = await factory.createThing("test-thing-3-public", owner, [], null, null, VisibilityTypes.public);
+        const thing_public_4 = await factory.createThing("test-thing-4-public", owner, [], null, null, VisibilityTypes.public);
+        const thing_public_5 = await factory.createThing("test-thing-5-public", owner, [], null, null, VisibilityTypes.public);
+        const thing_private_1 = await factory.createThing("test-thing-1-private", owner, [], null, null, VisibilityTypes.private);
+        const thing_private_2 = await factory.createThing("test-thing-2-private", user_provider, [], null, null, VisibilityTypes.private);
+        const thing_private_3 = await factory.createThing("test-thing-3-private", owner, [], null, null, VisibilityTypes.private);
+        const right_1 = await factory.createRight(thing_private_2, "Thing", user_provider, owner, []);
+        const right_2 = await factory.createRight(thing_private_1, "Thing", user_provider, owner, []);
+        const right_3 = await factory.createRight(thing_public_1, "Thing", user_provider, owner, []);
+        const right_4 = await factory.createRight(thing_public_2, "Thing", user_provider, owner, []);
+        let res = await chai.request(server).get('/v1/things/').set("Authorization", await factory.getUserToken(user_admin));
+        res.should.have.status(200);
+        res.body.docs.should.be.a('array');
+        res.body.docs.length.should.be.eql(8);
+        res = await chai.request(server).get('/v1/things/').set("Authorization", await factory.getUserToken(user_provider));
+        res.should.have.status(200);
+        res.body.docs.should.be.a('array');
+        res.body.docs.length.should.be.eql(3);
+    });
+
+    it('it should not read a thing without rights', async () => {
+        await mongoose.connection.dropDatabase();
+        const user_provider = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.provider);
+        const user_analyst = await factory.createUser("test-username-user-2", "test-password-user-2", UserRoles.analyst);
+        const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
+        const thing = await factory.createThing("test-thing-1", owner, [], null, null, VisibilityTypes.public);
+        const thing_owned = await factory.createThing("test-thing-2", owner, [], null, null, VisibilityTypes.public);
+        const right_1 = await factory.createRight(thing_owned, "Thing", user_provider, owner, []);
+        const right_2 = await factory.createRight(thing_owned, "Thing", user_analyst, owner, []);
+        let res = await chai.request(server).get('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_provider));
+        res.should.have.status(errors.restricted_access_read.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.be.eql(errors.restricted_access.message);
+        res = await chai.request(server).get('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_analyst));
+        res.should.have.status(errors.restricted_access.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.be.eql(errors.restricted_access.message);
+    });
+
+    it('it should read a thing with rights', async () => {
+        await mongoose.connection.dropDatabase();
+        const user_provider = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.provider);
+        const user_analyst = await factory.createUser("test-username-user-2", "test-password-user-2", UserRoles.analyst);
+        const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
+        const thing = await factory.createThing("test-thing-1", owner, [], null, null, VisibilityTypes.public);
+        const right_1 = await factory.createRight(thing, "Thing", user_provider, owner, []);
+        const right_2 = await factory.createRight(thing, "Thing", user_analyst, owner, []);
+        let res = await chai.request(server).get('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_provider));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body._id.should.eql(thing._id.toString());
+        res = await chai.request(server).get('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_analyst));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body._id.should.eql(thing._id.toString());
+    });
+});
+
+describe('Delete things with rights', () => {
+    it('it should not delete a thing without rights', async () => {
+        await mongoose.connection.dropDatabase();
+        const user_provider = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.provider);
+        const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
+        const thing = await factory.createThing("test-thing-1", user_provider, [], null, null, VisibilityTypes.public);
+        const thing_owned = await factory.createThing("test-thing-2", owner, [], null, null, VisibilityTypes.public);
+        const right = await factory.createRight(thing_owned, "Thing", user_provider, owner, []);
+        let res = await chai.request(server).delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_provider));
+        res.should.have.status(errors.restricted_access_read.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.be.eql(errors.restricted_access.message);
+    });
+
+    it('it should delete a thing with rights', async () => {
+        await mongoose.connection.dropDatabase();
+        const user_provider = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.provider);
+        const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
+        const thing = await factory.createThing("test-thing-1", user_provider, [], null, null, VisibilityTypes.public);
+        const right = await factory.createRight(thing, "Thing", user_provider, owner, []);
+        let res = await chai.request(server).delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_provider));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+    });
+});
+
+describe('Modify things with rights', () => {
+    it('it should not modify a thing without rights', async () => {
+        await mongoose.connection.dropDatabase();
+        const user_provider = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.provider);
+        const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
+        const thing = await factory.createThing("test-thing-1", user_provider, [], null, null, VisibilityTypes.public);
+        const thing_owned = await factory.createThing("test-thing-2", owner, [], null, null, VisibilityTypes.public);
+        const right = await factory.createRight(thing_owned, "Thing", user_provider, owner, []);
+        const tag = await factory.createTag("test-tag-1", owner);
+        const modification = { tags: { add: [tag._id] } };
+        let res = await chai.request(server).put('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_provider)).send(modification);
+        res.should.have.status(errors.restricted_access_read.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.be.eql(errors.restricted_access.message);
+    });
+
+    it('it should modify a thing with rights', async () => {
+        await mongoose.connection.dropDatabase();
+        const user_provider = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.provider);
+        const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
+        const thing = await factory.createThing("test-thing-1", user_provider, [], null, null, VisibilityTypes.public);
+        const right = await factory.createRight(thing, "Thing", user_provider, owner, []);
+        const tag = await factory.createTag("test-tag-1", owner);
+        const modification = { tags: { add: [tag._id] } };
+        let res = await chai.request(server).put('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_provider)).send(modification);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+    });
+});
+
+describe('Create a a thing with rights', () => {
+    it('it should not create a thing without rights on tag', async () => {
+        await mongoose.connection.dropDatabase();
+        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+        const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
+        const tag = await factory.createTag("test-tag-1", owner);
+        const tag_other = await factory.createTag("test-tag-2", owner);
+        const right = await factory.createRight(tag_other, "Tag", provider, owner, []);
+        const request = { _id: "thing-name-text", items: [{ name: 'item-name-1', unit: 'item-unit-1'}], tags:[tag._id]};
+        let res = await chai.request(server).post('/v1/things/').set('Authorization', await factory.getUserToken(provider)).send(request);
+        res.body.message.should.be.a('string');
+        res.should.have.status(errors.restricted_access.status);
+        res.body.message.should.contain(errors.restricted_access.message);
+        res.body.details.should.contain('You miss rigths on some resources');
+    });
+
+    it('it should create a thing with rights', async () => {
+        await mongoose.connection.dropDatabase();
+        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+        const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
+        const tag = await factory.createTag("test-tag-1", owner);
+        const right = await factory.createRight(tag, "Tag", provider, owner, []);
+        const request = { _id: "thing-name-text", items: [ { name: 'item-name-1', unit: 'item-unit-1'}], tags:[tag._id]}
+        let res = await chai.request(server).post('/v1/things/').set('Authorization', await factory.getUserToken(provider)).send(request);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+    });
+});
+

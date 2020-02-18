@@ -1,6 +1,9 @@
 {
     "version": "0.2.0",
     "configurations": [
+
+
+
     {
         "type": "node",
         "request": "launch",
@@ -33,7 +36,7 @@
             "--timeout",
             "999999",
             "--colors",
-            "test/access-control-measurement-test.js",
+            "test/access-control-thing-test.js",
             "${workspaceFolder}/test"
         ],
         "internalConsoleOptions": "openOnSessionStart"

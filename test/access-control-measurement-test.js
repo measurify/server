@@ -1214,11 +1214,8 @@ describe('Create a measurements with rights', () => {
         const right = await factory.createRight(other_thing, "Thing", provider, owner, []);
         const request = { owner: provider, feature: feature._id, thing: thing._id, device: device._id, tags: [tag._id], samples: [{values: 10.4, delta: 200}] }
         let res = await chai.request(server).post('/v1/measurements/').set('Authorization', await factory.getUserToken(provider)).send(request);
-        res.should.have.status(errors.post_request_error.status);
-        res.body.should.be.a('object');
-        res.body.message.should.be.a('string');
-        res.should.have.status(errors.post_request_error.status);
-        res.body.message.should.contain(errors.post_request_error.message);
+        res.should.have.status(errors.restricted_access.status);
+        res.body.message.should.contain(errors.restricted_access.message);
         res.body.details.should.contain('You miss rigths on some resources');
     });
 
@@ -1234,11 +1231,8 @@ describe('Create a measurements with rights', () => {
         const right = await factory.createRight(device_other, "Device", provider, owner, []);
         const request = { owner: provider, feature: feature._id, thing: thing._id, device: device._id, tags: [tag._id], samples: [{values: 10.4, delta: 200}] }
         let res = await chai.request(server).post('/v1/measurements/').set('Authorization', await factory.getUserToken(provider)).send(request);
-        res.should.have.status(errors.post_request_error.status);
-        res.body.should.be.a('object');
-        res.body.message.should.be.a('string');
-        res.should.have.status(errors.post_request_error.status);
-        res.body.message.should.contain(errors.post_request_error.message);
+        res.should.have.status(errors.restricted_access.status);
+        res.body.message.should.contain(errors.restricted_access.message);
         res.body.details.should.contain('You miss rigths on some resources');
     });
 
@@ -1254,15 +1248,13 @@ describe('Create a measurements with rights', () => {
         const right = await factory.createRight(feature_other, "Feature", provider, owner, []);
         const request = { owner: provider, feature: feature._id, thing: thing._id, device: device._id, tags: [tag._id], samples: [{values: 10.4, delta: 200}] }
         let res = await chai.request(server).post('/v1/measurements/').set('Authorization', await factory.getUserToken(provider)).send(request);
-        res.should.have.status(errors.post_request_error.status);
-        res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.post_request_error.status);
-        res.body.message.should.contain(errors.post_request_error.message);
+        res.should.have.status(errors.restricted_access.status);
+        res.body.message.should.contain(errors.restricted_access.message);
         res.body.details.should.contain('You miss rigths on some resources');
     });
 
-    it('it should not create a measurements without rights on feature', async () => {
+    it('it should not create a measurements without rights on tag', async () => {
         await mongoose.connection.dropDatabase();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -1274,15 +1266,13 @@ describe('Create a measurements with rights', () => {
         const right = await factory.createRight(tag_other, "Tag", provider, owner, []);
         const request = { owner: provider, feature: feature._id, thing: thing._id, device: device._id, tags: [tag._id], samples: [{values: 10.4, delta: 200}] }
         let res = await chai.request(server).post('/v1/measurements/').set('Authorization', await factory.getUserToken(provider)).send(request);
-        res.should.have.status(errors.post_request_error.status);
-        res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.should.have.status(errors.post_request_error.status);
-        res.body.message.should.contain(errors.post_request_error.message);
+        res.should.have.status(errors.restricted_access.status);
+        res.body.message.should.contain(errors.restricted_access.message);
         res.body.details.should.contain('You miss rigths on some resources');
     });
 
-    it('it should not create a measurements with rights', async () => {
+    it('it should create a measurements with rights', async () => {
         await mongoose.connection.dropDatabase();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -1294,6 +1284,82 @@ describe('Create a measurements with rights', () => {
         const right_2 = await factory.createRight(device, "Device", provider, owner, []);
         const request = { owner: provider, feature: feature._id, thing: thing._id, device: device._id, tags: [tag._id], samples: [{values: 10.4, delta: 200}] }
         let res = await chai.request(server).post('/v1/measurements/').set('Authorization', await factory.getUserToken(provider)).send(request);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+    });
+});
+
+describe('Delete measurement with rights', () => {
+    it('it should not delete a measurement without rights', async () => {
+        await mongoose.connection.dropDatabase();
+        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+        const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature-1", owner);
+        const device = await factory.createDevice("test-device-1", owner, [feature]);
+        const device_other = await factory.createDevice("test-device-2", owner, [feature]);
+        const thing = await factory.createThing("test-thing-1", owner);
+        const tag = await factory.createTag("test-tag-1", owner);
+        const tag_other = await factory.createTag("test-tag-2", owner);
+        const right = await factory.createRight(tag_other, "Tag", provider, owner, []);
+        const measurement   = await factory.createMeasurement(provider, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.public);
+        let res = await chai.request(server).delete('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        res.should.have.status(errors.restricted_access.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.be.eql(errors.restricted_access.message);
+    });
+
+    it('it should delete a measurement with rights', async () => {
+        await mongoose.connection.dropDatabase();
+        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+        const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature-1", owner);
+        const device = await factory.createDevice("test-device-1", owner, [feature]);
+        const device_other = await factory.createDevice("test-device-2", owner, [feature]);
+        const thing = await factory.createThing("test-thing-1", owner);
+        const tag = await factory.createTag("test-tag-1", owner);
+        const right = await factory.createRight(tag, "Tag", provider, owner, []);
+        const measurement   = await factory.createMeasurement(provider, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.public);
+        let res = await chai.request(server).delete('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+    });
+});
+
+describe('Modify measurements with rights', () => {
+    it('it should not modify a measurement without rights', async () => {
+        await mongoose.connection.dropDatabase();
+        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+        const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature-1", owner);
+        const device = await factory.createDevice("test-device-1", owner, [feature]);
+        const device_other = await factory.createDevice("test-device-2", owner, [feature]);
+        const thing = await factory.createThing("test-thing-1", owner);
+        const tag = await factory.createTag("test-tag-1", owner);
+        const tag_other = await factory.createTag("test-tag-2", owner);
+        const right = await factory.createRight(tag_other, "Tag", provider, owner, []);
+        const measurement   = await factory.createMeasurement(provider, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.public);
+        const modification = { tags: { add: [tag._id] } };
+        let res = await chai.request(server).put('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider)).send(modification);
+        res.should.have.status(errors.restricted_access.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.be.eql(errors.restricted_access.message);
+    });
+
+    it('it should modify a measurement with rights', async () => {
+        await mongoose.connection.dropDatabase();
+        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+        const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature-1", owner);
+        const device = await factory.createDevice("test-device-1", owner, [feature]);
+        const device_other = await factory.createDevice("test-device-2", owner, [feature]);
+        const thing = await factory.createThing("test-thing-1", owner);
+        const tag = await factory.createTag("test-tag-1", owner);
+        const right = await factory.createRight(tag, "Tag", provider, owner, []);
+        const measurement   = await factory.createMeasurement(provider, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.public);
+        const modification = { tags: { add: [tag._id] } };
+        let res = await chai.request(server).put('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
     });
