@@ -4,6 +4,8 @@
 
 
 
+
+
     {
         "type": "node",
         "request": "launch",
@@ -36,7 +38,7 @@
             "--timeout",
             "999999",
             "--colors",
-            "test/access-control-thing-test.js",
+            "test/right-test.js",
             "${workspaceFolder}/test"
         ],
         "internalConsoleOptions": "openOnSessionStart"

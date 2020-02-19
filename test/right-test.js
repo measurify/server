@@ -157,6 +157,20 @@ describe('/POST rights', () => {
         res.body.resource.should.be.eql(resource._id);
     });
 
+    it('it should POST a right using user username', async () => {
+        await mongoose.connection.dropDatabase();
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
+        const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
+        const right = { resource: resource._id, type: "Tag", user: user.username };
+        const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
+        console.log(res.text);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body.resource.should.be.eql(resource._id);
+    });
+
     it('it should not POST a script with already existant _id field', async () => {
         await mongoose.connection.dropDatabase();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);

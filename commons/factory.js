@@ -86,8 +86,8 @@ exports.createDemoContent = async function() {
     constraints.push(await this.createConstraint(users[0], "Tag", "Device", tags[2]._id, devices[1]._id, RelationshipTypes.dependency ));
 
     const rights = [];
-    rights.push(await this.createRight(things[0], "Thing", users[1], [AccessTypes.create], users[0], []));
-    rights.push(await this.createRight(things[1], "Thing", users[1], [AccessTypes.read, AccessTypes.delete] , users[0], []));
+    rights.push(await this.createRight(things[0], "Thing", users[1], users[0], []));
+    rights.push(await this.createRight(things[1], "Thing", users[1] , users[0], []));
  
     const measurements = [];
     measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car1", ["urban"], [{values: [60], delta: 0}]));
