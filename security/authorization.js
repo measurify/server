@@ -29,7 +29,8 @@ exports.isHim = function(resource, user) {
 }
 
 exports.isAvailable = async function(id, field, model) {
-    const item = await persistence.get(id, field, model);
+    let item = await persistence.get(id, field, model);
+    if(!item && model.modelName == 'User') item = await persistence.get(id, 'username', model); 
     if(!item) return null; 
     return item;
 }

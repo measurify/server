@@ -328,6 +328,15 @@ describe('/PUT user', () => {
         res.should.have.status(200);
         res.body.should.be.a('object');
     });
+
+    it('it should PUT a user to modify password as himself using username', async () => {
+        await mongoose.connection.dropDatabase();
+        const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
+        const modification = { password: 'new_password' };
+        const res = await chai.request(server).put('/v1/users/' + user.username).set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+    });
     
     it('it should not PUT a password to a fake user', async () => {
         await mongoose.connection.dropDatabase();

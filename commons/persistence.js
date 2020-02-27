@@ -1,11 +1,14 @@
 const mongoose = require('mongoose');
 
 exports.get = async function(id, field, model) {
-    let item = null;
-    if(field) item = await model.findOne({ [field]: id });
-    if(!item) item = await model.findById(id);
-    if(!item) return null;
-    return item;
+    try {
+        let item = null;
+        if(field) item = await model.findOne({ [field]: id });
+        if(!item) item = await model.findById(id);
+        if(!item) return null;
+        return item;
+    }
+    catch(err) { return null; }
 };
 
 exports.getSize = async function(filter, restriction, model) {
