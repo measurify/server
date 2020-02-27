@@ -164,7 +164,6 @@ describe('/POST rights', () => {
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const right = { resource: resource._id, type: "Tag", user: user.username };
         const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
-        console.log(res.text);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');

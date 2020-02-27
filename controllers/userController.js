@@ -32,10 +32,10 @@ exports.post = async (req, res) => {
 };
 
 exports.put = async (req, res) => { 
-    const fields = ['tags'];
+    const fields = ['password'];
     let result = await checker.isAvailable(req, res, User); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
-    result = await checker.isAdminitrator(req, res); if (result != true) return result;
+    result = await checker.isHim(req, res); if (result != true) return result;
     return await controller.updateResource(req, res, fields, User);
 };  
 

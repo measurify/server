@@ -251,7 +251,7 @@ Atmosphere has been employed in three industrial research projects, one in the h
 
 ## References
 
-[1] A. Monteriù, M.R. Prist, E. Frontoni, S. Longhi, F. Pietroni, S. Casacci, L. Scalise, A. Cenci, L. Romeo, R. Berta, L. Pescosolido, G. Orlandi, G.M. Revel, **A smart sensing architecture for domestic moniotring: methodological approach and experimental validation**, Sensors, Vol. 18 Issue 7, July 2018
+[1] A. Monteriù, M.R. Prist, E. Frontoni, S. Longhi, F. Pietroni, S. Casacci, L. Scalise, A. Cenci, L. Romeo, R. Berta, L. Pescosolido, G. Orlandi, G.M. Revel, **A smart sensing architecture for domestic monitoring: methodological approach and experimental validation**, Sensors, Vol. 18 Issue 7, July 2018
 
 [2] L. Pescosolido, R. Berta, L. Scalise, G. M. Revel, A. De Gloria and G. Orlandi, **An IoT-inspired cloud-based web service architecture for e-Health applications**, 2016 IEEE International Smart Cities Conference (ISC2), Trento, 2016, pp. 1-4
 

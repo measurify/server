@@ -38,7 +38,7 @@
             "--timeout",
             "999999",
             "--colors",
-            "test/right-test.js",
+            "test/user-test.js",
             "${workspaceFolder}/test"
         ],
         "internalConsoleOptions": "openOnSessionStart"

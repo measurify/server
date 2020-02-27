@@ -23,6 +23,11 @@ exports.isOwner = function(resource, user) {
     return resource.owner._id.equals(user._id); 
 }
 
+exports.isHim = function(resource, user) {
+    if(this.isAdministrator(user)) return true;
+    return resource._id.equals(user._id); 
+}
+
 exports.isAvailable = async function(id, field, model) {
     const item = await persistence.get(id, field, model);
     if(!item) return null; 

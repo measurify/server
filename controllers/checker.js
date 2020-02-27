@@ -42,6 +42,11 @@ exports.isAdminitrator = async function(req, res) {
     return true;
 }
 
+exports.isHim = async function(req, res) {
+    if (!authorizator.isHim(req.resource, req.user)) return errors.manage(res, errors.not_you, req.resource._id);
+    return true;
+}
+
 exports.isOwned = async function(req, res) {
     if (!authorizator.isOwner(req.resource, req.user)) return errors.manage(res, errors.not_yours, req.resource._id);
     return true;

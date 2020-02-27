@@ -307,3 +307,61 @@ describe('/DELETE users', () => {
         users_after.length.should.be.eql(2);
     });
 });
+
+// Test the /PUT route
+describe('/PUT user', () => {
+    it('it should PUT a user to modify password as admin', async () => {
+        await mongoose.connection.dropDatabase();
+        const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provide);
+        const modification = { password: 'new_password' };
+        const res = await chai.request(server).put('/v1/users/' + user._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+    });
+
+    it('it should PUT a user to modify password as himself', async () => {
+        await mongoose.connection.dropDatabase();
+        const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
+        const modification = { password: 'new_password' };
+        const res = await chai.request(server).put('/v1/users/' + user._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+    });
+    
+    it('it should not PUT a password to a fake user', async () => {
+        await mongoose.connection.dropDatabase();
+        const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
+        const modification = { password: 'new_password' };
+        const res = await chai.request(server).put('/v1/users/fake-user').set("Authorization", await factory.getUserToken(admin)).send(modification);
+        res.should.have.status(errors.resource_not_found.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.resource_not_found.message);
+    });
+
+    it('it should not PUT a user with a wrong field', async () => {
+        await mongoose.connection.dropDatabase();
+        const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
+        const modification = { username: 'new_username' };
+        const res = await chai.request(server).put('/v1/users/' + user._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
+        res.should.have.status(errors.put_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.put_request_error.message);
+        res.body.details.should.contain('Request field cannot be updated ');
+    });
+
+    it('it should not PUT a user as another user', async () => {
+        await mongoose.connection.dropDatabase();
+        const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
+        const other = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
+        const modification = { username: 'new_username' };
+        const res = await chai.request(server).put('/v1/users/' + user._id).set("Authorization", await factory.getUserToken(other)).send(modification);
+        res.should.have.status(errors.put_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.put_request_error.message);
+        res.body.details.should.contain('Request field cannot be updated ');
+    });
+});
