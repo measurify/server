@@ -1,6 +1,6 @@
 {
   "name": "atmosphere-measurement-api",
-  "version": "0.3.000",
+  "version": "0.3.100",
   "description": "Atmosphere Measurements Cloud API",
   "main": "server.js",
   "host": "localhost",
@@ -30,6 +30,7 @@
   "homepage": "https://github.com/Atmosphere-IoT-Framework",
   "dependencies": {
     "@types/mongoose-geojson-schema": "^2.1.1",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "compression": "^1.7.4",
     "compute-variance": "^3.0.0",

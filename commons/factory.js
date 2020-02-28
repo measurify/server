@@ -19,6 +19,7 @@ const jwt = require('jsonwebtoken');
 const ItemTypes = require('../types/itemTypes.js');
 const ComputationStatusTypes = require('../types/computationStatusTypes.js'); 
 const IssueTypes = require('../types/issueTypes.js');
+const bcrypt = require('bcryptjs');
 
 
 exports.uuid = function() { 

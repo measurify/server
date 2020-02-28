@@ -17,7 +17,11 @@ exports.get = async (req, res) => {
     const environment = process.env.ENV;
     const token_expiration_time = process.env.EXPIRATIONTIME;
     const database = process.env.DATABASE;
+    const passwordhash = process.env.PASSWORDHASH;
+    const log = process.env.LOG;
+    const CSVdelimiter = process.env.CSVDELIMITER;
     const timestamp = Date.now().toString();
-    const info = {version: version, environment: environment, token_expiration_time: token_expiration_time, database: database, timestamp: timestamp };
+    const info = {version: version, environment: environment, token_expiration_time: token_expiration_time, 
+                  database: database, timestamp: timestamp, passwordhash: passwordhash, log:log, CSVdelimiter:CSVdelimiter };
     res.status(200).json(info);
 };

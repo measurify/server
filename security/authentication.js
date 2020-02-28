@@ -6,19 +6,25 @@ const strategy_jwt   = passportJWT.Strategy;
 const extractJWT = passportJWT.ExtractJwt;
 const jwt = require('jsonwebtoken');
 const User = mongoose.model('User');
+const bcrypt = require('bcryptjs');
 
 passport.use(new strategy_local({
         usernameField: 'username',
         passwordField: 'password'
     }, 
-    function (username, password, done) {
-        return User.findOne({username: username, password: password})
-        .then(user => {
-           if (!user)
-               return done(null, false, "Incorrect username or password");
-           return done(null, user, "Logged Successfully");
-      })
-      .catch(error => done(error));
+    async function (username, password, done) {
+        try {
+            const user = await User.findOne({username: username}).select('+password');
+            if (!user) return done(null, false, "Incorrect username or password");
+        
+            let result = false;
+            if(process.env.PASSWORDHASH == 'true') result = bcrypt.compareSync(password, user._doc.password);
+            else if(password == user._doc.password) result = true; 
+
+            if (!result) return done(null, false, "Incorrect username or password");
+            return done(null, user, "Logged Successfully");
+        }
+        catch(error) { done(error) };
     }
 ));
 
