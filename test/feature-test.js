@@ -4,12 +4,13 @@ require('dotenv').config({ path: 'variables.test.env' });
 // This line allow to test with the self signed certificate
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
+
 // Import test tools
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+const mongoose = require('mongoose');
 const database = require('../database.js');
 const server = require('../server.js');
-const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
 const Feature = mongoose.model('Feature');
@@ -22,7 +23,7 @@ chai.use(chaiHttp);
 // Test the /GET route
 describe('/GET feature', () => {
     it('it should GET all the features', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         await factory.createFeature("test-feature-1", user);
         await factory.createFeature("test-feature-2", user);
@@ -33,7 +34,7 @@ describe('/GET feature', () => {
     });
 
     it('it should GET a specific feature', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user);
         const res = await chai.request(server).get('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user));
@@ -54,7 +55,7 @@ describe('/GET feature', () => {
 // Test the /POST route
 describe('/POST feature', () => {
     it('it should not POST a feature without _id field', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = {}
         const res = await chai.request(server).post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(feature)
@@ -135,7 +136,7 @@ describe('/POST feature', () => {
 // Test the /DELETE route
 describe('/DELETE feature', () => {
     it('it should DELETE a feature', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user);
         const features_before = await Feature.find();
@@ -148,7 +149,7 @@ describe('/DELETE feature', () => {
     });
 
     it('it should not DELETE a feature by non-owner', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user);
@@ -163,7 +164,7 @@ describe('/DELETE feature', () => {
     });
 
     it('it should not DELETE a fake feature', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const features_before = await Feature.find();
@@ -177,7 +178,7 @@ describe('/DELETE feature', () => {
     });
     
     it('it should not DELETE a feature already used in a measurement', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
@@ -195,7 +196,7 @@ describe('/DELETE feature', () => {
     });
 
     it('it should not DELETE a feature already used in a device', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);

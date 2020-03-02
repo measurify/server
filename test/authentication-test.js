@@ -20,7 +20,7 @@ chai.use(chaiHttp);
 
 describe('encode and decode', () => {
     it('it should decode a previus encoded string', async () => {
-        await factory.dropContents();
+        await factory.dropContents();;
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const encoded = Authentication.encode(user);
         encoded.should.contain('JWT');
@@ -29,7 +29,7 @@ describe('encode and decode', () => {
     });
 
     it('it should not decode a fake encoded string', async () => {
-        await factory.dropContents();
+        await factory.dropContents();;
         const decoded = Authentication.decode("fake")
         decoded.should.contain("invalid token");
     });

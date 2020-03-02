@@ -5,6 +5,7 @@ if (major < 7 || (major === 7 && minor <= 5)) {
   console.log('Older version of node, upload to 7.6 or greater\n');
   process.exit();
 }
+console.log('Node version: ' + process.versions.node);
 
 // Import environmental variables from variables.[ENVIRONMENT].env file (default dev)
 if(process.argv[2] === undefined) process.argv[2] = 'dev';

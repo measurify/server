@@ -20,7 +20,7 @@ chai.use(chaiHttp);
 // Test the /GET route
 describe('/GET device', () => {
     it('it should GET all the devices', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         await factory.createDevice("test-device-1", user);
         await factory.createDevice("test-device-2", user);
@@ -31,7 +31,7 @@ describe('/GET device', () => {
     });
 
     it('it should GET a specific device', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user);
         const device = await factory.createDevice("test-device-1", user, [feature]);
@@ -53,7 +53,7 @@ describe('/GET device', () => {
 // Test the /POST route
 describe('/POST device', () => {
     it('it should not POST a device without _id field', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = {}
         const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
@@ -65,7 +65,7 @@ describe('/POST device', () => {
     });
 
     it('it should not POST a device without features field', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = { _id: "test-device-1", owner: user }
         const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
@@ -77,7 +77,7 @@ describe('/POST device', () => {
     });
 
     it('it should not POST a device with a fake feature', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = { _id: "test-device-2", owner: user, features: ["fake-feature"] }
         const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
@@ -89,7 +89,7 @@ describe('/POST device', () => {
     });
 
     it('it should not POST a device with a fake tag', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = { _id: "test-device-2", owner: user, tags: ["fake-tag"], features: [await factory.createFeature("test-device-2-feature-good", user)] }
         const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
@@ -101,7 +101,7 @@ describe('/POST device', () => {
     });
 
     it('it should not POST a device with a fake buffer policy', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = { _id: "test-device-2", owner: user, measurementBufferPolicy: "fake-policy", features: [await factory.createFeature("test-device-2-feature-good", user)] }
         const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
@@ -188,7 +188,7 @@ describe('/POST device', () => {
     });
 
     it('it should POST a device with tags', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = {
             _id: "test-device-1",
@@ -208,7 +208,7 @@ describe('/POST device', () => {
 // Test the /DELETE route
 describe('/DELETE device', () => {
     it('it should DELETE a device', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = await factory.createDevice("test-device-1", user);
         const devices_before = await Device.find();
@@ -221,7 +221,7 @@ describe('/DELETE device', () => {
     });
 
     it('it should not DELETE a fake device', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = await factory.createDevice("test-device-2", user);
         const devices_before = await Device.find();
@@ -235,7 +235,7 @@ describe('/DELETE device', () => {
     });
     
     it('it should not DELETE a device by non-owner', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const device = await factory.createDevice("test-device-2", user);
@@ -250,7 +250,7 @@ describe('/DELETE device', () => {
     });
 
     it('it should not DELETE a device already used in a measurement', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const tag = await factory.createTag("test-tag", user);

@@ -28,7 +28,7 @@ exports.get = async (req, res) => {
 
 exports.post = async (req, res) => {
     if (!Authorization.isAdministrator(req.user)) return errors.manage(res, errors.admin_restricted_access); 
-    await factory.dropContents();
+    await factory.dropContents();;
     if (req.body != '{}') await factory.createDemoContent(); 
     else return errors.manage(res, errors.demo_content_request_not_implemented);
     const users = await User.find({}).select("+password");
@@ -45,7 +45,7 @@ exports.post = async (req, res) => {
 
 exports.delete = async (req, res) => {
     if (!Authorization.isAdministrator(req.user)) return errors.manage(res, errors.admin_restricted_access); 
-    await factory.dropContents();
+    await factory.dropContents();;
     const users = await User.find({}).select("+password");
     const tags = await Tag.find({});
     const features = await Feature.find({});

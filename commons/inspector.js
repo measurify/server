@@ -8,7 +8,7 @@ function shouldBeNumber(item) {
 function isNumber(value) {
     if(!value) return true;
     if(!Array.isArray(value)) 
-        return Number.isNaN(value);
+        return (typeof value == 'number');
     else 
         return value.every(number => !number || typeof number == 'number');
 }
@@ -20,8 +20,8 @@ function areSameDimension(value, item) {
     else return item.dimension == 2;
 }
 
-function areSameTypes(sample, feature) {
-    for(let[i, value] of sample.values.entries()) {
+function areSameTypes(values, feature) {
+    for(let[i, value] of values.entries()) {
         if(!areSameDimension(value, feature.items[i]))
             return 'No match between sample value size and feature items dimension  (' + value + ' != ' +  feature.items[i].dimension + ') [' + feature._id+ ']';
         if( (isNumber(value) && !shouldBeNumber(feature.items[i])) ||
@@ -34,9 +34,12 @@ function areSameTypes(sample, feature) {
 exports.areCoherent = function(measurement, feature) {
     const lenght = feature.items.length;
     for (let [i, sample] of measurement.samples.entries()) {
-        if(sample.values.length != lenght)
-            return 'No match between sample values size and feature items size  (' + sample.values.length + ' != ' +  lenght + ')'; 
-        let result = areSameTypes(sample, feature); 
+        let values = sample.values;
+        if(feature.items.length!=1 && values.length==1 && values.isMongooseArray)
+            values = values[0];    
+        if(values.length != lenght)
+            return 'No match between sample values size and feature items size  (' + values.length + ' != ' +  lenght + ')'; 
+        let result = areSameTypes(values, feature); 
         if(result != true) return result;
     }
     return true;

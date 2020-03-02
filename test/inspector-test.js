@@ -23,7 +23,7 @@ chai.use(chaiHttp);
 
 describe('areCoherent test', () => {
     it('it should throw an exception for measurements not coherent with feature (1 text 0-D item and a numeric sample value)', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", owner);
         const thing = await factory.createThing("test-thing-1", owner);
@@ -39,7 +39,7 @@ describe('areCoherent test', () => {
     });
 
     it('it should throw an exception for measurements not coherent with feature (1 numeric 0-D item and a string sample value)', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", owner);
         const thing = await factory.createThing("test-thing-1", owner);
@@ -55,7 +55,7 @@ describe('areCoherent test', () => {
     });
 
     it('it should throw an exception for measurements not coherent with feature (2 numeric 0-D item and a string sample value)', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", owner);
         const thing = await factory.createThing("test-thing-1", owner);
@@ -72,7 +72,7 @@ describe('areCoherent test', () => {
     });
 
     it('it should throw an exception for measurements not coherent with feature (2 numeric/string 0-D item and a string/numeric sample value)', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", owner);
         const thing = await factory.createThing("test-thing-1", owner);
@@ -89,7 +89,7 @@ describe('areCoherent test', () => {
     });
 
     it('it should throw an exception for measurements not coherent with feature (1 numeric 1-D item and a numeric sample value)', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", owner);
         const thing = await factory.createThing("test-thing-1", owner);
@@ -105,7 +105,7 @@ describe('areCoherent test', () => {
     });
 
     it('it should create a measurements coherents with its feature (1 0-D numeric item)', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", owner);
         const thing = await factory.createThing("test-thing-1", owner);
@@ -117,7 +117,7 @@ describe('areCoherent test', () => {
     });
 
     it('it should create a measurements coherents with its feature (2 1-D numeric item)', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", owner);
         const thing = await factory.createThing("test-thing-1", owner);
@@ -130,7 +130,7 @@ describe('areCoherent test', () => {
     });
 
     it('it should create a measurements coherents with its feature (2 1-D string/numeric item)', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", owner);
         const thing = await factory.createThing("test-thing-1", owner);

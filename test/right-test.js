@@ -22,7 +22,7 @@ chai.use(chaiHttp);
 // Test the /GET route
 describe('/GET rights', () => {
     it('it should GET all the rights', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource1 = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -38,7 +38,7 @@ describe('/GET rights', () => {
     });
 
     it('it should GET a specific right', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -61,7 +61,7 @@ describe('/GET rights', () => {
 // Test the /POST route
 describe('/POST rights', () => {
     it('it should not POST a right without resource field', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -75,7 +75,7 @@ describe('/POST rights', () => {
     });
 
     it('it should not POST a right with a not permitted resource type', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createScript("test-script-1", owner, "code", [], VisibilityTypes.private);
@@ -89,7 +89,7 @@ describe('/POST rights', () => {
     });
 
     it('it should not POST a right without type field', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -103,7 +103,7 @@ describe('/POST rights', () => {
     });
 
     it('it should not POST a right without user field', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -117,7 +117,7 @@ describe('/POST rights', () => {
     });
 
     it('it should not POST a right with resource and type mismatch', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -131,7 +131,7 @@ describe('/POST rights', () => {
     });
 
     it('it should not POST a right with a fake tag', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -145,7 +145,7 @@ describe('/POST rights', () => {
     });
 
     it('it should POST a right', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -158,7 +158,7 @@ describe('/POST rights', () => {
     });
 
     it('it should POST a right using user username', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -171,7 +171,7 @@ describe('/POST rights', () => {
     });
 
     it('it should not POST a script with already existant _id field', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -186,7 +186,7 @@ describe('/POST rights', () => {
     });
 
     it('it should POST a list of rights', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource1 = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -204,7 +204,7 @@ describe('/POST rights', () => {
     });
 
     it('it should POST only not existing rights from a list', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource1 = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -224,7 +224,7 @@ describe('/POST rights', () => {
     });
 
     it('it should POST a right with tags', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -241,7 +241,7 @@ describe('/POST rights', () => {
 // Test the /DELETE route
 describe('/DELETE rights', () => {
     it('it should DELETE a right', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -256,7 +256,7 @@ describe('/DELETE rights', () => {
     });
 
     it('it should not DELETE a fake right', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -275,7 +275,7 @@ describe('/DELETE rights', () => {
 // Test the /PUT route
 describe('/PUT rights', () => {
     it('it should PUT a right to add a tag', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -292,7 +292,7 @@ describe('/PUT rights', () => {
     });
 
     it('it should PUT a right to remove a tag', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -309,7 +309,7 @@ describe('/PUT rights', () => {
     });
 
     it('it should PUT a right to add and remove tags', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -330,7 +330,7 @@ describe('/PUT rights', () => {
     });
 
     it('it should not PUT a right adding a fake tag', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -347,7 +347,7 @@ describe('/PUT rights', () => {
     });
 
     it('it should not PUT a right removing a fake tag', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -364,7 +364,7 @@ describe('/PUT rights', () => {
     });
 
     it('it should not PUT a fake right', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);

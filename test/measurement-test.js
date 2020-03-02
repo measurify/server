@@ -400,7 +400,7 @@ describe('/POST measurement', () => {
         res.body.message.should.be.a('string');
         res.should.have.status(errors.post_request_error.status);
         res.body.message.should.contain(errors.post_request_error.message);
-        res.body.details.should.contain('No match between sample values size and feature items size');
+        res.body.details.should.contain('No match between sample value size and feature items dimension');
     });
 
     it('it should not POST a measurement with numeric samples with text feature', async () => {

@@ -24,7 +24,7 @@ chai.use(chaiHttp);
 // READ LIST
 describe('Access read a list of constraints', () => {
     it('it should get all the public/private constraints as admin or analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -56,7 +56,7 @@ describe('Access read a list of constraints', () => {
     });
 
     it('it should get just his own or public constraints as provider', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -92,7 +92,7 @@ describe('Access read a list of constraints', () => {
     });
 
     it('it should get a filtered list of his own or public measurements as provider', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);

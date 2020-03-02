@@ -23,7 +23,7 @@ chai.use(chaiHttp);
 // Test the /POST route
 describe('POST computation', () => {
     it('it should not post a computation on a fake feature', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("owner-username", "owner-password", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device", owner, [feature]);
@@ -39,7 +39,7 @@ describe('POST computation', () => {
     });
 /*
     it('it should not post a computation for a text measurements', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("owner-username", "owner-password", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner, [{name:'item-name-1', unit:'items-unit-1', type:ItemTypes.text}]);
         const device = await factory.createDevice("test-device", owner, [feature]);
@@ -68,7 +68,7 @@ describe('POST computation', () => {
 
 /*
     it('it should post a max computation over single-sample, single-scalar-item measurements', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const owner = await factory.createUser("owner-username", "owner-password", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device", owner, [feature]);

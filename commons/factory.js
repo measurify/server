@@ -31,8 +31,11 @@ exports.random = function(max) {
 }
 
 exports.dropContents = async function(){  
-    await mongoose.connection.dropDatabase(); 
-    await this.createSuperAdministrator();
+    try{  
+        await mongoose.connection.dropDatabase(); 
+        await this.createSuperAdministrator();
+    }
+    catch (error) {} 
 }
 
 exports.createSuperAdministrator = async function() {

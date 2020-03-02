@@ -23,7 +23,7 @@ chai.use(chaiHttp);
 // CREATE
 describe('Access create feature', () => {
     it('it should create a feature as admin', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const request = { _id: "feature-name-text", items: [{ name: "item-name-1", unit: "item-unit-1" }]}
         const res = await chai.request(server).post('/v1/features').set("Authorization", await factory.getUserToken(user_admin)).send(request);
@@ -34,7 +34,7 @@ describe('Access create feature', () => {
     });
 
     it('it should create a feature as provider', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const request = { _id: "feature-name-text", items: [{ name: "item-name-1", unit: "item-unit-1" }]}
         const res = await chai.request(server).post('/v1/features').set("Authorization", await factory.getUserToken(user_provider)).send(request);
@@ -45,7 +45,7 @@ describe('Access create feature', () => {
     });
 
     it('it should not create a feature as analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_analyst = await factory.createUser("test-username-1", "test-password-1", UserRoles.analyst);
         const request = { _id: "feature-name-text", items: [{ name: "item-name-1", unit: "item-unit-1" }]}
         const res = await chai.request(server).post('/v1/features').set("Authorization", await factory.getUserToken(user_analyst)).send(request);
@@ -59,7 +59,7 @@ describe('Access create feature', () => {
 // READ LIST
 describe('Access read a list of features', () => {
     it('it should get all the public/private features as admin or analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -82,7 +82,7 @@ describe('Access read a list of features', () => {
     });
 
     it('it should get just his own or public features as provider', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -107,7 +107,7 @@ describe('Access read a list of features', () => {
     });
 
     it('it should get a filtered list of his own or public features as provider', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -136,7 +136,7 @@ describe('Access read a list of features', () => {
 // READ
 describe('Access read a feature', () => {
     it('it should get a public/private feature as admin or analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -161,7 +161,7 @@ describe('Access read a feature', () => {
     });
 
     it('it should get a public feature as provider', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature_public = await factory.createFeature("test-feature-1-public", owner, null, [], VisibilityTypes.public);
@@ -172,7 +172,7 @@ describe('Access read a feature', () => {
     });
 
     it('it should not get a private feature as provider not owner', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature_private = await factory.createFeature("test-feature-1-private", owner, null, [], VisibilityTypes.private);
@@ -183,7 +183,7 @@ describe('Access read a feature', () => {
     });
 
     it('it should get a public/private feature as provider and owner', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const feature_public = await factory.createFeature("test-feature-1-public", user_provider_owner, null, [], VisibilityTypes.public);
         const feature_private = await factory.createFeature("test-feature-1-private", user_provider_owner, null, [], VisibilityTypes.private);
@@ -201,7 +201,7 @@ describe('Access read a feature', () => {
 // MODIFY
 describe('Access modify features', () => {
     it('it should modify a feature as admin', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner, null, [], VisibilityTypes.public);
@@ -215,7 +215,7 @@ describe('Access modify features', () => {
     });
 
     it('it should modify a feature as provider and owner', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provide_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user_provide_owner, null, [], VisibilityTypes.public);
         const tag = await factory.createTag("test-tag-1", user_provide_owner);
@@ -228,7 +228,7 @@ describe('Access modify features', () => {
     });
 
     it('it should not modify a feature as analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner, null, [], VisibilityTypes.public);
@@ -241,7 +241,7 @@ describe('Access modify features', () => {
     });
 
     it('it should not modify a feature as provider not owner', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner, null, [], VisibilityTypes.public);
@@ -258,7 +258,7 @@ describe('Access modify features', () => {
 
 describe('Access delete features', () => {
     it('it should delete a feature as admin', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner, null, [], VisibilityTypes.public);
@@ -268,7 +268,7 @@ describe('Access delete features', () => {
     });
 
     it('it should delete a feature as provider and owner', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provide_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user_provide_owner, null, [], VisibilityTypes.private);
         let res = await chai.request(server).delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user_provide_owner));
@@ -277,7 +277,7 @@ describe('Access delete features', () => {
     });
 
     it('it should not delete a feature as analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner, null, [], VisibilityTypes.private);
@@ -288,7 +288,7 @@ describe('Access delete features', () => {
     });
 
     it('it should not delete a feature as provider not owner', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner, null, [], VisibilityTypes.private);
@@ -302,7 +302,7 @@ describe('Access delete features', () => {
 // RIGTHS
 describe('Access features with rights', () => {
     it('it should get all the public/private features with rights as analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.admin);
         const user_analyst = await factory.createUser("test-username-user-2", "test-password-user-2", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -328,7 +328,7 @@ describe('Access features with rights', () => {
     });
 
     it('it should get all the public owned features with rights as provider', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.admin);
         const user_provider = await factory.createUser("test-username-user-2", "test-password-user-2", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -355,7 +355,7 @@ describe('Access features with rights', () => {
     });
 
     it('it should not read a feature without rights', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.provider);
         const user_analyst = await factory.createUser("test-username-user-2", "test-password-user-2", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -376,7 +376,7 @@ describe('Access features with rights', () => {
     });
 
     it('it should read a feature with rights', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.provider);
         const user_analyst = await factory.createUser("test-username-user-2", "test-password-user-2", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -396,7 +396,7 @@ describe('Access features with rights', () => {
 
 describe('Delete features with rights', () => {
     it('it should not delete a feature without rights', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user_provider, null, [], VisibilityTypes.public);
@@ -410,7 +410,7 @@ describe('Delete features with rights', () => {
     });
 
     it('it should delete a feature with rights', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user_provider, null, [], VisibilityTypes.public);
@@ -423,7 +423,7 @@ describe('Delete features with rights', () => {
 
 describe('Modify features with rights', () => {
     it('it should not modify a feature without rights', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user_provider, null, [], VisibilityTypes.public);
@@ -439,7 +439,7 @@ describe('Modify features with rights', () => {
     });
 
     it('it should modify a feature with rights', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user_provider, null, [], VisibilityTypes.public);
@@ -454,7 +454,7 @@ describe('Modify features with rights', () => {
 
 describe('Create a a feature with rights', () => {
     it('it should not create a feature without rights on tag', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", owner);
@@ -469,7 +469,7 @@ describe('Create a a feature with rights', () => {
     });
 
     it('it should create a feature with rights', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", owner);

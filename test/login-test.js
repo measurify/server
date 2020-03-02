@@ -18,7 +18,7 @@ chai.use(chaiHttp);
 // Test the /POST route
 describe('/POST login', () => {
     it('it should POST a login with correct username and password', async () => {
-        await factory.dropContents();
+        await factory.dropContents();;
         await factory.createUser("test-username-1", "test-password-1");
         const request = { username: "test-username-1", password: "test-password-1" };
         const res = await chai.request(server).post('/v1/login').send(request);
@@ -28,7 +28,7 @@ describe('/POST login', () => {
     });
 
     it('it should not POST a login with a fake username', async () => {
-        await factory.dropContents();
+        await factory.dropContents();;
         await factory.createUser("test-username-1", "test-password-1");
         const request = {username: "fake-username-1", password: "test-password-1"};
         const res = await chai.request(server).post('/v1/login').send(request);
@@ -40,7 +40,7 @@ describe('/POST login', () => {
     });
 
     it('it should not POST a login with a fake password', async () => {
-        await factory.dropContents();
+        await factory.dropContents();;
         await factory.createUser("test-username-1", "test-password-1");
         const request = {username: "test-username-1", password: "fake-password-1"};
         const res = await chai.request(server).post('/v1/login').send(request);

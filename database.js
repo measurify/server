@@ -16,9 +16,17 @@ const sleep = function(ms){
 
 const connection = async function(){
     let go = false;
+    let uri = null;
+    if(process.env.ENV === "test") {
+        const { MongoMemoryServer } = require('mongodb-memory-server');
+        const mongod = new MongoMemoryServer();
+        uri = await mongod.getUri();
+    }
+    else uri = process.env.DATABASE
+
     while(!go) {
         try { 
-            await mongoose.connect(process.env.DATABASE); 
+            await mongoose.connect(uri); 
             console.error('Database connected!')
             go = true;
         } 
@@ -28,14 +36,8 @@ const connection = async function(){
         }
     } 
 }
+connection();
 
-if(process.env.ENV === "test") {
-    const Mockgoose = new require('mockgoose').Mockgoose;
-    const mockgoose = new Mockgoose(mongoose);
-    mockgoose.prepareStorage().then(function() { mongoose.connect(process.env.DATABASE); });
-}
-else { connection() }
- 
 mongoosePaginate.paginate.options = { lean: false };
 
 require('./models/userSchema');

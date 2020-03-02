@@ -23,7 +23,7 @@ chai.use(chaiHttp);
 // CREATE
 describe('Access create measurement', () => {
     it('it should create a measurement as admin', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const feature = await factory.createFeature("test-feature-1", user_admin);
         const device = await factory.createDevice("test-device-1", user_admin, [feature]);
@@ -36,7 +36,7 @@ describe('Access create measurement', () => {
     });
 
     it('it should create a measurement as provider', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user_provider);
         const device = await factory.createDevice("test-device-1", user_provider, [feature]);
@@ -49,7 +49,7 @@ describe('Access create measurement', () => {
     });
 
     it('it should not create a measurement as analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_analyst = await factory.createUser("test-username-1", "test-password-1", UserRoles.analyst);
         const feature = await factory.createFeature("test-feature-1", user_analyst);
         const device = await factory.createDevice("test-device-1", user_analyst, [feature]);
@@ -66,7 +66,7 @@ describe('Access create measurement', () => {
 // READ LIST
 describe('Access read a list of measurements', () => {
     it('it should get all the public/private measurements as admin or analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -99,7 +99,7 @@ describe('Access read a list of measurements', () => {
     });
 
     it('it should get just his own or public measurements as provider', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -136,7 +136,7 @@ describe('Access read a list of measurements', () => {
     });
 
     it('it should get a filtered list of his own or public measurements as provider', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -174,7 +174,7 @@ describe('Access read a list of measurements', () => {
     });
 
     it('it should get own or public measurements only of a specific tag AND (of a specific feature OR a specific device)', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin); 
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -201,7 +201,7 @@ describe('Access read a list of measurements', () => {
     });
 
     it('it should get own or public measurements only of a specific tag AND of a specific feature', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin); 
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -231,7 +231,7 @@ describe('Access read a list of measurements', () => {
 // READ
 describe('Access read a measurement', () => {
     it('it should get a public/private measurement as admin or analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -259,7 +259,7 @@ describe('Access read a measurement', () => {
     });
 
     it('it should get a public measurement as provider', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -273,7 +273,7 @@ describe('Access read a measurement', () => {
     });
 
     it('it should not get a private measurement as provider not owner', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -287,7 +287,7 @@ describe('Access read a measurement', () => {
     });
 
     it('it should get a public/private measurement as provider and owner', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user_provider_owner);
         const device = await factory.createDevice("test-device-1", user_provider_owner, [feature]);
@@ -309,7 +309,7 @@ describe('Access read a measurement', () => {
 // MODIFY 
 describe('Access modify measurement', () => {
     it('it should modify a measurement as admin', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -326,7 +326,7 @@ describe('Access modify measurement', () => {
     });
 
     it('it should modify a measurement as provider and owner', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provide_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user_provide_owner);
         const device = await factory.createDevice("test-device-1", user_provide_owner, [feature]);
@@ -342,7 +342,7 @@ describe('Access modify measurement', () => {
     });
 
     it('it should not modify a measurement as analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -358,7 +358,7 @@ describe('Access modify measurement', () => {
     });
 
     it('it should not modify a measurement as provider not owner', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -378,7 +378,7 @@ describe('Access modify measurement', () => {
 
 describe('Access delete measurement', () => {
     it('it should delete a measurement as admin', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -393,7 +393,7 @@ describe('Access delete measurement', () => {
     });
 
     it('it should delete a measurement as provider and owner', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provide_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user_provide_owner);
         const device = await factory.createDevice("test-device-1", user_provide_owner, [feature]);
@@ -407,7 +407,7 @@ describe('Access delete measurement', () => {
     });
 
     it('it should not delete a measurement as analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -423,7 +423,7 @@ describe('Access delete measurement', () => {
     });
 
     it('it should not delete a measurement as provider not owner', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -443,7 +443,7 @@ describe('Access delete measurement', () => {
 // DELETE MORE
 describe('Access delete a list of measurements', () => {
     it('it should delete a list of measurements as admin', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -471,7 +471,7 @@ describe('Access delete a list of measurements', () => {
     });
 
     it('it should not delete a list of measurements as analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -499,7 +499,7 @@ describe('Access delete a list of measurements', () => {
     });
 
     it('it should not delete just its own list of measurements as provider', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_provider = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -527,7 +527,7 @@ describe('Access delete a list of measurements', () => {
     });
 
     it('it should delete a filtered list of his own measurements as provider', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -563,7 +563,7 @@ describe('Access delete a list of measurements', () => {
     });
 
     it('it should delete own measurements only of a specific tag AND (of a specific feature OR a specific device)', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin); 
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -591,7 +591,7 @@ describe('Access delete a list of measurements', () => {
 // RIGHTS
 describe('Access measurements withs right as analyst', () => {
     it('it should get only measurements of features with rights as analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature_right_1 = await factory.createFeature("test-feature-1", owner);
@@ -622,7 +622,7 @@ describe('Access measurements withs right as analyst', () => {
     });
 
     it('it should get only measurements of tags with rights as analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -654,7 +654,7 @@ describe('Access measurements withs right as analyst', () => {
     });
 
     it('it should get only measurements of device with rights as analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -685,7 +685,7 @@ describe('Access measurements withs right as analyst', () => {
     });
 
     it('it should get only measurements of things with rights as analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -716,7 +716,7 @@ describe('Access measurements withs right as analyst', () => {
     });
 
     it('it should get only measurements of device and feature with rights as analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -755,7 +755,7 @@ describe('Access measurements withs right as analyst', () => {
 
 describe('Access measurements withs right as provider', () => {
     it('it should get only his measurements of features with rights as provider', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature_right_1 = await factory.createFeature("test-feature-1", owner);
@@ -786,7 +786,7 @@ describe('Access measurements withs right as provider', () => {
     });
 
     it('it should get only his measurements of devices with rights as provider', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -817,7 +817,7 @@ describe('Access measurements withs right as provider', () => {
     });
 
     it('it should get only his measurements of things with rights as provider', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -848,7 +848,7 @@ describe('Access measurements withs right as provider', () => {
     });
 
     it('it should get only his measurements of tags with rights as provider', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -880,7 +880,7 @@ describe('Access measurements withs right as provider', () => {
     });
 
     it('it should get only his measurements of things and tags with rights as provider', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -920,7 +920,7 @@ describe('Access measurements withs right as provider', () => {
 
 describe('Access a single measurements with rights', () => {
     it('it should access a measurements with rights on thing', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -936,7 +936,7 @@ describe('Access a single measurements with rights', () => {
     });
 
     it('it should not access a measurements with a rights on a different thing', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -954,7 +954,7 @@ describe('Access a single measurements with rights', () => {
     });
 
     it('it should access a measurements with rights on device', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -970,7 +970,7 @@ describe('Access a single measurements with rights', () => {
     });
 
     it('it should not access a measurements with a rights on a different device', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -988,7 +988,7 @@ describe('Access a single measurements with rights', () => {
     });
 
     it('it should access a measurements with rights on device and other', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1006,7 +1006,7 @@ describe('Access a single measurements with rights', () => {
     });
 
     it('it should not access a measurements with a rights on a device but not on thing', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1025,7 +1025,7 @@ describe('Access a single measurements with rights', () => {
     });
 
     it('it should access a measurements with rights on feature', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1041,7 +1041,7 @@ describe('Access a single measurements with rights', () => {
     });
 
     it('it should not access a measurements with a rights on a different feature', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1059,7 +1059,7 @@ describe('Access a single measurements with rights', () => {
     });
 
     it('it should access a measurements with rights on feature and other', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1077,7 +1077,7 @@ describe('Access a single measurements with rights', () => {
     });
 
     it('it should not access a measurements with a rights on a feature but not on thing', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1096,7 +1096,7 @@ describe('Access a single measurements with rights', () => {
     });
 
     it('it should access a measurements with rights on tag', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1112,7 +1112,7 @@ describe('Access a single measurements with rights', () => {
     });
 
     it('it should access a measurements with rights on tag and others', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1134,7 +1134,7 @@ describe('Access a single measurements with rights', () => {
     });
 
     it('it should not access a measurements with a rights on a different tag', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1153,7 +1153,7 @@ describe('Access a single measurements with rights', () => {
     });
 
     it('it should not access a measurements with rights on a different set of tags', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1176,7 +1176,7 @@ describe('Access a single measurements with rights', () => {
     });
 
     it('it should not access a measurements with rights on tags but not on thing', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1203,7 +1203,7 @@ describe('Access a single measurements with rights', () => {
 
 describe('Create a measurements with rights', () => {
     it('it should not create a measurements without rights on thing', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1220,7 +1220,7 @@ describe('Create a measurements with rights', () => {
     });
 
     it('it should not create a measurements without rights on device', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1237,7 +1237,7 @@ describe('Create a measurements with rights', () => {
     });
 
     it('it should not create a measurements without rights on feature', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1255,7 +1255,7 @@ describe('Create a measurements with rights', () => {
     });
 
     it('it should not create a measurements without rights on tag', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1273,7 +1273,7 @@ describe('Create a measurements with rights', () => {
     });
 
     it('it should create a measurements with rights', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1291,7 +1291,7 @@ describe('Create a measurements with rights', () => {
 
 describe('Delete measurement with rights', () => {
     it('it should not delete a measurement without rights', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1310,7 +1310,7 @@ describe('Delete measurement with rights', () => {
     });
 
     it('it should delete a measurement with rights', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1325,7 +1325,7 @@ describe('Delete measurement with rights', () => {
     });
 
     it('it should not delete a measurement with rights as analyst', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1344,7 +1344,7 @@ describe('Delete measurement with rights', () => {
 
 describe('Modify measurements with rights', () => {
     it('it should not modify a measurement without rights', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
@@ -1364,7 +1364,7 @@ describe('Modify measurements with rights', () => {
     });
 
     it('it should modify a measurement with rights', async () => {
-        await mongoose.connection.dropDatabase();
+        factory.dropContents();
         const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
