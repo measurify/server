@@ -2782,14 +2782,47 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/v1/measurements/{{measurement}}",
+							"raw": "{{url}}/v1/measurements{{measurement}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"v1",
-								"measurements",
-								"{{measurement}}"
+								"measurements{{measurement}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE a list of measurements",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/v1/measurements",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements"
 							]
 						}
 					},

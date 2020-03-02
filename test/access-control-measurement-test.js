@@ -493,9 +493,9 @@ describe('Access delete a list of measurements', () => {
         const measurement_private_2 = await factory.createMeasurement(owner, feature, device, thing_7, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const measurement_private_3 = await factory.createMeasurement(owner, feature, device, thing_8, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         let res = await chai.request(server).delete('/v1/measurements').set("Authorization", await factory.getUserToken(user_analyst));
-        res.should.have.status(200);
+        res.should.have.status(errors.restricted_access_delete.status);
         res.body.should.be.a('object');
-        res.body.deleted.should.be.eql(8);
+        res.body.message.should.contain(errors.restricted_access_delete.message);
     });
 
     it('it should not delete just its own list of measurements as provider', async () => {
@@ -1315,7 +1315,6 @@ describe('Delete measurement with rights', () => {
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
-        const device_other = await factory.createDevice("test-device-2", owner, [feature]);
         const thing = await factory.createThing("test-thing-1", owner);
         const tag = await factory.createTag("test-tag-1", owner);
         const right = await factory.createRight(tag, "Tag", provider, owner, []);
@@ -1323,6 +1322,23 @@ describe('Delete measurement with rights', () => {
         let res = await chai.request(server).delete('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(200);
         res.body.should.be.a('object');
+    });
+
+    it('it should not delete a measurement with rights as analyst', async () => {
+        await mongoose.connection.dropDatabase();
+        const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
+        const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature-1", owner);
+        const device = await factory.createDevice("test-device-1", owner, [feature]);
+        const thing = await factory.createThing("test-thing-1", owner);
+        const tag = await factory.createTag("test-tag-1", owner);
+        const right = await factory.createRight(feature, "Feature", analyst, owner, []);
+        const measurement = await factory.createMeasurement(owner, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.public);
+        let res = await chai.request(server).delete('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(analyst));
+        res.should.have.status(errors.restricted_access_delete.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.be.eql(errors.restricted_access_delete.message);
     });
 });
 

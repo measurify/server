@@ -75,6 +75,13 @@ exports.canDelete = function(resource, user) {
     return false;
 } 
 
+exports.canDeleteList = function(user) {
+    if (this.isAdministrator(user)) return true;
+    if (this.isProvider(user)) return true;
+    if (this.isAnalyst(user)) return false;
+    return false;
+} 
+
 exports.whatCanRead = function(user) {
     let result = {};
     if (this.isAdministrator(user)) return result;

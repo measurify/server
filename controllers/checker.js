@@ -70,6 +70,11 @@ exports.canModify = async function(req, res) {
 exports.canDelete = async function(req, res) {
     if(!authorizator.canDelete(req.resource, req.user)) return errors.manage(res, errors.restricted_access_delete, req.resource._id);
     return true;
+}
+
+exports.canDeleteList = async function(req, res) {
+    if(!authorizator.canDeleteList(req.user)) return errors.manage(res, errors.restricted_access_delete);
+    return true;
 } 
 
 exports.whatCanRead = async function(req, res) {

@@ -40,6 +40,7 @@ exports.put = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
+    const result = await checker.canDeleteList(req, res); if (result != true) return result;
     const restriction_1 = await checker.whatCanDelete(req, res);
     const restriction_2 = await checker.whichRights(req, res, Measurement);
     const restrictions = {...restriction_1, ...restriction_2};
