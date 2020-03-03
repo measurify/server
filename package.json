@@ -11,6 +11,8 @@
     "prod": "node ./api.js prod",
     "docker": "node ./api.js docker",
     "start": "node api.js",
+    "inspect": "node --inspect api.js",
+    "profile": "node profile.js",
     "debug": "nodemon --inspect api.js dev"
   },
   "repository": {
@@ -29,6 +31,8 @@
   "license": "MIT",
   "homepage": "https://github.com/Atmosphere-IoT-Framework",
   "dependencies": {
+    "@nearform/clinic-doctor": "^2.6.1",
+    "@nearform/doctor": "^4.1.0",
     "@types/mongoose-geojson-schema": "^2.1.3",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
