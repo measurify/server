@@ -145,7 +145,7 @@ Remember the URL of the database server, if you are using the same machine for M
     sudo git clone https://github.com/Atmosphere-IoT-Framework/api.git 
     cd api/ 
     sudo npm install 
-    nmp run-script prod
+    npm run-script prod
 
 #### Setup environments
 
