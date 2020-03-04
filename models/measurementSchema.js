@@ -116,6 +116,9 @@ const measurementSchema = new mongoose.Schema({
 
 measurementSchema.set('toJSON', { versionKey: false });
 measurementSchema.index({ owner: 1 });
+measurementSchema.index({ feature: 1 });
+measurementSchema.index({ timestamp: -1 });
+measurementSchema.index({ feature: 1, timestamp: -1});
 measurementSchema.plugin(paginate);
 measurementSchema.plugin(require('mongoose-autopopulate'));
 

@@ -76,6 +76,7 @@ const featureSchema = new mongoose.Schema({
 
 featureSchema.set('toJSON', { versionKey: false });
 featureSchema.index({ owner: 1 });
+featureSchema.index({ timestamp: 1 });
 featureSchema.plugin(paginate);
 featureSchema.plugin(require('mongoose-autopopulate'));
 

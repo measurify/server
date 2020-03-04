@@ -8,12 +8,12 @@
     "mongo": "mongod --config /usr/local/etc/mongod.conf",
     "test": "mocha --timeout 20000 --exit --use_strict",
     "dev": "nodemon ./api.js dev",
-    "prod": "node ./api.js prod",
-    "docker": "node ./api.js docker",
-    "start": "node api.js",
-    "inspect": "node --inspect api.js",
-    "profile": "node profile.js",
-    "debug": "nodemon --inspect api.js dev"
+    "prod": "node --max_old_space_size=4096 ./api.js prod",
+    "docker": "node --max_old_space_size=4096 ./api.js docker",
+    "start": "node --max_old_space_size=4096 api.js",
+    "inspect": "node --max_old_space_size=4096 --inspect api.js",
+    "profile": "node --max_old_space_size=4096 profile.js",
+    "debug": "nodemon --max_old_space_size=4096 --inspect api.js dev"
   },
   "repository": {
     "type": "git",

@@ -59,6 +59,7 @@ const deviceSchema = new mongoose.Schema({
 
 deviceSchema.set('toJSON', { versionKey: false });
 deviceSchema.index({ owner: 1 });
+deviceSchema.index({ timestamp: 1 });
 deviceSchema.plugin(paginate);
 deviceSchema.plugin(require('mongoose-autopopulate'));
 
