@@ -216,10 +216,16 @@ measurementSchema.pre('save', async function() {
 measurementSchema.methods.toCSV = function toCSV() {
     let csv = '';
     this.samples.forEach(sample => {
-        sample.values.forEach(value => {
-            if (Array.isArray(value) && value.length != 1) csv += process.env.CSVVECTORSTART + value + process.env.CSVVECTOREND + process.env.CSVDELIMITER;
-            else csv += value + process.env.CSVDELIMITER;
-        });
+        if(sample.values.length == 1) {
+            let value = sample.values[0];
+            csv += value + process.env.CSVDELIMITER;
+        } 
+        else { 
+            sample.values.forEach(value => {
+                if (Array.isArray(value) && value.length != 1) csv += process.env.CSVVECTORSTART + value + process.env.CSVVECTOREND + process.env.CSVDELIMITER;
+                else csv += value + process.env.CSVDELIMITER;
+            });
+        }
         csv += '\n';
     });
     return csv;
