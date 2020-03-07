@@ -7,7 +7,7 @@ const VisibilityTypes = require('../types/visibilityTypes.js');
 /**
  * @swagger
  * definitions:
- *      tag:
+ *      tags:
  *          type: object
  *          required:
  *              - _id

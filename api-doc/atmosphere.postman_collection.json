@@ -533,7 +533,7 @@
 					"response": []
 				},
 				{
-					"name": "LOGIN as user",
+					"name": "LOGIN as new analyst",
 					"event": [
 						{
 							"listen": "test",
@@ -631,6 +631,49 @@
 					"response": []
 				},
 				{
+					"name": "LOGIN as user with modified password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"user-usernatme-test-2\",\n\t\"password\" : \"new password\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "PUT to modify password (with username)",
 					"event": [
 						{
@@ -680,6 +723,49 @@
 								"v1",
 								"users",
 								"{{username}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LOGIN as user with new modified password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"user-usernatme-test-2\",\n\t\"password\" : \"new password 2\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
 							]
 						}
 					},
@@ -2745,7 +2831,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\r\n\t{\r\n\t\t\"thing\": \"car-test\",\r\n\t\t\"feature\": \"position\",\r\n\t\t\"device\": \"gps\",\r\n\t\t\"samples\": [\r\n\t\t\t{\r\n\t\t\t\t\"values\": [80, 10]\r\n\t\t\t\t}\r\n\t\t\t],\r\n\t\t\"tags\":[]\r\n\t},\r\n\t{\r\n\t\t\"thing\": \"car-test\",\r\n\t\t\"feature\": \"position\",\r\n\t\t\"device\": \"gps\",\r\n\t\t\"samples\": [\r\n\t\t\t{\r\n\t\t\t\t\"values\": [81, 10]\r\n\t\t\t\t}\r\n\t\t\t],\r\n\t\t\"tags\":[]\r\n\t}\r\n\t\r\n]"
+							"raw": "[\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[13.1563809880239,3.4746090967566,1,668,31.3,19.3597744360902,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[12.0088029576339,5.09970767568572,806,139,31.3,20.6303956834532,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[19.2496260683761,0.113796895263035,1260,52,31.3,20.25,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[17.0521572104019,0.510756201646162,1432,47,31.3,20.0558510638298,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[0,0,1604,35,31.3,20,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[7.31194679849342,2.85329428697543,1663,118,31.3,20,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[12.7761494252874,0.706362455991267,1782,58,31.3,20.2068965517241,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[15.469212962963,0.292797630924325,1883,24,31.3,20,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[16.8641516516517,0.0875035749305456,1936,37,31.3,20,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[7.39215203106332,4.78677170688576,2089,186,31.3,20,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[15.750422705314,1.11392768277992,2360,69,31.3,20,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[21.4730257116621,0.780299560797208,2430,121,31.3,20,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[29.0786868686868,0.827350709696825,2751,110,31.3,20,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[28.1921737213404,0.350575435392229,2862,126,31.3,20,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[28.5417417417418,0.45922413269494,3185,37,31.3,20,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[28.9978427895981,0.12831023817071,3448,47,31.3,20,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[27.6613888888889,0.254335754044991,3825,45,31.3,20,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[29.3932438794727,0.619162847356931,3883,59,31.3,19.8347457627119,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[29.8238264767932,0.67408032169169,4034,316,31.3,19.6467563291139,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[30.6094918699187,1.08671657169904,4351,410,31.3,19.5,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[31.2610920852359,0.75626007873541,4772,73,31.3,19.5,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[29.4653876898481,0.289430990695237,4853,139,31.3,19.5,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[30.2525114155251,0.119154889112271,4994,73,31.3,19.5,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[30.5727686261842,0.584542792313596,5077,516,31.3,19.7843992248062,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[29.7690900383141,0.379501332604287,5946,145,31.3,20.2025862068966,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[27.3845878136201,0.172978608881249,6260,31,31.3,20.25,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[29.1648352260075,1.26922647444736,6315,499,31.3,20.4659318637275,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[31.1912037037037,0.697679862446531,7301,24,31.3,21,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[31.7097222222222,0.102484737852544,7449,23,31.3,21,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[31.7545,0.167489127138899,7482,50,31.3,21,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[31.024460909284,1.5173151924719,7542,523,31.3,20.8902963671128,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[32.4355507662835,1.23648247631337,9300,290,31.3,21.6103448275862,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[24.59079218107,0.0761321912173291,10390,27,31.3,21.6064814814815,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[33.3214849108367,2.41747832281529,10486,81,31.3,21.75,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[29.3534523809524,0.186036826528444,11051,35,31.3,22,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[30.295269726248,0.441018397229973,11483,69,31.3,21.75,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[29.3335286458333,1.42153426103631,12335,64,31.3,21.5,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[33.3775428921568,0.569997888113548,12614,136,31.3,21.5,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[30.7875816993464,0.133583309555244,13004,136,31.3,21.5,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[29.1625,0.243079552859191,13352,22,31.3,21.5,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[29.1329415954416,0.318462919479314,13677,39,31.3,21.4262820512821,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[28.9703525641026,0.171828825922352,13747,26,31.3,21.5,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[31.1642717717717,1.27020450922798,13817,370,31.3,21.5,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[32.3025308641975,0.09610710095239,14188,45,31.3,21.5,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[30.0014915693904,1.22061355358727,14242,514,31.3,21.5,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[8.88569023569024,0.718882878622896,15326,33,31.3,21.5757575757576,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[16.2403174603175,0.189209552676792,15609,35,31.3,21.75,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[19.4999368686869,0.654878824662637,15710,44,31.3,21.90625,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[27.2577599388379,0.634271177092714,16648,109,31.3,22.25,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[30.7633475328363,0.744072273699254,16961,313,31.3,22.2394169329073,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[30.4250595238095,0.622920498995632,17279,770,31.3,22.0496753246753,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[29.306855867347,0.804384370640155,18057,784,31.3,21.9532844387755,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[29.7340936739659,0.198256213923975,18911,137,31.3,22,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[29.0883698092031,0.123156384599698,19074,297,31.3,21.9305555555556,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[25.6299603174603,0.16132477621716,19584,42,31.3,22.25,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[30.4559032235059,0.925851440295042,19801,779,31.3,22.431161745828,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[30.7542605105105,0.547350140881462,20830,74,31.3,23,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[30.6760721247563,0.517723188625181,21171,57,31.3,23.1425438596491,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[31.0582070707071,0.0684597223997769,21344,55,31.3,23.0954545454545,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[29.2298647660818,0.640440836323494,21733,380,31.3,23.29375,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]},\n{\"thing\":\"84189782\",\"feature\":\"Uninfluenced_driving\",\"device\":\"Matlab\",\"samples\":{\"values\":[28.3009738604922,3.85218276318222,22212,763,31.3,23.5135976408912,1,1]},\"tags\":[\"Uninfluenced_driving\",\"Baseline\",\"All\",\"Professional\"]}\n]"
 						},
 						"url": {
 							"raw": "{{url}}/v1/measurements",
