@@ -32,7 +32,7 @@ const VisibilityTypes = require('../types/visibilityTypes.js');
 *                  type: number
 */
 const sampleSchema = new mongoose.Schema({
-    values: { type: [[Object]], default: [] },
+    values: { type: [Object], default: [] },
     delta: { type: Number } },
     { _id: false }
 );
@@ -214,18 +214,12 @@ measurementSchema.pre('save', async function() {
 });
 
 measurementSchema.methods.toCSV = function toCSV() {
-    let csv = '';
+    let csv = [];
     this.samples.forEach(sample => {
-        if(sample.values.length == 1) {
-            let value = sample.values[0];
-            csv += value + process.env.CSVDELIMITER;
-        } 
-        else { 
-            sample.values.forEach(value => {
-                if (Array.isArray(value) && value.length != 1) csv += process.env.CSVVECTORSTART + value + process.env.CSVVECTOREND + process.env.CSVDELIMITER;
-                else csv += value + process.env.CSVDELIMITER;
-            });
-        }
+        sample.values.forEach(value => {
+            if (Array.isArray(value)) csv.push(process.env.CSVVECTORSTART + value + process.env.CSVVECTOREND + process.env.CSVDELIMITER);
+            else csv.push(value + process.env.CSVDELIMITER);
+        });
         csv += '\n';
     });
     return csv;

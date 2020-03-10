@@ -35,8 +35,8 @@ exports.areCoherent = function(measurement, feature) {
     const lenght = feature.items.length;
     for (let [i, sample] of measurement.samples.entries()) {
         let values = sample.values;
-        if(feature.items.length!=1 && values.length==1 && values.isMongooseArray)
-            values = values[0];    
+        //if(feature.items.length!=1 && values.length==1 && values.isMongooseArray)
+        //    values = values[0];    
         if(values.length != lenght)
             return 'No match between sample values size and feature items size  (' + values.length + ' != ' +  lenght + ')'; 
         let result = areSameTypes(values, feature); 
