@@ -10,7 +10,7 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-EXPOSE 8084
+EXPOSE 8084 
 
 # Run API with docker settings
 CMD [ "npm", "run", "docker" ]
