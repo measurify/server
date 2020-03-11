@@ -214,32 +214,19 @@ measurementSchema.pre('save', async function() {
 });
 
 measurementSchema.methods.toCSV = function toCSV() {
-    if(!process.env.CSVDELIMITER ) throw new Error('Missing CSV configuration parameter (CSVDELIMITER)'); 
+    if(!process.env.CSVDELIMITER ) process.env.CSVDELIMITER = ','; 
+    if(!process.env.CSVVECTORSTART ) process.env.CSVVECTORSTART = ''; 
+    if(!process.env.CSVVECTOREND ) process.env.CSVVECTOREND = '';  
+    if(!process.env.CSVVECTORDELIMITER ) process.env.CSVVECTORDELIMITER =';' 
     let csv = '';
-    if(process.env.CSVVECTORSTART == "") process.env.CSVVECTORSTART = '"'; 
-    if(process.env.CSVVECTOREND == "") process.env.CSVVECTOREND = '"'; 
-    if(process.env.CSVVECTORDELIMITER) {
-        this.samples.forEach(sample => {
-            sample.values.forEach(value => {
-                if (Array.isArray(value)) value = value.join(process.env.CSVVECTORDELIMITER)
-                csv += value + process.env.CSVDELIMITER;
-            });
-            csv += '\n';
+    this.samples.forEach(sample => {
+        sample.values.forEach(value => {
+            if (Array.isArray(value)) value = process.env.CSVVECTORSTART + value.join(process.env.CSVVECTORDELIMITER) + process.env.CSVVECTOREND
+            csv += value + process.env.CSVDELIMITER;
         });
-        return csv;
-    }
-    else {
-        if(!process.env.CSVVECTORSTART ) throw new Error('Missing CSV configuration parameter (CSVVECTORSTART'); 
-        if(!process.env.CSVVECTOREND ) throw new Error('Missing CSV configuration parameter (CSVVECTOREND'); 
-        this.samples.forEach(sample => {
-            sample.values.forEach(value => {
-                if (Array.isArray(value)) csv += process.env.CSVVECTORSTART + value + process.env.CSVVECTOREND + process.env.CSVDELIMITER;
-                else csv += value + process.env.CSVDELIMITER;
-            });
-            csv += '\n';
-        });
-        return csv;
-    }
+        csv += '\n';
+    });
+    return csv;
 };
 
 module.exports = mongoose.models.Measurement || mongoose.model('Measurement', measurementSchema);
