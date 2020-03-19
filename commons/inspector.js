@@ -15,7 +15,7 @@ function isNumber(value) {
 
 function areSameDimension(value, item) {
     if(!value) return true;
-    if(!Array.isArray(value) || value.length == 1) return item.dimension == 0;
+    if(!Array.isArray(value)) return item.dimension == 0;
     else if(!Array.isArray(value[0])) return item.dimension == 1;
     else return item.dimension == 2;
 }
