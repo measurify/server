@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 
-exports.get = async function(id, field, model) {
+exports.get = async function(id, field, model, select) {
     try {
         let item = null;
-        if(field) item = await model.findOne({ [field]: id });
+        if (!select) select = '{}';
+        if(field) item = await model.findOne({ [field]: id }).select(JSON.parse(select));
         if(!item) item = await model.findById(id);
         if(!item) return null;
         return item;

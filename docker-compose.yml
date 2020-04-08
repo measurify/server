@@ -1,0 +1,19 @@
+version: "2"
+services:
+  atmosphere:
+    build: .
+    image: atmosphere
+    container_name: atmosphere
+    ports:
+      - "8084:8084"
+      - "443:443"
+    depends_on:
+      - mongo
+    volumes:
+        - ./resources:/resources   
+  mongo:
+    image: mongo
+    volumes:
+        - ./data:/data/db
+    ports:
+      - "27017:27017"

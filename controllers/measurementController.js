@@ -7,7 +7,7 @@ exports.get = async (req, res) => {
     const restriction_1 = await checker.whatCanRead(req, res);
     const restriction_2 = await checker.whichRights(req, res, Measurement);
     const restrictions = {...restriction_1, ...restriction_2};
-    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Measurement, restrictions);
+    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{"owner": false}', Measurement, restrictions);
 };
 
 exports.count = async (req, res) => { 
@@ -21,7 +21,7 @@ exports.getone = async (req, res) => {
     let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Measurement); if (result != true) return result;
-    return await controller.getResource(req, res, null, Measurement); 
+    return await controller.getResource(req, res, null, Measurement, '{"owner": false}'); 
 };
 
 exports.post = async (req, res) => {

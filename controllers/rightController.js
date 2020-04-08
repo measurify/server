@@ -6,13 +6,13 @@ const User = mongoose.model('User');
 
 exports.get = async (req, res) => { 
     const restriction = await checker.whatCanRead(req, res);
-    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Right, restriction);
+    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{"owner": false}', Right, restriction);
 };
 
 exports.getone = async (req, res) => { 
     let result = await checker.isAvailable(req, res, Right); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
-    return res.status(200).json(req.resource);
+    return await controller.getResource(req, res, null, Right, '{"owner": false}'); 
 };
 
 exports.post = async (req, res) => {

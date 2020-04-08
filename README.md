@@ -11,10 +11,11 @@ In order to support the IoT developer community, Atmosphere is released open sou
 ## Table of contents
 
 1. [Main Concepts](#main-concepts)
-2. [Getting Started] (#getting-started)
-3. [Installation](#installation)
-4. [Use cases](#use-cases)
-5. [References](#references)
+2. [Versioning](#versioning)
+3. [Getting Started](#getting-started)
+4. [Installation](#installation)
+5. [Use cases](#use-cases)
+6. [References](#references)
 
 ## Main concepts
 
@@ -32,9 +33,18 @@ Other supplementary resources are **User, Log, Login, Script, Tag, Constraint, a
 
 For a detailed description of each resource, please refere to [API Swagger Doc](TBD)
 
-## Getting Started
+## Versioning
 
-TBD
+[GitHub Repo](https://github.com/Atmosphere-IoT-Framework/api)
+
+## Quick start
+
+Clone code and run the container
+
+    git clone https://github.com/Atmosphere-IoT-Framework/api
+    docker-compose up 
+
+
 
 ## Installation
 

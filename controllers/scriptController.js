@@ -8,13 +8,13 @@ const errors = require('../commons/errors.js');
 
 exports.get = async (req, res) => { 
     const restriction = await checker.whatCanRead(req, res);
-    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Script, restriction); 
+    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{"owner": false}', Script, restriction); 
 };
 
 exports.getone = async (req, res) => { 
     let result = await checker.isAvailable(req, res, Script); if (result != true) return result;
-    result = await checker.canRead(req, res); if (result != true) return result;
-    return res.status(200).json(req.resource); 
+    result = await checker.canRead(req, res); if (result != true) return result; 
+    return await controller.getResource(req, res, null, Script, '{"owner": false}');
 };
 
 exports.post = async (req, res) => {

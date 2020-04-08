@@ -99,7 +99,7 @@ const sampleSchema = new mongoose.Schema({
  *                  type: number
  */
 const measurementSchema = new mongoose.Schema({
-    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, autopopulate: true },
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     location: { type: mongoose.SchemaTypes.GeoJSON, required: false, index: "2dsphere" },
     startDate: { type: Date, default: Date.now },
     endDate: { type: Date, default: Date.now },

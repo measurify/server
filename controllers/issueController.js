@@ -6,7 +6,7 @@ const IssueTypes = require('../types/issueTypes');
 
 exports.get = async (req, res) => { 
     const restriction = await checker.readJustOwned(req, res);
-    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Issue, restriction); 
+    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{"owner": false}', Issue, restriction); 
 };
 
 exports.post = async (req, res) => {

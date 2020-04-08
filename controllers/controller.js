@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 const persistence = require('../commons/persistence.js');
 const errors = require('../commons/errors.js');
 
-exports.getResource = async function(req, res, field, model) {
+exports.getResource = async function(req, res, field, model, select) {
     try {
-        const item = await persistence.get(req.params.id, field, model);
+        const item = await persistence.get(req.params.id, field, model, select);
         if(!item) return errors.manage(res, errors.resource_not_found, req.params.id);
         return res.status(200).json(item);
     } 
@@ -19,8 +19,7 @@ exports.getResourceList = async function(req, res, sort, select, model, restrict
     try {
         const query = req.query;
         if (!query.sort) query.sort = sort;
-        if (!query.select) query.select = select;
-        let list = await persistence.getList(query.filter, query.sort, query.select, query.page, query.limit, restriction, model);
+        let list = await persistence.getList(query.filter, query.sort, select, query.page, query.limit, restriction, model);
         if(req.headers.accept == 'text/csv') {
             res.header('Content-Type', 'text/csv');
             let result = '';

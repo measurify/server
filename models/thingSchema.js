@@ -28,7 +28,7 @@ const VisibilityTypes = require('../types/visibilityTypes.js');
  */
 const thingSchema = new mongoose.Schema({
     _id: { type: String, required: "Please, supply an _id" },
-    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, autopopulate: true },
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     visibility: {type: String, default: VisibilityTypes.private },
     tags: [{ type: String, ref: 'Tag' }],
     metadata: { type: Map, of: String },

@@ -177,6 +177,7 @@ describe('Access read a feature', () => {
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature_private = await factory.createFeature("test-feature-1-private", owner, null, [], VisibilityTypes.private);
         let res = await chai.request(server).get('/v1/features/' + feature_private._id).set("Authorization", await factory.getUserToken(user_provider));
+        console.log(res.text)
         res.should.have.status(errors.restricted_access_read.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.restricted_access_read.message);

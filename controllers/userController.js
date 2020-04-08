@@ -14,7 +14,7 @@ const bcrypt = require('bcryptjs');
 
 exports.get = async (req, res) => { 
     const result = await checker.isAdminitrator(req, res); if (result != true) return result;
-    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', User); 
+    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{"owner": false}', User); 
 };
 
 exports.getusernames = async (req, res) => { 
@@ -24,7 +24,7 @@ exports.getusernames = async (req, res) => {
 exports.getone = async (req, res) => {
     let result = await checker.isAvailable(req, res, User); if (result != true) return result;
     result = await checker.isAdminitrator(req, res); if (result != true) return result;
-    return res.status(200).json(req.resource);
+    return await controller.getResource(req, res, null, User, '{"owner": false}');
 };
 
 exports.post = async (req, res) => {

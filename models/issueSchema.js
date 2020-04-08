@@ -26,7 +26,7 @@ const IssueTypes = require('../types/issueTypes.js');
  *                      $ref: '#/paths/definitions/script'
  */
 const issueSchema = new mongoose.Schema({
-    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, autopopulate: true },
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     device: { type: String, required: "Please, supply a device", ref: 'Device', autopopulate: true, index: true },
     date: {type: Date, default: Date.now },
     message: { type: String },

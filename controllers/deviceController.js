@@ -11,14 +11,14 @@ exports.get = async (req, res) => {
     const restriction_1 = await checker.whatCanRead(req, res);
     const restriction_2 = await checker.whichRights(req, res, Device);
     const restrictions = {...restriction_1, ...restriction_2};
-    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Device, restrictions); 
+    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{"owner": false}', Device, restrictions); 
 };
 
 exports.getone = async (req, res) => { 
     let result = await checker.isAvailable(req, res, Device); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Device); if (result != true) return result;
-    return res.status(200).json(req.resource);
+    return await controller.getResource(req, res, null, Device, '{"owner": false}'); 
 };
 
 exports.getstream = async (req, res) => { 
