@@ -7,8 +7,8 @@ const loginRoute = require('./routes/loginRoute');
 router.use('/' + process.env.VERSION + '/login', loginRoute);
 
 // demo
-const demoRoute = require('./routes/demoRoute');
-router.use('/' + process.env.VERSION + '/demo', passport.authenticate('jwt', {session: false}), demoRoute);
+//const demoRoute = require('./routes/demoRoute');
+//router.use('/' + process.env.VERSION + '/demo', passport.authenticate('jwt', {session: false}), demoRoute);
 
 // log
 const logRoute = require('./routes/logRoute');

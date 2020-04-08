@@ -5,7 +5,7 @@ exports.get = async function(id, field, model, select) {
         let item = null;
         if (!select) select = '{}';
         if(field) item = await model.findOne({ [field]: id }).select(JSON.parse(select));
-        if(!item) item = await model.findById(id);
+        if(!item) item = await model.findById(id).select(JSON.parse(select));
         if(!item) return null;
         return item;
     }

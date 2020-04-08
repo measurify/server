@@ -13,8 +13,9 @@ const errors = require('../commons/errors.js');
 const bcrypt = require('bcryptjs');
 
 exports.get = async (req, res) => { 
+    const select  = '{"owner": false, "password": false, "timestamp": false, "lastmod": false, "__v":false}';
     const result = await checker.isAdminitrator(req, res); if (result != true) return result;
-    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{"owner": false}', User); 
+    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, User); 
 };
 
 exports.getusernames = async (req, res) => { 
@@ -22,9 +23,10 @@ exports.getusernames = async (req, res) => {
 };
 
 exports.getone = async (req, res) => {
+    const select  = '{"owner": false, "password": false, "timestamp": false, "lastmod": false, "__v":false}';
     let result = await checker.isAvailable(req, res, User); if (result != true) return result;
     result = await checker.isAdminitrator(req, res); if (result != true) return result;
-    return await controller.getResource(req, res, null, User, '{"owner": false}');
+    return await controller.getResource(req, res, null, User, select);
 };
 
 exports.post = async (req, res) => {

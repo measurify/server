@@ -7,18 +7,20 @@ const Measurement = mongoose.model('Measurement');
 const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 
-exports.get = async (req, res) => {  
+exports.get = async (req, res) => { 
+    const select  = '{"owner": false, "timestamp": false, "lastmod": false, "__v":false}'; 
     const restriction_1 = await checker.whatCanRead(req, res);
     const restriction_2 = await checker.whichRights(req, res, Device);
     const restrictions = {...restriction_1, ...restriction_2};
-    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{"owner": false}', Device, restrictions); 
+    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Device, restrictions); 
 };
 
 exports.getone = async (req, res) => { 
+    const select  = '{"owner": false, "timestamp": false, "lastmod": false, "__v":false}';
     let result = await checker.isAvailable(req, res, Device); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Device); if (result != true) return result;
-    return await controller.getResource(req, res, null, Device, '{"owner": false}'); 
+    return await controller.getResource(req, res, null, Device, select); 
 };
 
 exports.getstream = async (req, res) => { 

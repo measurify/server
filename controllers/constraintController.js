@@ -7,14 +7,16 @@ const ObjectId = require('mongoose').Types.ObjectId;
 const errors = require('../commons/errors.js');
 
 exports.get = async (req, res) => { 
+    const select  = '{"owner": false, "timestamp": false, "lastmod": false, "__v":false}';
     const restriction = await checker.whatCanRead(req, res);
-    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{}', Constraint, restriction); 
+    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Constraint, restriction); 
 };
 
 exports.getone = async (req, res) => { 
+    const select  = '{"owner": false, "timestamp": false, "lastmod": false, "__v":false}';
     let result = await checker.isAvailable(req, res, Constraint); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
-    return res.status(200).json(req.resource);
+    return await controller.getResource(req, res, null, Constraint, select); 
 };
 
 exports.post = async (req, res) => {

@@ -10,17 +10,19 @@ const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 
 exports.get = async (req, res) => { 
+    const select  = '{"owner": false, "timestamp": false, "lastmod": false, "__v":false}';
     const restriction_1 = await checker.whatCanRead(req, res);
     const restriction_2 = await checker.whichRights(req, res, Tag);
     const restrictions = {...restriction_1, ...restriction_2};
-    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{"owner": false}', Tag, restrictions);
+    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Tag, restrictions);
 };
 
 exports.getone = async (req, res) => { 
+    const select  = '{"owner": false, "timestamp": false, "lastmod": false, "__v":false}';
     let result = await checker.isAvailable(req, res, Tag); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Tag); if (result != true) return result;
-    return await controller.getResource(req, res, null, Tag, '{"owner": false}');
+    return await controller.getResource(req, res, null, Tag, select);
 };
 
 exports.post = async (req, res) => {
