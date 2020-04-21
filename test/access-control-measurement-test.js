@@ -67,8 +67,8 @@ describe('Access create measurement', () => {
 describe('Access read a list of measurements', () => {
     it('it should get all the public/private measurements as admin or analyst', async () => {
         factory.dropContents();
-        const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
-        const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
+        const user_admin = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.admin);
+        const user_analyst = await factory.createUser("test-username-user-2", "test-password-user-2", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);

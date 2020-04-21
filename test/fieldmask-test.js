@@ -112,7 +112,7 @@ describe('/POST fieldmasks', () => {
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.post_request_error.message);
-        res.body.details.should.contain('Fieldschema validation failed: supply valid computation fields');
+        res.body.details.should.contain('Fieldschema validation failed: supply valid fields');
     });
 
     it('it should POST a fieldmask', async () => {

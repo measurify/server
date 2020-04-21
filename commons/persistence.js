@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 exports.get = async function(id, field, model, select) {
     try {
         let item = null;
-        if (!select) select = '{}';
-        if(field) item = await model.findOne({ [field]: id }).select(JSON.parse(select));
-        if(!item) item = await model.findById(id).select(JSON.parse(select));
+        if (!select) select = {};
+        if(field) item = await model.findOne({ [field]: id }).select(select);
+        if(!item) item = await model.findById(id).select(select);
         if(!item) return null;
         return item;
     }
@@ -24,10 +24,10 @@ exports.getList = async function(filter, sort, select, page, limit, restriction,
     if (!limit) limit = '10';
     if (!filter) filter = '{}';
     if (!sort) sort = '{ "timestamp": "desc" }';
-    if (!select) select = '{}';
+    if (!select) select = {};
     filter = prepareFilter(filter, restriction);
     const options = {
-        select: JSON.parse(select),
+        select: select,
         sort: JSON.parse(sort),
         page: parseInt(page),
         limit: parseInt(limit)

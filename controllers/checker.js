@@ -3,6 +3,7 @@ const errors = require('../commons/errors.js');
 const authorizator = require('../security/authorization.js');
 const inspector = require('../commons/inspector.js');
 const Right = mongoose.model('Right');
+const Fieldmask = mongoose.model('Fieldmask');
 
 exports.isAvailable = async function(req, res, model) {
     try {
@@ -85,6 +86,17 @@ exports.canDeleteList = async function(req, res) {
 exports.whatCanRead = async function(req, res) {
     return authorizator.whatCanRead(req.user);
 } 
+
+exports.whatCanSee = async function(req, res, model) {
+    let select_base  = {owner: false, timestamp: false, lastmod: false, __v:false};
+    if(!req.user.fieldmask) return select_base;
+    const fieldmask = await Fieldmask.findById(req.user.fieldmask);
+    const mask = fieldmask[model.modelName.toLowerCase() + '_fields'];
+    if(!mask || mask.length == 0) return select_base;
+    let select = {};
+    for (let value of mask) {select[value] = true }
+    return select;
+}
 
 exports.whichRights = async function(req, res, model) {
     if(model.modelName == "Measurement") {

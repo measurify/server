@@ -2364,8 +2364,347 @@
 			]
 		},
 		{
+			"name": "FIELDMASK",
+			"item": [
+				{
+					"name": "LOGIN as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new fieldmask",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
+								"exec": [
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
+								"exec": [
+									"pm.environment.set(\"fieldmask\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"_id\": \"analyst-mask-2\",\r\n  \"measurement_fields\": [\"samples\", \"startDate\", \"device\"]\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/fieldmasks/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"fieldmasks",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT to modify of a fieldmask",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"measurement_fields\": {\r\n\t\"remove\": [\"device\"],\r\n  \t\"add\": [\"endDate\"]\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/fieldmasks/{{fieldmask}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"fieldmasks",
+								"{{fieldmask}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT to associate a fieldmask to a user",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "c4769826-e12f-420b-a3f4-bce00c9b7b78",
+								"exec": [
+									"var users = JSON.parse(pm.environment.get(\"users\"));",
+									"pm.environment.set('user', users[2]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"fieldmask\": \"{{fieldmask}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/users/{{user}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								"{{user}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LOGIN as user with fieldmask",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"user-analyst-name-1\",\n\t\"password\" : \"analyst-password-1\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET all measurements with masked fields",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "11f2ec22-be75-49e1-8378-53150d88f0c5",
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"if(data.docs) pm.environment.set('measurement', data.docs[0]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/measurements",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "MEASUREMENTS",
 			"item": [
+				{
+					"name": "LOGIN as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
 				{
 					"name": "GET all measurements",
 					"event": [
@@ -2714,7 +3053,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{url}}/v1/measurements?aggregator=[{\"$lookup\": { \"from\": \"things\", \"localField\": \"relatedThings\", \"foreignField\": \"_id\", \"as\": \"thing_docs\"}},\n{ \"$addFields\": { \"metadata\": \"$thing_docs.metadata\" }},\n{ \"$addFields\": { \"mileage\": \"$metadata.mileage\" }},\n{ \"$addFields\": { \"type\": \"$metadata.type\" }},\n{ \"$match\":{ \"$and\": [{\"type\": \"Ordinary\"},{\"feature\": \"Stat\"},{\"baseFeatures\":  { \"$size\": 1,\"$all\": [\"VehicleSpeed\"] } }]}}]",
+							"raw": "{{url}}/v1/measurements?aggregator=[{\"$lookup\": { \"from\": \"things\", \"localField\": \"relatedThings\", \"foreignField\": \"_id\", \"as\": \"thing_docs\"}},\n{ \"$addFields\": { \"metadata\": \"$thing_docs.metadata\" }},\n{ \"$addFields\": { \"mileage\": \"$metadata.mileage\" }},\n{ \"$addFields\": { \"type\": \"$metadata.type\" }},\n{ \"$match\":{ \"$and\": [{\"type\": \"Ordinary\"},{\"feature\": \"Stat\"},{\"baseFeatures\":  { \"$size\": 1,\"$all\": [\"VehicleSpeed\"] } }]}}] ",
 							"host": [
 								"{{url}}"
 							],

@@ -7,13 +7,13 @@ const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 
 exports.get = async (req, res) => { 
-    const select  = '{"owner": false, "timestamp": false, "lastmod": false, "__v":false}';
+    const select = await checker.whatCanSee(req, res, Script)
     const restriction = await checker.whatCanRead(req, res);
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Script, restriction); 
 };
 
 exports.getone = async (req, res) => {
-    const select  = '{"owner": false, "timestamp": false, "lastmod": false, "__v":false}';
+    const select = await checker.whatCanSee(req, res, Script)
     let result = await checker.isAvailable(req, res, Script); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result; 
     return await controller.getResource(req, res, null, Script, select);

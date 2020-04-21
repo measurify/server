@@ -47,7 +47,7 @@ fieldmaskSchema.pre('save', async function() {
         const request_fields = resource[property];
         if(!request_fields || request_fields == 0) return true;
         const model_fields = Object.keys(mongoose.model((property.charAt(0).toUpperCase() + property.slice(1)).replace('_fields','')).schema.paths);
-        if(!request_fields.every(request_field => model_fields.indexOf(request_field) > -1)) throw new Error('Fieldschema validation failed: supply valid computation fields'); 
+        if(!request_fields.every(request_field => model_fields.indexOf(request_field) > -1)) throw new Error('Fieldschema validation failed: supply valid fields'); 
     }));
 });
 

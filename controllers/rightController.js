@@ -5,13 +5,13 @@ const Right = mongoose.model('Right');
 const User = mongoose.model('User');
 
 exports.get = async (req, res) => { 
-    const select  = '{"owner": false, "timestamp": false, "lastmod": false, "__v":false}';
+    const select = await checker.whatCanSee(req, res, Right)
     const restriction = await checker.whatCanRead(req, res);
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Right, restriction);
 };
 
 exports.getone = async (req, res) => { 
-    const select  = '{"owner": false, "timestamp": false, "lastmod": false, "__v":false}';
+    const select = await checker.whatCanSee(req, res, Right)
     let result = await checker.isAvailable(req, res, Right); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
     return await controller.getResource(req, res, null, Right, select); 

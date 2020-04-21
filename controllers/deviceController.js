@@ -8,7 +8,7 @@ const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 
 exports.get = async (req, res) => { 
-    const select  = '{"owner": false, "timestamp": false, "lastmod": false, "__v":false}'; 
+    const select = await checker.whatCanSee(req, res, Device)
     const restriction_1 = await checker.whatCanRead(req, res);
     const restriction_2 = await checker.whichRights(req, res, Device);
     const restrictions = {...restriction_1, ...restriction_2};
@@ -16,7 +16,7 @@ exports.get = async (req, res) => {
 };
 
 exports.getone = async (req, res) => { 
-    const select  = '{"owner": false, "timestamp": false, "lastmod": false, "__v":false}';
+    const select = await checker.whatCanSee(req, res, Device)
     let result = await checker.isAvailable(req, res, Device); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Device); if (result != true) return result;

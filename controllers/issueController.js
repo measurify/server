@@ -5,7 +5,7 @@ const Issue = mongoose.model('Issue');
 const IssueTypes = require('../types/issueTypes');
 
 exports.get = async (req, res) => { 
-    const select  = '{"owner": false, "timestamp": false, "lastmod": false, "__v":false}';
+    const select = await checker.whatCanSee(req, res, Issue)
     const restriction = await checker.readJustOwned(req, res);
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Issue, restriction); 
 };
