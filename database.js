@@ -40,6 +40,7 @@ connection();
 
 mongoosePaginate.paginate.options = { lean: false };
 
+require('./models/fieldmaskSchema');
 require('./models/userSchema');
 require('./models/tagSchema');
 require('./models/logSchema');

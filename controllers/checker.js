@@ -17,9 +17,14 @@ exports.isAvailable = async function(req, res, model) {
     }
 }
 
-exports.isFilled = async function(req, res, values ) {
-    if(!authorizator.isFilled(req.body, values)) return errors.manage(res, errors.missing_info);
-    else return true;
+exports.isFilled = async function(req, res, values) {
+    const body = req.body;
+    if(!values.some(function (element) { 
+        if(body[element] == null) return false;
+        else if(Array.isArray(body[element])) if(body[element].length == 0) return false
+        return true;
+    })) return errors.manage(res, errors.missing_info);;
+    return true;
 }
 
 exports.isComputable = async function(req, res, model){

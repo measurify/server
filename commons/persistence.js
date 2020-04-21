@@ -59,7 +59,7 @@ exports.update = async function(body, fields, resource, model) {
                 let field_model = null;
                 const field_model_name = field[0].toUpperCase() + field.slice(1, -1);
                 try { field_model = await mongoose.model(field_model_name) } catch(err) {};
-                if (field_model) result = await modifyList(body[field], field_model, resource, field);
+                if (field_model) result = await modifyResourceList(body[field], field_model, resource, field);
                 if (result == true) break;
                 else if (result) throw result;
             
@@ -68,6 +68,14 @@ exports.update = async function(body, fields, resource, model) {
                 const field_type_name = field[0].toUpperCase() + field.slice(1) + "Types";
                 try { field_type = require('../types/' + field_type_name + '.js'); } catch(err) {};
                 if (field_type) result = await modifyCategoricalValueList(body[field], field_type, resource, field);
+                if (result == true) break;
+                else if (result) throw result;
+
+                // List of fields of a resource
+                let fieldlist_model = null;
+                const fieldlist_model_name = (field.charAt(0).toUpperCase() + field.slice(1)).replace('_fields','');
+                try { fieldlist_model = await mongoose.model(fieldlist_model_name) } catch(err) {};
+                if (fieldlist_model) result = await modifyFieldResourceList(body[field], fieldlist_model, resource, field);
                 if (result == true) break;
                 else if (result) throw result;
 
@@ -119,26 +127,39 @@ const postList = async function(body, model) {
     return results;     
 };
 
-const modifyList = async function(list, list_model, resource, field) {
+const modifyFieldResourceList = async function(list, model, resource, field) {
     if(list.remove) {
-        for (let value of list.remove) { if (!await list_model.findById(value)) throw 'Resource to be removed from list not found: ' + value; };
+        for (let value of list.remove) { if(Object.keys(model.schema.paths).indexOf(value) == -1) throw 'Field to be removed from list not found: ' + value; };
         resource[field] = resource[field].filter(value => !list.remove.includes(value));
     }
     if(list.add) {
-        for (let value of list.add) { if (!await list_model.findById(value))  throw 'Resource to be added to the list not found: ' + value; };
+        for (let value of list.add) { if(Object.keys(model.schema.paths).indexOf(value) == -1) throw 'Field to be added to the list not found: ' + value; };
         resource[field].push(...list.add);
     }
     resource[field] = [...new Set(resource[field])];
     return true;
 }
 
-const modifyCategoricalValueList = async function(list, list_type, resource, field) {
+const modifyResourceList = async function(list, model, resource, field) {
     if(list.remove) {
-        for (let value of list.remove) { if (!Object.values(list_type).includes(value)) throw 'Type to be removed from list not found: ' + value; };
+        for (let value of list.remove) { if (!await model.findById(value)) throw 'Resource to be removed from list not found: ' + value; };
         resource[field] = resource[field].filter(value => !list.remove.includes(value));
     }
     if(list.add) {
-        for (let value of list.add) { if (!Object.values(list_type).includes(value))  throw 'Type to be added to the list not found: ' + value; };
+        for (let value of list.add) { if (!await model.findById(value))  throw 'Resource to be added to the list not found: ' + value; };
+        resource[field].push(...list.add);
+    }
+    resource[field] = [...new Set(resource[field])];
+    return true;
+}
+
+const modifyCategoricalValueList = async function(list, type, resource, field) {
+    if(list.remove) {
+        for (let value of list.remove) { if (!Object.values(type).includes(value)) throw 'Type to be removed from list not found: ' + value; };
+        resource[field] = resource[field].filter(value => !list.remove.includes(value));
+    }
+    if(list.add) {
+        for (let value of list.add) { if (!Object.values(type).includes(value))  throw 'Type to be added to the list not found: ' + value; };
         resource[field].push(...list.add);
     }
     resource[field] = [...new Set(resource[field])];

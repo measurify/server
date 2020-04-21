@@ -340,7 +340,7 @@ describe('/PUT thing', () => {
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
         const thing = await factory.createThing("test-thing-1", user, [tag_1, tag_2]);
-        const modification = { fakefield: "fake-value" };
+        const modification = { tags: { remove: [tag_2._id] }, fakefield: "fake-value" };
         const res = await chai.request(server).put('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user)).send(modification);
         res.should.have.status(errors.put_request_error.status);
         res.body.should.be.a('object');

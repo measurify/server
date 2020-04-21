@@ -14,6 +14,7 @@ const Measurement = mongoose.model('Measurement');
 const Issue = mongoose.model('Issue');
 const Computation = mongoose.model('Computation');
 const Right = mongoose.model('Right');
+const Fieldmask = mongoose.model('Fieldmask');
 const RelationshipTypes = require('../types/relationshipTypes');
 const jwt = require('jsonwebtoken');
 const ItemTypes = require('../types/itemTypes.js');
@@ -112,12 +113,13 @@ exports.createDemoContent = async function() {
     measurements.push(await this.createMeasurement(users[0], "acceleration", "accelerometer", "car2", ["urban"], [{values: [3.1], delta: 0}]));                                              
 }
 
-exports.createUser = async function(username, password, type) {
+exports.createUser = async function(username, password, type, fieldmask) {
     let user = await User.findOne( { username: username });
     if(!user) {
         const req = { 
             username: username || uuid(),
             password: password ||  uuid(),
+            fieldmask: fieldmask,
             type: type || UserRoles.provider };
         user = new User(req);
         await user.save();
@@ -240,6 +242,23 @@ exports.createRight = async function(resource, type, user, owner, tags) {
     const right = new Right(req);
     await right.save();
     return right._doc;
+};
+
+exports.createFieldmask = async function(name, computation_fields, device_fields, feature_fields, measurement_fields, script_fields, tag_fields, thing_fields, owner) {
+    const req = { 
+        _id: name,
+        computation_fields: computation_fields,
+        device_fields: device_fields,
+        feature_fields: feature_fields,
+        measurement_fields: measurement_fields,
+        script_fields: script_fields,
+        tag_fields: tag_fields,
+        thing_fields: thing_fields,
+        owner: owner,
+    }
+    const fieldmask = new Fieldmask(req);
+    await fieldmask.save();
+    return fieldmask._doc;
 };
 
 exports.createMeasurement = async function(owner, feature, device, thing, tags, samples, startdate, enddate, location, visibility) {

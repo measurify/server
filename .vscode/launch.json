@@ -34,7 +34,7 @@
             "--timeout",
             "999999",
             "--colors",
-            "test/measurement-test.js",
+            "test/fieldmask-test.js",
             "${workspaceFolder}/test"
         ],
         "internalConsoleOptions": "openOnSessionStart"

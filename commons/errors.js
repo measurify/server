@@ -25,7 +25,7 @@ exports.filter_required                      = { status: 403, value: 22, message
 exports.invalid_code                         = { status: 400, value: 23, message: 'The code is not recognized as valid' };  
 exports.computation_error                    = { status: 500, value: 24, message: 'The computation is not working' };
 exports.restricted_access                    = { status: 403, value: 25, message: 'You cannot access this resource' };
-exports.not_you                              = { status: 403, value: 27, message: 'You are not that user' };
+exports.not_you                              = { status: 403, value: 26, message: 'You are not that user' };
 
 exports.manage = function(res, error, more) {
     if( typeof more === 'object' && more !== null) more = more.toString();

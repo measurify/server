@@ -353,7 +353,7 @@ describe('/PUT user', () => {
         factory.dropContents();
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
-        const modification = { username: 'new_username' };
+        const modification = { username: "new_username", password: 'new_password' };
         const res = await chai.request(server).put('/v1/users/' + user._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
         res.should.have.status(errors.put_request_error.status);
         res.body.should.be.a('object');
@@ -365,12 +365,11 @@ describe('/PUT user', () => {
         factory.dropContents();
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
-        const other = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
-        const modification = { username: 'new_username' };
+        const other = await factory.createUser("test-username-3", "test-password-3", UserRoles.provider);
+        const modification = { password: 'new_password' };
         const res = await chai.request(server).put('/v1/users/' + user._id).set("Authorization", await factory.getUserToken(other)).send(modification);
-        res.should.have.status(errors.put_request_error.status);
+        res.should.have.status(errors.not_you.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.put_request_error.message);
-        res.body.details.should.contain('Request field cannot be updated ');
+        res.body.message.should.contain(errors.not_you.message);
     });
 });

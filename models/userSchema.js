@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const UserRoles = require('../types/userRoles.js');
+const Fieldmask = mongoose.model('Fieldmask');
 const bcrypt = require('bcryptjs');
 
 mongoose.Promise = global.Promise;
@@ -8,6 +9,7 @@ const userSchema = new mongoose.Schema({
     username: { type: String, required: true, index: true },
     password: { type: String, required: true, select: false },
     type: { type: String, required: true },
+    fieldmask: { type: String, ref: 'Fieldmask' },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });

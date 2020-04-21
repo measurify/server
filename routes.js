@@ -56,6 +56,10 @@ router.use('/' + process.env.VERSION + '/things', passport.authenticate('jwt', {
 const featuresRoute = require('./routes/featureRoute');
 router.use('/' + process.env.VERSION + '/features', passport.authenticate('jwt', {session: false}), featuresRoute);
 
+// fieldmask
+const fieldmasksRoute = require('./routes/fieldmaskRoute');
+router.use('/' + process.env.VERSION + '/fieldmasks', passport.authenticate('jwt', {session: false}), fieldmasksRoute);
+
 // computation
 const computationsRoute = require('./routes/computationRoute');
 router.use('/' + process.env.VERSION + '/computations', passport.authenticate('jwt', {session: false}), computationsRoute);

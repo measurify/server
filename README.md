@@ -4,7 +4,7 @@ A **cloud-based, abstract, measurement-oriented API** for managing smart things 
 
 We tested the framework and its workflow in **three industrial research projects** analyzing data and enabling new services in the health and automotive domains. Our experience showed the benefits – especially in terms of **development efficiency and effectiveness** - of exploiting Atmosphere, which does not tie the development to a proprietary commercial platform, nor requires the huge set-up times needed to start from scratch a solution. Furthermore, customizing Atmosphere based on new requirements has proven to be easily feasible, also keeping abstraction for reusability.
 
-Atmosphere ia a project designed, developed and maintained by **[Elios Lab]()** of University of Genoa.
+Atmosphere ia a project designed, developed and maintained by **[Elios Lab](https://elios.diten.unige.it/)** of University of Genoa. **[Wondertech](http://www.wondertechweb.com/)** contributes to the development and maintenance of the source code.
 
 In order to support the IoT developer community, Atmosphere is released open source under **MIT licence**.
 
@@ -23,7 +23,7 @@ Atmosphere was designed to represent the application context and its elements as
 
 At the core of these resources are the essential elements that are common in the IoT environment: **Thing, Feature, Device, and Measurement**: a Thing represents the subject of a Measurement; a Feature describes the (typically physical) quantitity measured by a Device; each item in a Feature has a name and a unit; a Device is a tool providing Measurements regarding a Thing; finally, a Measurement represents a value of a Feature measured by a Device for a specific Thing. The following figure shows the relations among resources, highlighting the central role of the Measurement concept. The figure provides also a simple example in the context of collecting weather information (e.g. temperature and wind speed).
 
-![Resources relations focusing around the Measurement resource](/images/figure1.png?raw=true "Figure 1")
+![Resources relations focusing around the Measurement resource](images/figure1.png?raw=true "Figure 1")
 
 The concept of Measurement **abstracts the values posted to and retrieved from the Cloud**. Its structure must match the type of measured Feature. Each measurement is a **vector of samples**. They could be samples collected at different times (taken at intervals specified by the “delta” field), a single value or a set of statistical information (e.g., average, stdev, etc.). Each sample can be a **scalar** (e.g. a temperature), a **vector** (e.g. the orientation in space) or a **tensor** of numbers (e.g., general multidimensional data points). In the previous example, we have just a single scalar sample for the Measurement.
 
@@ -43,8 +43,6 @@ Clone code and run the container
 
     git clone https://github.com/Atmosphere-IoT-Framework/api
     docker-compose up 
-
-
 
 ## Installation
 
@@ -107,6 +105,8 @@ Remember the URL of the database server, if you are using the same machine for M
 
 ### Step 2 - Install NodeJS environment
 
+Detailed information can be found at [NodeJS installation](XXX)
+
 #### Get NodeJS
 
     sudo wget http://nodejs.org/dist/v8.11.1/node-v8.11.1.tar.gz 
@@ -143,12 +143,6 @@ Remember the URL of the database server, if you are using the same machine for M
     cd ~ 
     sudo npm install -g forever
 
-#### Forward the port from 8084 to 80
-
-    export PORT=8084 
-    sudo iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8084 
-    sudo apt-get install iptables-persistent
-
 #### Get Atmosphere API code
 
     cd ~/www 
@@ -182,7 +176,7 @@ In particular, the connection string with the database and administrator credent
 
 #### Setup to run the API in production
 
-We suggest to use a process manager for NodeJS, lile [pm2](https://pm2.keymetrics.io/)
+We suggest to use a process manager for NodeJS, like [pm2](https://pm2.keymetrics.io/)
 
     sudo npm install -g pm2 
     sudo pm2 start api.js -- prod 
@@ -197,45 +191,27 @@ We suggest to use a process manager for NodeJS, lile [pm2](https://pm2.keymetric
 
 ### Step 4 - Get a certificate for HTTPS
 
-Atmosphere API can support both HTTP and HTTPS. Without certificate, the API starts using HTTP. However we reccomend to get a valid certificate from a authority. In the following we provide instruction to add a certificate from [Let's Encript](https://letsencrypt.org/), a free, automated and open Certificate Authority.
-Detailed instruction can be found at [Certbot instruction](https://certbot.eff.org/instructions)
+Atmosphere API can support both HTTP and HTTPS. Without certificate, the API starts using a self-signed certificate (stored in the resources forlder) or in HTTP (if also the self-signed certificate is missing). It is reccomended to get a valid certificate from a authority.
+In the following, we provide instruction to add a certificate from [Let's Encript](https://letsencrypt.org/), a free, automated and open Certificate Authority. Detailed instruction can be found at [Certbot instruction](https://certbot.eff.org/instructions)
 
-#### Add Certbot PPA
+#### Install Certbot
 
     sudo apt-get update
     sudo apt-get install software-properties-common
     sudo add-apt-repository universe
     sudo add-apt-repository ppa:certbot/certbot
     sudo apt-get update
-
-#### Install Certbot
-
     sudo apt-get install certbot
 
-#### Run API
+#### Use Certbot (modify in order to provide your domain)
 
-    sudo pm2 start api
+    sudo ufw allow 80
+    sudo certbot certonly --standalone --preferred-challenges http -d *.atmosphere.tools
 
-It should run on HTTP, check if it is true
+#### Copy certificates (modify to adapt to your domain name)
 
-    sudo netstat -tulpn 
-
-#### Use Certbot
-
-    sudo certbot certonly --manual
-
-provide your domain name: (e.g. apil3p.atmosphere.tools)
-
-#### Provide a file for the authority
-
-    cd ~/www/atmosphere-measurement-api/public/.well-known/acme-challenge/
-    sudo nano [the file name provided by certbot]
-    copy contents provided by certbot inside the previously created file
-
-#### Copy certificates
-
-    sudo cp /etc/letsencrypt/live/apil3p.atmosphere.tools/fullchain.pem ~/www/atmosphere-measurement-api/resources/fullchain.pem
-    sudo cp /etc/letsencrypt/live/apil3p.atmosphere.tools/privkey.pem ~/www/atmosphere-measurement-api/resources/privkey.pem
+    sudo cp /etc/letsencrypt/live/atmosphere.tools/fullchain.pem ~/www/api/resources/fullchain.pem
+    sudo cp /etc/letsencrypt/live/atmosphere.tools/privkey.pem ~/www/api/resources/privkey.pem
 
 #### Restart API
 

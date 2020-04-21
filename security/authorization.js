@@ -35,11 +35,6 @@ exports.isAvailable = async function(id, field, model) {
     return item;
 }
 
-exports.isFilled = function(body, values ) {
-    if(!values.some(function (element) { return body[element] !== null; }) ) return false;
-    return true;
-}
-
 exports.isNotUsed = async function(resource, model, field) {
     let references = [];
     if(model.schema.path(field).instance === 'Array') references = await model.find({ [field] : { $elemMatch : {$in: [resource._id]}  } }).limit(1);
