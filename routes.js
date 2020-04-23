@@ -7,8 +7,10 @@ const loginRoute = require('./routes/loginRoute');
 router.use('/' + process.env.VERSION + '/login', loginRoute);
 
 // demo
-//const demoRoute = require('./routes/demoRoute');
-//router.use('/' + process.env.VERSION + '/demo', passport.authenticate('jwt', {session: false}), demoRoute);
+if (process.env.DEMO === 'true') {
+    const demoRoute = require('./routes/demoRoute');
+    router.use('/' + process.env.VERSION + '/demo', passport.authenticate('jwt', {session: false}), demoRoute);
+}
 
 // log
 const logRoute = require('./routes/logRoute');
@@ -23,6 +25,8 @@ const userRoute = require('./routes/userRoute');
 router.use('/' + process.env.VERSION + '/users', passport.authenticate('jwt', {session: false}), userRoute);
 const usernameRoute = require('./routes/usernameRoute');
 router.use('/' + process.env.VERSION + '/usernames', passport.authenticate('jwt', {session: false}), usernameRoute);
+const selfRoute = require('./routes/selfRoute');
+router.use('/' + process.env.VERSION + '/self', selfRoute);
 
 // measurement
 const measurementsRoute = require('./routes/measurementRoute');

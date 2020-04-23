@@ -24,7 +24,7 @@ exports.isFilled = async function(req, res, values) {
         if(body[element] == null) return false;
         else if(Array.isArray(body[element])) if(body[element].length == 0) return false
         return true;
-    })) return errors.manage(res, errors.missing_info);;
+    })) return errors.manage(res, errors.missing_info);
     return true;
 }
 
@@ -87,8 +87,15 @@ exports.whatCanRead = async function(req, res) {
     return authorizator.whatCanRead(req.user);
 } 
 
+exports.isValid = async function(req, res, type, field) {
+    const value = req.body[field];
+    if(!value) return true;
+    if(!Object.values(type).includes(value)) return errors.manage(res, errors.unknown_value, value);
+    return true;
+}
+
 exports.whatCanSee = async function(req, res, model) {
-    let select_base  = {owner: false, timestamp: false, lastmod: false, __v:false};
+    let select_base  = {owner: false, timestamp: false, lastmod: false, __v:false, password:false};
     if(!req.user.fieldmask) return select_base;
     const fieldmask = await Fieldmask.findById(req.user.fieldmask);
     const mask = fieldmask[model.modelName.toLowerCase() + '_fields'];

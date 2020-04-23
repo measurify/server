@@ -11,6 +11,7 @@ const Feature = mongoose.model('Feature');
 const Device = mongoose.model('Device');
 const Constraint = mongoose.model('Constraint');
 const Measurement = mongoose.model('Measurement');
+const PasswordReset = mongoose.model('PasswordReset');
 const Issue = mongoose.model('Issue');
 const Computation = mongoose.model('Computation');
 const Right = mongoose.model('Right');
@@ -19,6 +20,7 @@ const RelationshipTypes = require('../types/relationshipTypes');
 const jwt = require('jsonwebtoken');
 const ItemTypes = require('../types/itemTypes.js');
 const ComputationStatusTypes = require('../types/computationStatusTypes.js'); 
+const PasswordResetStatusTypes = require('../types/passwordResetStatusTypes.js');
 const IssueTypes = require('../types/issueTypes.js');
 const bcrypt = require('bcryptjs');
 
@@ -113,13 +115,14 @@ exports.createDemoContent = async function() {
     measurements.push(await this.createMeasurement(users[0], "acceleration", "accelerometer", "car2", ["urban"], [{values: [3.1], delta: 0}]));                                              
 }
 
-exports.createUser = async function(username, password, type, fieldmask) {
+exports.createUser = async function(username, password, type, fieldmask, email) {
     let user = await User.findOne( { username: username });
     if(!user) {
         const req = { 
             username: username || uuid(),
             password: password ||  uuid(),
             fieldmask: fieldmask,
+            email: email,
             type: type || UserRoles.provider };
         user = new User(req);
         await user.save();
@@ -243,6 +246,13 @@ exports.createRight = async function(resource, type, user, owner, tags) {
     await right.save();
     return right._doc;
 };
+
+exports.createReset = async function(user) {
+    const req = { user: user._id, status: PasswordResetStatusTypes.valid , created: Date.now() };
+    const reset = new PasswordReset(req);
+    await reset.save();
+    return await PasswordReset.findById(reset._id);
+}
 
 exports.createFieldmask = async function(name, computation_fields, device_fields, feature_fields, measurement_fields, script_fields, tag_fields, thing_fields, owner) {
     const req = { 

@@ -1,5 +1,3 @@
-// Based on http://en.wikipedia.org/wiki/Interquartile_range#Interquartile_range_and_outliers
-
 const Buncher = require('./buncher');
 const runner = require('../computations/runner');
 

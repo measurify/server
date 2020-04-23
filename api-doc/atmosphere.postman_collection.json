@@ -5214,6 +5214,409 @@
 			"protocolProfileBehavior": {}
 		},
 		{
+			"name": "REGISTRATION",
+			"item": [
+				{
+					"name": "POST a new self registration",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"postman.setEnvironmentVariable(\"user\", JSON.parse(responseBody)._id);",
+									"postman.setEnvironmentVariable(\"email\", JSON.parse(responseBody).email);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"username_test\",\n\t\"password\" : \"password_test\",\n\t\"email\" : \"riccardo.berta@gmail.com\",\n\t\"type\" : \"analyst\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/self",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"self"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT to enable registration request (link provided by email)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/v1/self/{{user}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"self",
+								"{{user}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LOGIN as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET the list of users to be enabled",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/users?filter={\"status\":\"awaiting\"}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"users"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "{\"status\":\"awaiting\"}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT to accept the new user (to be done by admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"status\": \"enabled\"\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/users/{{user}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								"{{user}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LOGIN as the new registered user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"postman.setEnvironmentVariable(\"token\", JSON.parse(responseBody).token);",
+									"postman.setEnvironmentVariable(\"user_id\", JSON.parse(responseBody).user._id);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "44025a2f-7f86-402f-8415-2bdb26e380bb",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"username_test\",\n\t\"password\" : \"password_test\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a request to reset password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\" : \"{{email}}\"\n}\t"
+						},
+						"url": {
+							"raw": "{{url}}/v1/self/reset",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"self",
+								"reset"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT to modify user password (needs the reset request information provided by email)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/v1/self?reset=5ea16a736caa124854c74c73&password=my_new_password",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"self"
+							],
+							"query": [
+								{
+									"key": "reset",
+									"value": "5ea16a736caa124854c74c73"
+								},
+								{
+									"key": "password",
+									"value": "my_new_password"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LOGIN using the new password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"postman.setEnvironmentVariable(\"token\", JSON.parse(responseBody).token);",
+									"postman.setEnvironmentVariable(\"user_id\", JSON.parse(responseBody).user._id);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "44025a2f-7f86-402f-8415-2bdb26e380bb",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"username_test\",\n\t\"password\" : \"my_new_password\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "API docs",
 			"event": [
 				{

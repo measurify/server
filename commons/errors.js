@@ -26,6 +26,10 @@ exports.invalid_code                         = { status: 400, value: 23, message
 exports.computation_error                    = { status: 500, value: 24, message: 'The computation is not working' };
 exports.restricted_access                    = { status: 403, value: 25, message: 'You cannot access this resource' };
 exports.not_you                              = { status: 403, value: 26, message: 'You are not that user' };
+exports.missing_email                        = { status: 401, value: 27, message: 'Please, specify the user email' };
+exports.missing_password                     = { status: 401, value: 28, message: 'Please, specify the user password' };
+exports.reset_invalid                        = { status: 403, value: 29, message: 'The reset password request is not valid' };
+exports.unknown_value                        = { status: 404, value: 30, message: 'Status value' };
 
 exports.manage = function(res, error, more) {
     if( typeof more === 'object' && more !== null) more = more.toString();
