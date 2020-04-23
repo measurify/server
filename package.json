@@ -1,6 +1,6 @@
 {
   "name": "atmosphere-measurement-api",
-  "version": "0.3.300",
+  "version": "0.3.500",
   "description": "Atmosphere Measurements Cloud API",
   "main": "server.js",
   "host": "localhost",
