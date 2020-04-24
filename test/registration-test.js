@@ -137,9 +137,9 @@ describe('/GET self', () => {
         res = await chai.request(server).get('/' + process.env.VERSION + '/self/' + res.body._id);
         res.should.have.status(200);
         res.body.status.should.be.eql(UserStatusTypes.awaiting);
-        const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const admin = await factory.createUser("test-username-2", "test-password-2", UserRoles.admin);
         const modification = { status: UserStatusTypes.enabled };
-        res = await chai.request(server).put('/v1/users/' + res.body._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
+        res = await chai.request(server).put('/v1/users/' + res.body._id + '/status').set("Authorization", await factory.getUserToken(admin)).send(modification);
         res.should.have.status(200);
         res.body.status.should.be.eql(UserStatusTypes.enabled);
     });

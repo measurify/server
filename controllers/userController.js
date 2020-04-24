@@ -40,7 +40,7 @@ exports.post = async (req, res) => {
 };
 
 exports.put = async (req, res) => { 
-    const fields = ['password', 'fieldmask', 'email', 'status'];
+    const fields = ['password', 'fieldmask', 'email'];
     let result = await checker.isAvailable(req, res, User); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.isValid(req, res, UserStatusTypes, 'status'); if (result != true) return result;
@@ -76,7 +76,23 @@ exports.awaiting = async (req, res) => {
     let result = await checker.isAvailable(req, res, User); if (result != true) return result;
     await User.findByIdAndUpdate(req.params.id, { "$set": { "status": UserStatusTypes.awaiting } });
     user_updated = await User.findById(req.params.id);
+    const url = req.protocol + '://' + req.get('host')
+    await email.send(messages.await(url, user_updated));
     return await res.status(200).json(user_updated); 
+};
+
+exports.accept = async (req, res) => {
+    const fields = ['status'];
+    let result = await checker.isAdminitrator(req, res); if (result != true) return result; 
+    result = await checker.isAvailable(req, res, User); if (result != true) return result;
+    result = await checker.isFilled(req, res, fields); if (result != true) return result;
+    result = await checker.isValid(req, res, UserStatusTypes, 'status'); if (result != true) return result;
+    await User.findByIdAndUpdate(req.params.id, { "$set": { "status": req.body.status } });
+    user_updated = await User.findById(req.params.id);
+    const url = req.protocol + '://' + req.get('host')
+    if(req.body.status == UserStatusTypes.enabled) await email.send(messages.accepted(url, user_updated));
+    if(req.body.status == UserStatusTypes.disabled) await email.send(messages.disabled(url, user_updated));
+    return await res.status(200).json(user_updated);
 };
 
 exports.reset = async (req, res) => {

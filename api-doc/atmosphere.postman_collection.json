@@ -5241,7 +5241,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"username_test\",\n\t\"password\" : \"password_test\",\n\t\"email\" : \"riccardo.berta@gmail.com\",\n\t\"type\" : \"analyst\"\n}"
+							"raw": "{\n\t\"username\" : \"username_test_1\",\n\t\"password\" : \"password_test_1\",\n\t\"email\" : \"berta@elios.unige.it\",\n\t\"type\" : \"analyst\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/self",
@@ -5257,7 +5257,7 @@
 					"response": []
 				},
 				{
-					"name": "PUT to enable registration request (link provided by email)",
+					"name": "GET to enable registration request (link provided by email)",
 					"event": [
 						{
 							"listen": "test",
@@ -5408,14 +5408,15 @@
 							"raw": "{\r\n  \"status\": \"enabled\"\r\n}"
 						},
 						"url": {
-							"raw": "{{url}}/v1/users/{{user}}",
+							"raw": "{{url}}/v1/users/{{user}}/status",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"v1",
 								"users",
-								"{{user}}"
+								"{{user}}",
+								"status"
 							]
 						}
 					},
