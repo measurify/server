@@ -24,7 +24,7 @@ describe('/GET users', () => {
         await factory.dropContents();;
         await factory.createUser("test-username-1", "test-password-1");
         await factory.createUser("test-username-2", "test-password-2");
-        const res = await chai.request(server).get('/v1/users').set('Authorization', await factory.getAdminToken());
+        const res = await chai.request(server).keepOpen().get('/v1/users').set('Authorization', await factory.getAdminToken());
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(3);
@@ -35,7 +35,7 @@ describe('/GET users', () => {
         const user = await factory.createUser("test-username-0", "test-password-0", UserRoles.regular);
         await factory.createUser("test-username-1", "test-password-1");
         await factory.createUser("test-username-2", "test-password-2");
-        const res = await chai.request(server).get('/v1/usernames').set('Authorization', await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().get('/v1/usernames').set('Authorization', await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(4);
@@ -46,7 +46,7 @@ describe('/GET users', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         await factory.createUser("test-username-1", "test-password-1");
         await factory.createUser("test-username-2", "test-password-2");
-        const res = await chai.request(server).get('/v1/users').set('Authorization', await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().get('/v1/users').set('Authorization', await factory.getUserToken(user));
         res.should.have.status(errors.admin_restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -56,7 +56,7 @@ describe('/GET users', () => {
     it('it should GET a specific user', async () => {
         await factory.dropContents();;
         const user = await factory.createUser("test-username-1", "test-password-1");
-        const res = await chai.request(server).get('/v1/users/' + user._id).set('Authorization', await factory.getAdminToken());
+        const res = await chai.request(server).keepOpen().get('/v1/users/' + user._id).set('Authorization', await factory.getAdminToken());
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.eql(user._id.toString());
@@ -66,7 +66,7 @@ describe('/GET users', () => {
         await factory.dropContents();;
         const regular = await factory.createUser("test-username-1", "test-password-1", UserRoles.regular);
         const user = await factory.createUser("test-username-1", "test-password-1");
-        const res = await chai.request(server).get('/v1/users/' + user._id).set('Authorization', await factory.getUserToken(regular));
+        const res = await chai.request(server).keepOpen().get('/v1/users/' + user._id).set('Authorization', await factory.getUserToken(regular));
         res.should.have.status(errors.admin_restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -74,7 +74,7 @@ describe('/GET users', () => {
     });
 
     it('it should not GET a fake user', async () => {
-        const res = await chai.request(server).get('/v1/users/fake-user').set('Authorization', await factory.getAdminToken());
+        const res = await chai.request(server).keepOpen().get('/v1/users/fake-user').set('Authorization', await factory.getAdminToken());
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -87,7 +87,7 @@ describe('/POST users', () => {
     it('it should not POST a user without username field', async () => {
         await factory.dropContents();;
         const user = { password : "test-password-1", usertype : "regular" };
-        const res = await chai.request(server).post('/v1/users').set("Authorization", await factory.getAdminToken()).send(user);
+        const res = await chai.request(server).keepOpen().post('/v1/users').set("Authorization", await factory.getAdminToken()).send(user);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -99,7 +99,7 @@ describe('/POST users', () => {
     it('it should not POST a user without password field', async () => {
         await factory.dropContents();;
         const user = { username: "test-username-1", usertype : "regular" };
-        const res = await chai.request(server).post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
+        const res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -111,7 +111,7 @@ describe('/POST users', () => {
     it('it should not POST a user without type field', async () => {
         await factory.dropContents();;
         const user = { username: "test-username-1", password : "test-password-1" };
-        const res = await chai.request(server).post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
+        const res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -123,7 +123,7 @@ describe('/POST users', () => {
     it('it should not POST a user with a fake type', async () => {
         await factory.dropContents();;
         const user = { username: "test-username-1", password : "test-password-1", type: "fake-type" };
-        const res = await chai.request(server).post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
+        const res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -135,7 +135,7 @@ describe('/POST users', () => {
     it('it should POST a user', async () => {
         await factory.dropContents();;
         const user = { username : "test-username-1", password : "test-password-1", type: UserRoles.analyst };
-        const res = await chai.request(server).post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
+        const res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -148,7 +148,7 @@ describe('/POST users', () => {
         await factory.dropContents();;
         await factory.createUser("test-username-1", "test-password-1");
         const user = { username : "test-username-1", password : "test-password-1", type : UserRoles.analyst};
-        const res = await chai.request(server).post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
+        const res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -161,7 +161,7 @@ describe('/POST users', () => {
         await factory.dropContents();;
         const users = [ { username : "test-username-1", password : "test-password-1", type: UserRoles.analyst }, 
                         { username : "test-username-2", password : "test-password-2", type: UserRoles.analyst } ]; 
-        const res = await chai.request(server).post('/v1/users').set('Authorization', await factory.getAdminToken()).send(users)
+        const res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', await factory.getAdminToken()).send(users)
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.users[0].username.should.be.eql(users[0].username);
@@ -177,7 +177,7 @@ describe('/POST users', () => {
                         { username : "test-username-3", password : "test-password-3", type: UserRoles.analyst },
                         { username : "test-username-4", password : "test-password-4", type: UserRoles.analyst },
                         { username : "test-username-5", password : "test-password-5", type: UserRoles.analyst } ]; 
-        const res = await chai.request(server).post('/v1/users').set('Authorization', await factory.getAdminToken()).send(users)
+        const res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', await factory.getAdminToken()).send(users)
         res.should.have.status(202);
         res.body.should.be.a('object');
         res.body.users.length.should.be.eql(3);
@@ -198,7 +198,7 @@ describe('/DELETE users', () => {
         const user_2 = await factory.createUser("test-username-2", "test-password-2");
         const users_before = await User.find();
         users_before.length.should.be.eql(3);
-        const res = await chai.request(server).delete('/v1/users/' + user_1._id).set('Authorization', await factory.getAdminToken());
+        const res = await chai.request(server).keepOpen().delete('/v1/users/' + user_1._id).set('Authorization', await factory.getAdminToken());
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.username.should.be.eql(user_1.username);
@@ -211,7 +211,7 @@ describe('/DELETE users', () => {
         const user = await factory.createUser("test-username-1", "test-password-1");
         const users_before = await User.find();
         users_before.length.should.be.eql(2);
-        const res = await chai.request(server).delete('/v1/users/fake_user').set('Authorization', await factory.getAdminToken());
+        const res = await chai.request(server).keepOpen().delete('/v1/users/fake_user').set('Authorization', await factory.getAdminToken());
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
@@ -225,7 +225,7 @@ describe('/DELETE users', () => {
         const no_admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const users_before = await User.find();
         users_before.length.should.be.eql(2);
-        const res = await chai.request(server).delete('/v1/users/' + user._id).set('Authorization', await factory.getUserToken(no_admin));
+        const res = await chai.request(server).keepOpen().delete('/v1/users/' + user._id).set('Authorization', await factory.getUserToken(no_admin));
         res.should.have.status(errors.admin_restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.admin_restricted_access.message);
@@ -240,7 +240,7 @@ describe('/DELETE users', () => {
         const device = await factory.createDevice("test-device-2", user, [feature]);
         const users_before = await User.find();
         users_before.length.should.be.eql(2);
-        const res = await chai.request(server).delete('/v1/users/' + user._id).set('Authorization', await factory.getAdminToken());
+        const res = await chai.request(server).keepOpen().delete('/v1/users/' + user._id).set('Authorization', await factory.getAdminToken());
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
@@ -254,7 +254,7 @@ describe('/DELETE users', () => {
         const feature = await factory.createFeature("test-feature-2", user);
         const users_before = await User.find();
         users_before.length.should.be.eql(2);
-        const res = await chai.request(server).delete('/v1/users/' + user._id).set('Authorization', await factory.getAdminToken());
+        const res = await chai.request(server).keepOpen().delete('/v1/users/' + user._id).set('Authorization', await factory.getAdminToken());
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
@@ -268,7 +268,7 @@ describe('/DELETE users', () => {
         const tag = await factory.createTag("test-tag", user);
         const users_before = await User.find();
         users_before.length.should.be.eql(2);
-        const res = await chai.request(server).delete('/v1/users/' + user._id).set('Authorization', await factory.getAdminToken());
+        const res = await chai.request(server).keepOpen().delete('/v1/users/' + user._id).set('Authorization', await factory.getAdminToken());
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
@@ -282,7 +282,7 @@ describe('/DELETE users', () => {
         const thing = await factory.createThing("thing-tag", user);
         const users_before = await User.find();
         users_before.length.should.be.eql(2);
-        const res = await chai.request(server).delete('/v1/users/' + user._id).set('Authorization', await factory.getAdminToken());
+        const res = await chai.request(server).keepOpen().delete('/v1/users/' + user._id).set('Authorization', await factory.getAdminToken());
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
@@ -299,7 +299,7 @@ describe('/DELETE users', () => {
         const measurement = await factory.createMeasurement(user, feature, device, thing);
         const users_before = await User.find();
         users_before.length.should.be.eql(2);
-        const res = await chai.request(server).delete('/v1/users/' + user._id).set('Authorization', await factory.getAdminToken());
+        const res = await chai.request(server).keepOpen().delete('/v1/users/' + user._id).set('Authorization', await factory.getAdminToken());
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
@@ -315,7 +315,7 @@ describe('/PUT user', () => {
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provide);
         const modification = { password: 'new_password' };
-        const res = await chai.request(server).put('/v1/users/' + user._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/users/' + user._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
     });
@@ -324,7 +324,7 @@ describe('/PUT user', () => {
         factory.dropContents();
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const modification = { password: 'new_password' };
-        const res = await chai.request(server).put('/v1/users/' + user._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/users/' + user._id).set("Authorization", await factory.getUserToken(user)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
     });
@@ -333,7 +333,7 @@ describe('/PUT user', () => {
         factory.dropContents();
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const modification = { password: 'new_password' };
-        const res = await chai.request(server).put('/v1/users/' + user.username).set("Authorization", await factory.getUserToken(user)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/users/' + user.username).set("Authorization", await factory.getUserToken(user)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
     });
@@ -343,7 +343,7 @@ describe('/PUT user', () => {
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const modification = { password: 'new_password' };
-        const res = await chai.request(server).put('/v1/users/fake-user').set("Authorization", await factory.getUserToken(admin)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/users/fake-user').set("Authorization", await factory.getUserToken(admin)).send(modification);
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
@@ -354,7 +354,7 @@ describe('/PUT user', () => {
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const modification = { username: "new_username", password: 'new_password' };
-        const res = await chai.request(server).put('/v1/users/' + user._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/users/' + user._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
         res.should.have.status(errors.put_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.put_request_error.message);
@@ -367,7 +367,7 @@ describe('/PUT user', () => {
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const other = await factory.createUser("test-username-3", "test-password-3", UserRoles.provider);
         const modification = { password: 'new_password' };
-        const res = await chai.request(server).put('/v1/users/' + user._id).set("Authorization", await factory.getUserToken(other)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/users/' + user._id).set("Authorization", await factory.getUserToken(other)).send(modification);
         res.should.have.status(errors.not_you.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.not_you.message);

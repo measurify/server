@@ -31,7 +31,7 @@ describe('/GET rights', () => {
         await factory.createRight(resource1, "Tag", user, owner, []);
         await factory.createRight(resource2, "Tag", user, owner, []);
         await factory.createRight(resource3, "Tag", user, owner, []);
-        const res = await chai.request(server).get('/v1/rights').set("Authorization", await factory.getUserToken(owner));
+        const res = await chai.request(server).keepOpen().get('/v1/rights').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(3);
@@ -43,7 +43,7 @@ describe('/GET rights', () => {
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const right = await factory.createRight(resource, "Tag", user, owner, []);
-        const res = await chai.request(server).get('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner));
+        const res = await chai.request(server).keepOpen().get('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.eql(right._id.toString());
@@ -51,7 +51,7 @@ describe('/GET rights', () => {
 
     it('it should not GET a fake right', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const res = await chai.request(server).get('/v1/rights/fake-right').set("Authorization", await factory.getUserToken(owner));
+        const res = await chai.request(server).keepOpen().get('/v1/rights/fake-right').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
@@ -66,7 +66,7 @@ describe('/POST rights', () => {
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const right = { type: "Tag", user: user._id };
-        const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
+        const res = await chai.request(server).keepOpen().post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -80,7 +80,7 @@ describe('/POST rights', () => {
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createScript("test-script-1", owner, "code", [], VisibilityTypes.private);
         const right = { type: "Script", resource: resource._id, user: user._id };
-        const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
+        const res = await chai.request(server).keepOpen().post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -94,7 +94,7 @@ describe('/POST rights', () => {
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const right = { resource: resource._id, user: user._id };
-        const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
+        const res = await chai.request(server).keepOpen().post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -108,7 +108,7 @@ describe('/POST rights', () => {
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const right = { resource: resource._id, type: "Tag" };
-        const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
+        const res = await chai.request(server).keepOpen().post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -122,7 +122,7 @@ describe('/POST rights', () => {
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const right = { resource: resource._id, type: "Feature", user: user._id };
-        const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
+        const res = await chai.request(server).keepOpen().post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -136,7 +136,7 @@ describe('/POST rights', () => {
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const right = { resource: resource._id, type: "Tag", user: user._id, tags: ["fake-tag"] };
-        const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
+        const res = await chai.request(server).keepOpen().post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -150,7 +150,7 @@ describe('/POST rights', () => {
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const right = { resource: resource._id, type: "Tag", user: user._id };
-        const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
+        const res = await chai.request(server).keepOpen().post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -163,7 +163,7 @@ describe('/POST rights', () => {
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const right = { resource: resource._id, type: "Tag", user: user.username };
-        const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
+        const res = await chai.request(server).keepOpen().post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -176,8 +176,8 @@ describe('/POST rights', () => {
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const right = { resource: resource._id, type: "Tag", user: user._id };
-        await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
-        const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
+        await chai.request(server).keepOpen().post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
+        const res = await chai.request(server).keepOpen().post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -195,7 +195,7 @@ describe('/POST rights', () => {
         const rights = [ { resource: resource1._id, type: "Tag", user: user._id },
                          { resource: resource2._id, type: "Tag", user: user._id },
                          { resource: resource3._id, type: "Tag", user: user._id } ];
-        const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(rights);
+        const res = await chai.request(server).keepOpen().post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(rights);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.rights.length.should.be.eql(3);
@@ -213,7 +213,7 @@ describe('/POST rights', () => {
         const rights = [ { resource: resource1._id, type: "Tag", user: user._id },
                          { resource: resource1._id, type: "Tag", user: user._id },
                          { resource: resource3._id, type: "Tag", user: user._id } ];
-        const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(rights);
+        const res = await chai.request(server).keepOpen().post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(rights);
         res.should.have.status(202);
         res.body.should.be.a('object');
         res.body.rights.length.should.be.eql(2);
@@ -230,7 +230,7 @@ describe('/POST rights', () => {
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const tag = await factory.createTag("tag-test-2", owner, [], VisibilityTypes.private);
         const right = { resource: resource._id, type: "Tag", user: user._id, tags:[tag] };
-        const res = await chai.request(server).post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
+        const res = await chai.request(server).keepOpen().post('/v1/rights').set("Authorization", await factory.getUserToken(owner)).send(right);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -248,7 +248,7 @@ describe('/DELETE rights', () => {
         const right = await factory.createRight(resource, "Tag", user, owner, []);
         const rights_before = await Right.find();
         rights_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner));
+        const res = await chai.request(server).keepOpen().delete('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.should.be.a('object');
         const rights_after = await Right.find();
@@ -263,7 +263,7 @@ describe('/DELETE rights', () => {
         const right = await factory.createRight(resource, "Tag", user, owner, []);
         const rights_before = await Right.find();
         rights_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/rights/fake_right').set("Authorization", await factory.getUserToken(owner));
+        const res = await chai.request(server).keepOpen().delete('/v1/rights/fake_right').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
@@ -284,7 +284,7 @@ describe('/PUT rights', () => {
         const tag_3 = await factory.createTag("test-tag-3", user);
         const right = await factory.createRight(resource, "Tag", user, owner, [tag_1, tag_2]);
         const modification = { tags: { add: [tag_3._id] } };
-        const res = await chai.request(server).put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -301,7 +301,7 @@ describe('/PUT rights', () => {
         const tag_3 = await factory.createTag("test-tag-3", user);
         const right = await factory.createRight(resource, "Tag", user, owner, [tag_1, tag_2, tag_3]);
         const modification = { tags: { remove: [tag_2._id] } };
-        const res = await chai.request(server).put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -322,7 +322,7 @@ describe('/PUT rights', () => {
         const tag_7 = await factory.createTag("test-tag-7", user);
         const right = await factory.createRight(resource, "Tag", user, owner, [tag_1, tag_2, tag_3, tag_4]);
         const modification = { tags: { remove: [tag_2._id, tag_3._id], add: [tag_5._id, tag_6._id, tag_7._id] } };
-        const res = await chai.request(server).put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -338,7 +338,7 @@ describe('/PUT rights', () => {
         const tag_2 = await factory.createTag("test-tag-2", user);
         const right = await factory.createRight(resource, "Tag", user, owner, [tag_1, tag_2]);
         const modification = { tags: { add: ["fake_tag"] } };
-        const res = await chai.request(server).put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
         res.should.have.status(errors.put_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -355,7 +355,7 @@ describe('/PUT rights', () => {
         const tag_2 = await factory.createTag("test-tag-2", user);
         const right = await factory.createRight(resource, "Tag", user, owner, [tag_1, tag_2]);
         const modification = { tags: { remove: ["fake_tag"] } };
-        const res = await chai.request(server).put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
         res.should.have.status(errors.put_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -370,7 +370,7 @@ describe('/PUT rights', () => {
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const right = await factory.createRight(resource, "Tag", user, owner, []);
         const modification = { access: { remove: ["fake_access"] } };
-        const res = await chai.request(server).put('/v1/rights/fake-right').set("Authorization", await factory.getUserToken(owner)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/rights/fake-right').set("Authorization", await factory.getUserToken(owner)).send(modification);
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose'); 
 const controller = require('./controller');
 const checker = require('./checker');
-const emitter = require('../commons/emitter');
+const broker = require('../commons/broker');
 const Thing = mongoose.model('Thing');
 const Measurement = mongoose.model('Measurement');
 const errors = require('../commons/errors.js');
@@ -22,12 +22,11 @@ exports.getone = async (req, res) => {
     return await controller.getResource(req, res, null, Thing, select);
 };
 
-exports.getstream = async (req, res) => { 
-    let result = await checker.isAvailable(req, res, Thing); if (result != true) return result;
-    result = await checker.canRead(req, res); if (result != true) return result;
-    result = await checker.hasRights(req, res, Thing); if (result != true) return result;
-    res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' });
-    emitter.on('thing-' + req.resource._id, function(data) { res.write('data: ' + JSON.stringify(data) + '\n\n'); });
+exports.getstream = async (ws, req) => { 
+    let result = await checker.isAvailable(req, ws, Thing); if (result != true) return result;
+    result = await checker.canRead(req, ws); if (result != true) return result;
+    result = await checker.hasRights(req, ws, Thing); if (result != true) return result;
+    broker.subscribe('thing-' + req.resource._id, ws);
 };
 
 exports.post = async (req, res) => {

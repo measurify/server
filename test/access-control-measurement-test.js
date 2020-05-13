@@ -29,7 +29,7 @@ describe('Access create measurement', () => {
         const device = await factory.createDevice("test-device-1", user_admin, [feature]);
         const thing = await factory.createThing("test-thing-1", user_admin);
         const measurement = { owner: user_admin, thing: thing._id, feature: feature._id, device: device._id, samples:[{values:10.4}] };
-        const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user_admin)).send(measurement);
+        const res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user_admin)).send(measurement);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -42,7 +42,7 @@ describe('Access create measurement', () => {
         const device = await factory.createDevice("test-device-1", user_provider, [feature]);
         const thing = await factory.createThing("test-thing-1", user_provider);
         const measurement = { owner: user_provider, thing: thing._id, feature: feature._id, device: device._id, samples:[{values:10.4}] };
-        const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user_provider)).send(measurement);
+        const res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user_provider)).send(measurement);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -55,7 +55,7 @@ describe('Access create measurement', () => {
         const device = await factory.createDevice("test-device-1", user_analyst, [feature]);
         const thing = await factory.createThing("test-thing-1", user_analyst);
         const measurement = { owner: user_analyst, thing: thing._id, feature: feature._id, device: device._id, samples:[{values:10.4}] };
-        const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user_analyst)).send(measurement);
+        const res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user_analyst)).send(measurement);
         res.should.have.status(errors.restricted_access_create.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -88,11 +88,11 @@ describe('Access read a list of measurements', () => {
         const measurement_private_1 = await factory.createMeasurement(owner, feature, device, thing_6, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const measurement_private_2 = await factory.createMeasurement(owner, feature, device, thing_7, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const measurement_private_3 = await factory.createMeasurement(owner, feature, device, thing_8, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements/').set("Authorization", await factory.getUserToken(user_admin));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/').set("Authorization", await factory.getUserToken(user_admin));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(8);
-        res = await chai.request(server).get('/v1/measurements/').set("Authorization", await factory.getUserToken(user_analyst));
+        res = await chai.request(server).keepOpen().get('/v1/measurements/').set("Authorization", await factory.getUserToken(user_analyst));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(8);
@@ -125,11 +125,11 @@ describe('Access read a list of measurements', () => {
         const measurement_private_3 = await factory.createMeasurement(user_provider, feature, device, thing_8, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const measurement_private_4 = await factory.createMeasurement(owner, feature, device, thing_9, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const measurement_private_5 = await factory.createMeasurement(owner, feature, device, thing_10, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements/').set("Authorization", await factory.getUserToken(user_provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/').set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(7);
-        res = await chai.request(server).get('/v1/measurements/').set("Authorization", await factory.getUserToken(user_admin));
+        res = await chai.request(server).keepOpen().get('/v1/measurements/').set("Authorization", await factory.getUserToken(user_admin));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(10);
@@ -163,11 +163,11 @@ describe('Access read a list of measurements', () => {
         const measurement_private_4 = await factory.createMeasurement(owner, feature, device, thing_9, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const measurement_private_5 = await factory.createMeasurement(owner, feature, device, thing_10, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const filter = "{\"thing\":{\"$regex\": \"search\"}}";
-        let res = await chai.request(server).get('/v1/measurements?filter=' + filter).set("Authorization", await factory.getUserToken(user_provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements?filter=' + filter).set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(3);
-        res = await chai.request(server).get('/v1/measurements?filter=' + filter).set("Authorization", await factory.getUserToken(user_admin));
+        res = await chai.request(server).keepOpen().get('/v1/measurements?filter=' + filter).set("Authorization", await factory.getUserToken(user_admin));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(4);
@@ -190,11 +190,11 @@ describe('Access read a list of measurements', () => {
         const measurement3 = await factory.createMeasurement(owner, feature1, device1, thing, [tag1], factory.createSamples(3), null, null, null, VisibilityTypes.private);
         const measurement4 = await factory.createMeasurement(owner, feature2, device2, thing, [tag1, tag2], factory.createSamples(4), null, null, null, VisibilityTypes.public);
         const measurement5 = await factory.createMeasurement(user_provider, feature2, device2, thing, [tag1], factory.createSamples(5), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements?filter={"$and":[{"tags":"test-tag-1"}, {"$or":[{"feature":"test-feature-1"},{"device":"test-device-1"}]}]}').set("Authorization", await factory.getUserToken(user_admin));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements?filter={"$and":[{"tags":"test-tag-1"}, {"$or":[{"feature":"test-feature-1"},{"device":"test-device-1"}]}]}').set("Authorization", await factory.getUserToken(user_admin));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(3);
-        res = await chai.request(server).get('/v1/measurements?filter={"$and":[{"tags":"test-tag-1"}, {"$or":[{"feature":"test-feature-1"},{"device":"test-device-1"}]}]}').set("Authorization", await factory.getUserToken(user_provider));
+        res = await chai.request(server).keepOpen().get('/v1/measurements?filter={"$and":[{"tags":"test-tag-1"}, {"$or":[{"feature":"test-feature-1"},{"device":"test-device-1"}]}]}').set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(2);
@@ -217,11 +217,11 @@ describe('Access read a list of measurements', () => {
         const measurement3 = await factory.createMeasurement(owner, feature1, device1, thing, [tag1], factory.createSamples(3), null, null, null, VisibilityTypes.private);
         const measurement4 = await factory.createMeasurement(owner, feature2, device2, thing, [tag1, tag2], factory.createSamples(4), null, null, null, VisibilityTypes.public);
         const measurement5 = await factory.createMeasurement(user_provider, feature2, device2, thing, [tag1], factory.createSamples(5), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements?filter={"tags":"test-tag-1", "feature":"test-feature-1"}').set("Authorization", await factory.getUserToken(user_admin));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements?filter={"tags":"test-tag-1", "feature":"test-feature-1"}').set("Authorization", await factory.getUserToken(user_admin));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(2);
-        res = await chai.request(server).get('/v1/measurements?filter={"tags":"test-tag-1", "feature":"test-feature-1"}').set("Authorization", await factory.getUserToken(user_provider));
+        res = await chai.request(server).keepOpen().get('/v1/measurements?filter={"tags":"test-tag-1", "feature":"test-feature-1"}').set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(1);
@@ -240,19 +240,19 @@ describe('Access read a measurement', () => {
         const thing = await factory.createThing("test-thing-1", owner);
         const measurement_public = await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(1), null, null, null, VisibilityTypes.public);
         const measurement_private = await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement_public._id).set("Authorization", await factory.getUserToken(user_admin));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement_public._id).set("Authorization", await factory.getUserToken(user_admin));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.eql(measurement_public._id.toString());
-        res = await chai.request(server).get('/v1/measurements/' + measurement_private._id).set("Authorization", await factory.getUserToken(user_admin));
+        res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement_private._id).set("Authorization", await factory.getUserToken(user_admin));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.eql(measurement_private._id.toString());
-        res = await chai.request(server).get('/v1/measurements/' + measurement_public._id).set("Authorization", await factory.getUserToken(user_analyst));
+        res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement_public._id).set("Authorization", await factory.getUserToken(user_analyst));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.eql(measurement_public._id.toString());
-        res = await chai.request(server).get('/v1/measurements/' + measurement_private._id).set("Authorization", await factory.getUserToken(user_analyst));
+        res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement_private._id).set("Authorization", await factory.getUserToken(user_analyst));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.eql(measurement_private._id.toString());
@@ -266,7 +266,7 @@ describe('Access read a measurement', () => {
         const device = await factory.createDevice("test-device-1", owner, [feature]);
         const thing = await factory.createThing("test-thing-1", owner);
         const measurement_public = await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(1), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement_public._id).set("Authorization", await factory.getUserToken(user_provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement_public._id).set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.eql(measurement_public._id.toString());
@@ -280,7 +280,7 @@ describe('Access read a measurement', () => {
         const device = await factory.createDevice("test-device-1", owner, [feature]);
         const thing = await factory.createThing("test-thing-1", owner);
         const measurement_private = await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement_private._id).set("Authorization", await factory.getUserToken(user_provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement_private._id).set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(errors.restricted_access_read.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.restricted_access_read.message);
@@ -294,11 +294,11 @@ describe('Access read a measurement', () => {
         const thing = await factory.createThing("test-thing-1", user_provider_owner);
         const measurement_public = await factory.createMeasurement(user_provider_owner, feature, device, thing, [], factory.createSamples(1), null, null, null, VisibilityTypes.public);
         const measurement_private = await factory.createMeasurement(user_provider_owner, feature, device, thing, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement_public._id).set("Authorization", await factory.getUserToken(user_provider_owner));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement_public._id).set("Authorization", await factory.getUserToken(user_provider_owner));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.eql(measurement_public._id.toString());
-        res = await chai.request(server).get('/v1/measurements/' + measurement_private._id).set("Authorization", await factory.getUserToken(user_provider_owner));
+        res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement_private._id).set("Authorization", await factory.getUserToken(user_provider_owner));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.eql(measurement_private._id.toString());
@@ -318,7 +318,7 @@ describe('Access modify measurement', () => {
         const measurement = await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
-        let res = await chai.request(server).put('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user_admin)).send(modification);
+        let res = await chai.request(server).keepOpen().put('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user_admin)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.tags.length.should.be.eql(1);
@@ -334,7 +334,7 @@ describe('Access modify measurement', () => {
         const measurement = await factory.createMeasurement(user_provide_owner, feature, device, thing, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const tag = await factory.createTag("test-tag-1", user_provide_owner);
         const modification = { tags: { add: [tag._id] } };
-        let res = await chai.request(server).put('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user_provide_owner)).send(modification);
+        let res = await chai.request(server).keepOpen().put('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user_provide_owner)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.tags.length.should.be.eql(1);
@@ -351,7 +351,7 @@ describe('Access modify measurement', () => {
         const measurement = await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
-        let res = await chai.request(server).put('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user_analyst)).send(modification);
+        let res = await chai.request(server).keepOpen().put('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user_analyst)).send(modification);
         res.should.have.status(errors.restricted_access_modify.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.restricted_access_modify.message);
@@ -367,7 +367,7 @@ describe('Access modify measurement', () => {
         const measurement = await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
-        let res = await chai.request(server).put('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user_provider)).send(modification);
+        let res = await chai.request(server).keepOpen().put('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user_provider)).send(modification);
         res.should.have.status(errors.restricted_access_modify.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.restricted_access_modify.message);
@@ -387,7 +387,7 @@ describe('Access delete measurement', () => {
         const measurement = await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
-        let res = await chai.request(server).delete('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user_admin)).send(modification);
+        let res = await chai.request(server).keepOpen().delete('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user_admin)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
     });
@@ -401,7 +401,7 @@ describe('Access delete measurement', () => {
         const measurement = await factory.createMeasurement(user_provide_owner, feature, device, thing, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const tag = await factory.createTag("test-tag-1", user_provide_owner);
         const modification = { tags: { add: [tag._id] } };
-        let res = await chai.request(server).delete('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user_provide_owner)).send(modification);
+        let res = await chai.request(server).keepOpen().delete('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user_provide_owner)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
     });
@@ -416,7 +416,7 @@ describe('Access delete measurement', () => {
         const measurement = await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
-        let res = await chai.request(server).delete('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user_analyst)).send(modification);
+        let res = await chai.request(server).keepOpen().delete('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user_analyst)).send(modification);
         res.should.have.status(errors.restricted_access_delete.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.restricted_access_delete.message);
@@ -432,7 +432,7 @@ describe('Access delete measurement', () => {
         const measurement = await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
-        let res = await chai.request(server).delete('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user_provider)).send(modification);
+        let res = await chai.request(server).keepOpen().delete('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user_provider)).send(modification);
         res.should.have.status(errors.restricted_access_delete.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.restricted_access_delete.message);
@@ -464,7 +464,7 @@ describe('Access delete a list of measurements', () => {
         const measurement_private_1 = await factory.createMeasurement(owner, feature, device, thing_6, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const measurement_private_2 = await factory.createMeasurement(owner, feature, device, thing_7, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const measurement_private_3 = await factory.createMeasurement(owner, feature, device, thing_8, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).delete('/v1/measurements').set("Authorization", await factory.getUserToken(user_admin));
+        let res = await chai.request(server).keepOpen().delete('/v1/measurements').set("Authorization", await factory.getUserToken(user_admin));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.deleted.should.be.eql(8);
@@ -492,7 +492,7 @@ describe('Access delete a list of measurements', () => {
         const measurement_private_1 = await factory.createMeasurement(owner, feature, device, thing_6, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const measurement_private_2 = await factory.createMeasurement(owner, feature, device, thing_7, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const measurement_private_3 = await factory.createMeasurement(owner, feature, device, thing_8, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).delete('/v1/measurements').set("Authorization", await factory.getUserToken(user_analyst));
+        let res = await chai.request(server).keepOpen().delete('/v1/measurements').set("Authorization", await factory.getUserToken(user_analyst));
         res.should.have.status(errors.restricted_access_delete.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.restricted_access_delete.message);
@@ -520,7 +520,7 @@ describe('Access delete a list of measurements', () => {
         const measurement_private_1 = await factory.createMeasurement(user_provider, feature, device, thing_6, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const measurement_private_2 = await factory.createMeasurement(user_provider, feature, device, thing_7, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const measurement_private_3 = await factory.createMeasurement(user_provider, feature, device, thing_8, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).delete('/v1/measurements').set("Authorization", await factory.getUserToken(user_provider));
+        let res = await chai.request(server).keepOpen().delete('/v1/measurements').set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.deleted.should.be.eql(5);
@@ -554,10 +554,10 @@ describe('Access delete a list of measurements', () => {
         const measurement_private_4 = await factory.createMeasurement(owner, feature, device, thing_9, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const measurement_private_5 = await factory.createMeasurement(owner, feature, device, thing_10, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
         const filter = "{\"thing\":{\"$regex\": \"search\"}}";
-        let res = await chai.request(server).delete('/v1/measurements?filter=' + filter).set("Authorization", await factory.getUserToken(user_provider));
+        let res = await chai.request(server).keepOpen().delete('/v1/measurements?filter=' + filter).set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(200);
         res.body.deleted.should.be.eql(2);
-        res = await chai.request(server).delete('/v1/measurements?filter=' + filter).set("Authorization", await factory.getUserToken(user_admin));
+        res = await chai.request(server).keepOpen().delete('/v1/measurements?filter=' + filter).set("Authorization", await factory.getUserToken(user_admin));
         res.should.have.status(200);
         res.body.deleted.should.be.eql(2);
     });
@@ -579,10 +579,10 @@ describe('Access delete a list of measurements', () => {
         const measurement3 = await factory.createMeasurement(owner, feature1, device1, thing, [tag1], factory.createSamples(3), null, null, null, VisibilityTypes.private);
         const measurement4 = await factory.createMeasurement(owner, feature2, device2, thing, [tag1, tag2], factory.createSamples(4), null, null, null, VisibilityTypes.public);
         const measurement5 = await factory.createMeasurement(user_provider, feature2, device2, thing, [tag1], factory.createSamples(5), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).delete('/v1/measurements?filter={"$and":[{"tags":"test-tag-1"}, {"$or":[{"feature":"test-feature-1"},{"device":"test-device-1"}]}]}').set("Authorization", await factory.getUserToken(user_provider));
+        let res = await chai.request(server).keepOpen().delete('/v1/measurements?filter={"$and":[{"tags":"test-tag-1"}, {"$or":[{"feature":"test-feature-1"},{"device":"test-device-1"}]}]}').set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(200);
         res.body.deleted.should.be.eql(1);
-        res = await chai.request(server).delete('/v1/measurements?filter={"$and":[{"tags":"test-tag-1"}, {"$or":[{"feature":"test-feature-1"},{"device":"test-device-1"}]}]}').set("Authorization", await factory.getUserToken(user_admin));
+        res = await chai.request(server).keepOpen().delete('/v1/measurements?filter={"$and":[{"tags":"test-tag-1"}, {"$or":[{"feature":"test-feature-1"},{"device":"test-device-1"}]}]}').set("Authorization", await factory.getUserToken(user_admin));
         res.should.have.status(200);
         res.body.deleted.should.be.eql(2);
     });
@@ -613,11 +613,11 @@ describe('Access measurements withs right as analyst', () => {
         const measurement_noright_2 = await factory.createMeasurement(owner, feature_noright_1, device, thing, [], factory.createSamples(8), null, null, null, VisibilityTypes.public);
         const measurement_noright_3 = await factory.createMeasurement(owner, feature_noright_2, device, thing, [], factory.createSamples(9), null, null, null, VisibilityTypes.public);
         const measurement_noright_4 = await factory.createMeasurement(owner, feature_noright_3, device, thing, [], factory.createSamples(10), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).get('/v1/measurements').set('Authorization', await factory.getUserToken(analyst));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements').set('Authorization', await factory.getUserToken(analyst));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(6);
-        res = await chai.request(server).get('/v1/measurements/count').set('Authorization', await factory.getUserToken(analyst));
+        res = await chai.request(server).keepOpen().get('/v1/measurements/count').set('Authorization', await factory.getUserToken(analyst));
         res.body.size.should.be.eql(6);
     });
 
@@ -645,11 +645,11 @@ describe('Access measurements withs right as analyst', () => {
         const measurement_noright_2 = await factory.createMeasurement(owner, feature, device, thing, [tag_noright_2], factory.createSamples(8), null, null, null, VisibilityTypes.public);
         const measurement_noright_3 = await factory.createMeasurement(owner, feature, device, thing, [tag_noright_2], factory.createSamples(9), null, null, null, VisibilityTypes.public);
         const measurement_noright_4 = await factory.createMeasurement(owner, feature, device, thing, [tag_noright_3], factory.createSamples(10), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).get('/v1/measurements').set('Authorization', await factory.getUserToken(analyst));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements').set('Authorization', await factory.getUserToken(analyst));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(7);
-        res = await chai.request(server).get('/v1/measurements/count').set('Authorization', await factory.getUserToken(analyst));
+        res = await chai.request(server).keepOpen().get('/v1/measurements/count').set('Authorization', await factory.getUserToken(analyst));
         res.body.size.should.be.eql(7);
     });
 
@@ -676,11 +676,11 @@ describe('Access measurements withs right as analyst', () => {
         const measurement_noright_2 = await factory.createMeasurement(owner, feature, device_noright_1, thing, [], factory.createSamples(8), null, null, null, VisibilityTypes.public);
         const measurement_noright_3 = await factory.createMeasurement(owner, feature, device_noright_2, thing, [], factory.createSamples(9), null, null, null, VisibilityTypes.public);
         const measurement_noright_4 = await factory.createMeasurement(owner, feature, device_noright_3, thing, [], factory.createSamples(10), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).get('/v1/measurements').set('Authorization', await factory.getUserToken(analyst));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements').set('Authorization', await factory.getUserToken(analyst));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(7);
-        res = await chai.request(server).get('/v1/measurements/count').set('Authorization', await factory.getUserToken(analyst));
+        res = await chai.request(server).keepOpen().get('/v1/measurements/count').set('Authorization', await factory.getUserToken(analyst));
         res.body.size.should.be.eql(7);
     });
 
@@ -707,11 +707,11 @@ describe('Access measurements withs right as analyst', () => {
         const measurement_noright_2 = await factory.createMeasurement(owner, feature, device, thing_noright_1, [], factory.createSamples(8), null, null, null, VisibilityTypes.public);
         const measurement_noright_3 = await factory.createMeasurement(owner, feature, device, thing_noright_2, [], factory.createSamples(9), null, null, null, VisibilityTypes.public);
         const measurement_noright_4 = await factory.createMeasurement(owner, feature, device, thing_noright_3, [], factory.createSamples(10), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).get('/v1/measurements').set('Authorization', await factory.getUserToken(analyst));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements').set('Authorization', await factory.getUserToken(analyst));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(6);
-        res = await chai.request(server).get('/v1/measurements/count').set('Authorization', await factory.getUserToken(analyst));
+        res = await chai.request(server).keepOpen().get('/v1/measurements/count').set('Authorization', await factory.getUserToken(analyst));
         res.body.size.should.be.eql(6);
     });
 
@@ -744,11 +744,11 @@ describe('Access measurements withs right as analyst', () => {
         const measurement_noright_3 = await factory.createMeasurement(owner, feature, device_noright_2, thing_right_1, [], factory.createSamples(8), null, null, null, VisibilityTypes.public);
         const measurement_noright_4 = await factory.createMeasurement(owner, feature, device_noright_2, thing_noright_2, [], factory.createSamples(9), null, null, null, VisibilityTypes.public);
         const measurement_noright_5 = await factory.createMeasurement(owner, feature, device_noright_3, thing_noright_3, [], factory.createSamples(10), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).get('/v1/measurements').set('Authorization', await factory.getUserToken(analyst));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements').set('Authorization', await factory.getUserToken(analyst));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(5);
-        res = await chai.request(server).get('/v1/measurements/count').set('Authorization', await factory.getUserToken(analyst));
+        res = await chai.request(server).keepOpen().get('/v1/measurements/count').set('Authorization', await factory.getUserToken(analyst));
         res.body.size.should.be.eql(5);
     });
 });
@@ -777,11 +777,11 @@ describe('Access measurements withs right as provider', () => {
         const measurement_noright_2_noown = await factory.createMeasurement(owner, feature_noright_1, device, thing, [], factory.createSamples(8), null, null, null, VisibilityTypes.private);
         const measurement_noright_3_noown = await factory.createMeasurement(owner, feature_noright_2, device, thing, [], factory.createSamples(9), null, null, null, VisibilityTypes.private);
         const measurement_noright_4_noown = await factory.createMeasurement(owner, feature_noright_3, device, thing, [], factory.createSamples(10), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements').set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements').set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(3);
-        res = await chai.request(server).get('/v1/measurements/count').set('Authorization', await factory.getUserToken(provider));
+        res = await chai.request(server).keepOpen().get('/v1/measurements/count').set('Authorization', await factory.getUserToken(provider));
         res.body.size.should.be.eql(3);
     });
 
@@ -808,11 +808,11 @@ describe('Access measurements withs right as provider', () => {
         const measurement_noright_2_noown = await factory.createMeasurement(owner, feature, device_noright_1, thing, [], factory.createSamples(8), null, null, null, VisibilityTypes.private);
         const measurement_noright_3_noown = await factory.createMeasurement(owner, feature, device_noright_2, thing, [], factory.createSamples(9), null, null, null, VisibilityTypes.private);
         const measurement_noright_4_noown = await factory.createMeasurement(owner, feature, device_noright_3, thing, [], factory.createSamples(10), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements').set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements').set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(3);
-        res = await chai.request(server).get('/v1/measurements/count').set('Authorization', await factory.getUserToken(provider));
+        res = await chai.request(server).keepOpen().get('/v1/measurements/count').set('Authorization', await factory.getUserToken(provider));
         res.body.size.should.be.eql(3);
     });
 
@@ -839,11 +839,11 @@ describe('Access measurements withs right as provider', () => {
         const measurement_noright_2_noown = await factory.createMeasurement(owner, feature, device, thing_noright_2, [], factory.createSamples(8), null, null, null, VisibilityTypes.private);
         const measurement_noright_3_noown = await factory.createMeasurement(owner, feature, device, thing_noright_2, [], factory.createSamples(9), null, null, null, VisibilityTypes.private);
         const measurement_noright_4_noown = await factory.createMeasurement(owner, feature, device, thing_noright_3, [], factory.createSamples(10), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements').set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements').set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(4);
-        res = await chai.request(server).get('/v1/measurements/count').set('Authorization', await factory.getUserToken(provider));
+        res = await chai.request(server).keepOpen().get('/v1/measurements/count').set('Authorization', await factory.getUserToken(provider));
         res.body.size.should.be.eql(4);
     });
 
@@ -871,11 +871,11 @@ describe('Access measurements withs right as provider', () => {
         const measurement_noright_2_noown = await factory.createMeasurement(owner, feature, device, thing, [tag_noright_2], factory.createSamples(8), null, null, null, VisibilityTypes.private);
         const measurement_noright_3_noown = await factory.createMeasurement(owner, feature, device, thing, [tag_noright_3,  tag_right_2], factory.createSamples(9), null, null, null, VisibilityTypes.private);
         const measurement_noright_4_noown = await factory.createMeasurement(owner, feature, device, thing, [tag_noright_3, tag_right_1], factory.createSamples(10), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements').set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements').set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(4);
-        res = await chai.request(server).get('/v1/measurements/count').set('Authorization', await factory.getUserToken(provider));
+        res = await chai.request(server).keepOpen().get('/v1/measurements/count').set('Authorization', await factory.getUserToken(provider));
         res.body.size.should.be.eql(4);
     });
 
@@ -909,11 +909,11 @@ describe('Access measurements withs right as provider', () => {
         const measurement_noright_2_noown = await factory.createMeasurement(owner, feature, device, thing_right_1, [tag_noright_2, tag_noright_1], factory.createSamples(8), null, null, null, VisibilityTypes.private);
         const measurement_noright_3_noown = await factory.createMeasurement(owner, feature, device, thing_right_2, [tag_noright_3], factory.createSamples(9), null, null, null, VisibilityTypes.private);
         const measurement_noright_4_noown = await factory.createMeasurement(owner, feature, device, thing_noright_3, [tag_noright_1, tag_right_2], factory.createSamples(10), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements').set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements').set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(4);
-        res = await chai.request(server).get('/v1/measurements/count').set('Authorization', await factory.getUserToken(provider));
+        res = await chai.request(server).keepOpen().get('/v1/measurements/count').set('Authorization', await factory.getUserToken(provider));
         res.body.size.should.be.eql(4);
     });
 });
@@ -929,7 +929,7 @@ describe('Access a single measurements with rights', () => {
         const tag = await factory.createTag("test-tag-1", owner);
         const right = await factory.createRight(thing, "Thing", provider, owner, []);
         const measurement   = await factory.createMeasurement(provider, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.be.eql(measurement._id.toString());
@@ -946,7 +946,7 @@ describe('Access a single measurements with rights', () => {
         const tag = await factory.createTag("test-tag-1", owner);
         const right = await factory.createRight(thing_other, "Thing", provider, owner, []);
         const measurement = await factory.createMeasurement(owner, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(errors.restricted_access_read.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -963,7 +963,7 @@ describe('Access a single measurements with rights', () => {
         const tag = await factory.createTag("test-tag-1", owner);
         const right = await factory.createRight(device, "Device", provider, owner, []);
         const measurement   = await factory.createMeasurement(provider, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.be.eql(measurement._id.toString());
@@ -980,7 +980,7 @@ describe('Access a single measurements with rights', () => {
         const tag = await factory.createTag("test-tag-1", owner);
         const right = await factory.createRight(device_other, "Device", provider, owner, []);
         const measurement   = await factory.createMeasurement(owner, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(errors.restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -999,7 +999,7 @@ describe('Access a single measurements with rights', () => {
         const right_1 = await factory.createRight(device, "Device", provider, owner, []);
         const right_2 = await factory.createRight(device_other, "Device", provider, owner, []);
         const measurement   = await factory.createMeasurement(provider, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.be.eql(measurement._id.toString());
@@ -1017,7 +1017,7 @@ describe('Access a single measurements with rights', () => {
         const right_1 = await factory.createRight(device, "Device", provider, owner, []);
         const right_2 = await factory.createRight(thing_other, "Thing", provider, owner, []);
         const measurement   = await factory.createMeasurement(owner, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(errors.restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -1034,7 +1034,7 @@ describe('Access a single measurements with rights', () => {
         const tag = await factory.createTag("test-tag-1", owner);
         const right = await factory.createRight(feature, "Feature", provider, owner, []);
         const measurement   = await factory.createMeasurement(provider, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.be.eql(measurement._id.toString());
@@ -1051,7 +1051,7 @@ describe('Access a single measurements with rights', () => {
         const tag = await factory.createTag("test-tag-1", owner);
         const right = await factory.createRight(feature_other, "Feature", provider, owner, []);
         const measurement   = await factory.createMeasurement(owner, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(errors.restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -1070,7 +1070,7 @@ describe('Access a single measurements with rights', () => {
         const right_1 = await factory.createRight(feature, "Feature", provider, owner, []);
         const right_2 = await factory.createRight(feature_other, "Feature", provider, owner, []);
         const measurement   = await factory.createMeasurement(provider, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.be.eql(measurement._id.toString());
@@ -1088,7 +1088,7 @@ describe('Access a single measurements with rights', () => {
         const right_1 = await factory.createRight(feature, "Feature", provider, owner, []);
         const right_2 = await factory.createRight(thing_other, "Thing", provider, owner, []);
         const measurement   = await factory.createMeasurement(owner, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(errors.restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -1105,7 +1105,7 @@ describe('Access a single measurements with rights', () => {
         const tag = await factory.createTag("test-tag-1", owner);
         const right = await factory.createRight(tag, "Tag", provider, owner, []);
         const measurement   = await factory.createMeasurement(provider, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.be.eql(measurement._id.toString());
@@ -1127,7 +1127,7 @@ describe('Access a single measurements with rights', () => {
         const right_2 = await factory.createRight(tag_2, "Tag", provider, owner, []);
         const right_3 = await factory.createRight(tag_3, "Tag", provider, owner, []);
         const measurement   = await factory.createMeasurement(provider, feature, device, thing, [tag_2, tag_3, tag_4, tag_5], factory.createSamples(1), null, null, null, VisibilityTypes.private);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.be.eql(measurement._id.toString());
@@ -1145,7 +1145,7 @@ describe('Access a single measurements with rights', () => {
         const tag_other = await factory.createTag("test-tag-2", owner);
         const right = await factory.createRight(tag_other, "Tag", provider, owner, []);
         const measurement   = await factory.createMeasurement(owner, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(errors.restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -1168,7 +1168,7 @@ describe('Access a single measurements with rights', () => {
         const right_2 = await factory.createRight(tag_2, "Tag", provider, owner, []);
         const right_3 = await factory.createRight(tag_3, "Tag", provider, owner, []);
         const measurement   = await factory.createMeasurement(owner, feature, device, thing, [tag_4, tag_5], factory.createSamples(1), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(errors.restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -1193,7 +1193,7 @@ describe('Access a single measurements with rights', () => {
         const right_3 = await factory.createRight(tag_3, "Tag", provider, owner, []);
         const right_4 = await factory.createRight(thing_other, "Thing", provider, owner, []);
         const measurement   = await factory.createMeasurement(owner, feature, device, thing, [tag_2, tag_3, tag_4, tag_5], factory.createSamples(1), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(errors.restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -1213,7 +1213,7 @@ describe('Create a measurements with rights', () => {
         const tag = await factory.createTag("test-tag-1", owner);
         const right = await factory.createRight(other_thing, "Thing", provider, owner, []);
         const request = { owner: provider, feature: feature._id, thing: thing._id, device: device._id, tags: [tag._id], samples: [{values: 10.4, delta: 200}] }
-        let res = await chai.request(server).post('/v1/measurements/').set('Authorization', await factory.getUserToken(provider)).send(request);
+        let res = await chai.request(server).keepOpen().post('/v1/measurements/').set('Authorization', await factory.getUserToken(provider)).send(request);
         res.should.have.status(errors.restricted_access.status);
         res.body.message.should.contain(errors.restricted_access.message);
         res.body.details.should.contain('You miss rigths on some resources');
@@ -1230,7 +1230,7 @@ describe('Create a measurements with rights', () => {
         const tag = await factory.createTag("test-tag-1", owner);
         const right = await factory.createRight(device_other, "Device", provider, owner, []);
         const request = { owner: provider, feature: feature._id, thing: thing._id, device: device._id, tags: [tag._id], samples: [{values: 10.4, delta: 200}] }
-        let res = await chai.request(server).post('/v1/measurements/').set('Authorization', await factory.getUserToken(provider)).send(request);
+        let res = await chai.request(server).keepOpen().post('/v1/measurements/').set('Authorization', await factory.getUserToken(provider)).send(request);
         res.should.have.status(errors.restricted_access.status);
         res.body.message.should.contain(errors.restricted_access.message);
         res.body.details.should.contain('You miss rigths on some resources');
@@ -1247,7 +1247,7 @@ describe('Create a measurements with rights', () => {
         const tag = await factory.createTag("test-tag-1", owner);
         const right = await factory.createRight(feature_other, "Feature", provider, owner, []);
         const request = { owner: provider, feature: feature._id, thing: thing._id, device: device._id, tags: [tag._id], samples: [{values: 10.4, delta: 200}] }
-        let res = await chai.request(server).post('/v1/measurements/').set('Authorization', await factory.getUserToken(provider)).send(request);
+        let res = await chai.request(server).keepOpen().post('/v1/measurements/').set('Authorization', await factory.getUserToken(provider)).send(request);
         res.body.message.should.be.a('string');
         res.should.have.status(errors.restricted_access.status);
         res.body.message.should.contain(errors.restricted_access.message);
@@ -1265,7 +1265,7 @@ describe('Create a measurements with rights', () => {
         const tag_other = await factory.createTag("test-tag-2", owner);
         const right = await factory.createRight(tag_other, "Tag", provider, owner, []);
         const request = { owner: provider, feature: feature._id, thing: thing._id, device: device._id, tags: [tag._id], samples: [{values: 10.4, delta: 200}] }
-        let res = await chai.request(server).post('/v1/measurements/').set('Authorization', await factory.getUserToken(provider)).send(request);
+        let res = await chai.request(server).keepOpen().post('/v1/measurements/').set('Authorization', await factory.getUserToken(provider)).send(request);
         res.body.message.should.be.a('string');
         res.should.have.status(errors.restricted_access.status);
         res.body.message.should.contain(errors.restricted_access.message);
@@ -1283,7 +1283,7 @@ describe('Create a measurements with rights', () => {
         const right_1 = await factory.createRight(tag, "Tag", provider, owner, []);
         const right_2 = await factory.createRight(device, "Device", provider, owner, []);
         const request = { owner: provider, feature: feature._id, thing: thing._id, device: device._id, tags: [tag._id], samples: [{values: 10.4, delta: 200}] }
-        let res = await chai.request(server).post('/v1/measurements/').set('Authorization', await factory.getUserToken(provider)).send(request);
+        let res = await chai.request(server).keepOpen().post('/v1/measurements/').set('Authorization', await factory.getUserToken(provider)).send(request);
         res.should.have.status(200);
         res.body.should.be.a('object');
     });
@@ -1302,7 +1302,7 @@ describe('Delete measurement with rights', () => {
         const tag_other = await factory.createTag("test-tag-2", owner);
         const right = await factory.createRight(tag_other, "Tag", provider, owner, []);
         const measurement   = await factory.createMeasurement(provider, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).delete('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().delete('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(errors.restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -1319,7 +1319,7 @@ describe('Delete measurement with rights', () => {
         const tag = await factory.createTag("test-tag-1", owner);
         const right = await factory.createRight(tag, "Tag", provider, owner, []);
         const measurement   = await factory.createMeasurement(provider, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).delete('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
+        let res = await chai.request(server).keepOpen().delete('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider));
         res.should.have.status(200);
         res.body.should.be.a('object');
     });
@@ -1334,7 +1334,7 @@ describe('Delete measurement with rights', () => {
         const tag = await factory.createTag("test-tag-1", owner);
         const right = await factory.createRight(feature, "Feature", analyst, owner, []);
         const measurement = await factory.createMeasurement(owner, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).delete('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(analyst));
+        let res = await chai.request(server).keepOpen().delete('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(analyst));
         res.should.have.status(errors.restricted_access_delete.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -1356,7 +1356,7 @@ describe('Modify measurements with rights', () => {
         const right = await factory.createRight(tag_other, "Tag", provider, owner, []);
         const measurement   = await factory.createMeasurement(provider, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.public);
         const modification = { tags: { add: [tag._id] } };
-        let res = await chai.request(server).put('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider)).send(modification);
+        let res = await chai.request(server).keepOpen().put('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider)).send(modification);
         res.should.have.status(errors.restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -1375,7 +1375,7 @@ describe('Modify measurements with rights', () => {
         const right = await factory.createRight(tag, "Tag", provider, owner, []);
         const measurement   = await factory.createMeasurement(provider, feature, device, thing, [tag], factory.createSamples(1), null, null, null, VisibilityTypes.public);
         const modification = { tags: { add: [tag._id] } };
-        let res = await chai.request(server).put('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider)).send(modification);
+        let res = await chai.request(server).keepOpen().put('/v1/measurements/' + measurement._id).set('Authorization', await factory.getUserToken(provider)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
     });

@@ -90,8 +90,29 @@ app.get('/' + process.env.VERSION + '/version', (req, res, next) => { return res
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({extended: true}))
 
+// Create HTTP/HTTPS server
+let server = null;
+let port = process.env.HTTP_PORT;
+let message = 'Measurify Cloud API Server is running on HTTP';
+if (process.env.PROTOCOL === 'http') {  server = http.createServer(app); }
+else {
+    try {
+        const config = { key: fs.readFileSync(key_file), cert: fs.readFileSync(cert_file), passphrase: process.env.HTTPSSECRET };
+        server = https.createServer(config, app);
+        port = process.env.HTTPS_PORT;
+        message = 'Measurify Cloud API Server is running on HTTPS';
+    }
+    catch(err) { server = http.createServer(app);
+        port = process.env.HTTPS_PORT;
+        message = 'WARNING: HTTPS not running (' + err + '), Measurify Cloud API Server is running on HTTP';
+    }
+}
+
 // Attach routes
 app.use(require('./routes'));
+
+// Attach Web Socket routes
+require('./routes/streamRoute').init(server);
 
 // serve documentation
 app.get('/' + process.env.VERSION + '/swagger.json', function(req, res) {
@@ -108,16 +129,7 @@ if (process.env.ENV === 'development') { app.use(errorHandlers.developmentErrors
 else if (process.env.ENV === 'test') { app.use(errorHandlers.developmentErrors); }
 else app.use(errorHandlers.productionErrors);
 
-// Create HTTP or HTTPS server
-let server = null;
-try {
-    const config = { key: fs.readFileSync(key_file), cert: fs.readFileSync(cert_file), passphrase: process.env.HTTPSSECRET };
-    server = https.createServer(config, app );
-    const instance = server.listen(443, () => { console.log('Atmosphere Measurement API are running on port ' +  instance.address().port); });
-}
-catch(err) {
-    server = http.createServer(app);
-    const instance = app.listen(8084, "0.0.0.0", () => { console.log('WARNING: HTTPS not running, Atmosphere Measurement API are running on port ' +  instance.address().port + ' (' + err + ')'); });
-}
+// Run server
+server.listen(port, "0.0.0.0", () => { console.log(message + ' - port ' + port) });
 
 module.exports = server;

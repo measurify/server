@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "f3274ad4-71d8-40b0-92eb-f2c008c9889c",
-		"name": "Atmosphere",
+		"name": "Measurify Cloud API Server",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [

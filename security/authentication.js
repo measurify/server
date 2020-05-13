@@ -30,7 +30,7 @@ passport.use(new strategy_local({
 ));
 
 passport.use(new strategy_jwt({
-        jwtFromRequest: extractJWT.fromAuthHeaderWithScheme("jwt"),
+        jwtFromRequest: extractJWT.fromExtractors([extractJWT.fromUrlQueryParameter("token"), extractJWT.fromAuthHeaderWithScheme("jwt")]),
         secretOrKey   : process.env.JWTSECRET
     },
     function (jwtPayload, done) {
@@ -52,3 +52,10 @@ exports.decode = function(token) {
     try {  return jwt.verify(token, process.env.JWTSECRET); }
     catch(error) { return "invalid token"; }  
 }
+
+exports.user = async function(token) {
+    token = token.replace('JWT ', '');
+    try { decoded = jwt.verify(token,process.env.JWTSECRET); } 
+    catch (err) { return false; }
+    return await User.findById(decoded._id);
+}    

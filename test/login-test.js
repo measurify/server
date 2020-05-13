@@ -21,7 +21,7 @@ describe('/POST login', () => {
         await factory.dropContents();;
         await factory.createUser("test-username-1", "test-password-1");
         const request = { username: "test-username-1", password: "test-password-1" };
-        const res = await chai.request(server).post('/v1/login').send(request);
+        const res = await chai.request(server).keepOpen().post('/v1/login').send(request);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('token');
@@ -31,7 +31,7 @@ describe('/POST login', () => {
         await factory.dropContents();;
         await factory.createUser("test-username-1", "test-password-1");
         const request = {username: "fake-username-1", password: "test-password-1"};
-        const res = await chai.request(server).post('/v1/login').send(request);
+        const res = await chai.request(server).keepOpen().post('/v1/login').send(request);
         res.should.have.status(errors.authentication_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -43,7 +43,7 @@ describe('/POST login', () => {
         await factory.dropContents();;
         await factory.createUser("test-username-1", "test-password-1");
         const request = {username: "test-username-1", password: "fake-password-1"};
-        const res = await chai.request(server).post('/v1/login').send(request);
+        const res = await chai.request(server).keepOpen().post('/v1/login').send(request);
         res.should.have.status(errors.authentication_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');

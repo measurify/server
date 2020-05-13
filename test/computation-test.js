@@ -30,7 +30,7 @@ describe('POST computation', () => {
         const thing = await factory.createThing("test-thing", owner);
         await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(1));
         const computation = { _id: "test-computation", code: "max", feature: "fake-feature", items: []};
-        const res = await chai.request(server).post('/v1/computations').set("Authorization", await factory.getUserToken(owner)).send(computation);
+        const res = await chai.request(server).keepOpen().post('/v1/computations').set("Authorization", await factory.getUserToken(owner)).send(computation);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -46,7 +46,7 @@ describe('POST computation', () => {
         const thing = await factory.createThing("test-thing", owner);
         await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples("text"));
         const computation = { _id: "test-computation", code: "max", feature: feature._id, items: [] };
-        const res = await chai.request(server).post('/v1/computations').set("Authorization", await factory.getUserToken(owner)).send(computation);
+        const res = await chai.request(server).keepOpen().post('/v1/computations').set("Authorization", await factory.getUserToken(owner)).send(computation);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -76,7 +76,7 @@ describe('POST computation', () => {
         const size = 100;
         for(let i=0; i<size; i++) await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(factory.random(30)));
         const computation = { _id: "test-computation", code: "max", feature: feature._id };
-        const res = await chai.request(server).post('/v1/computations').set("Authorization", await factory.getUserToken(owner)).send(computation);
+        const res = await chai.request(server).keepOpen().post('/v1/computations').set("Authorization", await factory.getUserToken(owner)).send(computation);
     });
 */
 });

@@ -1,9 +1,9 @@
 version: "2"
 services:
-  atmosphere:
+  measurify:
     build: .
-    image: atmosphere
-    container_name: atmosphere
+    image: measurify
+    container_name: measurify
     ports:
       - "8084:8084"
       - "443:443"

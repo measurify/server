@@ -35,5 +35,9 @@ exports.manage = function(res, error, more) {
     if( typeof more === 'object' && more !== null) more = more.toString();
     if(!error) error = this.internal_server_error;
     error.details = more;
-    return res.status(error.status).json(error); 
+    if(res.constructor.name === 'WebSocket') { 
+        res.send('data: ' + JSON.stringify(error) + '\n\n'); 
+        res.close();
+    }
+    else return res.status(error.status).json(error); 
 }

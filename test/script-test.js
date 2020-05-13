@@ -27,7 +27,7 @@ describe('/GET scripts', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         await factory.createScript("test-script-2", user, "test-code-2", []);
         await factory.createScript("test-script-1", user, "test-code-1", []);
-        const res = await chai.request(server).get('/v1/scripts').set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().get('/v1/scripts').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(2);
@@ -37,7 +37,7 @@ describe('/GET scripts', () => {
         factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = await factory.createScript("test-script-1", user, "test-code-2", []);
-        const res = await chai.request(server).get('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().get('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.eql(script._id.toString());
@@ -45,7 +45,7 @@ describe('/GET scripts', () => {
 
     it('it should not GET a fake script', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const res = await chai.request(server).get('/v1/scripts/fake-script').set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().get('/v1/scripts/fake-script').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
@@ -58,7 +58,7 @@ describe('/POST script', () => {
         factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = {}
-        const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
+        const res = await chai.request(server).keepOpen().post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -70,7 +70,7 @@ describe('/POST script', () => {
         factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = { _id: "script-id" }
-        const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
+        const res = await chai.request(server).keepOpen().post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -82,7 +82,7 @@ describe('/POST script', () => {
         factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = { _id: "test-script-a", code: "test-code-1", tags: ["fake-tag"] };
-        const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script);
+        const res = await chai.request(server).keepOpen().post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -94,7 +94,7 @@ describe('/POST script', () => {
         factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = { _id: "test-script-1", code: "test-code-1" };
-        const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
+        const res = await chai.request(server).keepOpen().post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -104,7 +104,7 @@ describe('/POST script', () => {
     it('it should not POST a script with already existant _id field', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = { _id: "test-script-1", code: "test-code-1" };
-        const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
+        const res = await chai.request(server).keepOpen().post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -117,7 +117,7 @@ describe('/POST script', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const scripts = [{ _id: "test-script-1", code: "test-code-1" },
                          { _id: "test-script-2", code: "test-code-2" } ];
-        const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(scripts);
+        const res = await chai.request(server).keepOpen().post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(scripts);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.scripts[0]._id.should.be.eql(scripts[0]._id);
@@ -131,7 +131,7 @@ describe('/POST script', () => {
                          { _id: "test-script-1", code: "test-code-1" },
                          { _id: "test-script-5", code: "test-code-5" },
                          { _id: "test-script-2", code: "test-code-2" } ];
-        const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(scripts)
+        const res = await chai.request(server).keepOpen().post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(scripts)
         res.should.have.status(202);
         res.body.should.be.a('object');
         res.body.scripts.length.should.be.eql(3);
@@ -148,7 +148,7 @@ describe('/POST script', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-2", user);
         const script = { _id: "test-script-1", code: "test-code-1", tags: [tag] };
-        const res = await chai.request(server).post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
+        const res = await chai.request(server).keepOpen().post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -165,7 +165,7 @@ describe('/DELETE script', () => {
         const script = await factory.createScript("test-script-1", user, "test-code-1", []);
         const script_before = await Script.find();
         script_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().delete('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
         const scripts_after = await Script.find();
@@ -178,7 +178,7 @@ describe('/DELETE script', () => {
         const script = await factory.createScript("test-script-1", user, "test-code-1", []);
         const script_before = await Script.find();
         script_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/scripts/fake_script').set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().delete('/v1/scripts/fake_script').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
@@ -194,7 +194,7 @@ describe('/DELETE script', () => {
         const device = await factory.createDevice("test-device-1", user, [feature], [], [script]);
         const script_before = await Script.find();
         script_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().delete('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
@@ -210,7 +210,7 @@ describe('/PUT script', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = await factory.createScript("test-script-1", user, "test-code-1", []);
         const modification = { code: "this is the new code"}
-        const res = await chai.request(server).put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -225,7 +225,7 @@ describe('/PUT script', () => {
         const tag_3 = await factory.createTag("test-tag-3", user);
         const script = await factory.createScript("test-script-1", user, "test-code-1", [tag_1, tag_2]);
         const modification = { tags: { add: [tag_3._id] } };
-        const res = await chai.request(server).put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -240,7 +240,7 @@ describe('/PUT script', () => {
         const tag_3 = await factory.createTag("test-tag-3", user);
         const script = await factory.createScript("test-script-1", user, "test-code-1", [tag_1, tag_2, tag_3]);
         const modification = { tags: { remove: [tag_2._id] } };
-        const res = await chai.request(server).put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -259,7 +259,7 @@ describe('/PUT script', () => {
         const tag_7 = await factory.createTag("test-tag-7", user);
         const script = await factory.createScript("test-script-1", user, "test-code-1", [tag_1, tag_2, tag_3, tag_4]);
         const modification = { tags: { remove: [tag_2._id, tag_3._id], add: [tag_5._id, tag_6._id, tag_7._id] } };
-        const res = await chai.request(server).put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -273,7 +273,7 @@ describe('/PUT script', () => {
         const tag_2 = await factory.createTag("test-tag-2", user);
         const script = await factory.createScript("test-script-1", user, "test-code-1", [tag_1, tag_2]);
         const modification = { tags: { add: ["fake_tag"] } };
-        const res = await chai.request(server).put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
         res.should.have.status(errors.put_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -288,7 +288,7 @@ describe('/PUT script', () => {
         const tag_2 = await factory.createTag("test-tag-2", user);
         const script = await factory.createScript("test-script-1", user, "test-code-1", [tag_1, tag_2]);
         const modification = { tags: { remove: ["fake_tag"] } };
-        const res = await chai.request(server).put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
         res.should.have.status(errors.put_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -303,7 +303,7 @@ describe('/PUT script', () => {
         const tag_2 = await factory.createTag("test-tag-2", user);
         const script = await factory.createScript("test-script-1", user, "test-code-1", [tag_1, tag_2]);
         const modification = { tags: { remove: ["fake_tag"] } };
-        const res = await chai.request(server).put('/v1/scripts/fake-script').set("Authorization", await factory.getUserToken(user)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/scripts/fake-script').set("Authorization", await factory.getUserToken(user)).send(modification);
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
@@ -316,7 +316,7 @@ describe('/PUT script', () => {
         const tag_2 = await factory.createTag("test-tag-2", user);
         const script = await factory.createScript("test-script-1", user, "test-code-1", [tag_1, tag_2]);
         const modification = { fakefield: "fake-value", tags: { remove: [tag_1._id] } };
-        const res = await chai.request(server).put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
         res.should.have.status(errors.put_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.put_request_error.message);

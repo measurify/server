@@ -51,33 +51,6 @@ router.get('/:id', catchErrors(deviceController.getone));
 
 /**
  * @swagger
- * /devices/{id}/stream:
- *  get:
- *      summary: returns a single device
- *      tags:
- *          - Device
- *      produces:
- *          - application/json
- *      parameters:
- *          - name: id
- *            description: device id
- *            in: path
- *            required: true
- *            type: guid
- *      responses:
- *          200:
- *              description: a single device
- *              schema:
- *                  $ref: '#/paths/definitions/device'
- *          404:
- *              description: device not found
- *              schema:
- *                  $ref: '#/paths/definitions/error'        
- */
-router.get('/:id/stream', catchErrors(deviceController.getstream));
-
-/**
- * @swagger
  * /devices:
  *   post:
  *     summary: creates one or several devices

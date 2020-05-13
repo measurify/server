@@ -52,33 +52,6 @@ router.get('/:id', catchErrors(thingController.getone));
 
 /**
  * @swagger
- * /things/{id}/stream:
- *  get:
- *      summary: returns a single thing
- *      tags:
- *          - Thing
- *      produces:
- *          - application/json
- *      parameters:
- *          - name: id
- *            description: thing id
- *            in: path
- *            required: true
- *            type: guid
- *      responses:
- *          200:
- *              description: a thing tag
- *              schema:
- *                  $ref: '#paths/definitions/thing'
- *          404:
- *              description: thing not found
- *              schema:
- *                  $ref: '#/paths/definitions/error'        
- */
-router.get('/:id/stream', catchErrors(thingController.getstream));
-
-/**
- * @swagger
  * /things:
  *   post:
  *     summary: creates one or several things

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const broker = require('../commons/broker');
 
 exports.get = async function(id, field, model, select) {
     try {
@@ -111,7 +112,12 @@ const prepareFilter = function(filter, restriction) {
 }
 
 const postOne = async function(body, model) {
-    return await (new model(body)).save();
+    const resource = await (new model(body)).save();
+    if(model.modelName == "Measurement") {
+        broker.publish('device-' + body.device, body);
+        broker.publish('thing-' + body.thing, body);
+    }
+    return resource;
 }
 
 const postList = async function(body, model) { 
@@ -120,7 +126,12 @@ const postList = async function(body, model) {
     for (let [i, element] of body.entries()) {
         try {
             element.owner = body.owner;
-            results[items].push(await (new model(element)).save());
+            const resource = await (new model(element)).save()
+            if(model.modelName == "Measurement") {
+                broker.publish('device-' + resource.device, resource);
+                broker.publish('thing-' + resource.thing, resource);
+            }
+            results[items].push(resource);
         }
         catch (err) { results.errors.push('Index: ' + i +  ' (' + err.message + ')'); }
     }

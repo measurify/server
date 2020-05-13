@@ -24,7 +24,7 @@ chai.use(chaiHttp);
 describe('/GET measurements', () => {
     it('it should not GET a fake measurement', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const res = await chai.request(server).get('/v1/measurements/fake-measurement').set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().get('/v1/measurements/fake-measurement').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
@@ -41,7 +41,7 @@ describe('/GET measurements', () => {
         const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(1));
         const measurement2 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(2));
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(3));
-        const res = await chai.request(server).get('/v1/measurements').set("Authorization", await factory.getUserToken(owner));
+        const res = await chai.request(server).keepOpen().get('/v1/measurements').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(3);
@@ -57,7 +57,7 @@ describe('/GET measurements', () => {
         const thing = await factory.createThing("test-thing-1", owner);
         const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], [factory.createSample([1.8,5.3,6.2]), factory.createSample([9.7,2.1,5.2])]);
         const measurement2 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples([4.4,7.3,3.6]));
-        const res = await chai.request(server).get('/v1/measurements').set('Authorization', await factory.getUserToken(owner)).set('Accept', 'text/csv');
+        const res = await chai.request(server).keepOpen().get('/v1/measurements').set('Authorization', await factory.getUserToken(owner)).set('Accept', 'text/csv');
         res.should.have.status(200);
         res.text.should.be.a('string');
     });
@@ -73,7 +73,7 @@ describe('/GET measurements', () => {
         const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(1));
         const measurement2 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(2));
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(3));
-        const res = await chai.request(server).get('/v1/measurements/' + measurement2._id).set("Authorization", await factory.getUserToken(owner));
+        const res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement2._id).set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.eql(measurement2._id.toString());
@@ -91,7 +91,7 @@ describe('/GET measurements', () => {
         const measurement2 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(2));
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(3));
         const measurement4 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(4));
-        const res = await chai.request(server).get('/v1/measurements?limit=2&page=1').set("Authorization", await factory.getUserToken(owner));
+        const res = await chai.request(server).keepOpen().get('/v1/measurements?limit=2&page=1').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(2);
@@ -113,11 +113,11 @@ describe('/GET measurements', () => {
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(3));
         const measurement4 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(4));
         const measurement5 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(5));
-        let res = await chai.request(server).get('/v1/measurements?filter={"tags":"test-tag-1"}').set("Authorization", await factory.getUserToken(owner));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements?filter={"tags":"test-tag-1"}').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(4);
-        res = await chai.request(server).get('/v1/measurements?filter={"tags":"test-tag-2"}').set("Authorization", await factory.getUserToken(owner));
+        res = await chai.request(server).keepOpen().get('/v1/measurements?filter={"tags":"test-tag-2"}').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(2);
@@ -136,7 +136,7 @@ describe('/GET measurements', () => {
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(3));
         const measurement4 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(4));
         const measurement5 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(5));
-        let res = await chai.request(server).get('/v1/measurements/count?filter={"tags":"test-tag-1"}').set("Authorization", await factory.getUserToken(owner));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/count?filter={"tags":"test-tag-1"}').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.size.should.be.eql(4);
@@ -156,15 +156,15 @@ describe('/GET measurements', () => {
         const measurement3 = await factory.createMeasurement(owner, feature2, device, thing, [tag1], factory.createSamples(3));
         const measurement4 = await factory.createMeasurement(owner, feature1, device, thing, [tag1, tag2], factory.createSamples(4));
         const measurement5 = await factory.createMeasurement(owner, feature2, device, thing, [tag2], factory.createSamples(5));
-        let res = await chai.request(server).get('/v1/measurements?filter={"feature":"test-feature-1", "tags":"test-tag-1"}').set("Authorization", await factory.getUserToken(owner));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements?filter={"feature":"test-feature-1", "tags":"test-tag-1"}').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(2);
-        res = await chai.request(server).get('/v1/measurements?filter={"feature":"test-feature-1", "tags":"test-tag-2"}').set("Authorization", await factory.getUserToken(owner));
+        res = await chai.request(server).keepOpen().get('/v1/measurements?filter={"feature":"test-feature-1", "tags":"test-tag-2"}').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(2);
-        res = await chai.request(server).get('/v1/measurements?filter={"feature":"test-feature-2", "tags":"test-tag-2"}').set("Authorization", await factory.getUserToken(owner));
+        res = await chai.request(server).keepOpen().get('/v1/measurements?filter={"feature":"test-feature-2", "tags":"test-tag-2"}').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(1);
@@ -184,7 +184,7 @@ describe('/GET measurements', () => {
         const measurement3 = await factory.createMeasurement(owner, feature2, device, thing, [tag1], factory.createSamples(3));
         const measurement4 = await factory.createMeasurement(owner, feature1, device, thing, [tag1, tag2], factory.createSamples(4));
         const measurement5 = await factory.createMeasurement(owner, feature2, device, thing, [tag2], factory.createSamples(5));
-        let res = await chai.request(server).get('/v1/measurements/count?filter={"feature":"test-feature-1", "tags":"test-tag-1"}').set("Authorization", await factory.getUserToken(owner));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/count?filter={"feature":"test-feature-1", "tags":"test-tag-1"}').set("Authorization", await factory.getUserToken(owner));
         res.body.should.be.a('object');
         res.body.size.should.be.eql(2);
     });
@@ -203,15 +203,15 @@ describe('/GET measurements', () => {
         const measurement3 = await factory.createMeasurement(owner, feature2, device, thing, [tag1], factory.createSamples(3));
         const measurement4 = await factory.createMeasurement(owner, feature1, device, thing, [tag1, tag2], factory.createSamples(4));
         const measurement5 = await factory.createMeasurement(owner, feature2, device, thing, [tag1], factory.createSamples(5));
-        let res = await chai.request(server).get('/v1/measurements?filter={"$or":[{"feature":"test-feature-1"}, {"tags":"test-tag-1"}]}').set("Authorization", await factory.getUserToken(owner));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements?filter={"$or":[{"feature":"test-feature-1"}, {"tags":"test-tag-1"}]}').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(5);
-        res = await chai.request(server).get('/v1/measurements?filter={"$or":[{"feature":"test-feature-1"},{"tags":"test-tag-2"}]}').set("Authorization", await factory.getUserToken(owner));
+        res = await chai.request(server).keepOpen().get('/v1/measurements?filter={"$or":[{"feature":"test-feature-1"},{"tags":"test-tag-2"}]}').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(3);
-        res = await chai.request(server).get('/v1/measurements?filter={"$or":[{"feature":"test-feature-2"},{"tags":"test-tag-2"}]}').set("Authorization", await factory.getUserToken(owner));
+        res = await chai.request(server).keepOpen().get('/v1/measurements?filter={"$or":[{"feature":"test-feature-2"},{"tags":"test-tag-2"}]}').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(4);
@@ -240,7 +240,7 @@ describe('/POST measurement', () => {
                 { values: 10.5, delta: 220 }
             ]
         }
-        const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
+        const res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -270,7 +270,7 @@ describe('/POST measurement', () => {
                 { values: 10.5, delta: 220 }
             ]
         }
-        const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
+        const res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -301,7 +301,7 @@ describe('/POST measurement', () => {
                 { values: 10.5, delta: 220 }
             ]
         }
-        const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
+        const res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -332,7 +332,7 @@ describe('/POST measurement', () => {
                 { values: 10.5, delta: 220 }
             ]
         }
-        const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
+        const res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -363,7 +363,7 @@ describe('/POST measurement', () => {
                 { values: 10.5, delta: 220 }
             ]
         }
-        const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
+        const res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -394,7 +394,7 @@ describe('/POST measurement', () => {
                 { values: 10.5, delta: 220 }
             ]
         }
-        const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
+        const res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -426,7 +426,7 @@ describe('/POST measurement', () => {
                 { values: 10.5, delta: 220 }
             ]
         }
-        const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
+        const res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -458,7 +458,7 @@ describe('/POST measurement', () => {
                 { values: "text-test-2", delta: 220 }
             ]
         }
-        const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
+        const res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -487,7 +487,7 @@ describe('/POST measurement', () => {
             feature: measurement_feature._id,
             samples: [ { values: 10.4, delta: 200 } ]
         }
-        const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
+        const res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -515,7 +515,7 @@ describe('/POST measurement', () => {
             feature: feature._id,
             samples: []
         }
-        const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
+        const res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -550,7 +550,7 @@ describe('/POST measurement', () => {
                 { values: [10.5, 43, 23, 10], delta: 220 }
             ]
         }
-        const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement);
+        const res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -596,7 +596,7 @@ describe('/POST measurement', () => {
                 { values: [10.6, 23, 12, 10], delta: 260 }
             ]
         }
-        const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement);
+        const res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -626,7 +626,7 @@ describe('/POST measurement', () => {
                 { values: 10.5, delta: 220 }
             ]
         }
-        const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement);
+        const res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -666,7 +666,7 @@ describe('/POST measurement', () => {
                 tag._id
             ]
         }
-        const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement);
+        const res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -707,7 +707,7 @@ describe('/POST measurement', () => {
                 "fake-tag"
             ]
         }
-        const res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement);
+        const res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -739,11 +739,11 @@ describe('/POST measurement', () => {
                 { values: [10.5], delta: 220 }
             ]
         }
-        let res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement);
+        let res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
-        res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
+        res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurement)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -791,11 +791,11 @@ describe('/POST measurement', () => {
                 ]
             }
         ];
-        let res = await chai.request(server).post('/v1/measurements?verbose=false').set("Authorization", await factory.getUserToken(user)).send(measurements);
+        let res = await chai.request(server).keepOpen().post('/v1/measurements?verbose=false').set("Authorization", await factory.getUserToken(user)).send(measurements);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.saved.should.be.eql(2);
-        res = await chai.request(server).post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurements);
+        res = await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", await factory.getUserToken(user)).send(measurements);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.measurements[0].thing.should.be.eql("test-thing-7");
@@ -876,7 +876,7 @@ describe('/POST measurement', () => {
             ]
         }
         ];
-        let res = await chai.request(server).post('/v1/measurements?verbose=false').set("Authorization", await factory.getUserToken(user)).send(measurements)
+        let res = await chai.request(server).keepOpen().post('/v1/measurements?verbose=false').set("Authorization", await factory.getUserToken(user)).send(measurements)
         res.should.have.status(202);
         res.body.should.be.a('object');
         res.body.saved.should.be.eql(1);
@@ -896,7 +896,7 @@ describe('/DELETE measurement', () => {
         const measurement = await factory.createMeasurement(user, feature, device, thing, [tag]);
         const measurements_before = await Measurement.find();
         measurements_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().delete('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
         const measurements_after = await Measurement.find();
@@ -913,7 +913,7 @@ describe('/DELETE measurement', () => {
         const measurement = await factory.createMeasurement(user, feature, device, thing, [tag]);
         const measurements_before = await Measurement.find();
         measurements_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/measurements/fake_measurement').set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().delete('/v1/measurements/fake_measurement').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);

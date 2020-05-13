@@ -31,7 +31,7 @@ describe('/GET issues', () => {
         const issue3_owned = await factory.createIssue(owner, device, null, "message3", null);
         const issue1_other = await factory.createIssue(other, device, null, "message1", null);
         const issue2_other = await factory.createIssue(other, device, null, "message2", null);
-        const res = await chai.request(server).get('/v1/issues').set("Authorization", await factory.getUserToken(owner));
+        const res = await chai.request(server).keepOpen().get('/v1/issues').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(3);
@@ -45,7 +45,7 @@ describe('/GET issues', () => {
         const issue1_owned = await factory.createIssue(owner, device, null, "message1", null);
         const issue2_owned = await factory.createIssue(owner, device, null, "message2", null);
         const issue3_owned = await factory.createIssue(owner, device, null, "message3", null);
-        const res = await chai.request(server).get('/v1/issues?limit=2&page=1').set("Authorization", await factory.getUserToken(owner));
+        const res = await chai.request(server).keepOpen().get('/v1/issues?limit=2&page=1').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(2);
@@ -65,11 +65,11 @@ describe('/GET issues', () => {
         const issue3_device1 = await factory.createIssue(owner, device1, null, "message3", null);
         const issue4_device2 = await factory.createIssue(owner, device2, null, "message1", null);
         const issue5_device2 = await factory.createIssue(owner, device2, null, "message2", null);
-        let res = await chai.request(server).get('/v1/issues?filter={"device":"test-device-1"}').set("Authorization", await factory.getUserToken(owner));
+        let res = await chai.request(server).keepOpen().get('/v1/issues?filter={"device":"test-device-1"}').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(3);
-        res = await chai.request(server).get('/v1/issues?filter={"device":"test-device-2"}').set("Authorization", await factory.getUserToken(owner));
+        res = await chai.request(server).keepOpen().get('/v1/issues?filter={"device":"test-device-2"}').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(2);
@@ -89,7 +89,7 @@ describe('/POST issue', () => {
             message: 'this is a message',
             type: IssueTypes.generic
         }
-        const res = await chai.request(server).post('/v1/issues').set("Authorization", await factory.getUserToken(user)).send(issue)
+        const res = await chai.request(server).keepOpen().post('/v1/issues').set("Authorization", await factory.getUserToken(user)).send(issue)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -110,7 +110,7 @@ describe('/POST issue', () => {
             message: 'this is a message',
             type: IssueTypes.generic
         }
-        const res = await chai.request(server).post('/v1/issues').set("Authorization", await factory.getUserToken(user)).send(issue)
+        const res = await chai.request(server).keepOpen().post('/v1/issues').set("Authorization", await factory.getUserToken(user)).send(issue)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -131,7 +131,7 @@ describe('/POST issue', () => {
             message: 'this is a message',
             type: "fake_type"
         }
-        const res = await chai.request(server).post('/v1/issues').set("Authorization", await factory.getUserToken(user)).send(issue)
+        const res = await chai.request(server).keepOpen().post('/v1/issues').set("Authorization", await factory.getUserToken(user)).send(issue)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -152,11 +152,11 @@ describe('/POST issue', () => {
             message: 'this is a message',
             type: IssueTypes.generic
         }
-        let res = await chai.request(server).post('/v1/issues').set("Authorization", await factory.getUserToken(user)).send(issue);
+        let res = await chai.request(server).keepOpen().post('/v1/issues').set("Authorization", await factory.getUserToken(user)).send(issue);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
-        res = await chai.request(server).post('/v1/issues').set("Authorization", await factory.getUserToken(user)).send(issue)
+        res = await chai.request(server).keepOpen().post('/v1/issues').set("Authorization", await factory.getUserToken(user)).send(issue)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -187,7 +187,7 @@ describe('/POST issue', () => {
             }
         ];
 
-        let res = await chai.request(server).post('/v1/issues?verbose=false').set("Authorization", await factory.getUserToken(user)).send(issues);
+        let res = await chai.request(server).keepOpen().post('/v1/issues?verbose=false').set("Authorization", await factory.getUserToken(user)).send(issues);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.saved.should.be.eql(2);
@@ -228,7 +228,7 @@ describe('/POST issue', () => {
                 type: IssueTypes.generic
             }
         ];
-        let res = await chai.request(server).post('/v1/issues?verbose=false').set("Authorization", await factory.getUserToken(user)).send(issues)
+        let res = await chai.request(server).keepOpen().post('/v1/issues?verbose=false').set("Authorization", await factory.getUserToken(user)).send(issues)
         res.should.have.status(202);
         res.body.should.be.a('object');
         res.body.saved.should.be.eql(3);

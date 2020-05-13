@@ -38,7 +38,7 @@ exports.accepted = function(url, user) {
                         subject: 'Registration accepted!',
                         text: 'Welcome ' + user.username + ', \n\xA0 \n\xA0' + 
                               'Your registration is now complete!' + ' \n\xA0' + 
-                              'You can start using Atmosphere!' + ' \n\xA0 \n\xA0'
+                              'You can start using Measurify Cloud API Server!' + ' \n\xA0 \n\xA0'
                         };
       return message;
 };
@@ -49,7 +49,7 @@ exports.disabled = function(url, user) {
                         subject: 'Account disabled!',
                         text: 'Dear ' + user.username + ', \n\xA0 \n\xA0' + 
                               'Your account is disabled' + ' \n\xA0' + 
-                              'Please, contact Atmosphere administrators' + ' \n\xA0 \n\xA0'
+                              'Please, contact Measurify Framework administrators' + ' \n\xA0 \n\xA0'
                         };
       return message;
 };

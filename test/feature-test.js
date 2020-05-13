@@ -27,7 +27,7 @@ describe('/GET feature', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         await factory.createFeature("test-feature-1", user);
         await factory.createFeature("test-feature-2", user);
-        const res = await chai.request(server).get('/v1/features').set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().get('/v1/features').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(2);
@@ -37,7 +37,7 @@ describe('/GET feature', () => {
         factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user);
-        const res = await chai.request(server).get('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().get('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.eql(feature._id.toString());
@@ -45,7 +45,7 @@ describe('/GET feature', () => {
 
     it('it should not GET a fake feature', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const res = await chai.request(server).get('/v1/features/fake-feature').set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().get('/v1/features/fake-feature').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
@@ -58,7 +58,7 @@ describe('/POST feature', () => {
         factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = {}
-        const res = await chai.request(server).post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(feature)
+        const res = await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(feature)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -76,7 +76,7 @@ describe('/POST feature', () => {
                 { name: "item-name-3", unit: "item-unit-3" }
             ]
         }
-        const res = await chai.request(server).post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(feature)
+        const res = await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(feature)
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -88,7 +88,7 @@ describe('/POST feature', () => {
     it('it should not POST a feature with already existant _id field', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = { _id: "feature-name-text", owner: user }
-        const res = await chai.request(server).post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(feature)
+        const res = await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(feature)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -98,7 +98,7 @@ describe('/POST feature', () => {
 
     it('it should GET the feature posted before', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const res = await chai.request(server).get('/v1/features').set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().get('/v1/features').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(1);
@@ -108,7 +108,7 @@ describe('/POST feature', () => {
     it('it should POST a list of features', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const features = [{ _id: "test-text-1", dimensions: [] }, { _id: "test-text-2", dimensions: [] }];
-        const res = await chai.request(server).post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(features)
+        const res = await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(features)
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.features[0]._id.should.be.eql(features[0]._id);
@@ -120,7 +120,7 @@ describe('/POST feature', () => {
         const features = [{ _id: "test-text-1", dimensions: [] }, { _id: "test-text-2", dimensions: [] },
         { _id: "test-text-3", dimensions: [] }, { _id: "test-text-4", dimensions: [] },
         { _id: "test-text-5", dimensions: [] }];
-        const res = await chai.request(server).post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(features)
+        const res = await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(features)
         res.should.have.status(202);
         res.body.should.be.a('object');
         res.body.features.length.should.be.eql(3);
@@ -141,7 +141,7 @@ describe('/DELETE feature', () => {
         const feature = await factory.createFeature("test-feature-1", user);
         const features_before = await Feature.find();
         features_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
         const features_after = await Feature.find();
@@ -155,7 +155,7 @@ describe('/DELETE feature', () => {
         const feature = await factory.createFeature("test-feature-1", user);
         const features_before = await Feature.find();
         features_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user2));
+        const res = await chai.request(server).keepOpen().delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user2));
         res.should.have.status(errors.not_yours.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.not_yours.message);
@@ -169,7 +169,7 @@ describe('/DELETE feature', () => {
         const feature = await factory.createFeature("test-feature-2", user);
         const features_before = await Feature.find();
         features_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/features/fake_feature').set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().delete('/v1/features/fake_feature').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
@@ -187,7 +187,7 @@ describe('/DELETE feature', () => {
         const measurement = await factory.createMeasurement(user, feature, device, thing, [tag]);
         const features_before = await Feature.find();
         features_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
@@ -202,7 +202,7 @@ describe('/DELETE feature', () => {
         const device = await factory.createDevice("test-device-2", user, [feature]);
         const features_before = await Feature.find();
         features_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);

@@ -26,7 +26,7 @@ describe('/GET fieldmask', () => {
         const fieldmask1 = await factory.createFieldmask("fieldmaask-test-1", [], [], [], ['samples'], [], [], [], admin);
         const fieldmask2 = await factory.createFieldmask("fieldmaask-test-2", [], [], [], ['samples'], [], [], [], admin);
         const fieldmask3 = await factory.createFieldmask("fieldmaask-test-3", [], [], [], ['samples'], [], [], [], admin);
-        const res = await chai.request(server).get('/v1/fieldmasks').set("Authorization", await factory.getUserToken(admin));
+        const res = await chai.request(server).keepOpen().get('/v1/fieldmasks').set("Authorization", await factory.getUserToken(admin));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(3);
@@ -39,7 +39,7 @@ describe('/GET fieldmask', () => {
         const fieldmask1 = await factory.createFieldmask("fieldmaask-test-1", [], [], [], ['samples'], [], [], [], admin);
         const fieldmask2 = await factory.createFieldmask("fieldmaask-test-2", [], [], [], ['samples'], [], [], [], admin);
         const fieldmask3 = await factory.createFieldmask("fieldmaask-test-3", [], [], [], ['samples'], [], [], [], admin);
-        const res = await chai.request(server).get('/v1/fieldmasks').set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().get('/v1/fieldmasks').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.admin_restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.admin_restricted_access.message);
@@ -49,7 +49,7 @@ describe('/GET fieldmask', () => {
         factory.dropContents();
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask = await factory.createFieldmask("fieldmaask-test-1", [], [], [], ['samples'], [], [], [], admin);
-        const res = await chai.request(server).get('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin));
+        const res = await chai.request(server).keepOpen().get('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.eql(fieldmask._id.toString());
@@ -60,7 +60,7 @@ describe('/GET fieldmask', () => {
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const fieldmask = await factory.createFieldmask("fieldmaask-test-1", [], [], [], ['samples'], [], [], [], admin);
-        const res = await chai.request(server).get('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().get('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.admin_restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.admin_restricted_access.message);
@@ -70,7 +70,7 @@ describe('/GET fieldmask', () => {
         factory.dropContents();
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask = await factory.createFieldmask("fieldmaask-test-1", [], [], [], ['samples'], [], [], [], admin);
-        const res = await chai.request(server).get('/v1/fieldmasks/fake-mask').set("Authorization", await factory.getUserToken(admin));
+        const res = await chai.request(server).keepOpen().get('/v1/fieldmasks/fake-mask').set("Authorization", await factory.getUserToken(admin));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
@@ -83,7 +83,7 @@ describe('/POST fieldmasks', () => {
         factory.dropContents();
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask = { measurement_fields: ['samples'] };
-        const res = await chai.request(server).post('/v1/fieldmasks').set("Authorization", await factory.getUserToken(admin)).send(fieldmask);
+        const res = await chai.request(server).keepOpen().post('/v1/fieldmasks').set("Authorization", await factory.getUserToken(admin)).send(fieldmask);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -95,7 +95,7 @@ describe('/POST fieldmasks', () => {
         factory.dropContents();
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask = { _id: 'test-fieldmask' };
-        const res = await chai.request(server).post('/v1/fieldmasks').set("Authorization", await factory.getUserToken(admin)).send(fieldmask);
+        const res = await chai.request(server).keepOpen().post('/v1/fieldmasks').set("Authorization", await factory.getUserToken(admin)).send(fieldmask);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -107,7 +107,7 @@ describe('/POST fieldmasks', () => {
         factory.dropContents();
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask = { _id: 'test-fieldmask', measurement_fields: ['fake-value']};
-        const res = await chai.request(server).post('/v1/fieldmasks').set("Authorization", await factory.getUserToken(admin)).send(fieldmask);
+        const res = await chai.request(server).keepOpen().post('/v1/fieldmasks').set("Authorization", await factory.getUserToken(admin)).send(fieldmask);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -119,7 +119,7 @@ describe('/POST fieldmasks', () => {
         factory.dropContents();
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask = { _id: 'test-fieldmask', measurement_fields: ['samples']};
-        const res = await chai.request(server).post('/v1/fieldmasks').set("Authorization", await factory.getUserToken(admin)).send(fieldmask);
+        const res = await chai.request(server).keepOpen().post('/v1/fieldmasks').set("Authorization", await factory.getUserToken(admin)).send(fieldmask);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -131,7 +131,7 @@ describe('/POST fieldmasks', () => {
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const fieldmask = { _id: 'test-fieldmask', measurement_fields: ['samples']};
-        const res = await chai.request(server).post('/v1/fieldmasks').set("Authorization", await factory.getUserToken(user)).send(fieldmask);
+        const res = await chai.request(server).keepOpen().post('/v1/fieldmasks').set("Authorization", await factory.getUserToken(user)).send(fieldmask);
         res.should.have.status(errors.admin_restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.admin_restricted_access.message);
@@ -141,8 +141,8 @@ describe('/POST fieldmasks', () => {
         factory.dropContents();
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask = { _id: 'test-fieldmask', measurement_fields: ['samples']};
-        await chai.request(server).post('/v1/fieldmasks').set("Authorization", await factory.getUserToken(admin)).send(fieldmask);
-        const res = await chai.request(server).post('/v1/fieldmasks').set("Authorization", await factory.getUserToken(admin)).send(fieldmask);
+        await chai.request(server).keepOpen().post('/v1/fieldmasks').set("Authorization", await factory.getUserToken(admin)).send(fieldmask);
+        const res = await chai.request(server).keepOpen().post('/v1/fieldmasks').set("Authorization", await factory.getUserToken(admin)).send(fieldmask);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -156,7 +156,7 @@ describe('/POST fieldmasks', () => {
         const fieldmasks = [ { _id: 'test-fieldmask-1', measurement_fields: ['samples'] },
                              { _id: 'test-fieldmask-2', measurement_fields: ['samples'] },
                              { _id: 'test-fieldmask-3', measurement_fields: ['samples'] } ];
-        const res = await chai.request(server).post('/v1/fieldmasks').set("Authorization", await factory.getUserToken(admin)).send(fieldmasks);
+        const res = await chai.request(server).keepOpen().post('/v1/fieldmasks').set("Authorization", await factory.getUserToken(admin)).send(fieldmasks);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.fieldmasks.length.should.be.eql(3);
@@ -172,7 +172,7 @@ describe('/POST fieldmasks', () => {
                             { _id: 'test-fieldmask-5', measurement_fields: ['samples'] },
                             { _id: 'test-fieldmask-6', measurement_fields: ['samples'] },
                             { _id: 'test-fieldmask-4', measurement_fields: ['samples'] } ];
-        const res = await chai.request(server).post('/v1/fieldmasks').set("Authorization", await factory.getUserToken(admin)).send(fieldmasks);
+        const res = await chai.request(server).keepOpen().post('/v1/fieldmasks').set("Authorization", await factory.getUserToken(admin)).send(fieldmasks);
         res.should.have.status(202);
         res.body.should.be.a('object');
         res.body.fieldmasks.length.should.be.eql(4);
@@ -188,7 +188,7 @@ describe('/DELETE fieldmasks', () => {
         const fieldmask = await factory.createFieldmask("fieldmaask-test-1", [], [], [], ['samples'], [], [], [], admin);
         const fieldmasks_before = await Fieldmask.find();
         fieldmasks_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin));
+        const res = await chai.request(server).keepOpen().delete('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin));
         res.should.have.status(200);
         res.body.should.be.a('object');
         const fieldmasks_after = await Fieldmask.find();
@@ -201,7 +201,7 @@ describe('/DELETE fieldmasks', () => {
         const fieldmask = await factory.createFieldmask("fieldmaask-test-1", [], [], [], ['samples'], [], [], [], admin);
         const fieldmasks_before = await Fieldmask.find();
         fieldmasks_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/fieldmasks/fake_fieldmask').set("Authorization", await factory.getUserToken(admin));
+        const res = await chai.request(server).keepOpen().delete('/v1/fieldmasks/fake_fieldmask').set("Authorization", await factory.getUserToken(admin));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
@@ -216,7 +216,7 @@ describe('/DELETE fieldmasks', () => {
         const fieldmask = await factory.createFieldmask("fieldmaask-test-1", [], [], [], ['samples'], [], [], [], admin);
         const fieldmasks_before = await Fieldmask.find();
         fieldmasks_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().delete('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.admin_restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.admin_restricted_access.message);
@@ -231,7 +231,7 @@ describe('/DELETE fieldmasks', () => {
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.analyst, fieldmask);
         const fieldmasks_before = await Fieldmask.find();
         fieldmasks_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin));
+        const res = await chai.request(server).keepOpen().delete('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin));
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
@@ -247,7 +247,7 @@ describe('/PUT fieldmasks', () => {
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask = await factory.createFieldmask("fieldmask-test-1", [], [], [], ['samples'], [], [], [], admin)
         const modification = { measurement_fields: { add: ['startDate'] } };
-        const res = await chai.request(server).put('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('measurement_fields');
@@ -259,7 +259,7 @@ describe('/PUT fieldmasks', () => {
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask = await factory.createFieldmask("fieldmask-test-1", [], [], [], ['samples', 'startDate'], [], [], [], admin)
         const modification = { measurement_fields: { remove: ['samples'] } };
-        const res = await chai.request(server).put('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('measurement_fields');
@@ -271,7 +271,7 @@ describe('/PUT fieldmasks', () => {
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask = await factory.createFieldmask("fieldmask-test-1", [], [], [], ['samples'], [], [], [], admin)
         const modification = { measurement_fields: { add: ['fake-field'] } };
-        const res = await chai.request(server).put('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
         res.should.have.status(errors.put_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.put_request_error.message);
@@ -283,7 +283,7 @@ describe('/PUT fieldmasks', () => {
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask = await factory.createFieldmask("fieldmask-test-1", [], [], [], ['samples', 'startDate'], [], [], [], admin)
         const modification = { measurement_fields: { remove: ['fake-field'] } };
-        const res = await chai.request(server).put('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
         res.should.have.status(errors.put_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.put_request_error.message);
@@ -295,7 +295,7 @@ describe('/PUT fieldmasks', () => {
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask = await factory.createFieldmask("fieldmask-test-1", [], [], [], ['samples', 'endDate', 'startDate'], [], [], [], admin)
         const modification = { measurement_fields: { remove: ['startDate'], add:['thing', 'device'] } };
-        const res = await chai.request(server).put('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('measurement_fields');
@@ -307,7 +307,7 @@ describe('/PUT fieldmasks', () => {
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask = await factory.createFieldmask("fieldmask-test-1", [], [], [], ['samples', 'startDate'], [], [], [], admin)
         const modification = { fakefield: { remove: ['samples'] } };
-        const res = await chai.request(server).put('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
         res.should.have.status(errors.missing_info.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.missing_info.message);
@@ -318,7 +318,7 @@ describe('/PUT fieldmasks', () => {
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask = await factory.createFieldmask("fieldmask-test-1", [], [], [], ['samples', 'endDate', 'startDate'], [], [], [], admin)
         const modification = { measurement_fields: { remove: ['startDate'], add:['thing', 'device'] } };
-        const res = await chai.request(server).put('/v1/fieldmasks/fake-fieldmask').set("Authorization", await factory.getUserToken(admin)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/fieldmasks/fake-fieldmask').set("Authorization", await factory.getUserToken(admin)).send(modification);
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
@@ -330,7 +330,7 @@ describe('/PUT fieldmasks', () => {
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const fieldmask = await factory.createFieldmask("fieldmaask-test-1", [], [], [], ['samples'], [], [], [], admin);
         const modification = { measurement_fields: { remove: ['startDate'], add:['thing', 'device'] } };
-        const res = await chai.request(server).put('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        const res = await chai.request(server).keepOpen().put('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(user)).send(modification);
         res.should.have.status(errors.admin_restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.admin_restricted_access.message);

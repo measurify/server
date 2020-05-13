@@ -1,7 +1,7 @@
 {
-  "name": "atmosphere-measurement-api",
-  "version": "0.3.500",
-  "description": "Atmosphere Measurements Cloud API",
+  "name": "measurify-server",
+  "version": "0.4.000",
+  "description": "Measurify Cloud API Server",
   "main": "server.js",
   "host": "localhost",
   "scripts": {
@@ -17,19 +17,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Atmosphere-IoT-Framework/api.git"
+    "url": "git+https://github.com/measurify/server.git"
   },
   "keywords": [
     "API",
-    "Atmosphere",
-    "IOT",
+    "Measurify",
+    "API",
+    "RESTful",
+    "IoT",
     "Edge",
     "Cloud Computing",
     "Fog Computing"
   ],
   "author": "Riccardo Berta",
   "license": "MIT",
-  "homepage": "https://github.com/Atmosphere-IoT-Framework",
+  "homepage": "https://github.com/measurify/server.git",
   "dependencies": {
     "@nearform/clinic-doctor": "^2.6.1",
     "@nearform/doctor": "^4.1.0",
@@ -65,9 +67,11 @@
     "shuffle-array": "^1.0.1",
     "skmeans": "^0.10.2",
     "slug": "^0.9.4",
+    "socket.io-client": "^2.3.0",
     "summary-statistics": "^1.0.0",
     "swagger-jsdoc": "^4.0.0",
-    "swagger-ui-express": "^3.0.10"
+    "swagger-ui-express": "^3.0.10",
+    "ws": "^7.2.5"
   },
   "devDependencies": {
     "chai": "^4.2.0",

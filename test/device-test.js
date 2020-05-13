@@ -24,7 +24,7 @@ describe('/GET device', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         await factory.createDevice("test-device-1", user);
         await factory.createDevice("test-device-2", user);
-        const res = await chai.request(server).get('/v1/devices').set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().get('/v1/devices').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(2);
@@ -35,7 +35,7 @@ describe('/GET device', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user);
         const device = await factory.createDevice("test-device-1", user, [feature]);
-        const res = await chai.request(server).get('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().get('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.eql(device._id.toString());
@@ -43,7 +43,7 @@ describe('/GET device', () => {
 
     it('it should not GET a fake device', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const res = await chai.request(server).get('/v1/devices/fake-device').set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().get('/v1/devices/fake-device').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
@@ -56,7 +56,7 @@ describe('/POST device', () => {
         factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = {}
-        const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
+        const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -68,7 +68,7 @@ describe('/POST device', () => {
         factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = { _id: "test-device-1", owner: user }
-        const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
+        const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -80,7 +80,7 @@ describe('/POST device', () => {
         factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = { _id: "test-device-2", owner: user, features: ["fake-feature"] }
-        const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
+        const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -92,7 +92,7 @@ describe('/POST device', () => {
         factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = { _id: "test-device-2", owner: user, tags: ["fake-tag"], features: [await factory.createFeature("test-device-2-feature-good", user)] }
-        const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
+        const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -104,7 +104,7 @@ describe('/POST device', () => {
         factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = { _id: "test-device-2", owner: user, measurementBufferPolicy: "fake-policy", features: [await factory.createFeature("test-device-2-feature-good", user)] }
-        const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
+        const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -119,7 +119,7 @@ describe('/POST device', () => {
             owner: user,
             features: [await factory.createFeature("test-device-1-feature", user)]
         }
-        const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
+        const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -135,7 +135,7 @@ describe('/POST device', () => {
             owner: user,
             features: [await factory.createFeature("test-device-1-feature-2", user)]
         }
-        const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
+        const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -145,7 +145,7 @@ describe('/POST device', () => {
 
     it('it should GET the device posted before', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const res = await chai.request(server).get('/v1/devices').set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().get('/v1/devices').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(1);
@@ -158,7 +158,7 @@ describe('/POST device', () => {
                             { _id: "test-device-3", owner: user, features: [await factory.createFeature("test-device-3-feature-1", user)] },
                             { _id: "test-device-4", features: [await factory.createFeature("test-device-4-feature-2", user)] }
                         ];
-        const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(devices)
+        const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(devices)
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.devices[0]._id.should.be.eql(devices[0]._id);
@@ -174,7 +174,7 @@ describe('/POST device', () => {
                             { _id: "test-device-4", user, features: [await factory.createFeature("test-device-4-feature-new", user)] },
                             { _id: "test-device-5", user, features: [await factory.createFeature("test-device-5-feature-new", user)] }
                         ];
-        const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(devices)
+        const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(devices)
         res.should.have.status(202);
         res.body.should.be.a('object');
         res.body.devices.length.should.be.eql(2);
@@ -196,7 +196,7 @@ describe('/POST device', () => {
             features: [await factory.createFeature("test-device-1-feature-2", user)],
             tags: [await factory.createTag("test-tag-2", user)]
         }
-        const res = await chai.request(server).post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
+        const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -213,7 +213,7 @@ describe('/DELETE device', () => {
         const device = await factory.createDevice("test-device-1", user);
         const devices_before = await Device.find();
         devices_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().delete('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
         const devices_after = await Device.find();
@@ -226,7 +226,7 @@ describe('/DELETE device', () => {
         const device = await factory.createDevice("test-device-2", user);
         const devices_before = await Device.find();
         devices_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/devices/fake_device').set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().delete('/v1/devices/fake_device').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
@@ -241,7 +241,7 @@ describe('/DELETE device', () => {
         const device = await factory.createDevice("test-device-2", user);
         const devices_before = await Device.find();
         devices_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user2));
+        const res = await chai.request(server).keepOpen().delete('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user2));
         res.should.have.status(errors.not_yours.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.not_yours.message);
@@ -259,7 +259,7 @@ describe('/DELETE device', () => {
         const measurement = await factory.createMeasurement(user, feature, device, thing, [tag]);
         const devices_before = await Device.find();
         devices_before.length.should.be.eql(1);
-        const res = await chai.request(server).delete('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().delete('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);

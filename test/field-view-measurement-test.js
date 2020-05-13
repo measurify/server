@@ -32,7 +32,7 @@ describe('Field view with mask', () => {
         const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(1), null, null, null, VisibilityTypes.public);
         const measurement2 = await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(1), null, null, null, VisibilityTypes.public);
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(1), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).get('/v1/measurements/').set("Authorization", await factory.getUserToken(analyst));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/').set("Authorization", await factory.getUserToken(analyst));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(3);
@@ -56,8 +56,8 @@ describe('Field view with mask', () => {
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(1), null, null, null, VisibilityTypes.public);
         const fieldmask = await factory.createFieldmask("fieldmask-test-1", [], [], [], ['samples', 'startDate'], [], [], [], admin)
         const modification = { fieldmask: 'fieldmask-test-1' };
-        let res = await chai.request(server).put('/v1/users/' + analyst._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
-        res = await chai.request(server).get('/v1/measurements/').set("Authorization", await factory.getUserToken(analyst));
+        let res = await chai.request(server).keepOpen().put('/v1/users/' + analyst._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
+        res = await chai.request(server).keepOpen().get('/v1/measurements/').set("Authorization", await factory.getUserToken(analyst));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(3);
@@ -77,7 +77,7 @@ describe('Field view with mask', () => {
         const device = await factory.createDevice("test-device-1", owner, [feature]);
         const thing = await factory.createThing("test-thing-1", owner);
         const measurement = await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(1), null, null, null, VisibilityTypes.public);
-        let res = await chai.request(server).get('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(analyst));
+        let res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(analyst));
         res.should.have.status(200);
         res.body.should.include.keys("samples");
         res.body.should.include.keys("startDate");
@@ -97,8 +97,8 @@ describe('Field view with mask', () => {
         const measurement = await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(1), null, null, null, VisibilityTypes.public);
         const fieldmask = await factory.createFieldmask("fieldmask-test-1", [], [], [], ['samples', 'startDate'], [], [], [], admin)
         const modification = { fieldmask: 'fieldmask-test-1' };
-        let res = await chai.request(server).put('/v1/users/' + analyst._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
-        res = await chai.request(server).get('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(analyst));
+        let res = await chai.request(server).keepOpen().put('/v1/users/' + analyst._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
+        res = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(analyst));
         res.should.have.status(200);
         res.body.should.include.keys("samples");
         res.body.should.include.keys("startDate");
