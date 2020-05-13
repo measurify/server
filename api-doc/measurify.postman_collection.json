@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "f3274ad4-71d8-40b0-92eb-f2c008c9889c",
-		"name": "Measurify Cloud API Server",
+		"name": "Atmosphere",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -5609,6 +5609,468 @@
 							"path": [
 								"v1",
 								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "STREAM",
+			"item": [
+				{
+					"name": "LOGIN as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new provider",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"provider\", JSON.parse(responseBody)._id);",
+									"pm.environment.set(\"provider_username\", JSON.parse(responseBody).username);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": " {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"provider-useranme-stream\",\n\t\"password\" : \"provider-password-stream\",\n\t\"type\" : \"provider\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new analyst",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"analyst\", JSON.parse(responseBody)._id);",
+									"pm.environment.set(\"analyst_username\", JSON.parse(responseBody).username);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": " {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"analyst-useranme-stream\",\n\t\"password\" : \"analyst-password-stream\",\n\t\"type\" : \"analyst\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new feature",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "2e852dd1-b983-4f2e-b17b-e20748f69c69",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "175d28d8-231a-46db-a349-1575bea419e9",
+								"exec": [
+									"pm.environment.set(\"feature\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"_id\": \"stream-data\",\n    \"items\": [\n    \t{\n        \t\"name\": \"valus\",\n            \"unit\": \"unit\",\n            \"type\": \"number\",\n            \"dimension\": 0\n        }\n    ]\n}\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/features",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"features"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new device",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "bf934b5a-b6e0-41dd-bd48-bdf0559f4d97",
+								"exec": [
+									"pm.environment.set(\"device\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"_id\": \"streamer\",\r\n    \"features\": [ \"stream-data\" ]\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/devices/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"devices",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new thing",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
+								"exec": [
+									"pm.environment.set(\"thing\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"_id\": \"streamed-thing\"\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/things/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"things",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LOGIN as provider",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"provider-username-stream\",\n\t\"password\" : \"provider-password-stream\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new measurement",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "981648d0-4153-4d98-9273-49fbcfd23e04",
+								"exec": [
+									"var current_timestamp = new Date();",
+									"postman.setEnvironmentVariable(\"current_timestamp\", current_timestamp.toISOString());",
+									"postman.setEnvironmentVariable(\"value\", Math.floor(Math.random() * 10));",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"startDate\": \"{{current_timestamp}}\",\r\n\t\"endDate\": \"{{current_timestamp}}\",\r\n\t\"thing\": \"streamed-thing\",\r\n\t\"feature\": \"stream-data\",\r\n\t\"device\": \"streamer\",\r\n\t\"samples\": [ { \"values\": [{{value}}] }]\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/measurements",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LOGIN as analyst",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"provider-username-stream\",\n\t\"password\" : \"provider-password-stream\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get the stream of measurement of a thing",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/stream/entity={{thing}}&token={{token}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"stream",
+								"entity={{thing}}&token={{token}}"
 							]
 						}
 					},
