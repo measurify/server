@@ -50,6 +50,7 @@ require('./models/thingSchema');
 require('./models/deviceSchema');
 require('./models/issueSchema');
 require('./models/rightSchema');
+require('./models/subscriptionSchema');
 require('./models/measurementSchema');
 require('./models/errorSchema');
 require('./models/computationSchema');

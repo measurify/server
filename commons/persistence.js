@@ -114,8 +114,9 @@ const prepareFilter = function(filter, restriction) {
 const postOne = async function(body, model) {
     const resource = await (new model(body)).save();
     if(model.modelName == "Measurement") {
-        broker.publish('device-' + body.device, body);
-        broker.publish('thing-' + body.thing, body);
+        broker.publish('device-' + body.device, body.device, body);
+        broker.publish('thing-' + body.thing, body.thing, body);
+        broker.notify(body);
     }
     return resource;
 }

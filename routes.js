@@ -52,6 +52,10 @@ router.use('/' + process.env.VERSION + '/scripts', passport.authenticate('jwt', 
 const rightsRoute = require('./routes/rightRoute');
 router.use('/' + process.env.VERSION + '/rights', passport.authenticate('jwt', {session: false}), rightsRoute);
 
+// subscription
+const subscriptionsRoute = require('./routes/subscriptionRoute');
+router.use('/' + process.env.VERSION + '/subscriptions', passport.authenticate('jwt', {session: false}), subscriptionsRoute);
+
 // thing
 const thingsRoute = require('./routes/thingRoute');
 router.use('/' + process.env.VERSION + '/things', passport.authenticate('jwt', {session: false}), thingsRoute);

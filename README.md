@@ -1,6 +1,6 @@
 # Measurify Cloud API Server
 
-Measnpm urify is a **cloud-based, abstract, measurement-oriented Framework** for managing smart things in IoT ecosystems. More information about the framework are published at this link **[measurify.org](https://measurify.org)**. This is the code base of the Measurify Server module implementing a RESTful API exposing Measurify resources.
+Measurify is a **cloud-based, abstract, measurement-oriented Framework** for managing smart things in IoT ecosystems. More information about the framework are published at this link **[measurify.org](https://measurify.org)**. This is the code base of the Measurify Server module implementing a RESTful API exposing Measurify resources.
 
 Measurify Cloud API Server is designed, developed and maintained by **[Elios Lab](https://elios.diten.unige.it/)** of University of Genoa. **[Wondertech](http://www.wondertechweb.com/)** contributes to the development and maintenance of the source code.
 

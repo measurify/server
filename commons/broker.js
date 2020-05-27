@@ -1,5 +1,8 @@
 const EventEmitter = require('events');
 const stream = new EventEmitter();
+const notifier = require('./notifier.js');
+const mongoose = require('mongoose');
+const Subscription = mongoose.model('Subscription');
 
 exports.subscribe = function(channel, who) {
     const action = function(data) { who.send(JSON.stringify(data)); }
@@ -19,7 +22,14 @@ exports.subscribe = function(channel, who) {
     stream.on(channel, action); 
 }
 
-exports.publish = function(channel, what) {
+exports.publish = function(channel, title, what) {
     stream.emit(channel, JSON.stringify(what));
 }
 
+exports.notify = async function(what) {
+    const subscribers = await Subscription.find({$or:[{'device': what.device}, {'thing': what.thing}]});
+    for (let subscriber of subscribers) {      
+        const title = what.device || what.thing;
+        const res = await notifier.send(subscriber.token, title, JSON.stringify(what)); 
+    }; 
+}

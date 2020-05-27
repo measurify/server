@@ -23,7 +23,6 @@ chai.use(chaiHttp);
 // Test the stream for a thing
 
 describe('Thing stream', () => {
-    
     it('it should GET measurements of a thing', async () => {
         await factory.dropContents();
         const WebSocket = require('ws');
@@ -43,7 +42,7 @@ describe('Thing stream', () => {
             client.close();
         });
         client.on('error', function (message) { assert.fail(message) });
-        client.on('open', async function (message) { await chai.request(server).keepOpen().keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
+        client.on('open', async function (message) { await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
         await new Promise(done => { client.on('close', done) });
     });
 
@@ -66,7 +65,7 @@ describe('Thing stream', () => {
             client.close();
         });
         client.on('error', function (message) { assert.fail(message) });
-        client.on('open', async function (message) { await chai.request(server).keepOpen().keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
+        client.on('open', async function (message) { await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
         await new Promise(done => { client.on('close', done) });
     });
 
@@ -91,7 +90,7 @@ describe('Thing stream', () => {
             client.close();
         });
         client.on('error', function (message) { assert.fail(message) });
-        client.on('open', async function (message) { await chai.request(server).keepOpen().keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
+        client.on('open', async function (message) { await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
         await new Promise(done => { client.on('close', done) });
     });
 
@@ -116,7 +115,7 @@ describe('Thing stream', () => {
             client.close();
         });
         client.on('error', function (message) { assert.fail(message) });
-        client.on('open', async function (message) { await chai.request(server).keepOpen().keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
+        client.on('open', async function (message) { await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
         await new Promise(done => { client.on('close', done) });
     });
 
@@ -139,7 +138,7 @@ describe('Thing stream', () => {
             client.close();
         });
         client.on('error', function (message) { assert.fail(message) });
-        client.on('open', async function (message) { await chai.request(server).keepOpen().keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
+        client.on('open', async function (message) { await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
         await new Promise(done => { client.on('close', done) });
     }); 
 
@@ -162,7 +161,7 @@ describe('Thing stream', () => {
             client.close();
         });
         client.on('error', function (message) { assert.fail(message) });
-        client.on('open', async function (message) { await chai.request(server).keepOpen().keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
+        client.on('open', async function (message) { await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
         await new Promise(done => { client.on('close', done) });
     });
 
@@ -185,7 +184,7 @@ describe('Thing stream', () => {
             client.close();
         });
         client.on('error', function (message) { assert.fail(message) });
-        client.on('open', async function (message) { await chai.request(server).keepOpen().keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
+        client.on('open', async function (message) { await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
         await new Promise(done => { client.on('close', done) });
     }); 
 
@@ -211,7 +210,7 @@ describe('Thing stream', () => {
             client.close();
         });
         client.on('error', function (message) { assert.fail(message) });
-        client.on('open', async function (message) { await chai.request(server).keepOpen().keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
+        client.on('open', async function (message) { await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
         await new Promise(done => { client.on('close', done) });
     }); 
 
@@ -236,7 +235,7 @@ describe('Thing stream', () => {
             client.close();
         });
         client.on('error', function (message) { assert.fail(message) });
-        client.on('open', async function (message) { await chai.request(server).keepOpen().keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
+        client.on('open', async function (message) { await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
         await new Promise(done => { client.on('close', done) });
     }); 
 
@@ -270,7 +269,10 @@ describe('Thing stream', () => {
             client_2.close();
         });
         client_2.on('error', function (message) { assert.fail(message) });
-        client_1.on('open', async function (message) { await chai.request(server).keepOpen().keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request_1); });
-        client_2.on('open', async function (message) { await chai.request(server).keepOpen().keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request_2); });
+        client_1.on('open', async function (message) { await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request_1); });
+        client_2.on('open', async function (message) { await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request_2); });
+        const promise_1 = new Promise(done_1 => { client_1.on('close', done_1) });
+        const promise_2 = new Promise(done_2 => { client_2.on('close', done_2) });
+        await Promise.all([promise_1, promise_2])
     }); 
 });

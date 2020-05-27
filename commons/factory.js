@@ -16,6 +16,7 @@ const Issue = mongoose.model('Issue');
 const Computation = mongoose.model('Computation');
 const Right = mongoose.model('Right');
 const Fieldmask = mongoose.model('Fieldmask');
+const Subscription = mongoose.model('Subscription');
 const RelationshipTypes = require('../types/relationshipTypes');
 const jwt = require('jsonwebtoken');
 const ItemTypes = require('../types/itemTypes.js');
@@ -232,6 +233,19 @@ exports.createScript = async function(name, owner, code, tags, visibility) {
     const script = new Script(req);
     await script.save();
     return script._doc;
+};
+
+exports.createSubscription = async function(token, owner, device, thing, tags) {
+    const req = { 
+        token: token,
+        owner: owner,
+        device: device,
+        thing: thing,
+        tags: tags
+    }
+    const subscription = new Subscription(req);
+    await subscription.save();
+    return subscription._doc;
 };
 
 exports.createRight = async function(resource, type, user, owner, tags) {

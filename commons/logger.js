@@ -10,7 +10,12 @@ morgan.token('url', function (req, res) { return decodeURIComponent(req.original
 
 morgan.token('body', function (req, res) { return JSON.stringify(req.body); });
 
-const connection = { connectionString: process.env.DATABASE };
+const connection = { 
+    connectionString: process.env.DATABASE,
+    //capped: true,
+    //cappedSize: 100000,
+    //cappedMax: 1000 
+};
 
 const option = { };
 
