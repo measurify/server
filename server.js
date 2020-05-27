@@ -103,7 +103,7 @@ else {
         message = 'Measurify Cloud API Server is running on HTTPS';
     }
     catch(err) { server = http.createServer(app);
-        port = process.env.HTTPS_PORT;
+        port = process.env.HTTP_PORT;
         message = 'WARNING: HTTPS not running (' + err + '), Measurify Cloud API Server is running on HTTP';
     }
 }

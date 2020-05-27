@@ -6080,6 +6080,409 @@
 			"protocolProfileBehavior": {}
 		},
 		{
+			"name": "SUBSCRIPTIONS",
+			"item": [
+				{
+					"name": "LOGIN as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "1d597e8a-3d59-4cab-8bd6-f02a081ceb42",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new provider",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "28c7fcb2-c270-42b9-a40e-79f3d8f167f2",
+								"exec": [
+									"pm.environment.set(\"provider\", JSON.parse(responseBody)._id);",
+									"pm.environment.set(\"provider_username\", JSON.parse(responseBody).username);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": " {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"provider-useranme-subscription\",\n\t\"password\" : \"provider-password-subscription\",\n\t\"type\" : \"provider\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new feature",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "949d2966-7d04-4c22-a65a-8280313ef27e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "b0a5d3fd-f141-4148-a5e8-25dad071bf1a",
+								"exec": [
+									"pm.environment.set(\"feature\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"_id\": \"subscription-data\",\n    \"items\": [\n    \t{\n        \t\"name\": \"valus\",\n            \"unit\": \"unit\",\n            \"type\": \"number\",\n            \"dimension\": 0\n        }\n    ]\n}\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/features",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"features"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new device",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "b72fefe2-65ed-4890-a06c-67079a3b4728",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "b34d5266-a3f1-413e-8c4f-ec6eeddee272",
+								"exec": [
+									"pm.environment.set(\"device\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"_id\": \"subscription-device\",\r\n    \"features\": [ \"subscription-data\" ]\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/devices/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"devices",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new thing",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "113148c9-02da-40b3-8692-094cf01ad35e",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "2beff83f-51da-4ede-bdf5-7017a38f573c",
+								"exec": [
+									"pm.environment.set(\"thing\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"_id\": \"subscription-thing\"\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/things/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"things",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new subscription",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "18ddd60b-5981-49d7-aec2-b62831bf1cb4",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "913c6f03-1087-4d06-a937-0b6d308faa45",
+								"exec": [
+									"pm.environment.set(\"thing\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"token\": \"fzXeIMCtk48:APA91bEDsNOrL2qfA_TK9lDsg0iCc4cb4AG5GfYGJfRjt4n0htJq-2byRf9-eoULMViG_NMk09_dMyoN6VTFr3SsW3Z8R8NDBHtL6E8__VNV1ZFVfXf2Mp886GVy3S4jREmwVhS0sOQR\",\r\n  \"thing\": \"subscription-thing\"\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/subscriptions/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"subscriptions",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LOGIN as provider",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fe916a8d-8367-4b23-98dc-f713821cc5d1",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"provider-username-subscription\",\n\t\"password\" : \"provider-password-subscription\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new measurement",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "fe0b104f-9781-40d2-bde8-919c17fa875f",
+								"exec": [
+									"var current_timestamp = new Date();",
+									"postman.setEnvironmentVariable(\"current_timestamp\", current_timestamp.toISOString());",
+									"postman.setEnvironmentVariable(\"value\", Math.floor(Math.random() * 10));",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"startDate\": \"{{current_timestamp}}\",\r\n\t\"endDate\": \"{{current_timestamp}}\",\r\n\t\"thing\": \"subscription-thing\",\r\n\t\"feature\": \"subscription-data\",\r\n\t\"device\": \"subscription-device\",\r\n\t\"samples\": [ { \"values\": [{{value}}] }]\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/measurements",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "API docs",
 			"event": [
 				{
