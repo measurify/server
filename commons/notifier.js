@@ -1,11 +1,15 @@
 const firebase = require("firebase-admin");
-//const account = require(process.env.FIREBASE_SECRET);
 const account = require("../security/firebase-config.json");
 
-firebase.initializeApp({
-    credential: firebase.credential.cert(account),
-    databaseURL: process.env.FIREBASE_URL
-});
+try{
+    firebase.initializeApp({
+        credential: firebase.credential.cert(account),
+        databaseURL: process.env.FIREBASE_URL
+    });
+}
+catch(error) {
+    console.log("Warning: firebase not started, check your firebase-config.json file");
+}
 
 const options = { priority: 'high', timeToLive: 60 * 60 * 24 };
 
