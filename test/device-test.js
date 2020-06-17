@@ -1,26 +1,23 @@
-// Import environmental variables from variables.test.env file
-require('dotenv').config({ path: 'variables.test.env' });
 
-// This line allow to test with the self signed certificate
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+process.env.ENV = 'test';
+process.env.LOG = 'false'; 
 
 // Import test tools
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+const database = require('../database.js');
 const server = require('../server.js');
 const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
-const Device = mongoose.model('Device');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
-
 chai.use(chaiHttp);
 
 // Test the /GET route
 describe('/GET device', () => {
-    it('it should GET all the devices', async () => {
-        factory.dropContents();
+    it('it should GET all the devices', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         await factory.createDevice("test-device-1", user);
         await factory.createDevice("test-device-2", user);
@@ -30,8 +27,7 @@ describe('/GET device', () => {
         res.body.docs.length.should.be.eql(2);
     });
 
-    it('it should GET a specific device', async () => {
-        factory.dropContents();
+    it('it should GET a specific device', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user);
         const device = await factory.createDevice("test-device-1", user, [feature]);
@@ -52,8 +48,7 @@ describe('/GET device', () => {
 
 // Test the /POST route
 describe('/POST device', () => {
-    it('it should not POST a device without _id field', async () => {
-        factory.dropContents();
+    it('it should not POST a device without _id field', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = {}
         const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
@@ -64,8 +59,7 @@ describe('/POST device', () => {
         res.body.details.should.contain('Please, supply an _id');
     });
 
-    it('it should not POST a device without features field', async () => {
-        factory.dropContents();
+    it('it should not POST a device without features field', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = { _id: "test-device-1", owner: user }
         const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
@@ -76,8 +70,7 @@ describe('/POST device', () => {
         res.body.details.should.contain('Please, supply at least one feature');
     });
 
-    it('it should not POST a device with a fake feature', async () => {
-        factory.dropContents();
+    it('it should not POST a device with a fake feature', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = { _id: "test-device-2", owner: user, features: ["fake-feature"] }
         const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
@@ -88,8 +81,7 @@ describe('/POST device', () => {
         res.body.details.should.contain('Feature not existent');
     });
 
-    it('it should not POST a device with a fake tag', async () => {
-        factory.dropContents();
+    it('it should not POST a device with a fake tag', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = { _id: "test-device-2", owner: user, tags: ["fake-tag"], features: [await factory.createFeature("test-device-2-feature-good", user)] }
         const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
@@ -100,8 +92,7 @@ describe('/POST device', () => {
         res.body.details.should.contain('Tag not existent');
     });
 
-    it('it should not POST a device with a fake buffer policy', async () => {
-        factory.dropContents();
+    it('it should not POST a device with a fake buffer policy', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = { _id: "test-device-2", owner: user, measurementBufferPolicy: "fake-policy", features: [await factory.createFeature("test-device-2-feature-good", user)] }
         const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
@@ -135,6 +126,7 @@ describe('/POST device', () => {
             owner: user,
             features: [await factory.createFeature("test-device-1-feature-2", user)]
         }
+        await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
         const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -145,6 +137,12 @@ describe('/POST device', () => {
 
     it('it should GET the device posted before', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const device = {
+            _id: "test-device-1",
+            owner: user,
+            features: [await factory.createFeature("test-device-1-feature", user)]
+        }
+        await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
         const res = await chai.request(server).keepOpen().get('/v1/devices').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
@@ -167,13 +165,19 @@ describe('/POST device', () => {
 
     it('it should POST only not existing devices from a list', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const devices = [
-                            { _id: "test-device-1", owner: user, features: [await factory.createFeature("test-device-1-feature-new", user)] },
-                            { _id: "test-device-2", user, features: [await factory.createFeature("test-device-2-feature-new", user)] },
-                            { _id: "test-device-3", user, features: [await factory.createFeature("test-device-3-feature-new", user)] },
-                            { _id: "test-device-4", user, features: [await factory.createFeature("test-device-4-feature-new", user)] },
-                            { _id: "test-device-5", user, features: [await factory.createFeature("test-device-5-feature-new", user)] }
-                        ];
+        let devices = [
+            { _id: "test-device-1", owner: user, features: [await factory.createFeature("test-device-1-feature-new", user)] },
+            { _id: "test-device-3", owner: user, features: [await factory.createFeature("test-device-3-feature-new", user)] },
+            { _id: "test-device-4", owner: user, features: [await factory.createFeature("test-device-4-feature-new", user)] }
+        ];
+        await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(devices)
+        devices = [
+            { _id: "test-device-1", owner: user, features: [await factory.createFeature("test-device-5-feature-new", user)] },
+            { _id: "test-device-2", owner: user, features: [await factory.createFeature("test-device-6-feature-new", user)] },
+            { _id: "test-device-3", owner: user, features: [await factory.createFeature("test-device-7-feature-new", user)] },
+            { _id: "test-device-4", owner: user, features: [await factory.createFeature("test-device-8-feature-new", user)] },
+            { _id: "test-device-5", owner: user, features: [await factory.createFeature("test-device-9-feature-new", user)] }
+        ];
         const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(devices)
         res.should.have.status(202);
         res.body.should.be.a('object');
@@ -187,8 +191,7 @@ describe('/POST device', () => {
 
     });
 
-    it('it should POST a device with tags', async () => {
-        factory.dropContents();
+    it('it should POST a device with tags', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = {
             _id: "test-device-1",
@@ -207,8 +210,7 @@ describe('/POST device', () => {
 
 // Test the /DELETE route
 describe('/DELETE device', () => {
-    it('it should DELETE a device', async () => {
-        factory.dropContents();
+    it('it should DELETE a device', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = await factory.createDevice("test-device-1", user);
         const devices_before = await Device.find();
@@ -220,8 +222,7 @@ describe('/DELETE device', () => {
         devices_after.length.should.be.eql(0);
     });
 
-    it('it should not DELETE a fake device', async () => {
-        factory.dropContents();
+    it('it should not DELETE a fake device', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = await factory.createDevice("test-device-2", user);
         const devices_before = await Device.find();
@@ -234,8 +235,7 @@ describe('/DELETE device', () => {
         devices_after.length.should.be.eql(1);
     });
     
-    it('it should not DELETE a device by non-owner', async () => {
-        factory.dropContents();
+    it('it should not DELETE a device by non-owner', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const device = await factory.createDevice("test-device-2", user);
@@ -249,8 +249,7 @@ describe('/DELETE device', () => {
         devices_after.length.should.be.eql(1);
     });
 
-    it('it should not DELETE a device already used in a measurement', async () => {
-        factory.dropContents();
+    it('it should not DELETE a device already used in a measurement', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const tag = await factory.createTag("test-tag", user);

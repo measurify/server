@@ -1,8 +1,7 @@
-// Import environmental variables from variables.test.env file
-require('dotenv').config({ path: 'variables.test.env' });
 
-// This line allow to test with the self signed certificate
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+process.env.ENV = 'test';
+process.env.LOG = 'false'; 
 
 // Import test tools
 const chai = require('chai');
@@ -13,18 +12,15 @@ const server = require('../server.js');
 const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
-const User = mongoose.model('User');
 const UserRoles = require('../types/userRoles.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 const errors = require('../commons/errors.js');
-
 chai.use(chaiHttp);
 
 // CREATE
 describe('Access create measurement', () => {
-    it('it should create a measurement as admin', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+    it('it should create a measurement as admin', async () => {      
+const user_admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const feature = await factory.createFeature("test-feature-1", user_admin);
         const device = await factory.createDevice("test-device-1", user_admin, [feature]);
         const thing = await factory.createThing("test-thing-1", user_admin);
@@ -35,8 +31,7 @@ describe('Access create measurement', () => {
         res.body.should.have.property('_id');
     });
 
-    it('it should create a measurement as provider', async () => {
-        factory.dropContents();
+    it('it should create a measurement as provider', async () => {      
         const user_provider = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user_provider);
         const device = await factory.createDevice("test-device-1", user_provider, [feature]);
@@ -48,9 +43,8 @@ describe('Access create measurement', () => {
         res.body.should.have.property('_id');
     });
 
-    it('it should not create a measurement as analyst', async () => {
-        factory.dropContents();
-        const user_analyst = await factory.createUser("test-username-1", "test-password-1", UserRoles.analyst);
+    it('it should not create a measurement as analyst', async () => {      
+const user_analyst = await factory.createUser("test-username-1", "test-password-1", UserRoles.analyst);
         const feature = await factory.createFeature("test-feature-1", user_analyst);
         const device = await factory.createDevice("test-device-1", user_analyst, [feature]);
         const thing = await factory.createThing("test-thing-1", user_analyst);
@@ -65,9 +59,8 @@ describe('Access create measurement', () => {
 
 // READ LIST
 describe('Access read a list of measurements', () => {
-    it('it should get all the public/private measurements as admin or analyst', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.admin);
+    it('it should get all the public/private measurements as admin or analyst', async () => {      
+const user_admin = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.admin);
         const user_analyst = await factory.createUser("test-username-user-2", "test-password-user-2", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -98,9 +91,8 @@ describe('Access read a list of measurements', () => {
         res.body.docs.length.should.be.eql(8);
     });
 
-    it('it should get just his own or public measurements as provider', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
+    it('it should get just his own or public measurements as provider', async () => {      
+const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -135,9 +127,8 @@ describe('Access read a list of measurements', () => {
         res.body.docs.length.should.be.eql(10);
     });
 
-    it('it should get a filtered list of his own or public measurements as provider', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
+    it('it should get a filtered list of his own or public measurements as provider', async () => {      
+const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -173,9 +164,8 @@ describe('Access read a list of measurements', () => {
         res.body.docs.length.should.be.eql(4);
     });
 
-    it('it should get own or public measurements only of a specific tag AND (of a specific feature OR a specific device)', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin); 
+    it('it should get own or public measurements only of a specific tag AND (of a specific feature OR a specific device)', async () => {      
+const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin); 
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature1 = await factory.createFeature("test-feature-1", owner);
@@ -200,9 +190,8 @@ describe('Access read a list of measurements', () => {
         res.body.docs.length.should.be.eql(2);
     });
 
-    it('it should get own or public measurements only of a specific tag AND of a specific feature', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin); 
+    it('it should get own or public measurements only of a specific tag AND of a specific feature', async () => {      
+const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin); 
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature1 = await factory.createFeature("test-feature-1", owner);
@@ -230,9 +219,8 @@ describe('Access read a list of measurements', () => {
 
 // READ
 describe('Access read a measurement', () => {
-    it('it should get a public/private measurement as admin or analyst', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
+    it('it should get a public/private measurement as admin or analyst', async () => {      
+const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -258,8 +246,7 @@ describe('Access read a measurement', () => {
         res.body._id.should.eql(measurement_private._id.toString());
     });
 
-    it('it should get a public measurement as provider', async () => {
-        factory.dropContents();
+    it('it should get a public measurement as provider', async () => {      
         const user_provider = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -272,8 +259,7 @@ describe('Access read a measurement', () => {
         res.body._id.should.eql(measurement_public._id.toString());
     });
 
-    it('it should not get a private measurement as provider not owner', async () => {
-        factory.dropContents();
+    it('it should not get a private measurement as provider not owner', async () => {      
         const user_provider = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -286,8 +272,7 @@ describe('Access read a measurement', () => {
         res.body.message.should.contain(errors.restricted_access_read.message);
     });
 
-    it('it should get a public/private measurement as provider and owner', async () => {
-        factory.dropContents();
+    it('it should get a public/private measurement as provider and owner', async () => {      
         const user_provider_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user_provider_owner);
         const device = await factory.createDevice("test-device-1", user_provider_owner, [feature]);
@@ -308,9 +293,8 @@ describe('Access read a measurement', () => {
 
 // MODIFY 
 describe('Access modify measurement', () => {
-    it('it should modify a measurement as admin', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
+    it('it should modify a measurement as admin', async () => {      
+const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -325,9 +309,8 @@ describe('Access modify measurement', () => {
         res.body._id.should.eql(measurement._id.toString());
     });
 
-    it('it should modify a measurement as provider and owner', async () => {
-        factory.dropContents();
-        const user_provide_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
+    it('it should modify a measurement as provider and owner', async () => {      
+const user_provide_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user_provide_owner);
         const device = await factory.createDevice("test-device-1", user_provide_owner, [feature]);
         const thing = await factory.createThing("test-thing-1", user_provide_owner);
@@ -341,9 +324,8 @@ describe('Access modify measurement', () => {
         res.body._id.should.eql(measurement._id.toString());
     });
 
-    it('it should not modify a measurement as analyst', async () => {
-        factory.dropContents();
-        const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
+    it('it should not modify a measurement as analyst', async () => {      
+const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -357,8 +339,7 @@ describe('Access modify measurement', () => {
         res.body.message.should.contain(errors.restricted_access_modify.message);
     });
 
-    it('it should not modify a measurement as provider not owner', async () => {
-        factory.dropContents();
+    it('it should not modify a measurement as provider not owner', async () => {      
         const user_provider = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -377,9 +358,8 @@ describe('Access modify measurement', () => {
 // DELETE
 
 describe('Access delete measurement', () => {
-    it('it should delete a measurement as admin', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
+    it('it should delete a measurement as admin', async () => {      
+const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -392,9 +372,8 @@ describe('Access delete measurement', () => {
         res.body.should.be.a('object');
     });
 
-    it('it should delete a measurement as provider and owner', async () => {
-        factory.dropContents();
-        const user_provide_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
+    it('it should delete a measurement as provider and owner', async () => {      
+const user_provide_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user_provide_owner);
         const device = await factory.createDevice("test-device-1", user_provide_owner, [feature]);
         const thing = await factory.createThing("test-thing-1", user_provide_owner);
@@ -406,9 +385,8 @@ describe('Access delete measurement', () => {
         res.body.should.be.a('object');
     });
 
-    it('it should not delete a measurement as analyst', async () => {
-        factory.dropContents();
-        const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
+    it('it should not delete a measurement as analyst', async () => {      
+const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -422,8 +400,7 @@ describe('Access delete measurement', () => {
         res.body.message.should.contain(errors.restricted_access_delete.message);
     });
 
-    it('it should not delete a measurement as provider not owner', async () => {
-        factory.dropContents();
+    it('it should not delete a measurement as provider not owner', async () => {      
         const user_provider = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -442,9 +419,8 @@ describe('Access delete measurement', () => {
 
 // DELETE MORE
 describe('Access delete a list of measurements', () => {
-    it('it should delete a list of measurements as admin', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
+    it('it should delete a list of measurements as admin', async () => {      
+const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -470,9 +446,8 @@ describe('Access delete a list of measurements', () => {
         res.body.deleted.should.be.eql(8);
     });
 
-    it('it should not delete a list of measurements as analyst', async () => {
-        factory.dropContents();
-        const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
+    it('it should not delete a list of measurements as analyst', async () => {      
+const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -498,8 +473,7 @@ describe('Access delete a list of measurements', () => {
         res.body.message.should.contain(errors.restricted_access_delete.message);
     });
 
-    it('it should not delete just its own list of measurements as provider', async () => {
-        factory.dropContents();
+    it('it should not delete just its own list of measurements as provider', async () => {      
         const user_provider = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -526,9 +500,8 @@ describe('Access delete a list of measurements', () => {
         res.body.deleted.should.be.eql(5);
     });
 
-    it('it should delete a filtered list of his own measurements as provider', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
+    it('it should delete a filtered list of his own measurements as provider', async () => {      
+const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -562,9 +535,8 @@ describe('Access delete a list of measurements', () => {
         res.body.deleted.should.be.eql(2);
     });
 
-    it('it should delete own measurements only of a specific tag AND (of a specific feature OR a specific device)', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin); 
+    it('it should delete own measurements only of a specific tag AND (of a specific feature OR a specific device)', async () => {      
+const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin); 
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature1 = await factory.createFeature("test-feature-1", owner);
@@ -590,9 +562,8 @@ describe('Access delete a list of measurements', () => {
 
 // RIGHTS
 describe('Access measurements withs right as analyst', () => {
-    it('it should get only measurements of features with rights as analyst', async () => {
-        factory.dropContents();
-        const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
+    it('it should get only measurements of features with rights as analyst', async () => {      
+const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature_right_1 = await factory.createFeature("test-feature-1", owner);
         const feature_right_2 = await factory.createFeature("test-feature-2", owner);
@@ -621,9 +592,8 @@ describe('Access measurements withs right as analyst', () => {
         res.body.size.should.be.eql(6);
     });
 
-    it('it should get only measurements of tags with rights as analyst', async () => {
-        factory.dropContents();
-        const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
+    it('it should get only measurements of tags with rights as analyst', async () => {      
+const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -653,9 +623,8 @@ describe('Access measurements withs right as analyst', () => {
         res.body.size.should.be.eql(7);
     });
 
-    it('it should get only measurements of device with rights as analyst', async () => {
-        factory.dropContents();
-        const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
+    it('it should get only measurements of device with rights as analyst', async () => {      
+const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device_right_1 = await factory.createDevice("test-device-1", owner, [feature]);
@@ -684,9 +653,8 @@ describe('Access measurements withs right as analyst', () => {
         res.body.size.should.be.eql(7);
     });
 
-    it('it should get only measurements of things with rights as analyst', async () => {
-        factory.dropContents();
-        const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
+    it('it should get only measurements of things with rights as analyst', async () => {      
+const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -715,9 +683,8 @@ describe('Access measurements withs right as analyst', () => {
         res.body.size.should.be.eql(6);
     });
 
-    it('it should get only measurements of device and feature with rights as analyst', async () => {
-        factory.dropContents();
-        const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
+    it('it should get only measurements of device and feature with rights as analyst', async () => {      
+const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device_right_1 = await factory.createDevice("test-device-1", owner, [feature]);
@@ -754,9 +721,8 @@ describe('Access measurements withs right as analyst', () => {
 });
 
 describe('Access measurements withs right as provider', () => {
-    it('it should get only his measurements of features with rights as provider', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should get only his measurements of features with rights as provider', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature_right_1 = await factory.createFeature("test-feature-1", owner);
         const feature_right_2 = await factory.createFeature("test-feature-2", owner);
@@ -785,9 +751,8 @@ describe('Access measurements withs right as provider', () => {
         res.body.size.should.be.eql(3);
     });
 
-    it('it should get only his measurements of devices with rights as provider', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should get only his measurements of devices with rights as provider', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device_right_1 = await factory.createDevice("test-device-1", owner, [feature]);
@@ -816,9 +781,8 @@ describe('Access measurements withs right as provider', () => {
         res.body.size.should.be.eql(3);
     });
 
-    it('it should get only his measurements of things with rights as provider', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should get only his measurements of things with rights as provider', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -847,9 +811,8 @@ describe('Access measurements withs right as provider', () => {
         res.body.size.should.be.eql(4);
     });
 
-    it('it should get only his measurements of tags with rights as provider', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should get only his measurements of tags with rights as provider', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -879,9 +842,8 @@ describe('Access measurements withs right as provider', () => {
         res.body.size.should.be.eql(4);
     });
 
-    it('it should get only his measurements of things and tags with rights as provider', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should get only his measurements of things and tags with rights as provider', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -919,9 +881,8 @@ describe('Access measurements withs right as provider', () => {
 });
 
 describe('Access a single measurements with rights', () => {
-    it('it should access a measurements with rights on thing', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should access a measurements with rights on thing', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -935,9 +896,8 @@ describe('Access a single measurements with rights', () => {
         res.body._id.should.be.eql(measurement._id.toString());
     });
 
-    it('it should not access a measurements with a rights on a different thing', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should not access a measurements with a rights on a different thing', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -953,9 +913,8 @@ describe('Access a single measurements with rights', () => {
         res.body.message.should.be.eql(errors.restricted_access_read.message);
     });
 
-    it('it should access a measurements with rights on device', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should access a measurements with rights on device', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -969,9 +928,8 @@ describe('Access a single measurements with rights', () => {
         res.body._id.should.be.eql(measurement._id.toString());
     });
 
-    it('it should not access a measurements with a rights on a different device', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should not access a measurements with a rights on a different device', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -987,9 +945,8 @@ describe('Access a single measurements with rights', () => {
         res.body.message.should.be.eql(errors.restricted_access.message);
     });
 
-    it('it should access a measurements with rights on device and other', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should access a measurements with rights on device and other', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -1005,9 +962,8 @@ describe('Access a single measurements with rights', () => {
         res.body._id.should.be.eql(measurement._id.toString());
     });
 
-    it('it should not access a measurements with a rights on a device but not on thing', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should not access a measurements with a rights on a device but not on thing', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -1024,9 +980,8 @@ describe('Access a single measurements with rights', () => {
         res.body.message.should.be.eql(errors.restricted_access.message);
     });
 
-    it('it should access a measurements with rights on feature', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should access a measurements with rights on feature', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -1040,9 +995,8 @@ describe('Access a single measurements with rights', () => {
         res.body._id.should.be.eql(measurement._id.toString());
     });
 
-    it('it should not access a measurements with a rights on a different feature', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should not access a measurements with a rights on a different feature', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const feature_other = await factory.createFeature("test-feature-2", owner);
@@ -1058,9 +1012,8 @@ describe('Access a single measurements with rights', () => {
         res.body.message.should.be.eql(errors.restricted_access.message);
     });
 
-    it('it should access a measurements with rights on feature and other', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should access a measurements with rights on feature and other', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const feature_other = await factory.createFeature("test-feature-2", owner);
@@ -1076,9 +1029,8 @@ describe('Access a single measurements with rights', () => {
         res.body._id.should.be.eql(measurement._id.toString());
     });
 
-    it('it should not access a measurements with a rights on a feature but not on thing', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should not access a measurements with a rights on a feature but not on thing', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -1095,9 +1047,8 @@ describe('Access a single measurements with rights', () => {
         res.body.message.should.be.eql(errors.restricted_access.message);
     });
 
-    it('it should access a measurements with rights on tag', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should access a measurements with rights on tag', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -1111,9 +1062,8 @@ describe('Access a single measurements with rights', () => {
         res.body._id.should.be.eql(measurement._id.toString());
     });
 
-    it('it should access a measurements with rights on tag and others', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should access a measurements with rights on tag and others', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -1133,9 +1083,8 @@ describe('Access a single measurements with rights', () => {
         res.body._id.should.be.eql(measurement._id.toString());
     });
 
-    it('it should not access a measurements with a rights on a different tag', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should not access a measurements with a rights on a different tag', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -1152,9 +1101,8 @@ describe('Access a single measurements with rights', () => {
         res.body.message.should.be.eql(errors.restricted_access.message);
     });
 
-    it('it should not access a measurements with rights on a different set of tags', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should not access a measurements with rights on a different set of tags', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -1175,9 +1123,8 @@ describe('Access a single measurements with rights', () => {
         res.body.message.should.be.eql(errors.restricted_access.message);
     });
 
-    it('it should not access a measurements with rights on tags but not on thing', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should not access a measurements with rights on tags but not on thing', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -1202,9 +1149,8 @@ describe('Access a single measurements with rights', () => {
 });
 
 describe('Create a measurements with rights', () => {
-    it('it should not create a measurements without rights on thing', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should not create a measurements without rights on thing', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -1219,9 +1165,8 @@ describe('Create a measurements with rights', () => {
         res.body.details.should.contain('You miss rigths on some resources');
     });
 
-    it('it should not create a measurements without rights on device', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should not create a measurements without rights on device', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -1236,9 +1181,8 @@ describe('Create a measurements with rights', () => {
         res.body.details.should.contain('You miss rigths on some resources');
     });
 
-    it('it should not create a measurements without rights on feature', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should not create a measurements without rights on feature', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const feature_other = await factory.createFeature("test-feature-2", owner);
@@ -1254,9 +1198,8 @@ describe('Create a measurements with rights', () => {
         res.body.details.should.contain('You miss rigths on some resources');
     });
 
-    it('it should not create a measurements without rights on tag', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should not create a measurements without rights on tag', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -1272,9 +1215,8 @@ describe('Create a measurements with rights', () => {
         res.body.details.should.contain('You miss rigths on some resources');
     });
 
-    it('it should create a measurements with rights', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should create a measurements with rights', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -1290,9 +1232,8 @@ describe('Create a measurements with rights', () => {
 });
 
 describe('Delete measurement with rights', () => {
-    it('it should not delete a measurement without rights', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should not delete a measurement without rights', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -1309,9 +1250,8 @@ describe('Delete measurement with rights', () => {
         res.body.message.should.be.eql(errors.restricted_access.message);
     });
 
-    it('it should delete a measurement with rights', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should delete a measurement with rights', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -1324,9 +1264,8 @@ describe('Delete measurement with rights', () => {
         res.body.should.be.a('object');
     });
 
-    it('it should not delete a measurement with rights as analyst', async () => {
-        factory.dropContents();
-        const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
+    it('it should not delete a measurement with rights as analyst', async () => {      
+const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -1343,9 +1282,8 @@ describe('Delete measurement with rights', () => {
 });
 
 describe('Modify measurements with rights', () => {
-    it('it should not modify a measurement without rights', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should not modify a measurement without rights', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -1363,9 +1301,8 @@ describe('Modify measurements with rights', () => {
         res.body.message.should.be.eql(errors.restricted_access.message);
     });
 
-    it('it should modify a measurement with rights', async () => {
-        factory.dropContents();
-        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+    it('it should modify a measurement with rights', async () => {      
+const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);

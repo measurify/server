@@ -1,12 +1,12 @@
 {
   "type": "service_account",
-  "project_id": "INSERT_YOUR_PRoJECT_ID",
-  "private_key_id": "INSERT_YOUR_PRIVATE_KEY_ID",
-  "private_key": "INSERT_YOUR_PRIVATE_KEY",
-  "client_email": "INSERT_YOUR_CLIENT_EMAIL",
-  "client_id": "INSERT_YOUR_CLIENT_ID",
-  "auth_uri": "INSERT_AUTH_URI",
-  "token_uri": "INSERT_YOUR_CLIENT_ID",
-  "auth_provider_x509_cert_url": "INSERT_AUHTO_PROVIDER",
-  "client_x509_cert_url": "INSERT_CLIENT_CERT_ID"
+  "project_id": "measurify",
+  "private_key_id": "5f486c0d3948bca6efb835a14708fef30dbefddf",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDmpKUPDo/8WLOj\n0K7INRvUwZiad71xWfm2NHX/nbZLb3QnO3nQ/dkKkj3fH7yCQ0UHCRle9eG9xbF1\nHdFUYZ0ZN49/7xUyECh+kOVm/eM0fOBa/vNdXg0rCVJzsJl1QFP9/IYDzbQuX/Id\n5k81GtsQYUOr843Y4GdPQC7tfcs4mQPExg1AYu99FnaFlpD4o95UP8HeR2GX7htI\nHuElxa1dq3cTJ18Al/9DndaHRYsj5mTYL7Tyib0oBwemZ6edK9aLKo1BmJcrtdme\n42cPNC0bLCbbOJGw5GVGNBd7DivT3yJnWqrI1yq98uiYe1ssbNN2P9JOhS2NKtN4\nyjVR2RyZAgMBAAECggEAXBQXIW+65A+1iAzj+mHZfpLbja+IHhzBqJBBG4+nG26f\nfJouA9WUNLg1o0JUS9z3TdvAGT0opk6qjgsdawadZVfdHkIgwB/bSswmCXwKnQXN\nvAZUuk22DBxoom86lKjd32RVTGdvK6R6UJ2FubnDA0MRdTCCzLaqB+Wj1oSGAU2z\nQpPa+FuZmIAaVFSFnP43G8Kf/88ta9ba5bd0wQtTvX81MQNXRNHxG9KmjykUAVbp\n6Q0oC9WVUy29xlXRhnml5nGnargROif/qzb3zR7QTGEqBrlO/L06mD/nPr4VxruS\nVGSdmRpwHc0PQGNfsbWpWtofLpNca0WZaqcsYUo+kQKBgQDzEnCzzBfagE3vyn6L\nIyUFGo1A4JbqO7cp/QU/BGOZGBL27EwaNJT/QsH1O6cDTQipXcqG4mL4ByNOi1OT\ntOIm7F3pPzf4eiP2XsZ8q3acS3DG9EZhsSk/eC7A0iAlN3h7siOL4G4VJmkcoif2\n3Ba09iVS7YsEtJd77gZZFTu0pwKBgQDy6Pp02T5X1W7pjKYI3zQOKM/cCmrJ/VeO\ngQxNZGzfn59w2MWBYW2Dmzh0575HjS4q8VgO3FEvGyU69s09Y/igyUSobZ6xYTVF\nGj2u+kce97dl7jFq15LXodlaRhgN//5MsP+upNu++k94n7Avx8WDqpy6ZEdtY7rJ\nPBep5q6MvwKBgE6l18uFLO6o9w6wUVOJso+9MJkeUhZF7hTq5kimjedaL8CvYkxU\nWSVin0lO3NInmbbbPw13sJgaDyV51TgEnewELLqsltqSApLTxZtPC1i03C+zmBZB\n8Vu08kO3eWkxUo2LbQ70Ngon3HjESvQH8FzrC9aSP5ntKNqTgIBQa3ofAoGAXi5a\nvWdltqR4RnFUBuiTxFGqlgQr93kUs5nxbShc1i+LoDNMEKf30CkksJ8RtahVmCzP\nGaPujjcWLlB2rzDNu3mN90fZWaj5AHv2IpvDa4xcPVcnLee7dYO5RDkdJoB01sNh\nvxMIaHmgyoIPy9bHDA/giJxM3WrnhxKXkjZwwv0CgYEA1vts6GBtS8nWUHDfX4XV\noagPeJ7phch0gDo0uOyE6ApLb87mxuWuYfFk7qeunMl96LjQs6zA5I/c6Wd2dP4J\ncmcm/ROc0i7iyccX6/sb11EvlgV78rCxDZ/ZMQdv6SE0kA+wnUrTyzU3fPh6bFYP\nFFbzYV5IbXSokHXy9WP04ds=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-zpvgg@measurify.iam.gserviceaccount.com",
+  "client_id": "117754774667284988288",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-zpvgg%40measurify.iam.gserviceaccount.com"
 }

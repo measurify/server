@@ -46,7 +46,7 @@ fieldmaskSchema.pre('save', async function() {
     if(properties.every(function (property) {
         const request_fields = resource[property];
         if(!request_fields || request_fields == 0) return true;
-        const model_fields = Object.keys(mongoose.model((property.charAt(0).toUpperCase() + property.slice(1)).replace('_fields','')).schema.paths);
+        const model_fields = Object.keys(resource.constructor.model((property.charAt(0).toUpperCase() + property.slice(1)).replace('_fields','')).schema.paths);
         if(!request_fields.every(request_field => model_fields.indexOf(request_field) > -1)) throw new Error('Fieldschema validation failed: supply valid fields'); 
     }));
 });
@@ -57,4 +57,5 @@ fieldmaskSchema.pre('save', async function () {
     if (res) throw new Error('Fieldmask validation failed: the _id is already used (' + this._id + ')');
 });
 
-module.exports = mongoose.models.Fieldmask || mongoose.model('Fieldmask', fieldmaskSchema);
+//module.exports = this.constructor.models.Fieldmask || this.constructor.model('Fieldmask', fieldmaskSchema);
+module.exports = fieldmaskSchema;

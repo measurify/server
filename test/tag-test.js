@@ -1,8 +1,5 @@
-// Import environmental variables from variables.test.env file
-require('dotenv').config({ path: 'variables.test.env' });
-
-// This line allow to test with the self signed certificate
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+process.env.ENV = 'test';
+process.env.LOG = 'false'; 
 
 // Import test tools
 const chai = require('chai');
@@ -12,19 +9,13 @@ const server = require('../server.js');
 const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
-const Measurement = mongoose.model('Measurement');
-const Tag = mongoose.model('Tag');
-const Feature = mongoose.model('Feature');
-const User = mongoose.model('User');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
-
 chai.use(chaiHttp);
 
 // Test the /GET route
 describe('/GET tags', () => {
     it('it should GET all the tags', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         await factory.createTag("test-tag-1", user);
         await factory.createTag("test-tag-2", user);
@@ -35,7 +26,6 @@ describe('/GET tags', () => {
     });
 
     it('it should GET a specific tag', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user);
         const res = await chai.request(server).keepOpen().get('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user));
@@ -56,7 +46,6 @@ describe('/GET tags', () => {
 // Test the /POST route
 describe('/POST tag', () => {
     it('it should not POST a tag without _id field', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = {}
         const res = await chai.request(server).keepOpen().post('/v1/tags').set("Authorization", await factory.getUserToken(user)).send(tag)
@@ -79,12 +68,11 @@ describe('/POST tag', () => {
     });
 
     it('it should POST a tagged tag', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
         const tag = { _id: "test-text", tags: [ tag_1._id, tag_2._id ] };
-        const res = await chai.request(server).keepOpen().post('/v1/tags').set("Authorization", await factory.getUserToken(user)).send(tag)
+        const res = await chai.request(server).keepOpen().post('/v1/tags').set("Authorization", await factory.getUserToken(user)).send(tag);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
@@ -96,7 +84,6 @@ describe('/POST tag', () => {
     });
 
     it('it should not POST a tag with already existant _id field', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const already_existant_tag = await factory.createTag("test-text", user);
         const tag = { _id: "test-text" }
@@ -109,7 +96,6 @@ describe('/POST tag', () => {
     });
 
     it('it should not POST a tag with a fake tag', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const already_existant_tag = await factory.createTag("test-text", user);
         const tag = { _id: "test-text", tags: [ "fake_tag" ] }
@@ -123,6 +109,8 @@ describe('/POST tag', () => {
 
     it('it should GET the tag posted before', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag = { _id: "test-text" };
+        await chai.request(server).keepOpen().post('/v1/tags').set("Authorization", await factory.getUserToken(user)).send(tag)
         const res = await chai.request(server).keepOpen().get('/v1/tags').set("Authorization", await factory.getUserToken(user))
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
@@ -142,7 +130,9 @@ describe('/POST tag', () => {
 
     it('it should POST only not existing tags from a list', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const tags = [{ _id: "test-text-1", user }, { _id: "test-text-2", user }, { _id: "test-text-3", user }, { _id: "test-text-4", user }, { _id: "test-text-5", user }];
+        let tags = [{ _id: "test-text-1", user }, { _id: "test-text-2", user }];
+        await chai.request(server).keepOpen().post('/v1/tags').set("Authorization", await factory.getUserToken(user)).send(tags)
+        tags = [{ _id: "test-text-1", user }, { _id: "test-text-2", user }, { _id: "test-text-3", user }, { _id: "test-text-4", user }, { _id: "test-text-5", user }];
         const res = await chai.request(server).keepOpen().post('/v1/tags').set("Authorization", await factory.getUserToken(user)).send(tags)
         res.should.have.status(202);
         res.body.should.be.a('object');
@@ -159,7 +149,6 @@ describe('/POST tag', () => {
 // Test the /DELETE route
 describe('/DELETE tag', () => {
     it('it should DELETE a tag', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", user);
         const tags_before = await Tag.find();
@@ -172,7 +161,6 @@ describe('/DELETE tag', () => {
     });
 
     it('it should not DELETE a fake tag', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-2", user);
         const tags_before = await Tag.find();
@@ -186,7 +174,6 @@ describe('/DELETE tag', () => {
     });
 
     it('it should not DELETE a tag already used in a measurement', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user);
         const device = await factory.createDevice("test-device-4", user, [feature]);
@@ -205,7 +192,6 @@ describe('/DELETE tag', () => {
     });
 
     it('it should not DELETE a tag already used in a device', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user);
         const tag = await factory.createTag("test-tag", user);
@@ -222,7 +208,6 @@ describe('/DELETE tag', () => {
     });
 
     it('it should not DELETE a tag already used in a feature', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user);
         const tag2 = await factory.createTag("test-tag-2", user);
@@ -238,7 +223,6 @@ describe('/DELETE tag', () => {
     });
 
     it('it should not DELETE a tag already used in a tag', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user);
         const tag2 = await factory.createTag("test-tag-2", user);
@@ -254,7 +238,6 @@ describe('/DELETE tag', () => {
     });
 
     it('it should not DELETE a tag already used in a thing', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user);
         const tag2 = await factory.createTag("test-tag-2", user);

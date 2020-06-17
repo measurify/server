@@ -1,8 +1,7 @@
-// Import environmental variables from variables.test.env file
-require('dotenv').config({ path: 'variables.test.env' });
 
-// This line allow to test with the self signed certificate
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+process.env.ENV = 'test';
+process.env.LOG = 'false'; 
 
 // Import test tools
 const chai = require('chai');
@@ -12,18 +11,13 @@ const server = require('../server.js');
 const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
-const Thing = mongoose.model('Thing');
-const Script = mongoose.model('Script');
-const User = mongoose.model('User');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
-
 chai.use(chaiHttp);
 
 // Test the /GET route
 describe('/GET scripts', () => {
     it('it should GET all the script', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         await factory.createScript("test-script-2", user, "test-code-2", []);
         await factory.createScript("test-script-1", user, "test-code-1", []);
@@ -34,7 +28,6 @@ describe('/GET scripts', () => {
     });
 
     it('it should GET a specific script', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = await factory.createScript("test-script-1", user, "test-code-2", []);
         const res = await chai.request(server).keepOpen().get('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user));
@@ -55,7 +48,6 @@ describe('/GET scripts', () => {
 // Test the /POST route
 describe('/POST script', () => {
     it('it should not POST a script without _id field', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = {}
         const res = await chai.request(server).keepOpen().post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
@@ -67,7 +59,6 @@ describe('/POST script', () => {
     });
 
     it('it should not POST a script without code field', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = { _id: "script-id" }
         const res = await chai.request(server).keepOpen().post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
@@ -79,7 +70,6 @@ describe('/POST script', () => {
     });
 
     it('it should not POST a script with a fake tag', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = { _id: "test-script-a", code: "test-code-1", tags: ["fake-tag"] };
         const res = await chai.request(server).keepOpen().post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script);
@@ -91,7 +81,6 @@ describe('/POST script', () => {
     });
 
     it('it should POST a script', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = { _id: "test-script-1", code: "test-code-1" };
         const res = await chai.request(server).keepOpen().post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
@@ -104,6 +93,7 @@ describe('/POST script', () => {
     it('it should not POST a script with already existant _id field', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = { _id: "test-script-1", code: "test-code-1" };
+        await chai.request(server).keepOpen().post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
         const res = await chai.request(server).keepOpen().post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(script)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -113,7 +103,6 @@ describe('/POST script', () => {
     });
 
     it('it should POST a list of script', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const scripts = [{ _id: "test-script-1", code: "test-code-1" },
                          { _id: "test-script-2", code: "test-code-2" } ];
@@ -126,7 +115,10 @@ describe('/POST script', () => {
 
     it('it should POST only not existing scripts from a list', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const scripts = [{ _id: "test-script-3", code: "test-code-3" },
+        let scripts = [{ _id: "test-script-1", code: "test-code-1" },
+                       { _id: "test-script-2", code: "test-code-2" } ];
+        await chai.request(server).keepOpen().post('/v1/scripts').set("Authorization", await factory.getUserToken(user)).send(scripts)
+        scripts = [{ _id: "test-script-3", code: "test-code-3" },
                          { _id: "test-script-4", code: "test-code-4" },
                          { _id: "test-script-1", code: "test-code-1" },
                          { _id: "test-script-5", code: "test-code-5" },
@@ -144,7 +136,6 @@ describe('/POST script', () => {
     });
 
     it('it should POST a script with tags', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-2", user);
         const script = { _id: "test-script-1", code: "test-code-1", tags: [tag] };
@@ -160,7 +151,6 @@ describe('/POST script', () => {
 // Test the /DELETE route
 describe('/DELETE script', () => {
     it('it should DELETE a script', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = await factory.createScript("test-script-1", user, "test-code-1", []);
         const script_before = await Script.find();
@@ -173,7 +163,6 @@ describe('/DELETE script', () => {
     });
 
     it('it should not DELETE a fake script', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = await factory.createScript("test-script-1", user, "test-code-1", []);
         const script_before = await Script.find();
@@ -187,7 +176,6 @@ describe('/DELETE script', () => {
     });
 
     it('it should not DELETE a script already used in a device', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = await factory.createScript("test-script-1", user, "test-code-1", []);
         const feature = await factory.createFeature("test-feature-1", user);
@@ -206,7 +194,6 @@ describe('/DELETE script', () => {
 // Test the /PUT route
 describe('/PUT script', () => {
     it('it should PUT a script to modify code', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = await factory.createScript("test-script-1", user, "test-code-1", []);
         const modification = { code: "this is the new code"}
@@ -218,7 +205,6 @@ describe('/PUT script', () => {
     });
 
     it('it should PUT a script to add a tag', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
@@ -233,7 +219,6 @@ describe('/PUT script', () => {
     });
 
     it('it should PUT a script to remove a tag', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
@@ -248,7 +233,6 @@ describe('/PUT script', () => {
     });
 
     it('it should PUT a script to add and remove tags', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
@@ -267,7 +251,6 @@ describe('/PUT script', () => {
     });
 
     it('it should not PUT a script adding a fake tag', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
@@ -282,7 +265,6 @@ describe('/PUT script', () => {
     });
 
     it('it should not PUT a script removing a fake tag', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
@@ -297,7 +279,6 @@ describe('/PUT script', () => {
     });
 
     it('it should not PUT a fake script', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
@@ -310,7 +291,6 @@ describe('/PUT script', () => {
     });
 
     it('it should not PUT a script with a wrong field', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);

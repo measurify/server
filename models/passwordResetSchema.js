@@ -10,4 +10,4 @@ const passwordResetSchema = new mongoose.Schema({
 
 passwordResetSchema.index({ user: 1 });
 
-module.exports = mongoose.model('PasswordReset', passwordResetSchema);
+module.exports = passwordResetSchema;

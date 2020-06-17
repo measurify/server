@@ -1,8 +1,7 @@
-// Import environmental variables from variables.test.env file
-require('dotenv').config({ path: 'variables.test.env' });
 
-// This line allow to test with the self signed certificate
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+process.env.ENV = 'test';
+process.env.LOG = 'false'; 
 
 // Import test tools
 const chai = require('chai');
@@ -12,17 +11,14 @@ const server = require('../server.js');
 const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
-const Right = mongoose.model('Right');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 const VisibilityTypes = require('../types/visibilityTypes.js');  
-
 chai.use(chaiHttp);
 
 // Test the /GET route
 describe('/GET rights', () => {
     it('it should GET all the rights', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource1 = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -38,7 +34,6 @@ describe('/GET rights', () => {
     });
 
     it('it should GET a specific right', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -61,7 +56,6 @@ describe('/GET rights', () => {
 // Test the /POST route
 describe('/POST rights', () => {
     it('it should not POST a right without resource field', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -75,7 +69,6 @@ describe('/POST rights', () => {
     });
 
     it('it should not POST a right with a not permitted resource type', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createScript("test-script-1", owner, "code", [], VisibilityTypes.private);
@@ -89,7 +82,6 @@ describe('/POST rights', () => {
     });
 
     it('it should not POST a right without type field', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -103,7 +95,6 @@ describe('/POST rights', () => {
     });
 
     it('it should not POST a right without user field', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -117,7 +108,6 @@ describe('/POST rights', () => {
     });
 
     it('it should not POST a right with resource and type mismatch', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -131,7 +121,6 @@ describe('/POST rights', () => {
     });
 
     it('it should not POST a right with a fake tag', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -145,7 +134,6 @@ describe('/POST rights', () => {
     });
 
     it('it should POST a right', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -158,7 +146,6 @@ describe('/POST rights', () => {
     });
 
     it('it should POST a right using user username', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -171,7 +158,6 @@ describe('/POST rights', () => {
     });
 
     it('it should not POST a script with already existant _id field', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -186,7 +172,6 @@ describe('/POST rights', () => {
     });
 
     it('it should POST a list of rights', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource1 = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -204,7 +189,6 @@ describe('/POST rights', () => {
     });
 
     it('it should POST only not existing rights from a list', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource1 = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -224,7 +208,6 @@ describe('/POST rights', () => {
     });
 
     it('it should POST a right with tags', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -241,7 +224,6 @@ describe('/POST rights', () => {
 // Test the /DELETE route
 describe('/DELETE rights', () => {
     it('it should DELETE a right', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -256,7 +238,6 @@ describe('/DELETE rights', () => {
     });
 
     it('it should not DELETE a fake right', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -275,7 +256,6 @@ describe('/DELETE rights', () => {
 // Test the /PUT route
 describe('/PUT rights', () => {
     it('it should PUT a right to add a tag', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -292,7 +272,6 @@ describe('/PUT rights', () => {
     });
 
     it('it should PUT a right to remove a tag', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -309,7 +288,6 @@ describe('/PUT rights', () => {
     });
 
     it('it should PUT a right to add and remove tags', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -330,7 +308,6 @@ describe('/PUT rights', () => {
     });
 
     it('it should not PUT a right adding a fake tag', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -347,7 +324,6 @@ describe('/PUT rights', () => {
     });
 
     it('it should not PUT a right removing a fake tag', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -364,7 +340,6 @@ describe('/PUT rights', () => {
     });
 
     it('it should not PUT a fake right', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);

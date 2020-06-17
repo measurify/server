@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 const UserRoles = require('../types/userRoles.js');
-const Fieldmask = mongoose.model('Fieldmask');
-const bcrypt = require('bcryptjs');
 const UserStatusTypes = require('../types/userStatusTypes.js');
 
 mongoose.Promise = global.Promise;
@@ -36,11 +34,6 @@ userSchema.pre('save', async function() {
     }                    
 });
 
-// hash password
-userSchema.pre('save', async function() {
-    if(process.env.PASSWORDHASH == 'true') this.password = bcrypt.hashSync(this.password, 8);                      
-});
-
 // check type
 userSchema.pre('save', async function() {
     if(!this.type) throw new Error('User validation failed: please specify the user type');  
@@ -52,4 +45,4 @@ userSchema.pre('save', async function() {
     if(this.status) if(!Object.values(UserStatusTypes).includes(this.status)) throw new Error('User validation failed: unrecognized status');                      
 });
 
-module.exports = mongoose.models.User || mongoose.model('User', userSchema);
+module.exports = userSchema;

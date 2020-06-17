@@ -10,15 +10,17 @@ morgan.token('url', function (req, res) { return decodeURIComponent(req.original
 
 morgan.token('body', function (req, res) { return JSON.stringify(req.body); });
 
+morgan.token('tenant', function (req, res) { return req.tenant._id; }); 
+
 const connection = { 
     connectionString: process.env.DATABASE,
-    //capped: true,
-    //cappedSize: 100000,
-    //cappedMax: 1000 
+    capped: true,
+    cappedSize: 100000,
+    cappedMax: 1000 
 };
 
 const option = { };
 
-const format = '{request: :method :url, contents: :body, user: :who, result: :status}';
+const format = '{tenant: :tenant request: :method :url, contents: :body, user: :who, result: :status}';
 
 module.exports = morgan(connection, option, format);

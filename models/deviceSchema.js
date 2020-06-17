@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
-
-const Tag = mongoose.model('Tag');
-const Feature = mongoose.model('Feature');
-const User = mongoose.model('User');
-const Script = mongoose.model('Script');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 const MeasurementBufferPolicyTypes = require('../types/measurementBufferPolicyTypes.js'); 
  
@@ -75,6 +70,7 @@ deviceSchema.path('features').validate({
 
 deviceSchema.path('features').validate({
     validator: async function (value) {
+        const Feature = this.constructor.model('Feature');
         for(let i=0; i<value.length; i++) {
             let feature = await Feature.findById(value[i]);
             if(!feature) throw new Error('Feature not existent (' + value[i] + ')');
@@ -86,6 +82,7 @@ deviceSchema.path('features').validate({
 // validate tags
 deviceSchema.path('tags').validate({
     validator: async function (values) {
+        const Tag = this.constructor.model('Tag');
         if(!values) return true;
         for(let i=0; i<values.length; i++) {
             let tag = await Tag.findById(values[i]);
@@ -105,6 +102,7 @@ deviceSchema.pre('save', async function() {
 // validate scripts
 deviceSchema.path('scripts').validate({
     validator: async function (values) {
+        const Script = this.constructor.model('Script');
         if(!values) return true;
         for(let i=0; i<values.length; i++) {
             let script = await Script.findById(values[i]);
@@ -118,6 +116,7 @@ deviceSchema.path('scripts').validate({
 // validate owner
 deviceSchema.path('owner').validate({
     validator: async function (value) {
+        const User = this.constructor.model('User');
         let user = await User.findById(value);
         if(!user) return false;
         return true;
@@ -131,4 +130,4 @@ deviceSchema.pre('save', async function () {
     if (res) throw new Error('Device validation failed: the _id is already used (' + this._id + ')');
 });
 
-module.exports = mongoose.models.Device || mongoose.model('Device', deviceSchema);
+module.exports = deviceSchema;

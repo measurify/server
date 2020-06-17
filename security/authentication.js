@@ -1,61 +1,88 @@
 const mongoose = require('mongoose');
 const passport = require('passport');
 const strategy_local = require('passport-local').Strategy;
+const custom_strategy = require('passport-custom').Strategy;
 const passportJWT = require("passport-jwt");
 const strategy_jwt   = passportJWT.Strategy;
 const extractJWT = passportJWT.ExtractJwt;
 const jwt = require('jsonwebtoken');
-const User = mongoose.model('User');
 const bcrypt = require('bcryptjs');
 const UserStatusTypes = require('../types/userStatusTypes.js');
 
 passport.use(new strategy_local({
         usernameField: 'username',
-        passwordField: 'password'
+        passwordField: 'password',
+        passReqToCallback: true
     }, 
-    async function (username, password, done) {
+    async function (req, username, password, done) {
         try {
+            if(!req.tenant) req.tenant = process.env.DEFAULT_TENANT;
+            const Tenant = mongoose.dbs['catalog'].model('Tenant');
+            const tenant = await Tenant.findById(req.tenant);
+            if (!tenant) return done(null, false, 'Incorrect tenant');
+            req.tenant = tenant;
+            const User = mongoose.dbs[tenant._id].model('User');
             const user = await User.findOne({username: username}).select('+password');
-            if (!user) return done(null, false, "Incorrect username or password");
-            if(user.status && user.status != UserStatusTypes.enabled) return done(null, false, "user not enabled");
+            if (!user) return done(null, false, 'Incorrect username or password');
+            if(user.status && user.status != UserStatusTypes.enabled) return done(null, false, 'user not enabled');
             let result = false;
-            if(process.env.PASSWORDHASH == 'true') result = bcrypt.compareSync(password, user._doc.password);
+            if(req.tenant.passwordhash == 'true') result = bcrypt.compareSync(password, user._doc.password);
             else if(password == user._doc.password) result = true; 
-
-            if (!result) return done(null, false, "Incorrect username or password");
-            return done(null, user, "Logged Successfully");
+            if (!result) return done(null, false, 'Incorrect username or password');
+            return done(null, user, 'Logged Successfully');
         }
         catch(error) { done(error) };
     }
 ));
 
-passport.use(new strategy_jwt({
-        jwtFromRequest: extractJWT.fromExtractors([extractJWT.fromUrlQueryParameter("token"), extractJWT.fromAuthHeaderWithScheme("jwt")]),
-        secretOrKey   : process.env.JWTSECRET
-    },
-    function (jwtPayload, done) {
-        return User.findById(jwtPayload._id)
-        .then(user => {
-            //req.user = user; 
-            return done(null, user);
-        })
-        .catch(error => done(error));
+passport.use('api-token', new custom_strategy(
+    function(req, done) {
+        const token = req.body.Authorization || req.get('Authorization') || req.query.Authorization;
+        if (!token) return done(null, false, "Missing token"); 
+        else if (token != process.env.API_TOKEN) return done(null, false, 'Invalid token');
+        else done(null, true, 'Logged Successfully');  
     }
 ));
 
-exports.encode = function(obj) {
-    return 'JWT ' + jwt.sign(obj.toJSON(), process.env.JWTSECRET, {expiresIn: process.env.EXPIRATIONTIME});
+passport.use('jwt-token', new custom_strategy(
+    async function(req, done) {
+        let token = req.body.Authorization || req.get('Authorization') || req.query.Authorization;
+        if (!token) return done(null, false, "Missing token"); 
+        try { 
+            token = token.replace('JWT ', '');
+            const info = jwt.verify(token, process.env.JWT_SECRET);
+            const User = mongoose.dbs[info.tenant._id].model('User');
+            const user = await User.findById(info.user._id);
+            if (!user) return done(null, false, "Missing user");
+            req.tenant = info.tenant;
+            return done(null, user, 'Logged Successfully');  
+        }
+        catch(error) {
+            return done(null, false, 'Login error (' + error + ')'); 
+        }
+    }
+));
+
+exports.encode = function(user, tenant) {
+    let info = {};
+    info.user = user;
+    info.tenant = tenant;
+    return 'JWT ' + jwt.sign(info, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRATIONTIME});
 };
 
 exports.decode = function(token) {
     token = token.replace('JWT ', '');
-    try {  return jwt.verify(token, process.env.JWTSECRET); }
-    catch(error) { return "invalid token"; }  
+    try {  return jwt.verify(token, process.env.JWT_SECRET); }
+    catch(error) { return 'invalid token'; }  
 }
 
-exports.user = async function(token) {
+exports.info = async function(token) {
+    const info =  {};
     token = token.replace('JWT ', '');
-    try { decoded = jwt.verify(token,process.env.JWTSECRET); } 
+    try { decoded = jwt.verify(token,process.env.JWT_SECRET); } 
     catch (err) { return false; }
-    return await User.findById(decoded._id);
+    const User = mongoose.dbs[decoded.tenant._id].model('User');
+    info.user = await User.findById(decoded.user._id);
+    info.tenant = decoded.tenant;
+    return info;
 }    

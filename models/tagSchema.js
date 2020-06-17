@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
-const User = mongoose.model('User');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
 /**
@@ -46,6 +45,7 @@ tagSchema.plugin(require('mongoose-autopopulate'));
 // validate owner
 tagSchema.path('owner').validate({
     validator: async function (value) {
+        const User = this.constructor.model('User');
         let user = await User.findById(value);
         if (!user) return false;
         return true;
@@ -71,4 +71,4 @@ tagSchema.pre('save', async function () {
     if (res) throw new Error('Tag validation failed: the _id is already used (' + this._id + ')');
 });
 
-module.exports = mongoose.models.Tag || mongoose.model('Tag', tagSchema);
+module.exports = tagSchema;

@@ -1,8 +1,7 @@
-// Import environmental variables from variables.test.env file
-require('dotenv').config({ path: 'variables.test.env' });
 
-// This line allow to test with the self signed certificate
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+process.env.ENV = 'test';
+process.env.LOG = 'false'; 
 
 // Import test tools
 const chai = require('chai');
@@ -12,18 +11,14 @@ const server = require('../server.js');
 const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
-const Computation = mongoose.model('Computation');
-const User = mongoose.model('User');
 const UserRoles = require('../types/userRoles.js');
 const ItemTypes = require('../types/itemTypes.js');
 const errors = require('../commons/errors.js');
-
 chai.use(chaiHttp);
 
 // Test the /POST route
 describe('POST computation', () => {
-    it('it should not post a computation on a fake feature', async () => {
-        factory.dropContents();
+    it('it should not post a computation on a fake feature', async () => {      
         const owner = await factory.createUser("owner-username", "owner-password", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device", owner, [feature]);
@@ -38,8 +33,7 @@ describe('POST computation', () => {
         res.body.details.should.be.eql('A computation needs an existing feature');
     });
 /*
-    it('it should not post a computation for a text measurements', async () => {
-        factory.dropContents();
+    it('it should not post a computation for a text measurements', async () => {      
         const owner = await factory.createUser("owner-username", "owner-password", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner, [{name:'item-name-1', unit:'items-unit-1', type:ItemTypes.text}]);
         const device = await factory.createDevice("test-device", owner, [feature]);
@@ -67,8 +61,7 @@ describe('POST computation', () => {
     });
 
 /*
-    it('it should post a max computation over single-sample, single-scalar-item measurements', async () => {
-        factory.dropContents();
+    it('it should post a max computation over single-sample, single-scalar-item measurements', async () => {      
         const owner = await factory.createUser("owner-username", "owner-password", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device", owner, [feature]);

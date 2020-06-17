@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
-
-const Tag = mongoose.model('Tag');
-const User = mongoose.model('User');
-const Device = mongoose.model('Device');
-const Thing = mongoose.model('Thing');
  
 /**
  * @swagger
@@ -51,7 +46,8 @@ subscriptionSchema.plugin(require('mongoose-autopopulate'));
 
 // validate thing
 subscriptionSchema.path('thing').validate({
-    validator: async function (value) {
+    validator: async function (value) { 
+        const Thing = this.constructor.model('Thing');
         if(value) {
             const thing = await Thing.findById(value);
             if (!thing) throw new Error('Thing not existent (' + value + ')');
@@ -62,7 +58,8 @@ subscriptionSchema.path('thing').validate({
 
 // validate device
 subscriptionSchema.path('device').validate({
-    validator: async function (value) {
+    validator: async function (value) {    
+        const Device = this.constructor.model('Device');
         if(value) {
             const device = await Device.findById(value);
             if (!device) throw new Error('Device not existent (' + value + ')');
@@ -74,6 +71,7 @@ subscriptionSchema.path('device').validate({
 // validate tags
 subscriptionSchema.path('tags').validate({
     validator: async function (values) {
+        const Tag = this.constructor.model('Tag');
         for (let value of values) {
             const tag = await Tag.findById(value);
             if (!tag) throw new Error('Tag not existent (' + value + ')');
@@ -85,6 +83,7 @@ subscriptionSchema.path('tags').validate({
 // validate owner
 subscriptionSchema.path('owner').validate({
     validator: async function (value) {
+        const User = this.constructor.model('User');
         let user = await User.findById(value);
         if (!user) throw new Error('User not existent (' + value + ')');
         return true;
@@ -105,4 +104,4 @@ subscriptionSchema.pre('save', async function() {
     if(res) throw new Error('The subscription already exists');                       
 });
 
-module.exports = mongoose.models.Subscription || mongoose.model('Subscription', subscriptionSchema);
+module.exports = subscriptionSchema;

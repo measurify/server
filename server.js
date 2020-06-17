@@ -12,22 +12,10 @@ const fs = require('fs');
 const compression = require('compression');
 
 // https credentials
-let cert_file;
-let key_file;
-// self-signed no ssl on local
-if (process.env.ENV === 'development' || process.env.ENV === 'test') {
-    cert_file = './resources/caCert.pem'; // The certificate
-    key_file = './resources/privateKey.pem'; // The private key
-}
-// authority signed ssl enable on remote (renew certificate every 3-months!)
-else if(process.env.ENV === 'production'){
-    cert_file = './resources/fullchain.pem'; // The certificate
-    key_file = './resources/privkey.pem'; // The private key
-}
-if (process.env.ENV === 'docker') {
-    cert_file = './resources/docker-caCert.pem'; // The certificate
-    key_file = './resources/docker-privateKey.pem'; // The private key
-}
+let cert_file_self = './resources/caCert.pem'; // The self certificate
+let key_file_self = './resources/privateKey.pem'; // The self private key
+let cert_file_prod = './resources/fullchain.pem'; // The certificate
+let key_file_prod = './resources/privkey.pem'; // The private key
 
 // Express server
 const app = express();
@@ -45,6 +33,7 @@ const options = {
         },
         basePath: '/' + process.env.VERSION + '/',
         tags: [
+            { name:"Tenent", description:"An organization" },
             { name:"Thing", description:"A generic object that is the subject of a measurement (e.g. persons, houses, cars, cities, trips, etc.)" },
             { name:"Device", description:"A sensor, real or virtual, which provides measurements about a thing or an actuator that acts on a thing to modify its status (e.g. environmental sensors, physiological parameters monitors, domotic appliances, LEDs, etc.)" },
             { name:"Feature", description:"A physical dimension measured by a device (e.g. heart rate, speed, stat, histogram, etc.)" },
@@ -71,7 +60,7 @@ app.use(function(req, res, next) {
 });
 
 // Logger
-if(process.env.LOG === 'enabled') {
+if(process.env.LOG === 'true') {
     const logger = require('./commons/logger.js');
     app.use(logger);
 }
@@ -97,14 +86,22 @@ let message = 'Measurify Cloud API Server is running on HTTP';
 if (process.env.PROTOCOL === 'http') {  server = http.createServer(app); }
 else {
     try {
-        const config = { key: fs.readFileSync(key_file), cert: fs.readFileSync(cert_file), passphrase: process.env.HTTPSSECRET };
+        const config = { key: fs.readFileSync(key_file_prod), cert: fs.readFileSync(cert_file_prod), passphrase: process.env.HTTPSSECRET };
         server = https.createServer(config, app);
         port = process.env.HTTPS_PORT;
         message = 'Measurify Cloud API Server is running on HTTPS';
     }
-    catch(err) { server = http.createServer(app);
-        port = process.env.HTTP_PORT;
-        message = 'WARNING: HTTPS not running (' + err + '), Measurify Cloud API Server is running on HTTP';
+    catch (error) {
+        try {
+            const config = { key: fs.readFileSync(key_file_self), cert: fs.readFileSync(cert_file_self), passphrase: process.env.HTTPSSECRET };
+            server = https.createServer(config, app);
+            port = process.env.HTTPS_PORT;
+            message = 'WARNING: Measurify Cloud API Server is running on HTTPS with self signed certificate (' + error + ')';
+        }
+        catch(error) { server = http.createServer(app);
+            port = process.env.HTTP_PORT;
+            message = 'WARNING: HTTPS not running (' + error + '), Measurify Cloud API Server is running on HTTP';
+        }
     }
 }
 
@@ -124,10 +121,8 @@ app.get('/' + process.env.VERSION + '/swagger.json', function(req, res) {
 // we 404 them and forward to error handler
 app.use(errorHandlers.notFound);
 
-// Development or production error handler
-if (process.env.ENV === 'development') { app.use(errorHandlers.developmentErrors); }
-else if (process.env.ENV === 'test') { app.use(errorHandlers.developmentErrors); }
-else app.use(errorHandlers.productionErrors);
+// Error handler
+app.use(errorHandlers.developmentErrors);
 
 // Run server
 server.listen(port, "0.0.0.0", () => { console.log(message + ' - port ' + port) });

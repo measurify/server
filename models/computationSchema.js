@@ -1,9 +1,6 @@
 const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
-
-const Tag = mongoose.model('Tag');
-const User = mongoose.model('User');
 const ComputationStatusTypes = require('../types/computationStatusTypes.js'); 
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
@@ -76,6 +73,7 @@ computationSchema.plugin(require('mongoose-autopopulate'));
 // validate tags
 computationSchema.path('tags').validate({
     validator: async function (values) {
+        const Tag = this.constructor.model('Tag');
         for (let i = 0; i < values.length; i++) {
             let tag = await Tag.findById(values[i]);
             if (!tag) return false;
@@ -88,6 +86,7 @@ computationSchema.path('tags').validate({
 // validate owner
 computationSchema.path('owner').validate({
     validator: async function (value) {
+        const User = this.constructor.model('User');
         let user = await User.findById(value);
         if (!user) return false;
         return true;
@@ -101,4 +100,4 @@ computationSchema.pre('save', async function () {
     if (res) throw new Error('Computation validation failed: the name already exists (' + 'name: ' + this.name + ')');
 });
 
-module.exports = mongoose.models.Computation || mongoose.model('Computation', computationSchema);
+module.exports = computationSchema;

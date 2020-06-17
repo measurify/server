@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
-const User = mongoose.model('User');
-const Tag = mongoose.model('Tag');
 const ItemTypes = require('../types/itemTypes.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
@@ -83,6 +81,7 @@ featureSchema.plugin(require('mongoose-autopopulate'));
 // validate owner
 featureSchema.path('owner').validate({
     validator: async function (value) {
+        const User = this.constructor.model('User');
         let user = await User.findById(value);
         if(!user) return false;
         return true;
@@ -93,6 +92,7 @@ featureSchema.path('owner').validate({
 // validate tags
 featureSchema.path('tags').validate({
     validator: async function (values) {
+        const Tag = this.constructor.model('Tag');
         for(let i=0; i<values.length; i++) {
             let tag = await Tag.findById(values[i]);
             if(!tag) throw new Error('Feature validation failed: Tag not existent (' + values[i] + ')');
@@ -107,4 +107,4 @@ featureSchema.pre('save', async function () {
     if (res) throw new Error('Feature validation failed: the _id is already used (' + this._id + ')');
 });
 
-module.exports = mongoose.models.Feature || mongoose.model('Feature', featureSchema);
+module.exports = featureSchema;

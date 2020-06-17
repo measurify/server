@@ -1,8 +1,7 @@
-// Import environmental variables from variables.test.env file
-require('dotenv').config({ path: 'variables.test.env' });
 
-// This line allow to test with the self signed certificate
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+process.env.ENV = 'test';
+process.env.LOG = 'false'; 
 
 // Import test tools
 const chai = require('chai');
@@ -13,18 +12,15 @@ const server = require('../server.js');
 const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
-const User = mongoose.model('User');
 const UserRoles = require('../types/userRoles.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 const errors = require('../commons/errors.js');
-
 chai.use(chaiHttp);
 
 // CREATE
 describe('Access create subscriptions', () => {
     
-    it('it should create a subscription as admin', async () => {
-        factory.dropContents();
+    it('it should create a subscription as admin', async () => {      
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const thing = await factory.createThing("test-thing-1", owner);
         const subscription = { token: "subscription-id", thing: thing._id, tags: [] };
@@ -35,9 +31,8 @@ describe('Access create subscriptions', () => {
         res.body.token.should.be.eql(subscription.token);
     });
 
-    it('it should create a subscription as provider', async () => {
-        factory.dropContents();
-        const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+    it('it should create a subscription as provider', async () => {      
+const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", admin);
         const subscription = { token: "subscription-id", thing: thing._id, tags: [] };
@@ -48,8 +43,7 @@ describe('Access create subscriptions', () => {
         res.body.token.should.be.eql(subscription.token);
     });
 
-    it('it should not create a subscription as analyst', async () => {
-        factory.dropContents();
+    it('it should not create a subscription as analyst', async () => {      
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.analyst);
         const thing = await factory.createThing("test-thing-1", owner);
         const subscription = { token: "subscription-id", thing: thing._id, tags: [] };
@@ -60,9 +54,8 @@ describe('Access create subscriptions', () => {
         res.body.message.should.be.eql(errors.restricted_access_create.message);
     });
 
-    it('it should not create a subscription as provider without rights on thing', async () => {
-        factory.dropContents();
-        const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+    it('it should not create a subscription as provider without rights on thing', async () => {      
+const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const thingnoright = await factory.createThing("test-thing-1", admin);
         const thingright = await factory.createThing("test-thing-2", admin);
@@ -75,9 +68,8 @@ describe('Access create subscriptions', () => {
         res.body.message.should.be.eql(errors.restricted_access.message);
     });
 
-    it('it should not create a subscription as provider without rights on device', async () => {
-        factory.dropContents();
-        const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+    it('it should not create a subscription as provider without rights on device', async () => {      
+const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", admin);
         const deviceright = await factory.createDevice("test-device-1", admin, [feature]);
@@ -91,9 +83,8 @@ describe('Access create subscriptions', () => {
         res.body.message.should.be.eql(errors.restricted_access.message);
     });
 
-    it('it should create a subscription as provider with rights on device', async () => {
-        factory.dropContents();
-        const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+    it('it should create a subscription as provider with rights on device', async () => {      
+const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", admin);
         const deviceright = await factory.createDevice("test-device-1", admin, [feature]);
@@ -110,9 +101,8 @@ describe('Access create subscriptions', () => {
 
 // READ LIST
 describe('Access read a list of subscriptions', () => {
-    it('it should get all the subscriptions as admin or analyst', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
+    it('it should get all the subscriptions as admin or analyst', async () => {      
+const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", owner);
@@ -131,9 +121,8 @@ describe('Access read a list of subscriptions', () => {
         res.body.docs.length.should.be.eql(5);
     });
 
-    it('it should get just his own subscriptions as provider', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
+    it('it should get just his own subscriptions as provider', async () => {      
+const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", owner);
@@ -152,9 +141,8 @@ describe('Access read a list of subscriptions', () => {
         res.body.docs.length.should.be.eql(5);
     });
 
-    it('it should get a filtered list of his own subscriptions as provider', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
+    it('it should get a filtered list of his own subscriptions as provider', async () => {      
+const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing_1 = await factory.createThing("test-thing-1", owner);
@@ -181,9 +169,8 @@ describe('Access read a list of subscriptions', () => {
 
 // READ
 describe('Access read a subscription', () => {
-    it('it should get a subscription as admin or analyst', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
+    it('it should get a subscription as admin or analyst', async () => {      
+const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", owner);
@@ -198,8 +185,7 @@ describe('Access read a subscription', () => {
         res.body.token.should.eql(subscription.token.toString());
     });
 
-    it('it should not get a subscription as provider not owner', async () => {
-        factory.dropContents();
+    it('it should not get a subscription as provider not owner', async () => {      
         const user_provider = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", owner);
@@ -210,8 +196,7 @@ describe('Access read a subscription', () => {
         res.body.message.should.contain(errors.restricted_access_read.message);
     });
 
-    it('it should get a subscription as provider owner', async () => {
-        factory.dropContents();
+    it('it should get a subscription as provider owner', async () => {      
         const user_provider_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", user_provider_owner);
         const subscription = await factory.createSubscription("test-subscription-1", user_provider_owner, null, thing, []);
@@ -224,9 +209,8 @@ describe('Access read a subscription', () => {
 
 // MODIFY
 describe('Access modify subscriptions', () => {
-    it('it should modify a subscription as admin', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
+    it('it should modify a subscription as admin', async () => {      
+const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", owner);
         const subscription = await factory.createSubscription("test-subscription-1", owner, null, thing, []);
@@ -239,9 +223,8 @@ describe('Access modify subscriptions', () => {
         res.body.token.should.eql(subscription.token.toString());
     });
 
-    it('it should modify a subscription as provider owner', async () => {
-        factory.dropContents();
-        const user_provide_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
+    it('it should modify a subscription as provider owner', async () => {      
+const user_provide_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", user_provide_owner);
         const subscription = await factory.createSubscription("test-subscription-1", user_provide_owner, null, thing, []);
         const tag = await factory.createTag("test-tag-1", user_provide_owner);
@@ -253,9 +236,8 @@ describe('Access modify subscriptions', () => {
         res.body.token.should.eql(subscription.token.toString());
     });
 
-    it('it should not modify a subscription as not owner', async () => {
-        factory.dropContents();
-        const user = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
+    it('it should not modify a subscription as not owner', async () => {      
+const user = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", owner);
         const subscription = await factory.createSubscription("test-subscription-1", owner, null, thing, []);
@@ -270,9 +252,8 @@ describe('Access modify subscriptions', () => {
 
 // DELETE
 describe('Access delete subscriptions', () => {
-    it('it should delete a subscription as admin', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
+    it('it should delete a subscription as admin', async () => {      
+const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", owner);
         const subscription = await factory.createSubscription("test-subscription-1", owner, null, thing, []);
@@ -281,9 +262,8 @@ describe('Access delete subscriptions', () => {
         res.body.should.be.a('object');
     });
 
-    it('it should delete a subscription as provider owner', async () => {
-        factory.dropContents();
-        const user_provide_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
+    it('it should delete a subscription as provider owner', async () => {      
+const user_provide_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", user_provide_owner);
         const subscription = await factory.createSubscription("test-subscription-1", user_provide_owner, null, thing, []);
         let res = await chai.request(server).keepOpen().delete('/v1/subscriptions/' + subscription._id).set("Authorization", await factory.getUserToken(user_provide_owner));
@@ -291,9 +271,8 @@ describe('Access delete subscriptions', () => {
         res.body.should.be.a('object');
     });
 
-    it('it should not delete a subscription as not owner', async () => {
-        factory.dropContents();
-        const user = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
+    it('it should not delete a subscription as not owner', async () => {      
+const user = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", owner);
         const subscription = await factory.createSubscription("test-subscription-1", owner, null, thing, []);
@@ -303,3 +282,4 @@ describe('Access delete subscriptions', () => {
         res.body.message.should.contain(errors.restricted_access_delete.message);
     });
 });
+

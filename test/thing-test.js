@@ -1,8 +1,5 @@
-// Import environmental variables from variables.test.env file
-require('dotenv').config({ path: 'variables.test.env' });
-
-// This line allow to test with the self signed certificate
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+process.env.ENV = 'test';
+process.env.LOG = 'false'; 
 
 // Import test tools
 const chai = require('chai');
@@ -12,17 +9,14 @@ const server = require('../server.js');
 const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
-const Thing = mongoose.model('Thing');
-const User = mongoose.model('User');
+const test = require('./before-test.js');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
-
 chai.use(chaiHttp);
 
 // Test the /GET route
 describe('/GET thing', () => {
     it('it should GET all the things', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         await factory.createThing("test-thing-1", user, [], null, [], null, null);
         await factory.createThing("test-thing-2", user, [], null, [], null, null);
@@ -33,7 +27,6 @@ describe('/GET thing', () => {
     });
 
     it('it should GET a specific thing', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = await factory.createThing("test-thing-2", user, [], null, []);
         const res = await chai.request(server).keepOpen().get('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user));
@@ -53,8 +46,7 @@ describe('/GET thing', () => {
 
 // Test the /POST route
 describe('/POST thing', () => {
-    it('it should not POST a thing without _id field', async () => {
-        factory.dropContents();
+    it('it should not POST a thing without _id field', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = {}
         const res = await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
@@ -64,8 +56,7 @@ describe('/POST thing', () => {
         res.body.message.should.contain(errors.post_request_error.message);
     });
 
-    it('it should not POST a thing with a fake tag', async () => {
-        factory.dropContents();
+    it('it should not POST a thing with a fake tag', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = { _id: "test-thing-2", tags: ["fake-tag"] };
         const res = await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
@@ -76,8 +67,7 @@ describe('/POST thing', () => {
         res.body.details.should.contain('Tag not existent');
     });
 
-    it('it should not POST a device with a fake relation', async () => {
-        factory.dropContents();
+    it('it should not POST a device with a fake relation', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = { _id: "test-thing-2", relations: [ 'fake-Thing'] };
         const res = await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
@@ -100,7 +90,8 @@ describe('/POST thing', () => {
 
     it('it should not POST a thing with already existant _id field', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const thing = { _id: "test-thing-1" }
+        const thing = { _id: "test-thing-1" };
+        await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
         const res = await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -110,7 +101,9 @@ describe('/POST thing', () => {
     });
 
     it('it should GET the thing posted before', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.analyst);
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const thing = { _id: "test-thing-1" };
+        await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
         const res = await chai.request(server).keepOpen().get('/v1/things').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
@@ -131,12 +124,16 @@ describe('/POST thing', () => {
 
     it('it should POST only not existing things from a list', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const things = [{ _id: "test-thing-1" },
-        { _id: "test-thing-2" },
-        { _id: "test-thing-3" },
-        { _id: "test-thing-4" },
-        { _id: "test-thing-5" }];
-        const res = await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(things)
+        let things = [{ _id: "test-thing-1" },
+                        { _id: "test-thing-3" },
+                        { _id: "test-thing-4" }];
+        await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(things);
+        things = [{ _id: "test-thing-1" },
+                        { _id: "test-thing-2" },
+                        { _id: "test-thing-3" },
+                        { _id: "test-thing-4" },
+                        { _id: "test-thing-5" }];
+        const res = await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(things);
         res.should.have.status(202);
         res.body.should.be.a('object');
         res.body.things.length.should.be.eql(2);
@@ -149,7 +146,6 @@ describe('/POST thing', () => {
     });
 
     it('it should POST a thing with tags', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-2", user);
         const thing = { _id: "test-thing-2", tags: [tag] };
@@ -162,7 +158,6 @@ describe('/POST thing', () => {
     });
 
     it('it should POST a thing with relations', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-2", user);
         const relation1 = await factory.createThing("relation-1", user);
@@ -180,7 +175,6 @@ describe('/POST thing', () => {
 // Test the /DELETE route
 describe('/DELETE thing', () => {
     it('it should DELETE a thing', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", user, [], null, []);
         const things_before = await Thing.find();
@@ -193,7 +187,6 @@ describe('/DELETE thing', () => {
     });
 
     it('it should not DELETE a fake thing', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = await factory.createThing("test-thing-2", user, [], null, []);
         const things_before = await Thing.find();
@@ -207,7 +200,6 @@ describe('/DELETE thing', () => {
     });
 
     it('it should not DELETE a thing already used in a measurement', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const tag = await factory.createTag("test-tag", user);
@@ -225,7 +217,6 @@ describe('/DELETE thing', () => {
     });
 
     it('it should not DELETE a thing already used as a relation', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const relation = await factory.createThing("test-relation-1", user);
         const thing = await factory.createThing("test-thing-1", user, null, null, [relation]);
@@ -243,7 +234,6 @@ describe('/DELETE thing', () => {
 // Test the /PUT route
 describe('/PUT thing', () => {
     it('it should PUT a thing to add a tag', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
@@ -258,7 +248,6 @@ describe('/PUT thing', () => {
     });
 
     it('it should PUT a thing to remove a tag', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
@@ -273,7 +262,6 @@ describe('/PUT thing', () => {
     });
 
     it('it should PUT a thing to add and remove tags', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
@@ -292,7 +280,6 @@ describe('/PUT thing', () => {
     });
 
     it('it should not PUT a thing adding a fake tag', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
@@ -307,7 +294,6 @@ describe('/PUT thing', () => {
     });
 
     it('it should not PUT a thing removing a fake tag', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
@@ -322,7 +308,6 @@ describe('/PUT thing', () => {
     });
 
     it('it should not PUT a fake thing', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);
@@ -335,7 +320,6 @@ describe('/PUT thing', () => {
     });
 
     it('it should not PUT a thing with a wrong field', async () => {
-        factory.dropContents();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
         const tag_2 = await factory.createTag("test-tag-2", user);

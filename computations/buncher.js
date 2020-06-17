@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
 const persistence = require('../commons/persistence');
 const authorization = require('../security/authorization');
-const Measurement = mongoose.model('Measurement');
 
-function Buncher(computation, runner, page_size) {
+function Buncher(computation, runner, page_size, tenant) {
     this.page_size = page_size;
     this.computation = computation;
     this.runner = runner;
@@ -13,6 +12,8 @@ function Buncher(computation, runner, page_size) {
     this.size = 0
     this.index = 1;
 
+    const Measurement = mongoose.dbs[tenant].model('Measurement');
+    
     this.init = async function() {
         this.restriction = await authorization.whatCanRead(this.computation.owner);
         this.size = await persistence.getSize(this.computation.filter, this.restriction, Measurement);

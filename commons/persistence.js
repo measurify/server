@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const broker = require('../commons/broker');
+const tenancy = require('../commons/tenancy.js');
+const factory = require('../commons/factory.js');
 
 exports.get = async function(id, field, model, select) {
     try {
@@ -37,9 +39,46 @@ exports.getList = async function(filter, sort, select, page, limit, restriction,
     return list;
 }
 
-exports.post = async function(body, model) {
-    if (body.constructor == Array) return await postList(body, model);
-    return await postOne(body, model);
+const postOne = async function(body, model, tenant) {
+    const resource = await (new model(body)).save();
+    if(model.modelName == 'Measurement') {
+        broker.publish('device-' + body.device, body.device, body);
+        broker.publish('thing-' + body.thing, body.thing, body);
+        broker.notify(body, tenant);
+    }
+    if(model.modelName == 'Tenant') {
+        await tenancy.init(resource); 
+        await factory.createSuperAdministrator(resource);
+    }
+    return resource;
+}
+
+const postList = async function(body, model, tenat) { 
+    const items = model.modelName.toLowerCase() + 's';
+    const results = { [items]: [], errors: [] };
+    for (let [i, element] of body.entries()) {
+        try {
+            element.owner = body.owner;
+            const resource = await (new model(element)).save()
+            if(model.modelName == "Measurement") {
+                broker.publish('device-' + resource.device, resource);
+                broker.publish('thing-' + resource.thing, resource);
+                broker.notify(body, tenant);
+            }
+            if(model.modelName == 'Tenant') {
+                await tenancy.init(resource); 
+                await factory.createSuperAdministrator(resource);
+            }
+            results[items].push(resource);
+        }
+        catch (err) { results.errors.push('Index: ' + i +  ' (' + err.message + ')'); }
+    }
+    return results;     
+};
+
+exports.post = async function(body, model, tenant) {
+    if (body.constructor == Array) return await postList(body, model, tenant);
+    return await postOne(body, model, tenant);
 }
 
 exports.delete = async function(id, model) {  
@@ -48,7 +87,7 @@ exports.delete = async function(id, model) {
     return result;
 }
 
-exports.update = async function(body, fields, resource, model) {
+exports.update = async function(body, fields, resource, model, tenant) {
     for (let field in body) if(!fields.includes(field)) throw 'Request field cannot be updated (' + field + ')';
     for (let field of fields) {
         if (typeof body[field] != 'object') { resource[field] = body[field]; continue; }
@@ -59,7 +98,7 @@ exports.update = async function(body, fields, resource, model) {
                 // List of resources
                 let field_model = null;
                 const field_model_name = field[0].toUpperCase() + field.slice(1, -1);
-                try { field_model = await mongoose.model(field_model_name) } catch(err) {};
+                try { if (tenant) field_model = await mongoose.dbs[tenant._id].model(field_model_name) } catch(err) {};
                 if (field_model) result = await modifyResourceList(body[field], field_model, resource, field);
                 if (result == true) break;
                 else if (result) throw result;
@@ -75,7 +114,7 @@ exports.update = async function(body, fields, resource, model) {
                 // List of fields of a resource
                 let fieldlist_model = null;
                 const fieldlist_model_name = (field.charAt(0).toUpperCase() + field.slice(1)).replace('_fields','');
-                try { fieldlist_model = await mongoose.model(fieldlist_model_name) } catch(err) {};
+                try { if (tenant) fieldlist_model = await mongoose.dbs[tenant._id].model(fieldlist_model_name) } catch(err) {};
                 if (fieldlist_model) result = await modifyFieldResourceList(body[field], fieldlist_model, resource, field);
                 if (result == true) break;
                 else if (result) throw result;
@@ -110,34 +149,6 @@ const prepareFilter = function(filter, restriction) {
     }
     return object;
 }
-
-const postOne = async function(body, model) {
-    const resource = await (new model(body)).save();
-    if(model.modelName == "Measurement") {
-        broker.publish('device-' + body.device, body.device, body);
-        broker.publish('thing-' + body.thing, body.thing, body);
-        broker.notify(body);
-    }
-    return resource;
-}
-
-const postList = async function(body, model) { 
-    const items = model.modelName.toLowerCase() + 's';
-    const results = { [items]: [], errors: [] };
-    for (let [i, element] of body.entries()) {
-        try {
-            element.owner = body.owner;
-            const resource = await (new model(element)).save()
-            if(model.modelName == "Measurement") {
-                broker.publish('device-' + resource.device, resource);
-                broker.publish('thing-' + resource.thing, resource);
-            }
-            results[items].push(resource);
-        }
-        catch (err) { results.errors.push('Index: ' + i +  ' (' + err.message + ')'); }
-    }
-    return results;     
-};
 
 const modifyFieldResourceList = async function(list, model, resource, field) {
     if(list.remove) {

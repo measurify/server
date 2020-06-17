@@ -1,8 +1,7 @@
-// Import environmental variables from variables.test.env file
-require('dotenv').config({ path: 'variables.test.env' });
 
-// This line allow to test with the self signed certificate
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+process.env.ENV = 'test';
+process.env.LOG = 'false'; 
 
 // Import test tools
 const chai = require('chai');
@@ -12,13 +11,11 @@ const server = require('../server.js');
 const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
-const Measurement = mongoose.model('Measurement');
-const User = mongoose.model('User');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 const ItemTypes = require('../types/itemTypes.js');
-
 chai.use(chaiHttp);
+
 
 // Test the /GET route
 describe('/GET measurements', () => {
@@ -31,7 +28,6 @@ describe('/GET measurements', () => {
     });
 
     it('it should GET all the measurements', async () => {
-        await mongoose.connection.dropDatabase();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const tag1 = await factory.createTag("test-tag-1", owner);
@@ -48,7 +44,6 @@ describe('/GET measurements', () => {
     });
 
     it('it should GET all the measurements as CSV', async () => {
-        await mongoose.connection.dropDatabase();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner, [ { name: "item-name-1", unit: "items-unit-1", type: ItemTypes.number  }, { name: "item-name-2", unit: "items-unit-2", type: ItemTypes.number  }, { name: "item-name-3", unit: "items-unit-3", type: ItemTypes.number  } ]);
         const tag1 = await factory.createTag("test-tag-1", owner);
@@ -63,7 +58,6 @@ describe('/GET measurements', () => {
     });
 
     it('it should GET a specific measurement', async () => {
-        await mongoose.connection.dropDatabase();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const tag1 = await factory.createTag("test-tag-1", owner);
@@ -80,7 +74,6 @@ describe('/GET measurements', () => {
     });
 
     it('it should GET measurements paginated', async () => {
-        await mongoose.connection.dropDatabase();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const tag1 = await factory.createTag("test-tag-1", owner);
@@ -101,7 +94,6 @@ describe('/GET measurements', () => {
     });
 
     it('it should GET measurements only of a specific tag', async () => {
-        await mongoose.connection.dropDatabase();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const tag1 = await factory.createTag("test-tag-1", owner);
@@ -124,7 +116,6 @@ describe('/GET measurements', () => {
     });
 
     it('it should GET the size of measurements only of a specific tag', async () => {
-        await mongoose.connection.dropDatabase();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const tag1 = await factory.createTag("test-tag-1", owner);
@@ -143,7 +134,6 @@ describe('/GET measurements', () => {
     });
 
     it('it should GET measurements only of a specific tag AND a of a specific feature', async () => {
-        await mongoose.connection.dropDatabase();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature1 = await factory.createFeature("test-feature-1", owner);
         const feature2 = await factory.createFeature("test-feature-2", owner);
@@ -171,7 +161,6 @@ describe('/GET measurements', () => {
     });
 
     it('it should GET the size measurements only of a specific tag AND a of a specific feature', async () => {
-        await mongoose.connection.dropDatabase();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature1 = await factory.createFeature("test-feature-1", owner);
         const feature2 = await factory.createFeature("test-feature-2", owner);
@@ -190,7 +179,6 @@ describe('/GET measurements', () => {
     });
 
     it('it should GET measurements only of a specific tag OR a of a specific feature', async () => {
-        await mongoose.connection.dropDatabase();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature1 = await factory.createFeature("test-feature-1", owner);
         const feature2 = await factory.createFeature("test-feature-2", owner);
@@ -221,7 +209,6 @@ describe('/GET measurements', () => {
 // Test the /POST route
 describe('/POST measurement', () => {
     it('it should not POST a measurement without thing field', async () => {
-        await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user);
         const device = await factory.createDevice("test-device-1", user, [feature]);
@@ -250,7 +237,6 @@ describe('/POST measurement', () => {
     });
 
     it('it should not POST a measurement without device field', async () => {
-        await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
@@ -280,7 +266,6 @@ describe('/POST measurement', () => {
     });
 
     it('it should not POST a measurement with a fake feature', async () => {
-        await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user);
         const device = await factory.createDevice("test-device-1", user, [feature]);
@@ -311,7 +296,6 @@ describe('/POST measurement', () => {
     });
 
     it('it should not POST a measurement with a fake device', async () => {
-        await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user);
         const device = await factory.createDevice("test-device-1", user, [feature]);
@@ -342,7 +326,6 @@ describe('/POST measurement', () => {
     });
 
     it('it should not POST a measurement with a fake thing', async () => {
-        await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user);
         const device = await factory.createDevice("test-device-1", user, [feature]);
@@ -373,7 +356,6 @@ describe('/POST measurement', () => {
     });
 
     it('it should not POST a measurement with samples not coherent with the feature', async () => {
-        await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user);
         const device = await factory.createDevice("test-device-1", user, [feature]);
@@ -404,7 +386,6 @@ describe('/POST measurement', () => {
     });
 
     it('it should not POST a measurement with numeric samples with text feature', async () => {
-        await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const items = [ { name: "item-name-1", unit: "item-unit-1", type: ItemTypes.text } ];
         const feature = await factory.createFeature("test-feature-3", user, items);
@@ -436,7 +417,6 @@ describe('/POST measurement', () => {
     });
 
     it('it should not POST a measurement with textual samples with a numeric feature', async () => {
-        await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const items = [ { name: "item-name-1", unit: "item-unit-1", type: ItemTypes.number } ];
         const feature = await factory.createFeature("test-feature-3", user, items);
@@ -468,7 +448,6 @@ describe('/POST measurement', () => {
     });
 
     it('it should not POST a measurement with a feature not available for the device', async () => {
-        await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const measurement_feature = await factory.createFeature("test-feature-1", user);
         const device_feature = await factory.createFeature("test-feature-2", user);
@@ -497,7 +476,6 @@ describe('/POST measurement', () => {
     });
 
     it('it should not POST a measurement with a empty', async () => {
-        await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user);
         const device = await factory.createDevice("test-device-1", user, [feature]);
@@ -525,7 +503,6 @@ describe('/POST measurement', () => {
     });
 
     it('it should POST a measurement with samples of several items', async () => {
-        await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const items = [ { name: "item-name-1", unit: "item-unit-1", type: ItemTypes.number },
                         { name: "item-name-2", unit: "item-unit-2", type: ItemTypes.number },
@@ -566,7 +543,6 @@ describe('/POST measurement', () => {
     });
 
     it('it should POST a measurement removing empty samples', async () => {
-        await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const items = [ { name: "item-name-1", unit: "item-unit-1", type: ItemTypes.number },
                         { name: "item-name-2", unit: "item-unit-2", type: ItemTypes.number },
@@ -605,7 +581,6 @@ describe('/POST measurement', () => {
     });
 
     it('it should POST a measurement with sample of one item', async () => {
-        await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-3", user, [{ name: "item-name-1", unit: "item-unit-1" } ]);
         const device = await factory.createDevice("test-device-3", user, [feature]);
@@ -803,7 +778,6 @@ describe('/POST measurement', () => {
     });
 
     it('it should POST only correct measurements from a list', async () => {
-        await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-8", user);
         const device = await factory.createDevice("test-device-8", user, [feature]);
@@ -887,7 +861,6 @@ describe('/POST measurement', () => {
 // Test the /DELETE route
 describe('/DELETE measurement', () => {
     it('it should DELETE a measurement', async () => {
-        await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user);
         const device = await factory.createDevice("test-device-4", user, [feature]);
@@ -904,7 +877,6 @@ describe('/DELETE measurement', () => {
     });
 
     it('it should not DELETE a fake measurement', async () => {
-        await mongoose.connection.dropDatabase();
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user);
         const device = await factory.createDevice("test-device-4", user, [feature]);

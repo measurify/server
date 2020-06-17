@@ -1,8 +1,7 @@
-// Import environmental variables from variables.test.env file
-require('dotenv').config({ path: 'variables.test.env' });
 
-// This line allow to test with the self signed certificate
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+process.env.ENV = 'test';
+process.env.LOG = 'false'; 
 
 // Import test tools
 const chai = require('chai');
@@ -12,19 +11,13 @@ const server = require('../server.js');
 const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
-const Thing = mongoose.model('Thing');
-const Device = mongoose.model('Device');
-const Subscription = mongoose.model('Subscription');
-const User = mongoose.model('User');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
-
 chai.use(chaiHttp);
 
 // Test the /GET route
 describe('/GET subscriptions', () => {
     it('it should GET all the subscriptions', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -38,7 +31,6 @@ describe('/GET subscriptions', () => {
     });
 
     it('it should GET a specific subscription', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -52,7 +44,6 @@ describe('/GET subscriptions', () => {
     });
 
     it('it should not GET a fake subscription', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -67,7 +58,6 @@ describe('/GET subscriptions', () => {
 // Test the /POST route
 describe('/POST subscription', () => {
     it('it should not POST a subscription without _id field', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -81,7 +71,6 @@ describe('/POST subscription', () => {
     });
 
     it('it should not POST a subscription without thing or device field', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -95,7 +84,6 @@ describe('/POST subscription', () => {
     });
 
     it('it should not POST a subscription with a fake tag', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -109,7 +97,6 @@ describe('/POST subscription', () => {
     });
 
     it('it should not POST a subscription with a fake device', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -123,7 +110,6 @@ describe('/POST subscription', () => {
     });
 
     it('it should not POST a subscription with a fake thing', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -137,7 +123,6 @@ describe('/POST subscription', () => {
     });
 
     it('it should POST a subscription for a device', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -152,7 +137,6 @@ describe('/POST subscription', () => {
     });
 
     it('it should POST a subscription for a thing', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const thing = await factory.createThing("test-thing-1", owner);
@@ -167,7 +151,6 @@ describe('/POST subscription', () => {
     });
 
     it('it should not POST a subscription already existant', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -184,7 +167,6 @@ describe('/POST subscription', () => {
     });
 
     it('it should POST a list of subscriptions', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", owner);
         const subscriptions = [{ token: "subscription-id-1", thing: thing._id, tags: [] },
@@ -199,7 +181,6 @@ describe('/POST subscription', () => {
     });
 
     it('it should POST only not existing subscriptions from a list', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing_1 = await factory.createThing("test-thing-1", owner);
         const thing_2 = await factory.createThing("test-thing-2", owner);
@@ -224,7 +205,6 @@ describe('/POST subscription', () => {
 // Test the /DELETE route
 describe('/DELETE subscription', () => {
     it('it should DELETE a subscription', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", owner);
         const subscription = await factory.createSubscription("test-subscription-1", owner, null, thing, []);
@@ -238,7 +218,6 @@ describe('/DELETE subscription', () => {
     });
 
     it('it should not DELETE a fake subscription', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", owner);
         const subscription = await factory.createSubscription("test-subscription-1", owner, null, thing, []);
@@ -255,9 +234,7 @@ describe('/DELETE subscription', () => {
 
 // Test the /PUT route
 describe('/PUT subscription', () => {
-
     it('it should PUT a subscription to add a tag', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", owner);
         const tag_2 = await factory.createTag("test-tag-2", owner);
@@ -273,7 +250,6 @@ describe('/PUT subscription', () => {
     });
 
     it('it should PUT a subscription to remove a tag', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", owner);
         const tag_2 = await factory.createTag("test-tag-2", owner);
@@ -289,7 +265,6 @@ describe('/PUT subscription', () => {
     });
 
     it('it should PUT a subscription to add and remove tags', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", owner);
         const tag_2 = await factory.createTag("test-tag-2", owner);
@@ -309,7 +284,6 @@ describe('/PUT subscription', () => {
     });
 
     it('it should not PUT a subscription adding a fake tag', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", owner);
         const tag_2 = await factory.createTag("test-tag-2", owner);
@@ -326,7 +300,6 @@ describe('/PUT subscription', () => {
     });
 
     it('it should not PUT a subscription removing a fake tag', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", owner);
         const tag_2 = await factory.createTag("test-tag-2", owner);
@@ -343,7 +316,6 @@ describe('/PUT subscription', () => {
     });
 
     it('it should not PUT a fake subscription', async () => {
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", owner);
         const tag_2 = await factory.createTag("test-tag-2", owner);
@@ -358,8 +330,6 @@ describe('/PUT subscription', () => {
     });
 
     it('it should not PUT a subscription with a wrong field', async () => {
-        factory.dropContents();
-        factory.dropContents();
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", owner);
         const tag_2 = await factory.createTag("test-tag-2", owner);

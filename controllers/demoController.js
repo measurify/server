@@ -1,19 +1,19 @@
 const mongoose = require('mongoose');
 const factory = require('../commons/factory.js');
-const User = mongoose.model('User');
-const Tag = mongoose.model('Tag');
-const Feature = mongoose.model('Feature');
-const Device = mongoose.model('Device');
-const Script = mongoose.model('Script');
-const Thing = mongoose.model('Thing');
-const Right = mongoose.model('Right');
-const Measurement = mongoose.model('Measurement');
-const Constraint = mongoose.model('Constraint');
 const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 
 exports.get = async (req, res) => {
     if (!Authorization.isAdministrator(req.user)) return errors.manage(res, errors.admin_restricted_access); 
+    const User = mongoose.dbs[req.tenant._id].model('User');
+    const Tag = mongoose.dbs[req.tenant._id].model('Tag');
+    const Feature = mongoose.dbs[req.tenant._id].model('Feature');
+    const Device = mongoose.dbs[req.tenant._id].model('Device');
+    const Script = mongoose.dbs[req.tenant._id].model('Script');
+    const Thing = mongoose.dbs[req.tenant._id].model('Thing');
+    const Right = mongoose.dbs[req.tenant._id].model('Right');
+    const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
+    const Constraint = mongoose.dbs[req.tenant._id].model('Constraint');
     const users = await User.find({}).select("+password");
     const tags = await Tag.find({});
     const features = await Feature.find({});
@@ -28,9 +28,18 @@ exports.get = async (req, res) => {
 
 exports.post = async (req, res) => {
     if (!Authorization.isAdministrator(req.user)) return errors.manage(res, errors.admin_restricted_access); 
-    await factory.dropContents();;
-    if (req.body != '{}') await factory.createDemoContent(); 
+    await factory.dropContents(req.tenant._id);
+    if (req.body != '{}') await factory.createDemoContent(req.tenant._id); 
     else return errors.manage(res, errors.demo_content_request_not_implemented);
+    const User = mongoose.dbs[req.tenant._id].model('User');
+    const Tag = mongoose.dbs[req.tenant._id].model('Tag');
+    const Feature = mongoose.dbs[req.tenant._id].model('Feature');
+    const Device = mongoose.dbs[req.tenant._id].model('Device');
+    const Script = mongoose.dbs[req.tenant._id].model('Script');
+    const Thing = mongoose.dbs[req.tenant._id].model('Thing');
+    const Right = mongoose.dbs[req.tenant._id].model('Right');  
+    const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
+    const Constraint = mongoose.dbs[req.tenant._id].model('Constraint');
     const users = await User.find({}).select("+password");
     const tags = await Tag.find({});
     const features = await Feature.find({});
@@ -45,7 +54,16 @@ exports.post = async (req, res) => {
 
 exports.delete = async (req, res) => {
     if (!Authorization.isAdministrator(req.user)) return errors.manage(res, errors.admin_restricted_access); 
-    await factory.dropContents();;
+    await factory.dropContents(req.tenant._id);
+    const User = mongoose.dbs[req.tenant._id].model('User');
+    const Tag = mongoose.dbs[req.tenant._id].model('Tag');
+    const Feature = mongoose.dbs[req.tenant._id].model('Feature');
+    const Device = mongoose.dbs[req.tenant._id].model('Device');
+    const Script = mongoose.dbs[req.tenant._id].model('Script');
+    const Thing = mongoose.dbs[req.tenant._id].model('Thing');
+    const Right = mongoose.dbs[req.tenant._id].model('Right');
+    const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
+    const Constraint = mongoose.dbs[req.tenant._id].model('Constraint');
     const users = await User.find({}).select("+password");
     const tags = await Tag.find({});
     const features = await Feature.find({});

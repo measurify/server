@@ -1,8 +1,7 @@
-// Import environmental variables from variables.test.env file
-require('dotenv').config({ path: 'variables.test.env' });
 
-// This line allow to test with the self signed certificate
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+process.env.ENV = 'test';
+process.env.LOG = 'false'; 
 
 // Import test tools
 const chai = require('chai');
@@ -12,19 +11,15 @@ const server = require('../server.js');
 const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
-const Device = mongoose.model('Device');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
-
 const assert = require('chai').assert;
-
 chai.use(chaiHttp);
 
-// Test the stream for a thing
 
+// Test the stream for a thing
 describe('Thing stream', () => {
     it('it should GET measurements of a thing', async () => {
-        await factory.dropContents();
         const WebSocket = require('ws');
         const provider = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const analyst = await factory.createUser("test-username-2", "test-password-2", UserRoles.analyst);
@@ -47,7 +42,6 @@ describe('Thing stream', () => {
     });
 
     it('it should GET measurements of a device', async () => {
-        await factory.dropContents();
         const WebSocket = require('ws');
         const provider = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const analyst = await factory.createUser("test-username-2", "test-password-2", UserRoles.analyst);
@@ -70,7 +64,6 @@ describe('Thing stream', () => {
     });
 
     it('it should not GET measurements of a fake thing', async () => {
-        await factory.dropContents();
         const WebSocket = require('ws');
         const provider = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const analyst = await factory.createUser("test-username-2", "test-password-2", UserRoles.analyst);
@@ -95,7 +88,6 @@ describe('Thing stream', () => {
     });
 
     it('it should not GET measurements of a fake device', async () => {
-        await factory.dropContents();
         const WebSocket = require('ws');
         const provider = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const analyst = await factory.createUser("test-username-2", "test-password-2", UserRoles.analyst);
@@ -120,7 +112,6 @@ describe('Thing stream', () => {
     });
 
     it('it should not GET measurements of a thing with a fake token', async () => {
-        await factory.dropContents();
         const WebSocket = require('ws');
         const provider = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const analyst = await factory.createUser("test-username-2", "test-password-2", UserRoles.analyst);
@@ -143,7 +134,6 @@ describe('Thing stream', () => {
     }); 
 
     it('it should not GET measurements of a device with a fake token', async () => {
-        await factory.dropContents();
         const WebSocket = require('ws');
         const provider = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const analyst = await factory.createUser("test-username-2", "test-password-2", UserRoles.analyst);
@@ -166,7 +156,6 @@ describe('Thing stream', () => {
     });
 
     it('it should not GET measurements of a fake entity', async () => {
-        await factory.dropContents();
         const WebSocket = require('ws');
         const provider = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const analyst = await factory.createUser("test-username-2", "test-password-2", UserRoles.analyst);
@@ -189,7 +178,6 @@ describe('Thing stream', () => {
     }); 
 
     it('it should not GET measurements of a thing wothout rights', async () => {
-        await factory.dropContents();
         const WebSocket = require('ws');
         const admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const provider = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
@@ -215,7 +203,6 @@ describe('Thing stream', () => {
     }); 
 
     it('it should GET measurements of a thing with rights', async () => {
-        await factory.dropContents();
         const WebSocket = require('ws');
         const admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const provider = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
@@ -240,7 +227,6 @@ describe('Thing stream', () => {
     }); 
 
     it('it should GET measurements of two different things on two different socket', async () => {
-        await factory.dropContents();
         const WebSocket = require('ws');
         const admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const provider = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);

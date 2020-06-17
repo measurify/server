@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
-const User = mongoose.model('User');
-const Device = mongoose.model('Device');
 const IssueTypes = require('../types/issueTypes.js'); 
 
 /**
@@ -42,6 +40,7 @@ issueSchema.plugin(require('mongoose-autopopulate'));
 // validate owner
 issueSchema.path('owner').validate({
     validator: async function (value) {
+        const User = this.constructor.model('User');
         let user = await User.findById(value);
         if (!user) return false;
         return true;
@@ -58,6 +57,7 @@ issueSchema.pre('save', async function() {
 // validate device
 issueSchema.path('device').validate({
     validator: async function (value) {
+        const Device = this.constructor.model('Device');
         let device = await Device.findById(value);
         if (!device) return false;
         return true;
@@ -76,4 +76,4 @@ issueSchema.pre('save', async function() {
     if(res) throw new Error('The issue already exists');                       
 });
 
-module.exports = mongoose.models.Issue || mongoose.model('Issue', issueSchema);
+module.exports = issueSchema;

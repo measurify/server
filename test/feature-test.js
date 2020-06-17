@@ -1,9 +1,5 @@
-// Import environmental variables from variables.test.env file
-require('dotenv').config({ path: 'variables.test.env' });
-
-// This line allow to test with the self signed certificate
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
+process.env.ENV = 'test';
+process.env.LOG = 'false'; 
 
 // Import test tools
 const chai = require('chai');
@@ -13,17 +9,13 @@ const database = require('../database.js');
 const server = require('../server.js');
 const should = chai.should();
 const factory = require('../commons/factory.js');
-const Feature = mongoose.model('Feature');
-const User = mongoose.model('User');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
-
 chai.use(chaiHttp);
 
 // Test the /GET route
 describe('/GET feature', () => {
-    it('it should GET all the features', async () => {
-        factory.dropContents();
+    it('it should GET all the features', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         await factory.createFeature("test-feature-1", user);
         await factory.createFeature("test-feature-2", user);
@@ -33,8 +25,7 @@ describe('/GET feature', () => {
         res.body.docs.length.should.be.eql(2);
     });
 
-    it('it should GET a specific feature', async () => {
-        factory.dropContents();
+    it('it should GET a specific feature', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user);
         const res = await chai.request(server).keepOpen().get('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user));
@@ -54,8 +45,7 @@ describe('/GET feature', () => {
 
 // Test the /POST route
 describe('/POST feature', () => {
-    it('it should not POST a feature without _id field', async () => {
-        factory.dropContents();
+    it('it should not POST a feature without _id field', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = {}
         const res = await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(feature)
@@ -87,7 +77,8 @@ describe('/POST feature', () => {
 
     it('it should not POST a feature with already existant _id field', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const feature = { _id: "feature-name-text", owner: user }
+        const feature = { _id: "feature-name-text", owner: user };
+        await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(feature)
         const res = await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(feature)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -98,6 +89,15 @@ describe('/POST feature', () => {
 
     it('it should GET the feature posted before', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = {
+            _id: "feature-name-text",
+            items: [
+                { name: "item-name-1", unit: "item-unit-1" },
+                { name: "item-name-2", unit: "item-unit-2" },
+                { name: "item-name-3", unit: "item-unit-3" }
+            ]
+        }
+        await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(feature)
         const res = await chai.request(server).keepOpen().get('/v1/features').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
@@ -117,7 +117,9 @@ describe('/POST feature', () => {
 
     it('it should POST only not existing features from a list', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const features = [{ _id: "test-text-1", dimensions: [] }, { _id: "test-text-2", dimensions: [] },
+        let features = [{ _id: "test-text-1", dimensions: [] }, { _id: "test-text-2", dimensions: [] }];
+        await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(features)
+        features = [{ _id: "test-text-1", dimensions: [] }, { _id: "test-text-2", dimensions: [] },
         { _id: "test-text-3", dimensions: [] }, { _id: "test-text-4", dimensions: [] },
         { _id: "test-text-5", dimensions: [] }];
         const res = await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(features)
@@ -135,8 +137,7 @@ describe('/POST feature', () => {
 
 // Test the /DELETE route
 describe('/DELETE feature', () => {
-    it('it should DELETE a feature', async () => {
-        factory.dropContents();
+    it('it should DELETE a feature', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user);
         const features_before = await Feature.find();
@@ -148,8 +149,7 @@ describe('/DELETE feature', () => {
         features_after.length.should.be.eql(0);
     });
 
-    it('it should not DELETE a feature by non-owner', async () => {
-        factory.dropContents();
+    it('it should not DELETE a feature by non-owner', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user);
@@ -163,8 +163,7 @@ describe('/DELETE feature', () => {
         features_after.length.should.be.eql(1);
     });
 
-    it('it should not DELETE a fake feature', async () => {
-        factory.dropContents();
+    it('it should not DELETE a fake feature', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const features_before = await Feature.find();
@@ -177,8 +176,7 @@ describe('/DELETE feature', () => {
         features_after.length.should.be.eql(1);
     });
     
-    it('it should not DELETE a feature already used in a measurement', async () => {
-        factory.dropContents();
+    it('it should not DELETE a feature already used in a measurement', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
@@ -195,8 +193,7 @@ describe('/DELETE feature', () => {
         features_after.length.should.be.eql(1);
     });
 
-    it('it should not DELETE a feature already used in a device', async () => {
-        factory.dropContents();
+    it('it should not DELETE a feature already used in a device', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);

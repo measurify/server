@@ -43,11 +43,11 @@ exports.getResourceListSize = async function(req, res, model, restriction) {
 
 exports.postResource = async function(req, res, model) {
     try { 
-        req.body.owner = req.user._id;
+        if(req.user._id) req.body.owner = req.user._id;
         if(!req.query.verbose) req.query.verbose = 'true';
-        if (req.body.constructor != Array) return res.status(200).json(await persistence.post(req.body, model));
+        if (req.body.constructor != Array) return res.status(200).json(await persistence.post(req.body, model, req.tenant));
         else {
-            const results = await persistence.post(req.body, model);
+            const results = await persistence.post(req.body, model, req.tenant);
             if (req.query.verbose == 'true') {
                 if (results.errors.length === 0) { return res.status(200).json(results); }
                 else { return res.status(202).json(results); }
@@ -85,7 +85,7 @@ exports.deleteResourceList = async function(req, res, model, restriction) {
 
 exports.updateResource = async function(req, res, fields, model) {
     try {
-        const modified_resource = await persistence.update(req.body, fields, req.resource, model);
+        const modified_resource = await persistence.update(req.body, fields, req.resource, model, req.tenant);
         return res.status(200).json(modified_resource);
     }
     catch (err) { return errors.manage(res, errors.put_request_error, err); }

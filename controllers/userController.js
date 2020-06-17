@@ -6,18 +6,12 @@ const PasswordResetStatusTypes = require('../types/passwordResetStatusTypes.js')
 const UserStatusTypes = require('../types/userStatusTypes.js');
 const email = require('../commons/email.js');
 const ObjectId = require('mongoose').Types.ObjectId;
-const User = mongoose.model('User');
-const PasswordReset = mongoose.model('PasswordReset');
-const Tag = mongoose.model('Tag');
-const Feature = mongoose.model('Feature');
-const Thing = mongoose.model('Thing');
-const Device = mongoose.model('Device');
-const Measurement = mongoose.model('Measurement');
 const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 const bcrypt = require('bcryptjs');
 
 exports.get = async (req, res) => { 
+    const User = mongoose.dbs[req.tenant._id].model('User');
     const select = await checker.whatCanSee(req, res, User)
     const result = await checker.isAdminitrator(req, res); if (result != true) return result;
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, User); 
@@ -28,6 +22,7 @@ exports.getusernames = async (req, res) => {
 };
 
 exports.getone = async (req, res) => {
+    const User = mongoose.dbs[req.tenant._id].model('User');
     const select = await checker.whatCanSee(req, res, User)
     let result = await checker.isAvailable(req, res, User); if (result != true) return result;
     result = await checker.isAdminitrator(req, res); if (result != true) return result;
@@ -35,21 +30,30 @@ exports.getone = async (req, res) => {
 };
 
 exports.post = async (req, res) => {
+    const User = mongoose.dbs[req.tenant._id].model('User');
     let result = await checker.isAdminitrator(req, res); if (result != true) return result;
+    if(req.tenant.passwordhash == 'true') req.password = bcrypt.hashSync(req.password, 8); 
     return await controller.postResource(req, res, User);
 };
 
 exports.put = async (req, res) => { 
+    const User = mongoose.dbs[req.tenant._id].model('User');
     const fields = ['password', 'fieldmask', 'email'];
     let result = await checker.isAvailable(req, res, User); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.isValid(req, res, UserStatusTypes, 'status'); if (result != true) return result;
     result = await checker.isHim(req, res); if (result != true) return result; 
-    if(req.body.password) if(process.env.PASSWORDHASH == 'true') req.body.password = bcrypt.hashSync(req.body.password, 8); 
+    if(req.body.password) if(req.tenant.passwordhash == 'true') req.body.password = bcrypt.hashSync(req.body.password, 8); 
     return await controller.updateResource(req, res, fields, User);
 };  
 
 exports.delete = async (req, res) => {
+    const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
+    const Device = mongoose.dbs[req.tenant._id].model('Device');
+    const Feature = mongoose.dbs[req.tenant._id].model('Feature');
+    const Thing = mongoose.dbs[req.tenant._id].model('Thing');
+    const Tag = mongoose.dbs[req.tenant._id].model('Tag');
+    const User = mongoose.dbs[req.tenant._id].model('User');
     let result = await checker.isAvailable(req, res, User); if (result != true) return result;
     result = await checker.isAdminitrator(req, res); if (result != true) return result;
     result = await checker.isNotUsed(req, res, Measurement, 'owner'); if (result != true) return result;
@@ -61,6 +65,11 @@ exports.delete = async (req, res) => {
 };
 
 exports.self = async (req, res) => {
+    if(!req.body.tenant) return errors.manage(res, errors.post_request_error, "Path `tenant` is required");
+    const Tenant = mongoose.dbs['catalog'].model('Tenant');
+    const tenant = await Tenant.findById(req.body.tenant);
+    if(!tenant) return errors.manage(res, errors.post_request_error, "Unknown tenant (" + req.body.tenant +")");
+    const User = mongoose.dbs[req.body.tenant].model('User');
     req.body.status = UserStatusTypes.disabled;
     if(!req.body.email) return errors.manage(res, errors.missing_email);
     let user=null;
@@ -73,6 +82,11 @@ exports.self = async (req, res) => {
 };
 
 exports.awaiting = async (req, res) => {
+    if(!req.query.tenant) return errors.manage(res, errors.get_request_error, "Query param `tenant` is required");
+    const Tenant = mongoose.dbs['catalog'].model('Tenant');
+    const tenant = await Tenant.findById(req.query.tenant);
+    if(!tenant) return errors.manage(res, errors.get_request_error, "Unknown tenant (" + req.query.tenant +")");
+    const User = mongoose.dbs[req.query.tenant].model('User');
     let result = await checker.isAvailable(req, res, User); if (result != true) return result;
     await User.findByIdAndUpdate(req.params.id, { "$set": { "status": UserStatusTypes.awaiting } });
     user_updated = await User.findById(req.params.id);
@@ -82,6 +96,7 @@ exports.awaiting = async (req, res) => {
 };
 
 exports.accept = async (req, res) => {
+    const User = mongoose.dbs[req.tenant._id].model('User');
     const fields = ['status'];
     let result = await checker.isAdminitrator(req, res); if (result != true) return result; 
     result = await checker.isAvailable(req, res, User); if (result != true) return result;
@@ -96,6 +111,12 @@ exports.accept = async (req, res) => {
 };
 
 exports.reset = async (req, res) => {
+    if(!req.query.tenant) return errors.manage(res, errors.get_request_error, "Query param `tenant` is required");
+    const Tenant = mongoose.dbs['catalog'].model('Tenant');
+    const tenant = await Tenant.findById(req.query.tenant);
+    if(!tenant) return errors.manage(res, errors.post_request_error, "Unknown tenant (" + req.query.tenant +")");
+    const User = mongoose.dbs[req.query.tenant].model('User');
+    const PasswordReset = mongoose.dbs[req.query.tenant].model('PasswordReset');
     if(!req.body.email) return errors.manage(res, errors.missing_email);
     const user = await User.findOne({email: req.body.email});
     if(!user) return errors.manage(res, errors.resource_not_found);
@@ -107,6 +128,12 @@ exports.reset = async (req, res) => {
 };
 
 exports.password = async (req, res) => {
+    if(!req.query.tenant) return errors.manage(res, errors.get_request_error, "Query param `tenant` is required");
+    const Tenant = mongoose.dbs['catalog'].model('Tenant');
+    const tenant = await Tenant.findById(req.query.tenant);
+    if(!tenant) return errors.manage(res, errors.get_request_error, "Unknown tenant (" + req.query.tenant +")");
+    const User = mongoose.dbs[req.query.tenant].model('User');
+    const PasswordReset = mongoose.dbs[req.query.tenant].model('PasswordReset');
     if(!req.query.password) return errors.manage(res, errors.missing_info);
     if(!req.query.reset) return errors.manage(res, errors.missing_info);
     if(!ObjectId.isValid(req.query.reset)) return errors.manage(res, errors.resource_not_found, req.body.reset);
@@ -116,7 +143,7 @@ exports.password = async (req, res) => {
     const user = await User.findById(reset.user);
     if(!user) return errors.manage(res, errors.resource_not_found, 'user');
     const reset_updated = await PasswordReset.findByIdAndUpdate(req.query.reset, { "$set": { "status": PasswordResetStatusTypes.invalid } });
-    if(process.env.PASSWORDHASH == 'true') req.query.password = bcrypt.hashSync(req.query.password, 8);
+    if(tenant.passwordhash == 'true') req.query.password = bcrypt.hashSync(req.query.password, 8);
     const user_updated = await User.findByIdAndUpdate(user._id, { "$set": { "password": req.query.password } });
     return res.status(200).json(user_updated);   
 };

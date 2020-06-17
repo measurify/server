@@ -6,9 +6,10 @@ try{
         credential: firebase.credential.cert(account),
         databaseURL: process.env.FIREBASE_URL
     });
+    console.log("Firebase initialized!");
 }
 catch(error) {
-    console.log("Warning: firebase not started, check your firebase-config.json file");
+    console.log("Warning: Firebase not started, check your firebase-config.json file + (" + error + ")");
 }
 
 const options = { priority: 'high', timeToLive: 60 * 60 * 24 };

@@ -1,12 +1,6 @@
 const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
-
-const User = mongoose.model('User');
-const Feature = mongoose.model('Feature');
-const Tag = mongoose.model('Tag');
-const Device = mongoose.model('Device');
-const Thing = mongoose.model('Thing');
 const RelationshipTypes = require('../types/relationshipTypes.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
  
@@ -54,6 +48,7 @@ constraintSchema.plugin(require('mongoose-autopopulate'));
 // validate owner
 constraintSchema.path('owner').validate({
     validator: async function (value) {
+        const User = this.constructor.model('User');
         let user = await User.findById(value);
         if (!user) throw new Error('User not existent (' + value + ')');
         return true;
@@ -63,6 +58,7 @@ constraintSchema.path('owner').validate({
 // validate tags
 constraintSchema.path('tags').validate({
     validator: async function (values) {
+        const Tag = this.constructor.model('Tag');
         for (let i = 0; i < values.length; i++) {
             const tag = await Tag.findById(values[i]);
             if (!tag) return false;
@@ -83,7 +79,7 @@ constraintSchema.path('relationship').validate({
 // validate element 1
 constraintSchema.pre('save', async function() {
     let model = null;
-    try { model = mongoose.model(this.type1) } catch(err) {};
+    try { model = this.constructor.model(this.type1) } catch(err) {};
     if(!model) throw new Error('Unrecognized resource type (' + this.type1 + ')');
     const resource = await model.findById(this.element1);
     if(!resource) throw new Error('Element 1 not found (' + this.element1 + ')');                   
@@ -92,7 +88,7 @@ constraintSchema.pre('save', async function() {
 // validate element 2
 constraintSchema.pre('save', async function() {
     let model = null;
-    try { model = mongoose.model(this.type2) } catch(err) {};
+    try { model = this.constructor.model(this.type2) } catch(err) {};
     if(!model) throw new Error('Unrecognized resource type (' + this.type2 + ')');
     const resource = await model.findById(this.element2);
     if(!resource) throw new Error('Element 2 not found (' + this.element2 + ')');                   
@@ -108,4 +104,4 @@ constraintSchema.pre('save', async function() {
     if(res) throw new Error('The constraint already exists (' + res._id + ')');                       
 });
 
-module.exports = mongoose.models.Constraint || mongoose.model('Constraint', constraintSchema);
+module.exports = constraintSchema;

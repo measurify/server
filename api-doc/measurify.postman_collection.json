@@ -6483,6 +6483,180 @@
 			"protocolProfileBehavior": {}
 		},
 		{
+			"name": "TENANTS",
+			"item": [
+				{
+					"name": "GET all tenants",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e932d7e0-5127-4508-aa36-c330f7fed26e",
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"if(data.docs) pm.environment.set('tenant', data.docs[0]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "ifhidhfudshuf8"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/tenants",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"tenants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get one tenant",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "ifhidhfudshuf8",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/tenants/{{tenant}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"tenants",
+								"{{tenant}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new tenant",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "4600cb40-a98b-40bf-9041-405103c220ed",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbe3c7f2-7f84-46a6-a565-999b247a2c68",
+								"exec": [
+									"pm.environment.set(\"tenant\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "ifhidhfudshuf8",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"_id\": \"measurify-tenat-test\",\r\n    \"organization\": \"Measurify org\",\r\n    \"address\": \"Measurify Street, Genova\",\r\n    \"email\": \"info@measurify.org\",\r\n    \"phone\": \"+39103218793817\"\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/tenants/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"tenants",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE a tenant",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "ifhidhfudshuf8"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/v1/tenants/{{tenant}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"tenants",
+								"{{tenant}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6e94a923-a3b6-446e-918c-6500654d3b9b",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "f44d86e8-1113-428d-a9e9-38658f0286a0",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "API docs",
 			"event": [
 				{

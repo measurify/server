@@ -1,19 +1,18 @@
 // Based on http://en.wikipedia.org/wiki/Interquartile_range#Interquartile_range_and_outliers
 
 const mongoose = require('mongoose');
-const Measurement = mongoose.model('Measurement');
 const runner = require('../computations/runner');
 
-exports.run = async function(filter, computation) { 
+exports.run = async function(filter, computation, tenant) { 
+    const Measurement = mongoose.dbs[tenant].model('Measurement');
     const measurements = await Measurement.paginate(filter);
-    const outliers = await find(measurements.docs.map(x => ({ id:x.id, value:x.samples[0].vlues[0][0] })), computation);
+    const outliers = await find(measurements.docs.map(x => ({ id:x.id, value:x.samples[0].vlues[0][0] })), computation, tenant);
     for(let i=0; i<outliers.length; i++) 
         await Measurement.findByIdAndUpdate(outliers[i].id, { $push: { tags: "outlier" } });
-    console.log(runner);
-    runner.complete(computation);
+    runner.complete(computation, tenant);
 }
 
-const find = async function(arr, computation) {
+const find = async function(arr, computation, tenant) {
   arr = arr.sort(function(a, b) { return a.value - b.value; });
   const middle = median(arr);
   const range = iqr(arr);
@@ -22,7 +21,7 @@ const find = async function(arr, computation) {
   for (let i = 0; i < arr.length; i++) {
     await sleep(3000); // just to simulate a long process
     if(index > arr.length/100) {
-        runner.progress(computation, ((i+1)/arr.length)*100);
+        runner.progress(computation, ((i+1)/arr.length)*100, tenant);
         index=0;
     }
     index++;

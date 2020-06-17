@@ -1,8 +1,5 @@
-// Import environmental variables from variables.test.env file
-require('dotenv').config({ path: 'variables.test.env' });
-
-// This line allow to test with the self signed certificate
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+process.env.ENV = 'test';
+process.env.LOG = 'false'; 
 
 // Import test tools
 const chai = require('chai');
@@ -13,19 +10,16 @@ const server = require('../server.js');
 const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
-const User = mongoose.model('User');
 const UserRoles = require('../types/userRoles.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 const errors = require('../commons/errors.js');
 const RelationshipTypes = require('../types/relationshipTypes.js');
-
 chai.use(chaiHttp);
 
 // READ LIST
 describe('Access read a list of constraints', () => {
-    it('it should get all the public/private constraints as admin or analyst', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
+    it('it should get all the public/private constraints as admin or analyst', async () => {      
+const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -55,9 +49,8 @@ describe('Access read a list of constraints', () => {
         res.body.docs.length.should.be.eql(8);
     });
 
-    it('it should get just his own or public constraints as provider', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
+    it('it should get just his own or public constraints as provider', async () => {      
+const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -91,9 +84,8 @@ describe('Access read a list of constraints', () => {
         res.body.docs.length.should.be.eql(10);
     });
 
-    it('it should get a filtered list of his own or public measurements as provider', async () => {
-        factory.dropContents();
-        const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
+    it('it should get a filtered list of his own or public measurements as provider', async () => {      
+const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature1 = await factory.createFeature("test-feature-1", owner);

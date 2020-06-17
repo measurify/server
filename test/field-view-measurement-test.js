@@ -1,8 +1,7 @@
-// Import environmental variables from variables.test.env file
-require('dotenv').config({ path: 'variables.test.env' });
 
-// This line allow to test with the self signed certificate
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+process.env.ENV = 'test';
+process.env.LOG = 'false'; 
 
 // Import test tools
 const chai = require('chai');
@@ -13,17 +12,14 @@ const server = require('../server.js');
 const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
-const User = mongoose.model('User');
 const UserRoles = require('../types/userRoles.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 const errors = require('../commons/errors.js');
-
 chai.use(chaiHttp);
 
 describe('Field view with mask', () => {
-    it('it should see all fields of a list of measurements without fieldmask', async () => {
-        factory.dropContents();
-        const admin = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.admin);
+    it('it should see all fields of a list of measurements without fieldmask', async () => {      
+const admin = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.admin);
         const analyst = await factory.createUser("test-username-user-2", "test-password-user-2", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -43,8 +39,7 @@ describe('Field view with mask', () => {
         res.body.docs[0].should.not.include.keys("owner");
     });
 
-    it('it should see just fields defined in fieldmask of a list of measurement', async () => {
-        factory.dropContents();
+    it('it should see just fields defined in fieldmask of a list of measurement', async () => {      
         const admin = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.admin);
         const analyst = await factory.createUser("test-username-user-2", "test-password-user-2", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -68,8 +63,7 @@ describe('Field view with mask', () => {
         res.body.docs[0].should.not.include.keys("owner");
     });
 
-    it('it should see all fields of a single measurement without fieldmask', async () => {
-        factory.dropContents();
+    it('it should see all fields of a single measurement without fieldmask', async () => {      
         const admin = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.admin);
         const analyst = await factory.createUser("test-username-user-2", "test-password-user-2", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
@@ -86,8 +80,7 @@ describe('Field view with mask', () => {
         res.body.should.not.include.keys("owner");
     });
 
-    it('it should see just fields defined in fieldmask of a single measurement', async () => {
-        factory.dropContents();
+    it('it should see just fields defined in fieldmask of a single measurement', async () => {      
         const admin = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.admin);
         const analyst = await factory.createUser("test-username-user-2", "test-password-user-2", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);

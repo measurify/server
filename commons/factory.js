@@ -1,122 +1,76 @@
-require('../models/userSchema');
-
 const UserRoles = require('../types/userRoles');
 const crypto = require("crypto");
 const mongoose = require('mongoose');
-const User = mongoose.model('User');
-const Thing = mongoose.model('Thing');
-const Tag = mongoose.model('Tag');
-const Script = mongoose.model('Script');
-const Feature = mongoose.model('Feature');
-const Device = mongoose.model('Device');
-const Constraint = mongoose.model('Constraint');
-const Measurement = mongoose.model('Measurement');
-const PasswordReset = mongoose.model('PasswordReset');
-const Issue = mongoose.model('Issue');
-const Computation = mongoose.model('Computation');
-const Right = mongoose.model('Right');
-const Fieldmask = mongoose.model('Fieldmask');
-const Subscription = mongoose.model('Subscription');
+const tenancy = require('./tenancy.js');
+const authentication = require('../security/authentication.js');
 const RelationshipTypes = require('../types/relationshipTypes');
 const jwt = require('jsonwebtoken');
 const ItemTypes = require('../types/itemTypes.js');
 const ComputationStatusTypes = require('../types/computationStatusTypes.js'); 
 const PasswordResetStatusTypes = require('../types/passwordResetStatusTypes.js');
 const IssueTypes = require('../types/issueTypes.js');
+const VisibilityTypes = require('../types/visibilityTypes.js');
 const bcrypt = require('bcryptjs');
 
+exports.uuid = function() {  return crypto.randomBytes(16).toString("hex"); }
 
-exports.uuid = function() { 
-    return crypto.randomBytes(16).toString("hex"); 
-}
+exports.random = function(max) { return Math.floor(Math.random() * max); }
 
-exports.random = function(max) {
-    return Math.floor(Math.random() * max);
-}
-
-exports.dropContents = async function(){  
+exports.dropContents = async function(tenant_id){  
     try{  
-        await mongoose.connection.dropDatabase(); 
-        await this.createSuperAdministrator();
+        if(!tenant_id) tenant_id = process.env.DEFAULT_TENANT_TEST;
+        const Tenant = mongoose.dbs['catalog'].model('Tenant');
+        tenant = await Tenant.findById(tenant_id);
+        for (let collection in mongoose.dbs[tenant._id].collections) { await mongoose.dbs[tenant._id].collections[collection].deleteMany(); };    
+        await this.createSuperAdministrator(tenant);
     }
-    catch (error) {} 
+    catch (error) { console.log('Error in dropping databae ' + tenant + '('+ error + ')')} 
 }
 
-exports.createSuperAdministrator = async function() {
-    return await this.createUser(process.env.ADMIN_USERNAME, process.env.ADMIN_PASSWORD, UserRoles.admin);
+exports.createSuperAdministrator = async function(tenant) {
+    return await this.createUser(process.env.DEFAULT_TENANT_ADMIN_USERNAME, process.env.DEFAULT_TENANT_ADMIN_PASSWORD, UserRoles.admin, null, process.env.EMAIL, tenant._id);
 };
 
-exports.getAdminToken = async function() {
-    const admin = await User.findOne({ username: process.env.ADMIN_USERNAME });
-    const token = jwt.sign(admin.toJSON(), process.env.JWTSECRET);
-    return 'JWT ' + token;
+exports.getAdminToken = async function(tenant_id) {
+    if(!tenant_id) tenant_id = process.env.DEFAULT_TENANT_TEST;
+    const Tenant = mongoose.dbs['catalog'].model('Tenant');
+    tenant = await Tenant.findById(tenant_id);
+    const User = mongoose.dbs[tenant._id].model('User');
+    const admin = await User.findOne({ username: process.env.DEFAULT_TENANT_ADMIN_USERNAME });
+    return authentication.encode(admin, tenant);
 };
 
-exports.getUserToken = async function(user) {
-    const token = jwt.sign(user.toJSON(), process.env.JWTSECRET);
-    return 'JWT ' + token;
+exports.getUserToken = async function(user, tenant) {
+    if(!tenant) tenant = process.env.DEFAULT_TENANT_TEST;
+    const Tenant = mongoose.dbs['catalog'].model('Tenant');
+    tenant = await Tenant.findById(tenant);
+    return authentication.encode(user, tenant);
 };
 
-exports.createDemoContent = async function() {
-    const users = [];
-    users.push(await this.createUser('user-provider-name-1', 'provider-password-1', UserRoles.provider));
-    users.push(await this.createUser('user-analyst-name-1', 'analyst-password-1', UserRoles.analyst));
+exports.createTenant = async function(id, organization, address, email, phone, admin_username, admin_password) {
+    const Tenant = mongoose.dbs['catalog'].model('Tenant');
+    let tenant = await Tenant.findOne( { _id: id });
+    if(!tenant) {
+        const req = { 
+            _id: id || uuid(),
+            organization: organization ||  uuid(),
+            address: address,
+            email: email,
+            phone: phone,
+            admin_username: admin_username,
+            admin_password: admin_password 
+        };
+        tenant = new Tenant(req);
+        await tenant.save();
+    }
+    await tenancy.init(tenant);
+    await this.createSuperAdministrator(tenant);
+    return await Tenant.findById(tenant._id);
+};
 
-    const tags = [];
-    tags.push(await this.createTag('diesel', users[0]));
-    tags.push(await this.createTag('gasoline', users[0]));
-    tags.push(await this.createTag('urban', users[0]));
-    tags.push(await this.createTag('autoroute', users[0]));
-    tags.push(await this.createTag('rural', users[0]));
-
-    const features = [];
-    features.push(await this.createFeature("speed", users[0], [{name: "value", unit: "km/h"}]));
-    features.push(await this.createFeature("acceleration", users[0], [{name: "value", unit: "km/h2"}]));
-
-    const script = [];
-    script.push(await this.createScript("script-speedometer-rural", users[0], "source code speedometer", ["rural"]));
-    script.push(await this.createScript("script-accelerometer-rural", users[0], "source code accelometer", ["rural"]));
-    script.push(await this.createScript("script-speedometer-urban", users[0], "source code speedometer", ["urban"]));
-    script.push(await this.createScript("script-accelerometer-urban", users[0], "source code accelometer", ["urban"]));
-
-    const devices = [];
-    devices.push(await this.createDevice("speedometer", users[0], ["speed"], [], ["script-speedometer-rural", "script-speedometer-urban"]));
-    devices.push(await this.createDevice("accelerometer", users[0], ["acceleration"], [], ["script-accelerometer-rural", "script-accelerometer-urban"]));
-
-    const things = [];
-    things.push(await this.createThing("car1", users[0], ["diesel"] ));
-    things.push(await this.createThing("car2", users[0], ["gasoline"]));
-    things.push(await this.createThing("car3", users[0], ["gasoline"]))
-
-    const constraints = [];
-    constraints.push(await this.createConstraint(users[0], "Tag", "Device", tags[0]._id, devices[0]._id, RelationshipTypes.dependency ));
-    constraints.push(await this.createConstraint(users[0], "Tag", "Device", tags[1]._id, devices[0]._id, RelationshipTypes.dependency ));
-    constraints.push(await this.createConstraint(users[0], "Tag", "Device", tags[2]._id, devices[1]._id, RelationshipTypes.dependency ));
-
-    const rights = [];
-    rights.push(await this.createRight(things[0], "Thing", users[1], users[0], []));
-    rights.push(await this.createRight(things[1], "Thing", users[1] , users[0], []));
- 
-    const measurements = [];
-    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car1", ["urban"], [{values: [60], delta: 0}]));
-    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car2", ["urban"], [{values: [80], delta: 0}]));
-    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car3", ["autoroute"], [{values: [95], delta: 0}]));
-    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car1", ["urban"], [{values: [160], delta: 0}]));
-    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car1", ["autoroute"], [{values: [130], delta: 0}]));
-    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car2", ["rural"], [{values: [20], delta: 0}]));
-    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car2", ["urban"], [{values: [40], delta: 0}]));
-    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car1", ["rural"], [{values: [55], delta: 0}]));
-    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car3", ["rural"], [{values: [65], delta: 0}]));
-    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car1", ["rural"], [{values: [73], delta: 0}]));
-    measurements.push(await this.createMeasurement(users[0], "acceleration", "accelerometer", "car1", ["rural"], [{values: [3.1], delta: 0}]));
-    measurements.push(await this.createMeasurement(users[0], "acceleration", "accelerometer", "car1", ["urban"], [{values: [4.3], delta: 0}]));
-    measurements.push(await this.createMeasurement(users[0], "acceleration", "accelerometer", "car3", ["autoroute"], [{values: [4.5], delta: 0}]));
-    measurements.push(await this.createMeasurement(users[0], "acceleration", "accelerometer", "car1", ["urban"], [{values: [1.2], delta: 0}]));
-    measurements.push(await this.createMeasurement(users[0], "acceleration", "accelerometer", "car2", ["autoroute"], [{values: [2.7], delta: 0}]));
-    measurements.push(await this.createMeasurement(users[0], "acceleration", "accelerometer", "car2", ["urban"], [{values: [3.1], delta: 0}]));                                              
-}
-
-exports.createUser = async function(username, password, type, fieldmask, email) {
+exports.createUser = async function(username, password, type, fieldmask, email, tenant) {
+    if(!tenant) tenant = process.env.DEFAULT_TENANT_TEST;
+    const User = mongoose.dbs[tenant].model('User');
     let user = await User.findOne( { username: username });
     if(!user) {
         const req = { 
@@ -141,7 +95,9 @@ exports.createSample = function (value, delta) {
     else return { values: [value], delta: delta }
 }
 
-exports.createTag = async function(name, owner, tags, visibility) {
+exports.createTag = async function(name, owner, tags, visibility, tenant) {
+    if(!tenant) tenant = process.env.DEFAULT_TENANT_TEST;
+    const Tag = mongoose.dbs[tenant].model('Tag');
     let tag = await Tag.findOne( { _id: name });
     if(!tag) {
         const req = { _id: name , owner: owner, tags: tags, visibility: visibility }
@@ -151,7 +107,9 @@ exports.createTag = async function(name, owner, tags, visibility) {
     return tag._doc;
 };
 
-exports.createFeature = async function(name, owner, items, tags, visibility) {
+exports.createFeature = async function(name, owner, items, tags, visibility, tenant) {
+    if(!tenant) tenant = process.env.DEFAULT_TENANT_TEST;
+    const Feature = mongoose.dbs[tenant].model('Feature');
     const req = { 
         _id: name,
         owner: owner,
@@ -164,7 +122,9 @@ exports.createFeature = async function(name, owner, items, tags, visibility) {
     return feature._doc;
 };
 
-exports.createDevice = async function(name, owner, features, tags, scripts, visibility) {
+exports.createDevice = async function(name, owner, features, tags, scripts, visibility, tenant) {
+    if(!tenant) tenant = process.env.DEFAULT_TENANT_TEST;
+    const Device = mongoose.dbs[tenant].model('Device');
     const req = { 
         _id: name,
         owner: owner,
@@ -178,7 +138,9 @@ exports.createDevice = async function(name, owner, features, tags, scripts, visi
     return device._doc;
 };
 
-exports.createIssue = async function(owner, device, date, message, type) {
+exports.createIssue = async function(owner, device, date, message, type, tenant) {
+    if(!tenant) tenant = process.env.DEFAULT_TENANT_TEST;
+    const Issue = mongoose.dbs[tenant].model('Issue');
     const req = { 
         owner: owner,
         device: device,
@@ -192,7 +154,9 @@ exports.createIssue = async function(owner, device, date, message, type) {
     return issue._doc;
 };
 
-exports.createConstraint = async function(owner, type1, type2, element1, element2, relationship, visibility, tags) {
+exports.createConstraint = async function(owner, type1, type2, element1, element2, relationship, visibility, tags, tenant) {
+    if(!tenant) tenant = process.env.DEFAULT_TENANT_TEST;
+    const Constraint = mongoose.dbs[tenant].model('Constraint');
     const req = { 
         owner: owner,
         type1: type1,
@@ -208,7 +172,9 @@ exports.createConstraint = async function(owner, type1, type2, element1, element
     return constraint._doc;
 };
 
-exports.createThing = async function(name, owner, tags, metadata, relations, visibility) {
+exports.createThing = async function(name, owner, tags, metadata, relations, visibility, tenant) {
+    if(!tenant) tenant = process.env.DEFAULT_TENANT_TEST;
+    const Thing = mongoose.dbs[tenant].model('Thing');
     const req = { 
         _id: name,
         owner: owner,
@@ -222,7 +188,9 @@ exports.createThing = async function(name, owner, tags, metadata, relations, vis
     return thing._doc;
 };
 
-exports.createScript = async function(name, owner, code, tags, visibility) {
+exports.createScript = async function(name, owner, code, tags, visibility, tenant) {
+    if(!tenant) tenant = process.env.DEFAULT_TENANT_TEST;
+    const Script = mongoose.dbs[tenant].model('Script');
     const req = { 
         _id: name,
         owner: owner,
@@ -235,7 +203,9 @@ exports.createScript = async function(name, owner, code, tags, visibility) {
     return script._doc;
 };
 
-exports.createSubscription = async function(token, owner, device, thing, tags) {
+exports.createSubscription = async function(token, owner, device, thing, tags, tenant) {
+    if(!tenant) tenant = process.env.DEFAULT_TENANT_TEST;
+    const Subscription = mongoose.dbs[tenant].model('Subscription');
     const req = { 
         token: token,
         owner: owner,
@@ -248,7 +218,9 @@ exports.createSubscription = async function(token, owner, device, thing, tags) {
     return subscription._doc;
 };
 
-exports.createRight = async function(resource, type, user, owner, tags) {
+exports.createRight = async function(resource, type, user, owner, tags, tenant) {
+    if(!tenant) tenant = process.env.DEFAULT_TENANT_TEST;
+    const Right = mongoose.dbs[tenant].model('Right');
     const req = { 
         resource: resource,
         type: type,
@@ -261,14 +233,18 @@ exports.createRight = async function(resource, type, user, owner, tags) {
     return right._doc;
 };
 
-exports.createReset = async function(user) {
+exports.createReset = async function(user, tenant) {
+    if(!tenant) tenant = process.env.DEFAULT_TENANT_TEST;
+    const PasswordReset = mongoose.dbs[tenant].model('PasswordReset');
     const req = { user: user._id, status: PasswordResetStatusTypes.valid , created: Date.now() };
     const reset = new PasswordReset(req);
     await reset.save();
     return await PasswordReset.findById(reset._id);
 }
 
-exports.createFieldmask = async function(name, computation_fields, device_fields, feature_fields, measurement_fields, script_fields, tag_fields, thing_fields, owner) {
+exports.createFieldmask = async function(name, computation_fields, device_fields, feature_fields, measurement_fields, script_fields, tag_fields, thing_fields, owner, tenant) {
+    if(!tenant) tenant = process.env.DEFAULT_TENANT_TEST;
+    const Fieldmask = mongoose.dbs[tenant].model('Fieldmask');
     const req = { 
         _id: name,
         computation_fields: computation_fields,
@@ -285,7 +261,9 @@ exports.createFieldmask = async function(name, computation_fields, device_fields
     return fieldmask._doc;
 };
 
-exports.createMeasurement = async function(owner, feature, device, thing, tags, samples, startdate, enddate, location, visibility) {
+exports.createMeasurement = async function(owner, feature, device, thing, tags, samples, startdate, enddate, location, visibility, tenant) {
+    if(!tenant) tenant = process.env.DEFAULT_TENANT_TEST;
+    const Measurement = mongoose.dbs[tenant].model('Measurement');
     const req = {
         owner: owner,
         startDate: startdate || Date.now(),
@@ -303,7 +281,9 @@ exports.createMeasurement = async function(owner, feature, device, thing, tags, 
     return measurement._doc;
 };
 
-exports.createComputation = async function(id, owner, code, feature, items, filter, tags, features) {
+exports.createComputation = async function(id, owner, code, feature, items, filter, tags, features, tenant) {
+    if(!tenant) tenant = process.env.DEFAULT_TENANT_TEST;
+    const Computation = mongoose.dbs[tenant].model('Computation');
     const req = { 
         _id: id,
         owner: owner,
@@ -320,3 +300,63 @@ exports.createComputation = async function(id, owner, code, feature, items, filt
     return computation._doc;
 };
 
+exports.createDemoContent = async function(tenant) {
+    if(!tenant) tenant = process.env.DEFAULT_TENANT_TEST;
+
+    const users = [];
+    users.push(await this.createUser('user-provider-name-1', 'provider-password-1', UserRoles.provider, null, "user1@measurify.org", tenant));
+    users.push(await this.createUser('user-analyst-name-1', 'analyst-password-1', UserRoles.analyst, null, "user2@measurify.org", tenant));
+
+    const tags = [];
+    tags.push(await this.createTag('diesel', users[0], [], VisibilityTypes.public, tenant));
+    tags.push(await this.createTag('gasoline', users[0], [], VisibilityTypes.public, tenant));
+    tags.push(await this.createTag('urban', users[0], [], VisibilityTypes.public, tenant));
+    tags.push(await this.createTag('autoroute', users[0], [], VisibilityTypes.public, tenant));
+    tags.push(await this.createTag('rural', users[0], [], VisibilityTypes.public, tenant));
+
+    const features = [];
+    features.push(await this.createFeature("speed", users[0], [{name: "value", unit: "km/h"}], [], VisibilityTypes.public, tenant));
+    features.push(await this.createFeature("acceleration", users[0], [{name: "value", unit: "km/h2"}], [], VisibilityTypes.public, tenant));
+
+    const script = [];
+    script.push(await this.createScript("script-speedometer-rural", users[0], "source code speedometer", ["rural"], VisibilityTypes.public, tenant));
+    script.push(await this.createScript("script-accelerometer-rural", users[0], "source code accelometer", ["rural"], VisibilityTypes.public, tenant));
+    script.push(await this.createScript("script-speedometer-urban", users[0], "source code speedometer", ["urban"], VisibilityTypes.public, tenant));
+    script.push(await this.createScript("script-accelerometer-urban", users[0], "source code accelometer", ["urban"], VisibilityTypes.public, tenant));
+
+    const devices = [];
+    devices.push(await this.createDevice("speedometer", users[0], ["speed"], [], ["script-speedometer-rural", "script-speedometer-urban"], VisibilityTypes.public, tenant));
+    devices.push(await this.createDevice("accelerometer", users[0], ["acceleration"], [], ["script-accelerometer-rural", "script-accelerometer-urban"], VisibilityTypes.public, tenant));
+    
+    const things = [];
+    things.push(await this.createThing("car1", users[0], ["diesel"], null, null, VisibilityTypes.public, tenant));
+    things.push(await this.createThing("car2", users[0], ["gasoline"], null, null, VisibilityTypes.public, tenant));
+    things.push(await this.createThing("car3", users[0], ["gasoline"], null, null, VisibilityTypes.public, tenant));
+
+    const constraints = [];
+    constraints.push(await this.createConstraint(users[0], "Tag", "Device", tags[0]._id, devices[0]._id, RelationshipTypes.dependency, VisibilityTypes.public, [], tenant));
+    constraints.push(await this.createConstraint(users[0], "Tag", "Device", tags[1]._id, devices[0]._id, RelationshipTypes.dependency, VisibilityTypes.public, [], tenant));
+    constraints.push(await this.createConstraint(users[0], "Tag", "Device", tags[2]._id, devices[1]._id, RelationshipTypes.dependency, VisibilityTypes.public, [], tenant));
+
+    const rights = [];
+    rights.push(await this.createRight(things[0], "Thing", users[1], users[0], [], tenant));
+    rights.push(await this.createRight(things[1], "Thing", users[1] , users[0], [], tenant));
+ 
+    const measurements = [];
+    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car1", ["urban"], [{values: [60], delta: 0}], null, null, null, VisibilityTypes.public, tenant));
+    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car2", ["urban"], [{values: [80], delta: 0}], null, null, null, VisibilityTypes.public, tenant));
+    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car3", ["autoroute"], [{values: [95], delta: 0}], null, null, null, VisibilityTypes.public, tenant));
+    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car1", ["urban"], [{values: [160], delta: 0}], null, null, null, VisibilityTypes.public, tenant));
+    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car1", ["autoroute"], [{values: [130], delta: 0}], null, null, null, VisibilityTypes.public, tenant));
+    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car2", ["rural"], [{values: [20], delta: 0}], null, null, null, VisibilityTypes.public, tenant));
+    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car2", ["urban"], [{values: [40], delta: 0}], null, null, null, VisibilityTypes.public, tenant));
+    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car1", ["rural"], [{values: [55], delta: 0}], null, null, null, VisibilityTypes.public, tenant));
+    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car3", ["rural"], [{values: [65], delta: 0}], null, null, null, VisibilityTypes.public, tenant));
+    measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car1", ["rural"], [{values: [73], delta: 0}], null, null, null, VisibilityTypes.public, tenant));
+    measurements.push(await this.createMeasurement(users[0], "acceleration", "accelerometer", "car1", ["rural"], [{values: [3.1], delta: 0}], null, null, null, VisibilityTypes.public, tenant));
+    measurements.push(await this.createMeasurement(users[0], "acceleration", "accelerometer", "car1", ["urban"], [{values: [4.3], delta: 0}], null, null, null, VisibilityTypes.public, tenant));
+    measurements.push(await this.createMeasurement(users[0], "acceleration", "accelerometer", "car3", ["autoroute"], [{values: [4.5], delta: 0}], null, null, null, VisibilityTypes.public, tenant));
+    measurements.push(await this.createMeasurement(users[0], "acceleration", "accelerometer", "car1", ["urban"], [{values: [1.2], delta: 0}], null, null, null, VisibilityTypes.public, tenant));
+    measurements.push(await this.createMeasurement(users[0], "acceleration", "accelerometer", "car2", ["autoroute"], [{values: [2.7], delta: 0}], null, null, null, VisibilityTypes.public, tenant));
+    measurements.push(await this.createMeasurement(users[0], "acceleration", "accelerometer", "car2", ["urban"], [{values: [3.1], delta: 0}], null, null, null, VisibilityTypes.public, tenant));   
+}

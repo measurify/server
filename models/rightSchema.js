@@ -2,8 +2,6 @@ const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
 const RightTypes  = require('../types/rightTypes.js');
-const User = mongoose.model('User');
-const Tag = mongoose.model('Tag');
 
 /**
  * @swagger
@@ -46,6 +44,7 @@ rightSchema.plugin(require('mongoose-autopopulate'));
 // validate owner
 rightSchema.path('owner').validate({
     validator: async function (value) {
+        const User = this.constructor.model('User');
         let user = await User.findById(value);
         if (!user) throw new Error('User not existent (' + value + ')');
         return true;
@@ -55,6 +54,7 @@ rightSchema.path('owner').validate({
 // validate user
 rightSchema.path('user').validate({
     validator: async function (value) {
+        const User = this.constructor.model('User');
         let user = await User.findById(value);
         if (!user) throw new Error('User not existent (' + value + ')');
         return true;
@@ -64,6 +64,7 @@ rightSchema.path('user').validate({
 // validate tags
 rightSchema.path('tags').validate({
     validator: async function (values) {
+        const Tag = this.constructor.model('Tag');
         for (let i = 0; i < values.length; i++) {
             const tag = await Tag.findById(values[i]);
             if (!tag) return false;
@@ -76,7 +77,7 @@ rightSchema.path('tags').validate({
 // validate resource
 rightSchema.pre('save', async function() {
     let model = null;
-    try { model = mongoose.model(this.type) } catch(err) {};
+    try { model = this.constructor.model(this.type) } catch(err) {};
     if(!model) throw new Error('Unrecognized resource type (' + this.type + ')');
     const resource = await model.findById(this.resource);
     if(!resource) throw new Error('Resource not found (' + this.resource + ')');                   
@@ -98,4 +99,4 @@ rightSchema.pre('save', async function() {
     if(res) throw new Error('The right already exists (' + res._id + ')');                       
 });
 
-module.exports = mongoose.models.Right || mongoose.model('Right', rightSchema);
+module.exports = rightSchema;

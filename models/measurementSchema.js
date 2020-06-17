@@ -2,14 +2,6 @@ const mongoose = require('mongoose');
 const geojson = require('mongoose-geojson-schema');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
-
-const Feature = mongoose.model('Feature');
-const Tag = mongoose.model('Tag');
-const Device = mongoose.model('Device');
-const Thing = mongoose.model('Thing');
-const User = mongoose.model('User');
-const Script = mongoose.model('Script');
-const Right = mongoose.model('Right');
 const inspector = require('../commons/inspector.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
@@ -125,6 +117,7 @@ measurementSchema.plugin(require('mongoose-autopopulate'));
 // validate feature
 measurementSchema.path('feature').validate({
     validator: async function (value) {
+        const Feature = this.constructor.model('Feature');
         const feature = await Feature.findById(value);
         if (!feature) throw new Error('Feature not existent (' + value + ')');
         return true;
@@ -134,6 +127,7 @@ measurementSchema.path('feature').validate({
 // validate script
 measurementSchema.path('script').validate({
     validator: async function (value) {
+        const Script = this.constructor.model('Script');
         const script = await Script.findById(value);
         if (!script) throw new Error('Script not existent (' + value + ')');
         return true;
@@ -143,6 +137,7 @@ measurementSchema.path('script').validate({
 // validate thing
 measurementSchema.path('thing').validate({
     validator: async function (value) {
+        const Thing = this.constructor.model('Thing');
         const thing = await Thing.findById(value);
         if (!thing) throw new Error('Thing not existent (' + value + ')');
         return true;
@@ -152,6 +147,8 @@ measurementSchema.path('thing').validate({
 // validate device
 measurementSchema.path('device').validate({
     validator: async function (value) {
+        const Feature = this.constructor.model('Feature');
+        const Device = this.constructor.model('Device');
         const device = await Device.findById(value);
         if (!device) throw new Error('Device not existent (' + value + ')');
         return true;
@@ -160,7 +157,8 @@ measurementSchema.path('device').validate({
 
 // validate tags
 measurementSchema.path('tags').validate({
-    validator: async function (values) {
+    validator: async function (values) { 
+        const Tag = this.constructor.model('Tag');
         for (let value of values) {
             const tag = await Tag.findById(value);
             if (!tag) throw new Error('Tag not existent (' + value + ')');
@@ -172,6 +170,7 @@ measurementSchema.path('tags').validate({
 // validate owner
 measurementSchema.path('owner').validate({
     validator: async function (value) {
+        const User = this.constructor.model('User');
         let user = await User.findById(value);
         if (!user) throw new Error('User not existent (' + value + ')');
         return true;
@@ -189,6 +188,7 @@ measurementSchema.pre('save', async function () {
 
 // check consistency between samples and feature
 measurementSchema.pre('save', async function () {
+    const Feature = this.constructor.model('Feature');
     const feature = (await Feature.findById(this.feature));
     let result = inspector.areCoherent(this, feature);
     if(result != true) throw new Error(result);
@@ -196,6 +196,8 @@ measurementSchema.pre('save', async function () {
 
 // check consistency between device and feature
 measurementSchema.pre('save', async function () {
+    const Feature = this.constructor.model('Feature');
+    const Device = this.constructor.model('Device');
     const feature = await Feature.findById(this.feature);
     const device = await Device.findById(this.device);
     if(!device.features.includes(feature._id)) throw new Error("No match between device features and measurement feature (" + feature._id + ")");
@@ -214,19 +216,19 @@ measurementSchema.pre('save', async function() {
 });
 
 measurementSchema.methods.toCSV = function toCSV() {
-    if(!process.env.CSVDELIMITER ) process.env.CSVDELIMITER = ','; 
-    if(!process.env.CSVVECTORSTART ) process.env.CSVVECTORSTART = ''; 
-    if(!process.env.CSVVECTOREND ) process.env.CSVVECTOREND = '';  
-    if(!process.env.CSVVECTORDELIMITER ) process.env.CSVVECTORDELIMITER =';' 
+    if(!process.env.CSV_DELIMITER ) process.env.CSV_DELIMITER = ','; 
+    if(!process.env.CSV_VECTOR_START ) process.env.CSV_VECTOR_START = ''; 
+    if(!process.env.CSV_VECTOR_END ) process.env.CSV_VECTOR_END = '';  
+    if(!process.env.CSV_VECTOR_DELIMITER ) process.env.CSV_VECTOR_DELIMITER =';' 
     let csv = '';
     this.samples.forEach(sample => {
         sample.values.forEach(value => {
-            if (Array.isArray(value)) value = process.env.CSVVECTORSTART + value.join(process.env.CSVVECTORDELIMITER) + process.env.CSVVECTOREND
-            csv += value + process.env.CSVDELIMITER;
+            if (Array.isArray(value)) value = process.env.CSV_VECTOR_START + value.join(process.env.CSV_VECTOR_DELIMITER) + process.env.CSV_VECTOR_END;
+            csv += value + process.env.CSV_VECTOR_DELIMITER;
         });
         csv += '\n';
     });
     return csv;
 };
 
-module.exports = mongoose.models.Measurement || mongoose.model('Measurement', measurementSchema);
+module.exports = measurementSchema;

@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
-const mongoosePaginate = require('mongoose-paginate-v2');
+const mongoosePaginate = require('mongoose-paginate-v2');     
+const factory = require('./commons/factory.js');
+const tenancy = require('./commons/tenancy.js');
 
 mongoose.Promise = global.Promise; 
 
@@ -8,51 +10,48 @@ mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 
-const sleep = function(ms){
-    return new Promise(resolve=>{
-        setTimeout(resolve, ms)
-    })
-}
+mongoosePaginate.paginate.options = { lean: false };
+mongoose.dbs = [];
 
-const connection = async function(){
+const sleep = function(ms){ return new Promise(resolve=>{ setTimeout(resolve, ms) }) };
+
+exports.init = async function(mode){
     let go = false;
     let uri = null;
-    if(process.env.ENV === "test") {
+    
+    // Select MongoDb server (in memory version of testing)
+    if(mode === "test") {
         const { MongoMemoryServer } = require('mongodb-memory-server');
         const mongod = new MongoMemoryServer();
         uri = await mongod.getUri();
     }
     else uri = process.env.DATABASE
 
+    // Connect to tenants catalogue database
     while(!go) {
-        try { 
-            await mongoose.connect(uri); 
-            console.error('Database connected!')
+        try {             
+            mongoose.dbs['catalog'] = await mongoose.createConnection(uri); 
+            const tenderSchema = require('./models/tenantSchema.js');
+            connection = mongoose.dbs['catalog'].model('Tenant', tenderSchema);
+            console.error('Database connected!');
             go = true;
         } 
         catch (error) { 
-            console.error('Database connection error, retry in 3 secs...'); 
+            console.error('Database connection error, retry in 3 secs... (' + error + ')'); 
             await sleep(3000);
         }
     } 
-}
-connection();
 
-mongoosePaginate.paginate.options = { lean: false };
+    // Init tenants
+    const tenants = await tenancy.getList();
+    if(tenants.length < 2) { 
+        console.error('Database initialization error, missing default tenants'); 
+        process.exit();
+    }
+    for(let i=0; i<tenants.length; i++) { 
+        await tenancy.init(tenants[i]); 
+        await factory.createSuperAdministrator(tenants[i]);
+    }
 
-require('./models/fieldmaskSchema');
-require('./models/userSchema');
-require('./models/tagSchema');
-require('./models/logSchema');
-require('./models/scriptSchema');
-require('./models/featureSchema');
-require('./models/thingSchema');
-require('./models/deviceSchema');
-require('./models/issueSchema');
-require('./models/rightSchema');
-require('./models/subscriptionSchema');
-require('./models/measurementSchema');
-require('./models/errorSchema');
-require('./models/computationSchema');
-require('./models/constraintSchema');
-require('./models/passwordResetSchema');
+    console.error('Database ready!');
+} 

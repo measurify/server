@@ -1,28 +1,24 @@
-// Import environmental variables from variables.test.env file
-require('dotenv').config({ path: 'variables.test.env' });
 
-// This line allow to test with the self signed certificate
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+process.env.ENV = 'test';
+process.env.LOG = 'false'; 
 
 // Import test tools
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+const database = require('../database.js');
 const server = require('../server.js');
 const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
-const User = mongoose.model('User');
-const Constraint = mongoose.model('Constraint');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 const RelationshipTypes = require('../types/relationshipTypes.js');
-
 chai.use(chaiHttp);
 
 // Test the /GET route
 describe('/GET constraint', () => {
-    it('it should GET all the constraint', async () => {
-        factory.dropContents();
+    it('it should GET all the constraint', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
@@ -34,8 +30,7 @@ describe('/GET constraint', () => {
         res.body.docs.length.should.be.eql(2);
     });
 
-    it('it should GET a specific constraint', async () => {
-        factory.dropContents();
+    it('it should GET a specific constraint', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
@@ -56,10 +51,7 @@ describe('/GET constraint', () => {
 });
 
 // Test the /POST route
-describe('/POST constraint', () => {
-
-    it('it should not POST a constraint without type1 field', async () => {
-        factory.dropContents();
+describe('/POST constraint', () => {  it('it should not POST a constraint without type1 field', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
@@ -72,8 +64,7 @@ describe('/POST constraint', () => {
         res.body.details.should.contain('Please, supply type1');
     });
 
-    it('it should not POST a constraint without type2 field', async () => {
-        factory.dropContents();
+    it('it should not POST a constraint without type2 field', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
@@ -86,8 +77,7 @@ describe('/POST constraint', () => {
         res.body.details.should.contain('Please, supply type2');
     });
 
-    it('it should not POST a constraint without element1 field', async () => {
-        factory.dropContents();
+    it('it should not POST a constraint without element1 field', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
@@ -100,8 +90,7 @@ describe('/POST constraint', () => {
         res.body.details.should.contain('Please, supply element1');
     });
 
-    it('it should not POST a constraint without element2 field', async () => {
-        factory.dropContents();
+    it('it should not POST a constraint without element2 field', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
@@ -114,8 +103,7 @@ describe('/POST constraint', () => {
         res.body.details.should.contain('Please, supply element2');
     });
 
-    it('it should not POST a constraint without relationship field', async () => {
-        factory.dropContents();
+    it('it should not POST a constraint without relationship field', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
@@ -128,8 +116,7 @@ describe('/POST constraint', () => {
         res.body.details.should.contain('Please, supply a relationship');
     });
 
-    it('it should not POST a constraint with a fake type1', async () => {
-        factory.dropContents();
+    it('it should not POST a constraint with a fake type1', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
@@ -142,8 +129,7 @@ describe('/POST constraint', () => {
         res.body.details.should.contain('Unrecognized resource type');
     });
 
-    it('it should not POST a constraint with a fake type2', async () => {
-        factory.dropContents();
+    it('it should not POST a constraint with a fake type2', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
@@ -156,8 +142,7 @@ describe('/POST constraint', () => {
         res.body.details.should.contain('Unrecognized resource type');
     });
 
-    it('it should not POST a constraint with a fake relatioship', async () => {
-        factory.dropContents();
+    it('it should not POST a constraint with a fake relatioship', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
@@ -170,8 +155,7 @@ describe('/POST constraint', () => {
         res.body.details.should.contain('Unrecognized relationship');
     });
 
-    it('it should not POST a constraint with a fake element1', async () => {
-        factory.dropContents();
+    it('it should not POST a constraint with a fake element1', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
@@ -184,8 +168,7 @@ describe('/POST constraint', () => {
         res.body.details.should.contain('Element 1 not found');
     });
 
-    it('it should not POST a constraint with a fake element2', async () => {
-        factory.dropContents();
+    it('it should not POST a constraint with a fake element2', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
@@ -198,8 +181,7 @@ describe('/POST constraint', () => {
         res.body.details.should.contain('Element 2 not found');
     });
 
-    it('it should not POST a constraint with a fake tag', async () => {
-        factory.dropContents();
+    it('it should not POST a constraint with a fake tag', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
@@ -212,8 +194,7 @@ describe('/POST constraint', () => {
         res.body.details.should.contain('Tag not existent');
     });
 
-    it('it should POST a constraint', async () => {
-        factory.dropContents();
+    it('it should POST a constraint', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
@@ -226,8 +207,7 @@ describe('/POST constraint', () => {
         res.body.type1.should.be.eql('Tag');
     });
 
-    it('it should POST a tagged constraint', async () => {
-        factory.dropContents();
+    it('it should POST a tagged constraint', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature1 = await factory.createFeature("test-feature1", user);
@@ -241,8 +221,7 @@ describe('/POST constraint', () => {
         res.body.should.have.property('tags');
     });
 
-    it('it should not POST a constraint with already exist', async () => {
-        factory.dropContents();
+    it('it should not POST a constraint with already exist', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
@@ -256,8 +235,7 @@ describe('/POST constraint', () => {
         res.body.details.should.contain('The constraint already exists');
     });
 
-    it('it should POST a list of constraint', async () => {
-        factory.dropContents();
+    it('it should POST a list of constraint', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user);
         const constraints = [
@@ -272,8 +250,7 @@ describe('/POST constraint', () => {
         res.body.constraints[1].element2.should.be.eql(constraints[1].element2);
     });
 
-    it('it should POST only not existing constraint from a list', async () => {
-        factory.dropContents();
+    it('it should POST only not existing constraint from a list', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user);
         const feature1 = await factory.createFeature("test-feature-1", user);
@@ -297,8 +274,7 @@ describe('/POST constraint', () => {
 
 // Test the /DELETE route
 describe('/DELETE constraint', () => {
-    it('it should DELETE a constraint', async () => {
-        factory.dropContents();
+    it('it should DELETE a constraint', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
@@ -313,8 +289,7 @@ describe('/DELETE constraint', () => {
         constraints_after.length.should.be.eql(1);
     });
 
-    it('it should not DELETE a fake constraint', async () => {
-        factory.dropContents();
+    it('it should not DELETE a fake constraint', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);

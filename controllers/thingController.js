@@ -2,11 +2,10 @@ const mongoose = require('mongoose');
 const controller = require('./controller');
 const checker = require('./checker');
 const broker = require('../commons/broker');
-const Thing = mongoose.model('Thing');
-const Measurement = mongoose.model('Measurement');
 const errors = require('../commons/errors.js');
 
 exports.get = async (req, res) => { 
+    const Thing = mongoose.dbs[req.tenant._id].model('Thing');
     const select = await checker.whatCanSee(req, res, Thing)
     const restriction_1 = await checker.whatCanRead(req, res);
     const restriction_2 = await checker.whichRights(req, res, Thing);
@@ -15,6 +14,7 @@ exports.get = async (req, res) => {
 };
 
 exports.getone = async (req, res) => { 
+    const Thing = mongoose.dbs[req.tenant._id].model('Thing');
     const select = await checker.whatCanSee(req, res, Thing)
     let result = await checker.isAvailable(req, res, Thing); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
@@ -23,6 +23,7 @@ exports.getone = async (req, res) => {
 };
 
 exports.getstream = async (ws, req) => { 
+    const Thing = mongoose.dbs[req.tenant._id].model('Thing');
     let result = await checker.isAvailable(req, ws, Thing); if (result != true) return result;
     result = await checker.canRead(req, ws); if (result != true) return result;
     result = await checker.hasRights(req, ws, Thing); if (result != true) return result;
@@ -30,12 +31,14 @@ exports.getstream = async (ws, req) => {
 };
 
 exports.post = async (req, res) => {
+    const Thing = mongoose.dbs[req.tenant._id].model('Thing');
     let result = await checker.canCreate(req, res); if (result != true) return result;
     result = await checker.hasRightsToCreate(req, res, ['tags']); if (result != true) return result;
     return await controller.postResource(req, res, Thing);
 };
 
 exports.put = async (req, res) => { 
+    const Thing = mongoose.dbs[req.tenant._id].model('Thing');
     const fields = ['tags'];
     let result = await checker.isAvailable(req, res, Thing); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
@@ -45,6 +48,8 @@ exports.put = async (req, res) => {
 };   
 
 exports.delete = async (req, res) => {
+    const Thing = mongoose.dbs[req.tenant._id].model('Thing');
+    const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
     let result = await checker.isAvailable(req, res, Thing); if (result != true) return result;
     result = await checker.isOwned(req, res); if (result != true) return result;
     result = await checker.isNotUsed(req, res, Measurement, 'thing'); if (result != true) return result;
