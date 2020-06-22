@@ -28,7 +28,7 @@ exports.get = async (req, res) => {
 
 exports.post = async (req, res) => {
     if (!Authorization.isAdministrator(req.user)) return errors.manage(res, errors.admin_restricted_access); 
-    await factory.dropContents(req.tenant._id);
+    await factory.dropContents(req.tenant);
     if (req.body != '{}') await factory.createDemoContent(req.tenant._id); 
     else return errors.manage(res, errors.demo_content_request_not_implemented);
     const User = mongoose.dbs[req.tenant._id].model('User');
@@ -54,7 +54,7 @@ exports.post = async (req, res) => {
 
 exports.delete = async (req, res) => {
     if (!Authorization.isAdministrator(req.user)) return errors.manage(res, errors.admin_restricted_access); 
-    await factory.dropContents(req.tenant._id);
+    await factory.dropContents(req.tenan);
     const User = mongoose.dbs[req.tenant._id].model('User');
     const Tag = mongoose.dbs[req.tenant._id].model('Tag');
     const Feature = mongoose.dbs[req.tenant._id].model('Feature');

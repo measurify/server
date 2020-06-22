@@ -28,25 +28,25 @@ exports.Tenant = null;
 
 before(async () => { 
 
-    process.env.DEFAULT_TENANT = process.env.DEFAULT_TENANT_TEST;
+    process.env.DEFAULT_TENANT = process.env.DEFAULT_TENANT;
     await database.init('test');
 
-    Fieldmask = mongoose.dbs[process.env.DEFAULT_TENANT_TEST].model('Fieldmask');
-    User = mongoose.dbs[process.env.DEFAULT_TENANT_TEST].model('User');
-    Tag = mongoose.dbs[process.env.DEFAULT_TENANT_TEST].model('Tag');
-    Computation = mongoose.dbs[process.env.DEFAULT_TENANT_TEST].model('Computation');
-    Script = mongoose.dbs[process.env.DEFAULT_TENANT_TEST].model('Script');
-    Feature = mongoose.dbs[process.env.DEFAULT_TENANT_TEST].model('Feature');
-    Thing = mongoose.dbs[process.env.DEFAULT_TENANT_TEST].model('Thing');
-    Device = mongoose.dbs[process.env.DEFAULT_TENANT_TEST].model('Device');
-    Issue = mongoose.dbs[process.env.DEFAULT_TENANT_TEST].model('Issue');
-    Right = mongoose.dbs[process.env.DEFAULT_TENANT_TEST].model('Right');
-    Subscription = mongoose.dbs[process.env.DEFAULT_TENANT_TEST].model('Subscription');
-    Measurement = mongoose.dbs[process.env.DEFAULT_TENANT_TEST].model('Measurement');
-    Computation = mongoose.dbs[process.env.DEFAULT_TENANT_TEST].model('Computation');
-    Constraint = mongoose.dbs[process.env.DEFAULT_TENANT_TEST].model('Constraint');
-    PasswordReset = mongoose.dbs[process.env.DEFAULT_TENANT_TEST].model('PasswordReset');
+    Fieldmask = mongoose.dbs[process.env.DEFAULT_TENANT].model('Fieldmask');
+    User = mongoose.dbs[process.env.DEFAULT_TENANT].model('User');
+    Tag = mongoose.dbs[process.env.DEFAULT_TENANT].model('Tag');
+    Computation = mongoose.dbs[process.env.DEFAULT_TENANT].model('Computation');
+    Script = mongoose.dbs[process.env.DEFAULT_TENANT].model('Script');
+    Feature = mongoose.dbs[process.env.DEFAULT_TENANT].model('Feature');
+    Thing = mongoose.dbs[process.env.DEFAULT_TENANT].model('Thing');
+    Device = mongoose.dbs[process.env.DEFAULT_TENANT].model('Device');
+    Issue = mongoose.dbs[process.env.DEFAULT_TENANT].model('Issue');
+    Right = mongoose.dbs[process.env.DEFAULT_TENANT].model('Right');
+    Subscription = mongoose.dbs[process.env.DEFAULT_TENANT].model('Subscription');
+    Measurement = mongoose.dbs[process.env.DEFAULT_TENANT].model('Measurement');
+    Computation = mongoose.dbs[process.env.DEFAULT_TENANT].model('Computation');
+    Constraint = mongoose.dbs[process.env.DEFAULT_TENANT].model('Constraint');
+    PasswordReset = mongoose.dbs[process.env.DEFAULT_TENANT].model('PasswordReset');
     Tenant = mongoose.dbs['catalog'].model('Tenant');
 });
 
-beforeEach(async () => { await factory.dropContents(process.env.DEFAULT_TENANT_TEST); });
+beforeEach(async () => { await factory.dropContents(); });

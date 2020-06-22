@@ -15,7 +15,6 @@ chai.use(chaiHttp);
 
 // Test the /GET route
 describe('/GET users', () => {
-
     it('it should GET all the users', async () => {
         await factory.createUser("test-username-1", "test-password-1");
         await factory.createUser("test-username-2", "test-password-2");
@@ -65,6 +64,7 @@ describe('/GET users', () => {
     });
 
     it('it should not GET a fake user', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1");
         const res = await chai.request(server).keepOpen().get('/v1/users/fake-user').set('Authorization', await factory.getAdminToken());
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
@@ -76,6 +76,7 @@ describe('/GET users', () => {
 // Test the /POST route
 describe('/POST users', () => {
     it('it should not POST a user without username field', async () => {
+        await factory.createUser("test-user", "test-userpassword-1");
         const user = { password : "test-password-1", usertype : "regular" };
         const res = await chai.request(server).keepOpen().post('/v1/users').set("Authorization", await factory.getAdminToken()).send(user);
         res.should.have.status(errors.post_request_error.status);
@@ -87,6 +88,7 @@ describe('/POST users', () => {
     });
 
     it('it should not POST a user without password field', async () => {
+        await factory.createUser("test-user", "test-userpassword-1");
         const user = { username: "test-username-1", usertype : "regular" };
         const res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
         res.should.have.status(errors.post_request_error.status);
@@ -98,6 +100,7 @@ describe('/POST users', () => {
     });
 
     it('it should not POST a user without type field', async () => {
+        await factory.createUser("test-user", "test-userpassword-1");
         const user = { username: "test-username-1", password : "test-password-1" };
         const res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
         res.should.have.status(errors.post_request_error.status);
@@ -109,6 +112,7 @@ describe('/POST users', () => {
     });
 
     it('it should not POST a user with a fake type', async () => {
+        await factory.createUser("test-user", "test-userpassword-1");
         const user = { username: "test-username-1", password : "test-password-1", type: "fake-type" };
         const res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
         res.should.have.status(errors.post_request_error.status);
@@ -120,6 +124,7 @@ describe('/POST users', () => {
     });
 
     it('it should POST a user', async () => {
+        await factory.createUser("test-user", "test-userpassword-1");
         const user = { username : "test-username-1", password : "test-password-1", type: UserRoles.analyst };
         const res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
         res.should.have.status(200);
@@ -131,6 +136,7 @@ describe('/POST users', () => {
     });
 
     it('it should not POST a user with already existant username field', async () => {
+        await factory.createUser("test-user", "test-userpassword-1");
         await factory.createUser("test-username-1", "test-password-1");
         const user = { username : "test-username-1", password : "test-password-1", type : UserRoles.analyst};
         const res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', await factory.getAdminToken()).send(user);
@@ -143,6 +149,7 @@ describe('/POST users', () => {
     });
 
     it('it should POST a list of users', async () => {
+        await factory.createUser("test-user", "test-userpassword-1");
         const users = [ { username : "test-username-1", password : "test-password-1", type: UserRoles.analyst }, 
                         { username : "test-username-2", password : "test-password-2", type: UserRoles.analyst } ]; 
         const res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', await factory.getAdminToken()).send(users)

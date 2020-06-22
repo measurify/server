@@ -11,9 +11,6 @@ const run = async function() {
   // Import environmental variables
   require('dotenv').config({ path: 'variables.env' });
   
-  // Deafult tenant
-  process.env.DEFAULT_TENANT = process.env.DEFAULT_TENANT_PROD;
-
   // Init database
   const database = require('./database.js');
   await database.init('prod');

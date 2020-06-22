@@ -10,13 +10,13 @@ morgan.token('url', function (req, res) { return decodeURIComponent(req.original
 
 morgan.token('body', function (req, res) { return JSON.stringify(req.body); });
 
-morgan.token('tenant', function (req, res) { return req.tenant._id; }); 
+morgan.token('tenant', function (req, res) { if (req.tenant) return req.tenant._id; else return '-'; }); 
 
 const connection = { 
-    connectionString: process.env.DATABASE,
-    capped: true,
-    cappedSize: 100000,
-    cappedMax: 1000 
+    connectionString: process.env.DATABASE
+    //capped: true,
+    //cappedSize: 100000,
+    //cappedMax: 1000 
 };
 
 const option = { };

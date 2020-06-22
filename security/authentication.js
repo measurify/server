@@ -16,9 +16,9 @@ passport.use(new strategy_local({
     }, 
     async function (req, username, password, done) {
         try {
-            if(!req.tenant) req.tenant = process.env.DEFAULT_TENANT;
+            if(!req.body.tenant) req.body.tenant = process.env.DEFAULT_TENANT;
             const Tenant = mongoose.dbs['catalog'].model('Tenant');
-            const tenant = await Tenant.findById(req.tenant);
+            const tenant = await Tenant.findById(req.body.tenant);
             if (!tenant) return done(null, false, 'Incorrect tenant');
             req.tenant = tenant;
             const User = mongoose.dbs[tenant._id].model('User');
@@ -26,12 +26,15 @@ passport.use(new strategy_local({
             if (!user) return done(null, false, 'Incorrect username or password');
             if(user.status && user.status != UserStatusTypes.enabled) return done(null, false, 'user not enabled');
             let result = false;
-            if(req.tenant.passwordhash == 'true') result = bcrypt.compareSync(password, user._doc.password);
+            if(req.tenant.passwordhash == true || req.tenant.passwordhash == 'true') result = bcrypt.compareSync(password, user._doc.password);
             else if(password == user._doc.password) result = true; 
             if (!result) return done(null, false, 'Incorrect username or password');
             return done(null, user, 'Logged Successfully');
         }
-        catch(error) { done(error) };
+        catch(error) { 
+            console.log(error);
+            done(error) 
+        };
     }
 ));
 

@@ -46,14 +46,11 @@ const postOne = async function(body, model, tenant) {
         broker.publish('thing-' + body.thing, body.thing, body);
         broker.notify(body, tenant);
     }
-    if(model.modelName == 'Tenant') {
-        await tenancy.init(resource); 
-        await factory.createSuperAdministrator(resource);
-    }
+    if(model.modelName == 'Tenant') { await tenancy.init(resource, body.admin_username, body.admin_password); }
     return resource;
 }
 
-const postList = async function(body, model, tenat) { 
+const postList = async function(body, model, tenant) { 
     const items = model.modelName.toLowerCase() + 's';
     const results = { [items]: [], errors: [] };
     for (let [i, element] of body.entries()) {
@@ -65,10 +62,7 @@ const postList = async function(body, model, tenat) {
                 broker.publish('thing-' + resource.thing, resource);
                 broker.notify(body, tenant);
             }
-            if(model.modelName == 'Tenant') {
-                await tenancy.init(resource); 
-                await factory.createSuperAdministrator(resource);
-            }
+            if(model.modelName == 'Tenant') await tenancy.init(resource, body.admin_username, body.admin_password); 
             results[items].push(resource);
         }
         catch (err) { results.errors.push('Index: ' + i +  ' (' + err.message + ')'); }

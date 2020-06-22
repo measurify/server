@@ -44,13 +44,12 @@ exports.init = async function(mode){
 
     // Init tenants
     const tenants = await tenancy.getList();
-    if(tenants.length < 2) { 
+    if(tenants.length < 1) { 
         console.error('Database initialization error, missing default tenants'); 
         process.exit();
     }
     for(let i=0; i<tenants.length; i++) { 
         await tenancy.init(tenants[i]); 
-        await factory.createSuperAdministrator(tenants[i]);
     }
 
     console.error('Database ready!');

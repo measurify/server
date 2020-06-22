@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "f3274ad4-71d8-40b0-92eb-f2c008c9889c",
-		"name": "Atmosphere",
+		"name": "Measurify",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -197,15 +197,132 @@
 			]
 		},
 		{
-			"name": "LOGIN",
+			"name": "TENANTS",
 			"item": [
 				{
-					"name": "LOGIN as admin",
+					"name": "GET all tenants",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"id": "e932d7e0-5127-4508-aa36-c330f7fed26e",
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"if(data.docs) pm.environment.set('tenant', data.docs[0]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "ifhidhfudshuf8"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/tenants",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"tenants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get one tenant",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "ifhidhfudshuf8",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/tenants/{{tenant}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"tenants",
+								"{{tenant}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new tenant",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "4600cb40-a98b-40bf-9041-405103c220ed",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "bbe3c7f2-7f84-46a6-a565-999b247a2c68",
+								"exec": [
+									"pm.environment.set(\"tenant\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "ifhidhfudshuf8",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"_id\": \"measurify-tenat-test\",\r\n    \"organization\": \"Measurify org\",\r\n    \"address\": \"Measurify Street, Genova\",\r\n    \"email\": \"info@measurify.org\",\r\n    \"phone\": \"+39103218793817\",\r\n    \"admin_username\": \"test-username\",\r\n    \"admin_password\": \"test-password\"\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/tenants/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"tenants",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LOGIN as admin on the new tenant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b6a7d6f3-bcd9-4146-b0a9-6be3757e84c6",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -227,7 +344,162 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+							"raw": "{\n\t\"username\" : \"test-username\",\n\t\"password\" : \"test-password\",\n\t\"tenant\": \"{{tenant}}\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT a tenant",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "bbcbe4a7-0aef-4e46-9a55-1a1594efa034",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "d8387940-9023-45c0-862f-01f851b9d12d",
+								"exec": [
+									"pm.environment.set(\"tenant\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "ifhidhfudshuf8"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organization\": \"Measurify org 2\"\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/tenants/{{tenant}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"tenants",
+								"{{tenant}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE a tenant",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "ifhidhfudshuf8"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/v1/tenants/{{tenant}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"tenants",
+								"{{tenant}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6e94a923-a3b6-446e-918c-6500654d3b9b",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "f44d86e8-1113-428d-a9e9-38658f0286a0",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "LOGIN",
+			"item": [
+				{
+					"name": "LOGIN as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\",\n\t\"tenant\": \"atmosphere-dev\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/login",
@@ -485,7 +757,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"user-usernatme-test-2\",\n\t\"password\" : \"user-password-test-2\",\n\t\"type\" : \"analyst\"\n}"
+							"raw": "{\n\t\"username\" : \"user-username-test-2\",\n\t\"password\" : \"user-password-test-2\",\n\t\"type\" : \"analyst\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/users",
@@ -1379,7 +1651,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\",\n\t\"tenant\": \"atmosphere-dev\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/login",
@@ -4400,50 +4672,7 @@
 			"name": "LOGS",
 			"item": [
 				{
-					"name": "LOGIN as admin",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
-								"exec": [
-									"postman.setEnvironmentVariable(\"token\", JSON.parse(responseBody).token);",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
-						},
-						"url": {
-							"raw": "{{url}}/v1/login",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET Logs as admin",
+					"name": "GET Logs with API token",
 					"event": [
 						{
 							"listen": "test",
@@ -5286,7 +5515,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/v1/self/{{user}}",
+							"raw": "{{url}}/v1/self/{{user}}?tenant=atmosphere-dev",
 							"host": [
 								"{{url}}"
 							],
@@ -5294,6 +5523,12 @@
 								"v1",
 								"self",
 								"{{user}}"
+							],
+							"query": [
+								{
+									"key": "tenant",
+									"value": "atmosphere-dev"
+								}
 							]
 						}
 					},
@@ -5499,7 +5734,7 @@
 							"raw": "{\n\t\"email\" : \"{{email}}\"\n}\t"
 						},
 						"url": {
-							"raw": "{{url}}/v1/self/reset",
+							"raw": "{{url}}/v1/self/reset?tenant=atmosphere-dev",
 							"host": [
 								"{{url}}"
 							],
@@ -5507,13 +5742,19 @@
 								"v1",
 								"self",
 								"reset"
+							],
+							"query": [
+								{
+									"key": "tenant",
+									"value": "atmosphere-dev"
+								}
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "PUT to modify user password (needs the reset request information provided by email)",
+					"name": "GET to modify user password (needs the reset request information provided by email)",
 					"event": [
 						{
 							"listen": "test",
@@ -5542,7 +5783,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/v1/self?reset=5ea16a736caa124854c74c73&password=my_new_password",
+							"raw": "{{url}}/v1/self?reset=5ea16a736caa124854c74c73&password=my_new_password&?tenant=atmosphere-dev",
 							"host": [
 								"{{url}}"
 							],
@@ -5558,6 +5799,10 @@
 								{
 									"key": "password",
 									"value": "my_new_password"
+								},
+								{
+									"key": "?tenant",
+									"value": "atmosphere-dev"
 								}
 							]
 						}
@@ -6483,77 +6728,15 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "TENANTS",
+			"name": "MULTI-TENANCY",
 			"item": [
 				{
-					"name": "GET all tenants",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "e932d7e0-5127-4508-aa36-c330f7fed26e",
-								"exec": [
-									"var data = JSON.parse(responseBody);",
-									"if(data.docs) pm.environment.set('tenant', data.docs[0]._id);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"type": "text",
-								"value": "ifhidhfudshuf8"
-							}
-						],
-						"url": {
-							"raw": "{{url}}/v1/tenants",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"tenants"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get one tenant",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "ifhidhfudshuf8",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{url}}/v1/tenants/{{tenant}}",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"tenants",
-								"{{tenant}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POST a new tenant",
+					"name": "POST tenat-1",
 					"event": [
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "4600cb40-a98b-40bf-9041-405103c220ed",
+								"id": "16b91f2d-2425-4879-874a-b89254db63f9",
 								"exec": [
 									""
 								],
@@ -6563,7 +6746,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "bbe3c7f2-7f84-46a6-a565-999b247a2c68",
+								"id": "99645ab0-4e58-4b2a-a4cc-e14e7cd851d1",
 								"exec": [
 									"pm.environment.set(\"tenant\", JSON.parse(responseBody)._id);"
 								],
@@ -6580,13 +6763,16 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "ifhidhfudshuf8",
-								"type": "text"
+								"type": "text",
+								"value": "ifhidhfudshuf8"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"_id\": \"measurify-tenat-test\",\r\n    \"organization\": \"Measurify org\",\r\n    \"address\": \"Measurify Street, Genova\",\r\n    \"email\": \"info@measurify.org\",\r\n    \"phone\": \"+39103218793817\"\r\n}"
+							"raw": "{\r\n    \"_id\": \"tenat-1\",\r\n    \"organization\": \"Measurify org\",\r\n    \"address\": \"Measurify Street, Genova\",\r\n    \"email\": \"info@measurify.org\",\r\n    \"phone\": \"+39103218793817\",\r\n    \"admin_username\": \"test-username-1\",\r\n    \"admin_password\": \"test-password-1\",\r\n    \"passwordhash\" : \"true\"\r\n}\t",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{url}}/v1/tenants/",
@@ -6597,6 +6783,214 @@
 								"v1",
 								"tenants",
 								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST tenat-2",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "9f4299c9-1b5d-4ea6-bf32-34a43f69db0a",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "a91a8831-d42f-47b3-9294-5a3bdfcf9760",
+								"exec": [
+									"pm.environment.set(\"tenant\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "ifhidhfudshuf8"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"_id\": \"tenat-2\",\r\n    \"organization\": \"Measurify org\",\r\n    \"address\": \"Measurify Street, Genova\",\r\n    \"email\": \"info@measurify.org\",\r\n    \"phone\": \"+39103218793817\",\r\n    \"admin_username\": \"test-username-2\",\r\n    \"admin_password\": \"test-password-2\",\r\n    \"passwordhash\" : \"true\"\r\n}",
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/tenants/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"tenants",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LOGIN as admin of tenat-1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e148dad6-c769-475f-9527-46c12a2734c3",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"test-username-1\",\n\t\"password\" : \"test-password-1\",\n\t\"tenant\": \"tenat-1\"\n}",
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LOGIN as admin of tenat-2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "be53f2a7-af4e-479d-8bc3-aaf93f0b32f8",
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"test-username-2\",\n\t\"password\" : \"test-password-2\",\n\t\"tenant\": \"tenat-2\"\n}",
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT a tenant (the one loggend in)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "aa989db6-f0fd-4d3d-9db5-c24151a8b7c8",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "28b3bdaf-3628-40ff-85e3-ee9ad0f595e5",
+								"exec": [
+									"pm.environment.set(\"tenant\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "ifhidhfudshuf8"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organization\": \"Measurify org 2\"\r\n}",
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/tenants/{{tenant}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"tenants",
+								"{{tenant}}"
 							]
 						}
 					},
@@ -6630,13 +7024,108 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "POST a new thing (on the tenant loggen in)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "6514f779-d497-43cd-ac00-03ab5b8a4285",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "dccaef45-5ff2-4614-9dbb-ac532966afc0",
+								"exec": [
+									"pm.environment.set(\"thing\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"_id\": \"car-test\"\r\n}",
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/things/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"things",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET all things (of the tennant logged in)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cbd8ea82-4a59-4398-933b-bea92324bdbf",
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"if(data.docs) pm.environment.set('thing', data.docs[0]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/things",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"things"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "6e94a923-a3b6-446e-918c-6500654d3b9b",
+						"id": "0f1495f7-0459-443d-b122-23bea06436e7",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -6646,7 +7135,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f44d86e8-1113-428d-a9e9-38658f0286a0",
+						"id": "aa469eb6-d4b9-4737-aa59-0566d6fce90f",
 						"type": "text/javascript",
 						"exec": [
 							""

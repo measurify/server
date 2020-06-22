@@ -19,7 +19,7 @@ chai.use(chaiHttp);
 // Create a new "self" user
 describe('/POST self', () => {
     it('it should not POST a user without username field', async () => {
-        const user = { password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT_TEST };
+        const user = { password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT };
         const res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self').send(user);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -29,7 +29,7 @@ describe('/POST self', () => {
     });
 
     it('it should not POST a user without password field', async () => {
-        const user = { username : "test-username-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT_TEST };
+        const user = { username : "test-username-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT };
         const res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self').send(user);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -39,7 +39,7 @@ describe('/POST self', () => {
     });
 
     it('it should not POST a user without type field', async () => {
-        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", tenant: process.env.DEFAULT_TENANT_TEST };
+        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", tenant: process.env.DEFAULT_TENANT };
         const res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self').send(user);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -59,7 +59,7 @@ describe('/POST self', () => {
     });
 
     it('it should not POST a user with a fake type field', async () => {
-        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : "fake-type", tenant: process.env.DEFAULT_TENANT_TEST };
+        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : "fake-type", tenant: process.env.DEFAULT_TENANT };
         const res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self').send(user);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -69,7 +69,7 @@ describe('/POST self', () => {
     });
     
     it('it should not POST a user without email field', async () => {
-        const user = { username : "test-username-1", password : "test-password-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT_TEST };
+        const user = { username : "test-username-1", password : "test-password-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT };
         const res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self').send(user);
         res.should.have.status(errors.missing_email.status);
         res.body.should.be.a('object');
@@ -78,7 +78,7 @@ describe('/POST self', () => {
     });
 
     it('it should POST a user', async () => {
-        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT_TEST };
+        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT };
         const res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self').send(user);
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -91,7 +91,7 @@ describe('/POST self', () => {
 
     it('it should not POST a user with already existant username field', async () => {
         await factory.createUser("test-username-1", "test-password-1");
-        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT_TEST };
+        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT };
         const res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self').send(user);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -112,7 +112,7 @@ describe('/POST self', () => {
 
     it('it should not POST a user with already existant email', async () => {
         await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
-        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1@test.it", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT_TEST };
+        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1@test.it", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT };
         const res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self').send(user);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -125,17 +125,17 @@ describe('/POST self', () => {
 // Confirm the created user
 describe('/GET self', () => {
     it('it should GET a self user to awaiting a profile', async () => {
-        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT_TEST };
+        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT };
         let res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self').send(user);
         res.should.have.status(200);
         res.body.status.should.be.eql(UserStatusTypes.disabled);
-        res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self/' + res.body._id + '?tenant=' + process.env.DEFAULT_TENANT_TEST);
+        res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self/' + res.body._id + '?tenant=' + process.env.DEFAULT_TENANT);
         res.should.have.status(200);
         res.body.status.should.be.eql(UserStatusTypes.awaiting);
     });
 
     it('it should not GET a self user to awaiting a profile without a tenant', async () => {
-        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT_TEST };
+        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT };
         let res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self').send(user);
         res.should.have.status(200);
         res.body.status.should.be.eql(UserStatusTypes.disabled);
@@ -148,7 +148,7 @@ describe('/GET self', () => {
     });
 
     it('it should not GET a self user to awaiting a profile with a fake tenant', async () => {
-        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT_TEST };
+        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT };
         let res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self').send(user);
         res.should.have.status(200);
         res.body.status.should.be.eql(UserStatusTypes.disabled);
@@ -162,7 +162,7 @@ describe('/GET self', () => {
 
     it('it should not GET a self user to awaiting a profile with another tenant', async () => {
         const other_tenant = await factory.createTenant("test-tenant-2", "organization-test-1", "test street", "test@email", "433232", "test", "test");
-        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT_TEST };
+        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT };
         let res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self').send(user);
         res.should.have.status(200);
         res.body.status.should.be.eql(UserStatusTypes.disabled);
@@ -174,11 +174,11 @@ describe('/GET self', () => {
     });
 
     it('it should PUT a self user to enable the profile as admin', async () => {
-        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT_TEST };
+        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT };
         let res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self').send(user);
         res.should.have.status(200);
         res.body.status.should.be.eql(UserStatusTypes.disabled);
-        res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self/' + res.body._id + '?tenant=' + process.env.DEFAULT_TENANT_TEST );
+        res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self/' + res.body._id + '?tenant=' + process.env.DEFAULT_TENANT );
         res.should.have.status(200);
         res.body.status.should.be.eql(UserStatusTypes.awaiting);
         const admin = await factory.createUser("test-username-2", "test-password-2", UserRoles.admin);
@@ -190,16 +190,16 @@ describe('/GET self', () => {
 
     it('it should not PUT a self user to enable the profile as admin of another tenant', async () => {
         const other_tenant = await factory.createTenant("test-tenant-2", "organization-test-1", "test street", "test@email", "433232", "test", "test");
-        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT_TEST };
+        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT };
         let res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self').send(user);
         res.should.have.status(200);
         res.body.status.should.be.eql(UserStatusTypes.disabled);
-        res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self/' + res.body._id + '?tenant=' + process.env.DEFAULT_TENANT_TEST );
+        res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self/' + res.body._id + '?tenant=' + process.env.DEFAULT_TENANT );
         res.should.have.status(200);
         res.body.status.should.be.eql(UserStatusTypes.awaiting);
-        const admin = await factory.createUser("test-username-2", "test-password-2", UserRoles.admin, null, null, other_tenant._id);
+        const admin = await factory.createUser("test-username-2", "test-password-2", UserRoles.admin, null, null, other_tenant);
         const modification = { status: UserStatusTypes.enabled };
-        res = await chai.request(server).keepOpen().put('/v1/users/' + res.body._id + '/status').set("Authorization", await factory.getUserToken(admin, other_tenant._id)).send(modification);
+        res = await chai.request(server).keepOpen().put('/v1/users/' + res.body._id + '/status').set("Authorization", await factory.getUserToken(admin, other_tenant)).send(modification);
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -210,7 +210,7 @@ describe('/GET self', () => {
 // Ask to reset a password
 describe('/POST reset', () => {
     it('it should not POST a reset without email field', async () => {
-        const res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self/reset?tenant=' + process.env.DEFAULT_TENANT_TEST).send({});
+        const res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self/reset?tenant=' + process.env.DEFAULT_TENANT).send({});
         res.should.have.status(errors.missing_email.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -218,7 +218,7 @@ describe('/POST reset', () => {
     });
 
     it('it should not POST a reset for a fake email', async () => {
-        const res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self/reset?tenant=' + process.env.DEFAULT_TENANT_TEST).send({}).send({email: "fake_email"});
+        const res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self/reset?tenant=' + process.env.DEFAULT_TENANT).send({}).send({email: "fake_email"});
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -227,7 +227,7 @@ describe('/POST reset', () => {
 
     it('it should POST a reset request', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
-        const res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self/reset?tenant=' + process.env.DEFAULT_TENANT_TEST).send({}).send({email: user.email});
+        const res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self/reset?tenant=' + process.env.DEFAULT_TENANT).send({}).send({email: user.email});
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -260,7 +260,7 @@ describe('/PUT password', () => {
     it('it should GET a password reset', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
-        const res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&password=my_new_password&tenant=' + process.env.DEFAULT_TENANT_TEST).send({});
+        const res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&password=my_new_password&tenant=' + process.env.DEFAULT_TENANT).send({});
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('username');
@@ -269,7 +269,7 @@ describe('/PUT password', () => {
     it('it should not GET a password reset without password field', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
-        const res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&tenant=' + process.env.DEFAULT_TENANT_TEST).send({});
+        const res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&tenant=' + process.env.DEFAULT_TENANT).send({});
         res.should.have.status(errors.missing_info.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -279,7 +279,7 @@ describe('/PUT password', () => {
     it('it should not GET a password reset without reset field', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
-        const res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?password=my_new_password&tenant=' + process.env.DEFAULT_TENANT_TEST).send({});
+        const res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?password=my_new_password&tenant=' + process.env.DEFAULT_TENANT).send({});
         res.should.have.status(errors.missing_info.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -289,7 +289,7 @@ describe('/PUT password', () => {
     it('it should not GET a password reset with a fake reset', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
-        const res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=fake_reset&password=my_new_password&tenant=' + process.env.DEFAULT_TENANT_TEST).send({});
+        const res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=fake_reset&password=my_new_password&tenant=' + process.env.DEFAULT_TENANT).send({});
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -299,11 +299,11 @@ describe('/PUT password', () => {
     it('it should not GET a password reset with a fake reset', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
-        let res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&password=my_new_password&tenant=' + process.env.DEFAULT_TENANT_TEST).send({});
+        let res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&password=my_new_password&tenant=' + process.env.DEFAULT_TENANT).send({});
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('username');
-        res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&password=my_new_password&tenant=' + process.env.DEFAULT_TENANT_TEST).send({});
+        res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&password=my_new_password&tenant=' + process.env.DEFAULT_TENANT).send({});
         res.should.have.status(errors.reset_invalid.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');

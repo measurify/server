@@ -1,6 +1,7 @@
 const mongoose = require('mongoose'); 
 const controller = require('./controller');
 const checker = require('./checker');
+const errors = require('../commons/errors.js');
 
 exports.get = async (req, res) => { 
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
