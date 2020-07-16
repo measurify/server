@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const controller = require('./controller');
 const checker = require('./checker');
+const filemanager = require('../commons/filemanager');
 
 exports.get = async (req, res) => { 
     const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
@@ -35,6 +36,7 @@ exports.post = async (req, res) => {
     return await controller.postResource(req, res, Measurement);
 };
 
+
 exports.put = async (req, res) => { 
     const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
     const fields = ['tags'];
@@ -60,4 +62,20 @@ exports.deleteone = async (req, res) => {
     result = await checker.canDelete(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Measurement); if (result != true) return result;
     return await controller.deleteResource(req, res, Measurement);
+} 
+
+exports.getstream = async (ws, req) => { 
+    const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
+    let result = await checker.isAvailable(req, ws, Measurement); if (result != true) return result;
+    result = await checker.canRead(req, ws); if (result != true) return result;
+    result = await checker.hasRights(req, ws, Measurement); if (result != true) return result;
+    filemanager.upload(ws, req.resource._id, 'webm');
+};
+
+exports.getfile = async (req, res) => {
+    const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
+    let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
+    result = await checker.canDelete(req, res); if (result != true) return result;
+    result = await checker.hasRights(req, res, Measurement); if (result != true) return result;
+    await filemanager.download(req, res, req.resource._id, 'webm');
 } 

@@ -116,6 +116,8 @@ router.get('/count',  catchErrors(measurementController.count));
  */
 router.get('/:id', catchErrors(measurementController.getone));
 
+router.get('/:id/file', catchErrors(measurementController.getfile));
+
 /**
  * @swagger
  * /measurements:

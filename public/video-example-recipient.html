@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Measurify Video Support Example (Recipient)</title>
+    </head>
+    <body>
+        <video id="result" controls></video>
+        <script>
+            const run_scenario = async function() {
+                let login = await fetch("https://localhost:443/v1/login", { method: "post", headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }, body: '{ "username": "admin", "password": "admin" }' });
+                let token = (await login.json()).token.replace('JWV ','');
+                let src = "https://localhost:443/v1/measurements/5f106ecf03b7b63610e31407/file?Authorization=" + token;
+                document.getElementById("result").innerHTML += '<source src="' + src + '" type="video/webm"></source>';
+            } 
+            run_scenario();
+        </script>
+    </body>
+</html>
