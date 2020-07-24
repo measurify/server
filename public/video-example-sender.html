@@ -16,14 +16,14 @@
                 let video_id = 'video-one';
 
                 async function getAPI() {
-                    let login = await fetch("https://localhost:443/v1/login", { method: "post", headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }, body: '{ "username": "admin", "password": "admin" }' });
+                    let login = await fetch("http://students.atmosphere.tools/v1/login", { method: "post", headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }, body: '{ "username": "admin", "password": "admin" }' });
                     let token = (await login.json()).token.replace('JWV ','');
-                    let thing = await fetch("https://localhost:443/v1/things", { method: "post", headers: { 'Authorization': token, 'Accept': 'application/json', 'Content-Type': 'application/json' }, body: '{ "_id": "test-thing" }' });
-                    let feature = await fetch("https://localhost:443/v1/features", { method: "post", headers: { 'Authorization': token, 'Accept': 'application/json', 'Content-Type': 'application/json' }, body: '{ "_id": "test-feature", "items": [ { "name": "test", "unit": "unit" }] }' });                    console.log(await feature.json());
-                    let device = await fetch("https://localhost:443/v1/devices", { method: "post", headers: { 'Authorization': token, 'Accept': 'application/json', 'Content-Type': 'application/json' }, body: '{ "_id": "test-device", "features": [ "test-feature" ] }' });
-                    let measurement = await fetch("https://localhost:443/v1/measurements", { method: "post", headers: { 'Authorization': token, 'Accept': 'application/json', 'Content-Type': 'application/json' }, body: '{ "thing": "test-thing", "feature": "test-feature", "device": "test-device", "samples": [ {"values": [10] } ] }' });
+                    let thing = await fetch("http://students.atmosphere.tools/v1/things", { method: "post", headers: { 'Authorization': token, 'Accept': 'application/json', 'Content-Type': 'application/json' }, body: '{ "_id": "test-thing" }' });
+                    let feature = await fetch("http://students.atmosphere.tools/v1/features", { method: "post", headers: { 'Authorization': token, 'Accept': 'application/json', 'Content-Type': 'application/json' }, body: '{ "_id": "test-feature", "items": [ { "name": "test", "unit": "unit" }] }' });                    console.log(await feature.json());
+                    let device = await fetch("http://students.atmosphere.tools/v1/devices", { method: "post", headers: { 'Authorization': token, 'Accept': 'application/json', 'Content-Type': 'application/json' }, body: '{ "_id": "test-device", "features": [ "test-feature" ] }' });
+                    let measurement = await fetch("http://students.atmosphere.tools/v1/measurements", { method: "post", headers: { 'Authorization': token, 'Accept': 'application/json', 'Content-Type': 'application/json' }, body: '{ "thing": "test-thing", "feature": "test-feature", "device": "test-device", "samples": [ {"values": [10] } ] }' });
                     measurement = await measurement.json();
-                    api = new WebSocket("wss://localhost:443/v1/streams?measurement=" + measurement._id + "&token=" + token);
+                    api = new WebSocket("ws://students.atmosphere.tools/v1/streams?measurement=" + measurement._id + "&token=" + token);
                     api.binaryType = 'arraybuffer';
                     api.onmessage = function (message) { handleSocketMessage(message); }
                 };
