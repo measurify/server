@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
 const ComputationStatusTypes = require('../types/computationStatusTypes.js'); 
+const ComputationCodeTypes = require('../types/ComputationCodeTypes.js'); 
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
 /**
@@ -52,6 +53,8 @@ const computationSchema = new mongoose.Schema({
     _id: { type: String, required: "Please, supply an _id" },
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     code: { type: String, required: 'Please, supply the code'  },
+    metadata: { type: Map, of: String },
+    result: { type: Map, of: String },
     feature: { type: String, required: 'Please, supply a feature', ref: 'Feature', autopopulate: true },
     items: { type: [String], default: [] },
     filter: { type: String },
@@ -94,10 +97,16 @@ computationSchema.path('owner').validate({
     message: 'User not existent'
 });
 
-// validate name
+// validate code
+computationSchema.pre('save', async function() {
+    if(!this.code) throw new Error('Computation validation failed: please specify the code type');  
+    if(!Object.values(ComputationCodeTypes).includes(this.code)) throw new Error('Computation validation failed: unrecognized code');                      
+});
+
+// validate id
 computationSchema.pre('save', async function () {
-    const res = await this.constructor.findOne({ name: this.name });
-    if (res) throw new Error('Computation validation failed: the name already exists (' + 'name: ' + this.name + ')');
+    const res = await this.constructor.findOne({ _id: this._id });
+    if (res) throw new Error('Computation validation failed: the _id is already used (' + this._id + ')');
 });
 
 module.exports = computationSchema;

@@ -21,16 +21,14 @@ exports.getone = async (req, res) => {
 
 exports.post = async (req, res) => {
     const Computation = mongoose.dbs[req.tenant._id].model('Computation');
-    const fields = ['code','feature'];
-    let result = await checker.isFilled(req, res, fields); if (result != true) return result;
+    const Feature = mongoose.dbs[req.tenant._id].model('Feature');
+    let result = await checker.canCreate(req, res); if (result != true) return result;
+    result = await checker.hasRightsToCreate(req, res, ['feature','tags']); if (result != true) return result;
     result = await checker.isComputable(req, res, Feature); if (result != true) return result;
-    const computation = new Computation(req.body);
-    if(runner.go(computation, req.tenant._id)) {
-        await computation.save();
-        return res.status(200).json(computation);
-    }
-    else return res.status(errors.computation_error.status).json(errors.computation_error.message);
-}
+    const answer = await controller.postResource(req, res, Computation);
+    runner.go(req.result, req.user, req.tenant);
+    return answer;
+};
 
 exports.put = async (req, res) => { 
     const Computation = mongoose.dbs[req.tenant._id].model('Computation');

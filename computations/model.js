@@ -5,16 +5,22 @@ exports.run = async function(computation, user, tenant) {
     const bunch_size = 3
     const buncher = new Buncher(computation, user, runner, bunch_size, tenant);
     await buncher.init();
-    let max_measurement = null;
+    // Create ELM file
     let page = null;
     while(page = await buncher.next()) {
         const measurements = page.docs;
         console.log(measurements.length);
-        for(i=0; i<measurements.length; i++) {
-            if(!max_measurement) { max_measurement = measurements[i]; continue; }
-            if(measurements[i].samples[0].values[0] > max_measurement.samples[0].values[0]) max_measurement = measurements[i];
-        }
+        // Add bunch_size lines to CSV file for ELM
     }        
-    result = { id: max_measurement._id, value: max_measurement.samples[0].values[0] }; 
+    
+    // Get info about the ELM model from "metadata" field of the measurement
+    
+    // Call ELM providing CSV file and model parameters
+    
+    // Wait for ELM result
+
+    // Add result information to an "result" object, files anche be added specifiyng filenames, then we will
+    // add a routes to the API in order to dowload them
+     
     runner.complete(computation, result, tenant);
 }

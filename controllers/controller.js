@@ -45,9 +45,10 @@ exports.postResource = async function(req, res, model) {
     try { 
         if(req.user._id) req.body.owner = req.user._id;
         if(!req.query.verbose) req.query.verbose = 'true';
-        if (req.body.constructor != Array) return res.status(200).json(await persistence.post(req.body, model, req.tenant));
+        const results = await persistence.post(req.body, model, req.tenant);
+        req.result = results;   
+        if (req.body.constructor != Array) return res.status(200).json(results);
         else {
-            const results = await persistence.post(req.body, model, req.tenant);
             if (req.query.verbose == 'true') {
                 if (results.errors.length === 0) { return res.status(200).json(results); }
                 else { return res.status(202).json(results); }
