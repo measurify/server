@@ -3848,7 +3848,7 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "COMPUTATIONS (OUTLIERS)",
+			"name": "COMPUTATIONS (MAX)",
 			"item": [
 				{
 					"name": "LOGIN as admin",
@@ -4086,7 +4086,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\": [ { \"numbers\": [\"12\"] } ] \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\": [ { \"numbers\": [\"14\"] } ] \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\",  \n\t\t\"samples\": [ { \"numbers\": [\"51\"] } ] \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\": [ { \"numbers\": [\"12\"] } ] \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\": [ { \"numbers\": [\"10\"] } ] \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\",  \n\t\t\"samples\": [ { \"numbers\": [\"9\"] } ] \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\": [ { \"numbers\": [\"16\"] } ] \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\": [ { \"numbers\": [\"1\"] } ] \n\t}\n]\n"
+							"raw": "[\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\":  { \"values\": 12 }  \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\":  { \"values\": 14 } \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\":  { \"values\": 24 } \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\":  { \"values\": 25 } \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\":  { \"values\": 23 } \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\":  { \"values\": 20 } \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\":  { \"values\": 18 } \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\":  { \"values\": 30 } \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\":  { \"values\": 29 } \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\":  { \"values\": 15 } \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\":  { \"values\": 17 } \n\t}\n]\n"
 						},
 						"url": {
 							"raw": "{{url}}/v1/measurements",
@@ -4143,7 +4143,7 @@
 					"response": []
 				},
 				{
-					"name": "POST a computation to identify temperature outliers",
+					"name": "POST a computation to identify max temperature",
 					"event": [
 						{
 							"listen": "test",
@@ -4172,7 +4172,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"name\": \"Find outliers from temperature in office\",\r\n\t\"code\": \"outliers()\",\r\n\t\"filter\": \"{\\\"thing\\\":\\\"{{thing}}\\\", \\\"feature\\\":\\\"{{feature}}\\\"}\"\r\n}"
+							"raw": "{\r\n\t\"_id\": \"Find office max temperature\",\r\n\t\"code\": \"max\",\r\n\t\"feature\": \"{{feature}}\",\r\n\t\"filter\": \"{\\\"thing\\\":\\\"{{thing}}\\\", \\\"feature\\\":\\\"{{feature}}\\\"}\"\r\n}\r\n"
 						},
 						"url": {
 							"raw": "{{url}}/v1/computations",
@@ -4207,47 +4207,6 @@
 								"v1",
 								"computations",
 								"{{computation}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET all outliers from temperature of office paginated",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"type": "text",
-								"value": "{{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{url}}/v1/measurements?filter={\"thing\":\"{{thing}}\", \"tags\":\"outlier\"}&limit=5&page=1 ",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"measurements"
-							],
-							"query": [
-								{
-									"key": "filter",
-									"value": "{\"thing\":\"{{thing}}\", \"tags\":\"outlier\"}"
-								},
-								{
-									"key": "limit",
-									"value": "5"
-								},
-								{
-									"key": "page",
-									"value": "1 "
-								}
 							]
 						}
 					},

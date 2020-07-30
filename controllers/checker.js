@@ -41,7 +41,7 @@ exports.isFilled = async function(req, res, values) {
 }
 
 exports.isComputable = async function(req, res, model){
-    const result = await inspector.isComputable(req.body.feature, req.body.items, model);
+    const result = await inspector.isComputable(req.body.feature, req.body.items, req.body.code, model);
     if(result != true) return errors.manage(res, errors.post_request_error, result);
     return true;
 }
