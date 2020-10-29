@@ -3,7 +3,6 @@ const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
 const ComputationStatusTypes = require('../types/computationStatusTypes.js'); 
 const ComputationCodeTypes = require('../types/ComputationCodeTypes.js'); 
-const ItemTypes = require('../types/itemTypes.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
 /**
@@ -55,7 +54,7 @@ const computationSchema = new mongoose.Schema({
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     code: { type: String, required: 'Please, supply the code'  },
     metadata: { type: Map, of: String },
-    results: { type: [Map], of: String },
+    result: { type: Map, of: String },
     feature: { type: String, required: 'Please, supply a feature', ref: 'Feature', autopopulate: true },
     items: { type: [String], default: [] },
     filter: { type: String },
@@ -96,30 +95,6 @@ computationSchema.path('owner').validate({
         return true;
     },
     message: 'User not existent'
-});
-
-// validate feature
-computationSchema.path('feature').validate({
-    validator: async function (value) {
-        const Feature = this.constructor.model('Feature');
-        let feature = await Feature.findById(value);
-        if (!feature) return false;
-        return true;
-    },
-    message: 'Feature not existent'
-});
-
-// validate items
-computationSchema.pre('save', async function() {
-    if(!this.items || this.items.length == 0) throw new Error('Computation validation failed: please specify items');  
-    const Feature = this.constructor.model('Feature');
-    let feature = await Feature.findById(this.feature);
-    const item_names = feature.items.map(item => item.name);
-    if(!this.items.every(item => item_names.includes(item))) throw new Error('A computation has to work on items contained on the feature');
-    for(let item of feature.items) { 
-        if(this.items.includes(item.name) && item.type!=ItemTypes.number) throw new Error('A computation needs a numeric item');
-        if(this.items.includes(item.name) && item.dimension!=0) throw new Error('A computation is valid just on 1D item');
-    } 
 });
 
 // validate code
