@@ -16,52 +16,39 @@ exports.run = async function(computation, user, tenant) {
     await buncher.init();
 
     let metadata = {};
-    let target = computation.target;
-    if(!target)
-        target = computation.items[computation.items.length-1]; //default
+    let target = null;
     let model_id = null;
 
     // Get info about the ELM model from "metadata" field of the measurement
     (computation.metadata).forEach((value, key) => {
-        try{
-            metadata[key] = JSON.parse(value);
-        }
-        catch{
-            metadata[key] = value;
+        if(key == 'target')
+            target = value;
+        else{
+            try {
+                metadata[key] = JSON.parse(value);
+            }
+            catch{
+                metadata[key] = value;
+            }
         }
     });
 
     // Send post request to create elm model
-    try{
-        const { response, body } = await elm.postModel(metadata);
-        if(response['statusCode'] != 200){
-            runner.error(computation, body['type'] + ' :: ' +  body['details'], tenant);
-            return;
+    const post_model = await elm.postModel(metadata).then(function(response){
+        if("error" in response){
+            runner.error(computation, response['error'], tenant);
+            return false;
         }
-        model_id = body['_id'];
-    }
-    catch{
-        runner.error(computation, 'ELM server not found', tenant);
-        return;
-    }
+        model_id = response._id;
+        return true;
+    }, function(error) {
+        runner.error(computation, error, tenant);
+        return false;
+    });
+
+    if(!post_model) return null;
 
     // Create ELM file
-    //option1
-
-    // // send ref to csv
-    // try{
-    //     const { response, body } = await elm.postMeasurify(computation, model_id);
-    //     if(response['statusCode'] != 200){
-    //         runner.error(computation, body['type'] + ' :: ' +  body['details'], tenant);
-    //         return;
-    //     }
-    // }
-    // catch{
-    //     runner.error(computation, 'ELM server not found', tenant);
-    //     return;
-    // }
-
-    //option2
     const pathfile = process.env.UPLOAD_PATH + '/' + computation._id + '.csv';
     let csvrow = [];
     feature.items.forEach(value => { if(computation.items.includes(value.name)) csvrow.push(value.name) });
@@ -79,7 +66,8 @@ exports.run = async function(computation, user, tenant) {
                 for(i=0; i<sample.values.length; i++) {
                     const item = feature.items[i].name;
                     const value = sample.values[i];
-                    if(computation.items.includes(item)) row.push(value);
+                    if(!computation.items.includes(item)) continue;
+                    row.push(value);
                 }
                 csvrow = '\n';
                 csvrow += row.join(',');
@@ -90,75 +78,60 @@ exports.run = async function(computation, user, tenant) {
         }
     }
 
-    try{
-        const { response, body } = await elm.postDataset(computation, model_id, target);
-        if(response['statusCode'] != 200){
-            runner.error(computation, body['type'] + ' :: ' +  body['details'], tenant);
-            return;
+    // Call ELM providing CSV file and model parameters
+    const post_dataset = await elm.postDataset(computation, model_id, target).then(function(response){
+        const respondeJson = JSON.parse(response);
+        if("error" in respondeJson){
+            runner.error(computation, respondeJson['error'], tenant);
+            return false;
         }
-    }
-    catch{
-        runner.error(computation, 'ELM server not found', tenant);
-        return;
-    }
+        return true;
+    }, function(error) {
+        runner.error(computation, error, tenant);
+        return false;
+    });
 
+    if(!post_dataset) return null;
 
     // Start training
-    try{
-        const { response, body } = await elm.putTraining(model_id);
-        if(response['statusCode'] != 200){
-            runner.error(computation, body['type'] + ' :: ' +  body['details'], tenant);
-            return;
+    const put_training = await elm.putTraining(model_id).then(function(response){
+        if("error" in response){
+            runner.error(computation, response['error'], tenant);
+            return false;
         }
-    }
-    catch{
-        runner.error(computation, 'ELM server not found', tenant);
-        return;
-    }
+        return true;
+    }, function(error){
+        runner.error(computation, error, tenant);
+        return false;
+    });
+
+    if(!put_training) return null;
 
     // Wait for ELM result
     let go = false;
     let countdown = 20;
+    let get_result = false;
 
     while(!go){
+        get_result = await elm.getModel(model_id).then(function(response){
+            if("error" in response){
+                runner.error(computation, response['error'], tenant);
+                return false;
+            }
+            if(response['status']['code'] === 4){
+                go = true;
+                return true;
+            }
+        }, function(error){
+            runner.error(computation, error, tenant);
+            return false;
+        });
         await sleep(500);
-        try{
-            let { response, body } = await elm.getModel(model_id);
-            if(response['statusCode'] != 200){
-                runner.error(computation, body['type'] + ' :: ' +  body['details'], tenant);
-                return;
-            }
-            if(body['status']['code'] === 4){
-                go = true;
-                continue;
-            }
-            if(countdown-- === 0){
-                go = true;
-                runner.error(computation, "ELM generic error", tenant);
-            }
-        }
-        catch{
-            runner.error(computation, 'ELM server not found', tenant);
-            return;
-        }        
+        countdown--;
+        if(countdown === 0) go = true;
     }
 
+    if(!get_result) return null;
     const result = [];
     runner.complete(computation, result, tenant);
 }
-
-    // var request = require('request');
-    // var r = request.post("https://localhost:5000/stream");
-    // var upload = fs.createReadStream(pathfile);
-
-    // upload.pipe(r);
-
-    // var progress = 0;
-    // upload.on('data', function(chunk) {
-    //     progress += chunk.length;
-    //     console.log(new Date(), progress);
-    // });
-
-    // upload.on('end', function(res){
-    //     console.log('Finished');
-    // });

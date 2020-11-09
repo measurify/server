@@ -8,10 +8,8 @@ exports.sendJson = async function(url, method, headers, json=true) {
             headers: headers,
             json: json
         }, (error, response, body) => {
-            if(error)   
-                reject(error);
-            else        
-                resolve({response, body});
+            if(error)   reject(error);
+            else        resolve(body);
         });
     });
 }
@@ -24,12 +22,8 @@ exports.sendForm = async function(url, method, headers, formData) {
             headers: headers,
             formData: formData
         }, (error, response, body) => {
-            if(error)   
-                reject(error);
-            else{
-                body = JSON.parse(body)
-                resolve({response, body});
-            }
+            if(error)   reject(error);
+            else        resolve(body);
         });
     });
 }
