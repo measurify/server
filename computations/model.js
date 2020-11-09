@@ -3,6 +3,7 @@ const runner = require('../computations/runner');
 const mongoose = require('mongoose');
 const elm = require('../commons/elm');
 const fs = require('fs');
+const ComputationStatusTypes = require('../types/computationStatusTypes');
 
 const sleep = function(ms){ return new Promise(resolve=>{ setTimeout(resolve, ms) }) };
 
@@ -16,122 +17,132 @@ exports.run = async function(computation, user, tenant) {
     await buncher.init();
 
     let metadata = {};
-    let target = null;
+    let target = computation.target;
+    if(!target)
+        target = computation.items[computation.items.length-1]; // default
     let model_id = null;
 
     // Get info about the ELM model from "metadata" field of the measurement
     (computation.metadata).forEach((value, key) => {
-        if(key == 'target')
-            target = value;
-        else{
-            try {
-                metadata[key] = JSON.parse(value);
-            }
-            catch{
-                metadata[key] = value;
-            }
+        try {
+            metadata[key] = JSON.parse(value);
+        }
+        catch{
+            metadata[key] = value;
         }
     });
 
     // Send post request to create elm model
-    const post_model = await elm.postModel(metadata).then(function(response){
-        if("error" in response){
-            runner.error(computation, response['error'], tenant);
-            return false;
+    try{
+        const {response, body } = await elm.postModel(metadata);
+        if(response['statusCode'] != 200){
+            runner.error(computation, '[' + body['type'] + ']' + body['details'], tenant);
+            return;
         }
-        model_id = response._id;
-        return true;
-    }, function(error) {
-        runner.error(computation, error, tenant);
-        return false;
-    });
-
-    if(!post_model) return null;
+        model_id = body['_id'];
+    }
+    catch{
+        runner.error(computation, 'Error1!', tenant);
+        return;
+    }
 
     // Create ELM file
-    const pathfile = process.env.UPLOAD_PATH + '/' + computation._id + '.csv';
-    let csvrow = [];
-    feature.items.forEach(value => { if(computation.items.includes(value.name)) csvrow.push(value.name) });
-    csvrow = csvrow.join(',');
-
-    fs.writeFileSync(pathfile, csvrow, function(error) {
-        if(error) return runner.error(computation, error, tenant);
-    });
-
-    while(page = await buncher.next()) {
-        // Add bunch_size lines to CSV file for ELM
-        for(const measurement of page.docs) {
-            for(const sample of measurement.samples) {
-                let row = [];
-                for(i=0; i<sample.values.length; i++) {
-                    const item = feature.items[i].name;
-                    const value = sample.values[i];
-                    if(!computation.items.includes(item)) continue;
-                    row.push(value);
-                }
-                csvrow = '\n';
-                csvrow += row.join(',');
-                fs.appendFileSync(pathfile, csvrow, function(error) {
-                    if(error) return runner.error(computation, error, tenant);
-                });
-            }
+    // option 1 
+    try{
+        const { response, body } = await elm.postMeasurify(computation, model_id);
+        if(response['statusCode'] != 200){
+            runner.error(computation, '[' + body['type'] + ']' + body['details'], tenant);
+            return;
         }
     }
-
-    // Call ELM providing CSV file and model parameters
-    const post_dataset = await elm.postDataset(computation, model_id, target).then(function(response){
-        const respondeJson = JSON.parse(response);
-        if("error" in respondeJson){
-            runner.error(computation, respondeJson['error'], tenant);
-            return false;
-        }
-        return true;
-    }, function(error) {
-        runner.error(computation, error, tenant);
-        return false;
-    });
-
-    if(!post_dataset) return null;
-
-    // Start training
-    const put_training = await elm.putTraining(model_id).then(function(response){
-        if("error" in response){
-            runner.error(computation, response['error'], tenant);
-            return false;
-        }
-        return true;
-    }, function(error){
-        runner.error(computation, error, tenant);
-        return false;
-    });
-
-    if(!put_training) return null;
-
-    // Wait for ELM result
-    let go = false;
-    let countdown = 20;
-    let get_result = false;
-
-    while(!go){
-        get_result = await elm.getModel(model_id).then(function(response){
-            if("error" in response){
-                runner.error(computation, response['error'], tenant);
-                return false;
-            }
-            if(response['status']['code'] === 4){
-                go = true;
-                return true;
-            }
-        }, function(error){
-            runner.error(computation, error, tenant);
-            return false;
-        });
-        await sleep(500);
-        countdown--;
-        if(countdown === 0) go = true;
+    catch{
+        runner.error(computation, 'Error2!', tenant);
+        return;
     }
 
-    if(!get_result) return null;
+    // option 2
+    // const pathfile = process.env.UPLOAD_PATH + '/' + computation._id + '.csv';
+    // let csvrow = [];
+    // feature.items.forEach(value => { if(computation.items.includes(value.name)) csvrow.push(value.name) });
+    // csvrow = csvrow.join(',');
+
+    // fs.writeFileSync(pathfile, csvrow, function(error) {
+    //     if(error) return runner.error(computation, error, tenant);
+    // });
+
+    // while(page = await buncher.next()) {
+    //     // Add bunch_size lines to CSV file for ELM
+    //     for(const measurement of page.docs) {
+    //         for(const sample of measurement.samples) {
+    //             let row = [];
+    //             for(i=0; i<sample.values.length; i++) {
+    //                 const item = feature.items[i].name;
+    //                 const value = sample.values[i];
+    //                 if(computation.items.includes(item)) row.push(value);
+    //             }
+    //             csvrow = '\n';
+    //             csvrow += row.join(',');
+    //             fs.appendFileSync(pathfile, csvrow, function(error) {
+    //                 if(error) return runner.error(computation, error, tenant);
+    //             });
+    //         }
+    //     }
+    // }
+
+    // // Call ELM providing CSV file and model parameters
+    // try{
+    //     const { response, body } = await elm.postDataset(computation, model_id, target);
+    //     if(response['statusCode'] != 200){
+    //         runner.error(computation, '[' + body['type'] + ']' + body['details'], tenant);
+    //         return;
+    //     }
+    // }
+    // catch{
+    //     runner.error(computation, 'ELM Dataset not uploaded!', tenant);
+    //     return;
+    // }
+
+    // // Start training
+    // try{
+    //     const { response, body } = await elm.putTraining(model_id);
+    //     if(response['statusCode'] != 200){
+    //         runner.error(computation, '[' + body['type'] + ']' + body['details'], tenant);
+    //         return;
+    //     }
+    // }
+    // catch{
+    //     runner.error(computation, 'ELM training failed!', tenant);
+    //     return;
+    // }
+
+
+    // // Wait for ELM result
+    // let go = false;
+    // let countdown = 20;
+
+    // while(!go){
+    //     await sleep(500);
+    //     try{
+    //         const { response, body } = await elm.getModel(model_id);
+    //         if(response['statusCode'] != 200){
+    //             runner.error(computation, '[' + body['type'] + ']' + body['details'], tenant);
+    //             return;
+    //         }
+    //         if(body['status']['code'] === 4){
+    //             go = true;
+    //             continue;
+    //         }
+    //     }
+    //     catch{
+    //         runner.error(computation, 'Error', tenant);
+    //         return;
+    //     }
+    //     if(countdown-- === 0){
+    //         go = true;
+    //         runner.error(computation, 'Error', tenant);
+    //     }
+    // }
+
     const result = [];
     runner.complete(computation, result, tenant);
 }
