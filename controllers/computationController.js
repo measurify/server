@@ -21,10 +21,12 @@ exports.getone = async (req, res) => {
 
 exports.post = async (req, res) => {
     const Computation = mongoose.dbs[req.tenant._id].model('Computation');
+    const Feature = mongoose.dbs[req.tenant._id].model('Feature');
     let result = await checker.canCreate(req, res); if (result != true) return result;
     result = await checker.hasRightsToCreate(req, res, ['feature','tags']); if (result != true) return result;
+    result = await checker.isComputable(req, res, Feature); if (result != true) return result;
     const answer = await controller.postResource(req, res, Computation);
-    if(req.result) runner.go(req.result, req.user, req.tenant);
+    runner.go(req.result, req.user, req.tenant);
     return answer;
 };
 

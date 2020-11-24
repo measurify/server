@@ -7,7 +7,7 @@ function Buncher(computation, user, runner, page_size, tenant) {
     this.computation = computation;
     this.user = user;
     this.runner = runner;
-    this.page = 0;
+    this.page = 1;
     this.pages = 0;
     this.restriction = null;
     this.size = 0

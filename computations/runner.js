@@ -16,10 +16,10 @@ exports.error = async function(computation, message, tenant) {
     await Computation.findByIdAndUpdate(computation._id, { $set: { status: ComputationStatusTypes.error } });
 }
 
-exports.complete = async function(computation, results, tenant) {
-    console.log("Computation: " + computation._id + " completed");
+exports.complete = async function(computation, result, tenant) {
+    console.log("Computation: " + computation._id + " complete: " + result);
     const Computation = mongoose.dbs[tenant._id].model('Computation');
-    await Computation.findByIdAndUpdate(computation._id, { $set: { status: ComputationStatusTypes.concluded, results: results } });
+    await Computation.findByIdAndUpdate(computation._id, { $set: { status: ComputationStatusTypes.concluded, result: result } });
 }
 
 exports.go = function(computation, user, tenant) { 
