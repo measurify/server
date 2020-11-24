@@ -1,5 +1,3 @@
-
-
 process.env.ENV = 'test';
 process.env.LOG = 'false'; 
 
@@ -16,6 +14,7 @@ const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 const ItemTypes = require('../types/itemTypes.js');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 describe('areCoherent test', () => {
     it('it should throw an exception for measurements not coherent with feature (1 text 0-D item and a numeric sample value)', async () => {      

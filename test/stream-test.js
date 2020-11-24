@@ -1,5 +1,3 @@
-
-
 process.env.ENV = 'test';
 process.env.LOG = 'false'; 
 
@@ -15,6 +13,7 @@ const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 const assert = require('chai').assert;
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 
 // Test the stream for a thing

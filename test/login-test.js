@@ -11,6 +11,7 @@ const should = chai.should();
 const factory = require('../commons/factory.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 // Test the /POST route
 describe('/POST login', () => {

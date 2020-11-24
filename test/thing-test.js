@@ -13,6 +13,7 @@ const test = require('./before-test.js');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 // Test the /GET route
 describe('/GET thing', () => {
@@ -177,25 +178,25 @@ describe('/DELETE thing', () => {
     it('it should DELETE a thing', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", user, [], null, []);
-        const things_before = await Thing.find();
+        const things_before = await before.Thing.find();
         things_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
-        const things_after = await Thing.find();
+        const things_after = await before.Thing.find();
         things_after.length.should.be.eql(0);
     });
 
     it('it should not DELETE a fake thing', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = await factory.createThing("test-thing-2", user, [], null, []);
-        const things_before = await Thing.find();
+        const things_before = await before.Thing.find();
         things_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/things/fake_thing').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
-        const things_after = await Thing.find();
+        const things_after = await before.Thing.find();
         things_after.length.should.be.eql(1);
     });
 
@@ -206,13 +207,13 @@ describe('/DELETE thing', () => {
         const device = await factory.createDevice("test-device-2", user, [feature]);
         const thing = await factory.createThing("test-thing-2", user);
         const measurement = await factory.createMeasurement(user, feature, device, thing, [tag]);
-        const things_before = await Thing.find();
+        const things_before = await before.Thing.find();
         things_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
-        const things_after = await Thing.find();
+        const things_after = await before.Thing.find();
         things_after.length.should.be.eql(1);
     });
 
@@ -220,13 +221,13 @@ describe('/DELETE thing', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const relation = await factory.createThing("test-relation-1", user);
         const thing = await factory.createThing("test-thing-1", user, null, null, [relation]);
-        const things_before = await Thing.find();
+        const things_before = await before.Thing.find();
         things_before.length.should.be.eql(2);
         const res = await chai.request(server).keepOpen().delete('/v1/things/' + relation._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
-        const things_after = await Thing.find();
+        const things_after = await before.Thing.find();
         things_after.length.should.be.eql(2);
     });
 });

@@ -1,5 +1,3 @@
-
-
 process.env.ENV = 'test';
 process.env.LOG = 'false'; 
 
@@ -15,6 +13,7 @@ const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 const ItemTypes = require('../types/itemTypes.js');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 
 // Test the /GET route
@@ -867,12 +866,12 @@ describe('/DELETE measurement', () => {
         const tag = await factory.createTag("test-tag", user);
         const thing = await factory.createThing("test-thing", user);
         const measurement = await factory.createMeasurement(user, feature, device, thing, [tag]);
-        const measurements_before = await Measurement.find();
+        const measurements_before = await before.Measurement.find();
         measurements_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
-        const measurements_after = await Measurement.find();
+        const measurements_after = await before.Measurement.find();
         measurements_after.length.should.be.eql(0);
     });
 
@@ -883,13 +882,13 @@ describe('/DELETE measurement', () => {
         const tag = await factory.createTag("test-tag", user);
         const thing = await factory.createThing("test-thing", user);
         const measurement = await factory.createMeasurement(user, feature, device, thing, [tag]);
-        const measurements_before = await Measurement.find();
+        const measurements_before = await before.Measurement.find();
         measurements_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/measurements/fake_measurement').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
-        const measurements_after = await Measurement.find();
+        const measurements_after = await before.Measurement.find();
         measurements_after.length.should.be.eql(1);
     });
 });

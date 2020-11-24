@@ -32,7 +32,7 @@ exports.init = async function(mode){
         try {             
             mongoose.dbs['catalog'] = await mongoose.createConnection(uri); 
             const tenderSchema = require('./models/tenantSchema.js');
-            connection = mongoose.dbs['catalog'].model('Tenant', tenderSchema);
+            mongoose.dbs['catalog'].model('Tenant', tenderSchema);
             console.error('Database connected!');
             go = true;
         } 

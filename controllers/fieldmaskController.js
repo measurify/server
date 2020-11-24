@@ -22,7 +22,7 @@ exports.getone = async (req, res) => {
 
 exports.post = async (req, res) => {
     const Fieldmask = mongoose.dbs[req.tenant._id].model('Fieldmask');
-    result = await checker.isAdminitrator(req, res); if (result != true) return result;
+    let result = await checker.isAdminitrator(req, res); if (result != true) return result;
     return await controller.postResource(req, res, Fieldmask);
 };
 

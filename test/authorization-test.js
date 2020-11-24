@@ -1,5 +1,3 @@
-
-
 process.env.ENV = 'test';
 process.env.LOG = 'false'; 
 
@@ -15,6 +13,7 @@ const should = chai.should();
 const factory = require('../commons/factory.js');
 const UserRoles = require('../types/userRoles.js');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 describe('is administrator?', () => {
     it('it should answer true if the user is an administrator', async () => {

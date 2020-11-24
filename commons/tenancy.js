@@ -5,13 +5,13 @@ const bcrypt = require('bcryptjs');
 const UserRoles = require('../types/userRoles');
 
 const init = async function(tenant, username, password) {
-    const passwordhash = tenant.passwordhash || process.env.DEFAULT_TENANT_PASSWORDHASH;
+    const passwordhash = tenant.passwordhash;
     if(!username) username = process.env.DEFAULT_TENANT_ADMIN_USERNAME;
     if(!password) password = process.env.DEFAULT_TENANT_ADMIN_TEMPORARY_PASSWORD;
     if(passwordhash == true || passwordhash == 'true') { password = bcrypt.hashSync(password, 8); }
     mongoose.dbs[tenant._id] = await mongoose.dbs['catalog'].useDb(tenant._id);
     const models = await fs.readdirSync('./models/');
-    for(i=0; i<models.length; i++) {
+    for(let i=0; i<models.length; i++) {
         if(models[i] == "tenantSchema.js") continue;
         if(models[i] == "logSchema.js") continue;
         const model_schema = require('../models/' + models[i]);

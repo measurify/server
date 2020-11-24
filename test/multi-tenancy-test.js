@@ -13,6 +13,7 @@ const test = require('./before-test.js');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 describe('Contents in different tanant', () => {
     it('it should GET all the thing of a specific tenant', async () => {

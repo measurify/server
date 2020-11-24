@@ -15,6 +15,7 @@ const UserStatusTypes = require('../types/userStatusTypes');
 const errors = require('../commons/errors');
 const PasswordResetStatusTypes = require('../types/passwordResetStatusTypes');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 // Create a new "self" user
 describe('/POST self', () => {

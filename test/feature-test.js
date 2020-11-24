@@ -12,6 +12,7 @@ const factory = require('../commons/factory.js');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 // Test the /GET route
 describe('/GET feature', () => {
@@ -140,39 +141,39 @@ describe('/DELETE feature', () => {
     it('it should DELETE a feature', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user);
-        const features_before = await Feature.find();
+        const features_before = await before.Feature.find();
         features_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
-        const features_after = await Feature.find();
+        const features_after = await before.Feature.find();
         features_after.length.should.be.eql(0);
     });
 
-    it('it should not DELETE a feature by non-owner', async () => {      
+    it('it should not DELETE a feature by non-owner', async () => {     
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user);
-        const features_before = await Feature.find();
+        const features_before = await before.Feature.find();
         features_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user2));
         res.should.have.status(errors.not_yours.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.not_yours.message);
-        const features_after = await Feature.find();
+        const features_after = await before.Feature.find();
         features_after.length.should.be.eql(1);
     });
 
     it('it should not DELETE a fake feature', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
-        const features_before = await Feature.find();
+        const features_before = await before.Feature.find();
         features_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/features/fake_feature').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
-        const features_after = await Feature.find();
+        const features_after = await before.Feature.find();
         features_after.length.should.be.eql(1);
     });
     
@@ -183,13 +184,13 @@ describe('/DELETE feature', () => {
         const tag = await factory.createTag("test-tag", user);
         const thing = await factory.createThing("test-thing-2", user);
         const measurement = await factory.createMeasurement(user, feature, device, thing, [tag]);
-        const features_before = await Feature.find();
+        const features_before = await before.Feature.find();
         features_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
-        const features_after = await Feature.find();
+        const features_after = await before.Feature.find();
         features_after.length.should.be.eql(1);
     });
 
@@ -197,13 +198,13 @@ describe('/DELETE feature', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
-        const features_before = await Feature.find();
+        const features_before = await before.Feature.find();
         features_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
-        const features_after = await Feature.find();
+        const features_after = await before.Feature.find();
         features_after.length.should.be.eql(1);
     });
 });

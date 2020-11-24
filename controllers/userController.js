@@ -18,6 +18,7 @@ exports.get = async (req, res) => {
 };
 
 exports.getusernames = async (req, res) => { 
+    const User = mongoose.dbs[req.tenant._id].model('User');
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{ "type": "0", "_id": "0" }', User); 
 };
 
@@ -89,7 +90,7 @@ exports.awaiting = async (req, res) => {
     const User = mongoose.dbs[req.query.tenant].model('User');
     let result = await checker.isAvailable(req, res, User); if (result != true) return result;
     await User.findByIdAndUpdate(req.params.id, { "$set": { "status": UserStatusTypes.awaiting } });
-    user_updated = await User.findById(req.params.id);
+    let user_updated = await User.findById(req.params.id);
     const url = req.protocol + '://' + req.get('host')
     await email.send(messages.await(url, user_updated));
     return await res.status(200).json(user_updated); 
@@ -103,7 +104,7 @@ exports.accept = async (req, res) => {
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.isValid(req, res, UserStatusTypes, 'status'); if (result != true) return result;
     await User.findByIdAndUpdate(req.params.id, { "$set": { "status": req.body.status } });
-    user_updated = await User.findById(req.params.id);
+    let user_updated = await User.findById(req.params.id);
     const url = req.protocol + '://' + req.get('host')
     if(req.body.status == UserStatusTypes.enabled) await email.send(messages.accepted(url, user_updated));
     if(req.body.status == UserStatusTypes.disabled) await email.send(messages.disabled(url, user_updated));

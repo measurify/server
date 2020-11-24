@@ -63,6 +63,7 @@ exports.createTenant = async function(id, organization, address, email, phone, a
 exports.createUser = async function(username, password, type, fieldmask, email, tenant) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
+    if(tenant.passwordhash == true || tenant.passwordhash == 'true') { password = bcrypt.hashSync(password, 8); }
     const User = mongoose.dbs[tenant._id].model('User');
     let user = await User.findOne( { username: username });
     if(!user) {

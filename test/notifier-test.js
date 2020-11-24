@@ -11,6 +11,7 @@ const should = chai.should();
 const notifier = require('../commons/notifier.js');
 const factory = require('../commons/factory.js');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 describe('notifications', () => {
     it('it should send a notification', async () => {

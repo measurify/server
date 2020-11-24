@@ -1,5 +1,3 @@
-
-
 process.env.ENV = 'test';
 process.env.LOG = 'false'; 
 
@@ -14,6 +12,7 @@ const factory = require('../commons/factory.js');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 // Test the /GET route
 describe('/GET subscriptions', () => {
@@ -208,12 +207,12 @@ describe('/DELETE subscription', () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", owner);
         const subscription = await factory.createSubscription("test-subscription-1", owner, null, thing, []);
-        const subscription_before = await Subscription.find();
+        const subscription_before = await  before.Subscription.find();
         subscription_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/subscriptions/' + subscription._id).set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.should.be.a('object');
-        const subscriptions_after = await Subscription.find();
+        const subscriptions_after = await  before.Subscription.find();
         subscriptions_after.length.should.be.eql(0);
     });
 
@@ -221,13 +220,13 @@ describe('/DELETE subscription', () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", owner);
         const subscription = await factory.createSubscription("test-subscription-1", owner, null, thing, []);
-        const subscription_before = await Subscription.find();
+        const subscription_before = await  before.Subscription.find();
         subscription_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/subscriptions/fake_subscription').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
-        const subscriptions_after = await Subscription.find();
+        const subscriptions_after = await  before.Subscription.find();
         subscriptions_after.length.should.be.eql(1);
     });
 });

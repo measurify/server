@@ -1,5 +1,3 @@
-
-
 process.env.ENV = 'test';
 process.env.LOG = 'false'; 
 
@@ -14,6 +12,7 @@ const should = chai.should();
 const factory = require('../commons/factory.js');
 const UserRoles = require('../types/userRoles.js');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 describe('encode and decode', () => {
     it('it should decode a previus encoded string', async () => {

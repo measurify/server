@@ -1,5 +1,3 @@
-
-
 process.env.ENV = 'test';
 process.env.LOG = 'false'; 
 
@@ -15,6 +13,7 @@ const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 const VisibilityTypes = require('../types/visibilityTypes.js');  
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 // Test the /GET route
 describe('/GET rights', () => {
@@ -228,12 +227,12 @@ describe('/DELETE rights', () => {
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const right = await factory.createRight(resource, "Tag", user, owner, []);
-        const rights_before = await Right.find();
+        const rights_before = await before.Right.find();
         rights_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/rights/' + right._id).set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.should.be.a('object');
-        const rights_after = await Right.find();
+        const rights_after = await before.Right.find();
         rights_after.length.should.be.eql(0);
     });
 
@@ -242,13 +241,13 @@ describe('/DELETE rights', () => {
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
         const right = await factory.createRight(resource, "Tag", user, owner, []);
-        const rights_before = await Right.find();
+        const rights_before = await before.Right.find();
         rights_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/rights/fake_right').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
-        const rights_after = await Right.find();
+        const rights_after = await before.Right.find();
         rights_after.length.should.be.eql(1);
     });
 });

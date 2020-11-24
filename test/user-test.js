@@ -12,6 +12,7 @@ const factory = require('../commons/factory.js');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 // Test the /GET route
 describe('/GET users', () => {
@@ -185,38 +186,38 @@ describe('/DELETE users', () => {
     it('it should DELETE a user', async () => {
         const user_1 = await factory.createUser("test-username-1", "test-password-1");
         const user_2 = await factory.createUser("test-username-2", "test-password-2");
-        const users_before = await User.find();
+        const users_before = await before.User.find();
         users_before.length.should.be.eql(3);
         const res = await chai.request(server).keepOpen().delete('/v1/users/' + user_1._id).set('Authorization', await factory.getAdminToken());
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.username.should.be.eql(user_1.username);
-        const users_after = await User.find();
+        const users_after = await before.User.find();
         users_after.length.should.be.eql(2);
     });
 
     it('it should not DELETE a fake user', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1");
-        const users_before = await User.find();
+        const users_before = await before.User.find();
         users_before.length.should.be.eql(2);
         const res = await chai.request(server).keepOpen().delete('/v1/users/fake_user').set('Authorization', await factory.getAdminToken());
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
-        const users_after = await User.find();
+        const users_after = await before.User.find();
         users_after.length.should.be.eql(2);
     });
 
     it('it should not DELETE a by non-admin', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1");
         const no_admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
-        const users_before = await User.find();
+        const users_before = await before.User.find();
         users_before.length.should.be.eql(2);
         const res = await chai.request(server).keepOpen().delete('/v1/users/' + user._id).set('Authorization', await factory.getUserToken(no_admin));
         res.should.have.status(errors.admin_restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.admin_restricted_access.message);
-        const users_after = await User.find();
+        const users_after = await before.User.find();
         users_after.length.should.be.eql(2);
     });
 
@@ -224,52 +225,52 @@ describe('/DELETE users', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
-        const users_before = await User.find();
+        const users_before = await before.User.find();
         users_before.length.should.be.eql(2);
         const res = await chai.request(server).keepOpen().delete('/v1/users/' + user._id).set('Authorization', await factory.getAdminToken());
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
-        const users_after = await User.find();
+        const users_after = await before.User.find();
         users_after.length.should.be.eql(2);
     });
 
     it('it should not DELETE a user owner of a feature', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-2", user);
-        const users_before = await User.find();
+        const users_before = await before.User.find();
         users_before.length.should.be.eql(2);
         const res = await chai.request(server).keepOpen().delete('/v1/users/' + user._id).set('Authorization', await factory.getAdminToken());
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
-        const users_after = await User.find();
+        const users_after = await before.User.find();
         users_after.length.should.be.eql(2);
     });
 
     it('it should not DELETE a user owner of a tag', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag", user);
-        const users_before = await User.find();
+        const users_before = await before.User.find();
         users_before.length.should.be.eql(2);
         const res = await chai.request(server).keepOpen().delete('/v1/users/' + user._id).set('Authorization', await factory.getAdminToken());
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
-        const users_after = await User.find();
+        const users_after = await before.User.find();
         users_after.length.should.be.eql(2);
     });
 
     it('it should not DELETE a user owner of a thing', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const thing = await factory.createThing("thing-tag", user);
-        const users_before = await User.find();
+        const users_before = await before.User.find();
         users_before.length.should.be.eql(2);
         const res = await chai.request(server).keepOpen().delete('/v1/users/' + user._id).set('Authorization', await factory.getAdminToken());
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
-        const users_after = await User.find();
+        const users_after = await before.User.find();
         users_after.length.should.be.eql(2);
     });
 
@@ -279,13 +280,13 @@ describe('/DELETE users', () => {
         const device = await factory.createDevice("test-device-4", user, [feature]);
         const thing = await factory.createThing("test-thing", user);
         const measurement = await factory.createMeasurement(user, feature, device, thing);
-        const users_before = await User.find();
+        const users_before = await before.User.find();
         users_before.length.should.be.eql(2);
         const res = await chai.request(server).keepOpen().delete('/v1/users/' + user._id).set('Authorization', await factory.getAdminToken());
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
-        const users_after = await User.find();
+        const users_after = await before.User.find();
         users_after.length.should.be.eql(2);
     });
 });

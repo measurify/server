@@ -1,5 +1,3 @@
-
-
 process.env.ENV = 'test';
 process.env.LOG = 'false'; 
 
@@ -14,6 +12,7 @@ const factory = require('../commons/factory.js');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 // Test the /GET route
 describe('/GET fieldmask', () => {
@@ -169,25 +168,25 @@ describe('/DELETE fieldmasks', () => {
     it('it should DELETE a fieldmask', async () => {      
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask = await factory.createFieldmask("fieldmaask-test-1", [], [], [], ['samples'], [], [], [], admin);
-        const fieldmasks_before = await Fieldmask.find();
+        const fieldmasks_before = await before.Fieldmask.find();
         fieldmasks_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin));
         res.should.have.status(200);
         res.body.should.be.a('object');
-        const fieldmasks_after = await Fieldmask.find();
+        const fieldmasks_after = await before.Fieldmask.find();
         fieldmasks_after.length.should.be.eql(0);
     });
 
     it('it should not DELETE a fake fieldmask', async () => {      
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask = await factory.createFieldmask("fieldmaask-test-1", [], [], [], ['samples'], [], [], [], admin);
-        const fieldmasks_before = await Fieldmask.find();
+        const fieldmasks_before = await before.Fieldmask.find();
         fieldmasks_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/fieldmasks/fake_fieldmask').set("Authorization", await factory.getUserToken(admin));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
-        const fieldmasks_after = await Fieldmask.find();
+        const fieldmasks_after = await before.Fieldmask.find();
         fieldmasks_after.length.should.be.eql(1);
     });
 
@@ -195,13 +194,13 @@ describe('/DELETE fieldmasks', () => {
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const fieldmask = await factory.createFieldmask("fieldmaask-test-1", [], [], [], ['samples'], [], [], [], admin);
-        const fieldmasks_before = await Fieldmask.find();
+        const fieldmasks_before = await before.Fieldmask.find();
         fieldmasks_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.admin_restricted_access.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.admin_restricted_access.message);
-        const fieldmasks_after = await Fieldmask.find();
+        const fieldmasks_after = await before.Fieldmask.find();
         fieldmasks_after.length.should.be.eql(1);
     });
 
@@ -209,13 +208,13 @@ describe('/DELETE fieldmasks', () => {
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask = await factory.createFieldmask("fieldmaask-test-1", [], [], [], ['samples'], [], [], [], admin);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.analyst, fieldmask);
-        const fieldmasks_before = await Fieldmask.find();
+        const fieldmasks_before = await before.Fieldmask.find();
         fieldmasks_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin));
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
-        const fieldmasks_after = await Fieldmask.find();
+        const fieldmasks_after = await before.Fieldmask.find();
         fieldmasks_after.length.should.be.eql(1);
     });
 });

@@ -12,6 +12,7 @@ const factory = require('../commons/factory.js');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 // Test the /GET route
 describe('/GET tags', () => {
@@ -151,25 +152,25 @@ describe('/DELETE tag', () => {
     it('it should DELETE a tag', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", user);
-        const tags_before = await Tag.find();
+        const tags_before = await before.Tag.find();
         tags_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
-        const tags_after = await Feature.find();
+        const tags_after = await before.Feature.find();
         tags_after.length.should.be.eql(0);
     });
 
     it('it should not DELETE a fake tag', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-2", user);
-        const tags_before = await Tag.find();
+        const tags_before = await before.Tag.find();
         tags_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/tags/fake_tag').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
-        const tags_after = await Tag.find();
+        const tags_after = await before.Tag.find();
         tags_after.length.should.be.eql(1);
     });
 
@@ -181,13 +182,13 @@ describe('/DELETE tag', () => {
         const tag2 = await factory.createTag("test-tag-2", user);
         const thing = await factory.createThing("test-thing", user);
         const measurement = await factory.createMeasurement(user, feature, device, thing, [tag, tag2]);
-        const tags_before = await Tag.find();
+        const tags_before = await before.Tag.find();
         tags_before.length.should.be.eql(2);
         const res = await chai.request(server).keepOpen().delete('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
-        const tags_after = await Tag.find();
+        const tags_after = await before.Tag.find();
         tags_after.length.should.be.eql(2);
     });
 
@@ -197,13 +198,13 @@ describe('/DELETE tag', () => {
         const tag = await factory.createTag("test-tag", user);
         const tag2 = await factory.createTag("test-tag-2", user);
         const device = await factory.createDevice("test-device-4", user, [feature], [tag]);
-        const tags_before = await Tag.find();
+        const tags_before = await before.Tag.find();
         tags_before.length.should.be.eql(2);
         const res = await chai.request(server).keepOpen().delete('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
-        const tags_after = await Tag.find();
+        const tags_after = await before.Tag.find();
         tags_after.length.should.be.eql(2);
     });
 
@@ -212,13 +213,13 @@ describe('/DELETE tag', () => {
         const tag = await factory.createTag("test-tag", user);
         const tag2 = await factory.createTag("test-tag-2", user);
         const feature = await factory.createFeature("test-feature", user, null, [tag]);
-        const tags_before = await Tag.find();
+        const tags_before = await before.Tag.find();
         tags_before.length.should.be.eql(2);
         const res = await chai.request(server).keepOpen().delete('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
-        const tags_after = await Tag.find();
+        const tags_after = await before.Tag.find();
         tags_after.length.should.be.eql(2);
     });
 
@@ -227,13 +228,13 @@ describe('/DELETE tag', () => {
         const tag = await factory.createTag("test-tag", user);
         const tag2 = await factory.createTag("test-tag-2", user);
         const tagged_tag = await factory.createTag("test-tag-3", user, [tag]);
-        const tags_before = await Tag.find();
+        const tags_before = await before.Tag.find();
         tags_before.length.should.be.eql(3);
         const res = await chai.request(server).keepOpen().delete('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
-        const tags_after = await Tag.find();
+        const tags_after = await before.Tag.find();
         tags_after.length.should.be.eql(3);
     });
 
@@ -242,13 +243,13 @@ describe('/DELETE tag', () => {
         const tag = await factory.createTag("test-tag", user);
         const tag2 = await factory.createTag("test-tag-2", user);
         const thing = await factory.createThing("test-thing", user, [tag]);
-        const tags_before = await Tag.find();
+        const tags_before = await before.Tag.find();
         tags_before.length.should.be.eql(2);
         const res = await chai.request(server).keepOpen().delete('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
-        const tags_after = await Tag.find();
+        const tags_after = await before.Tag.find();
         tags_after.length.should.be.eql(2);
     });
 });

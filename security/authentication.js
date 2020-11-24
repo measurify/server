@@ -82,6 +82,7 @@ exports.decode = function(token) {
 exports.info = async function(token) {
     const info =  {};
     token = token.replace('JWT ', '');
+    let decoded = null;
     try { decoded = jwt.verify(token,process.env.JWT_SECRET); } 
     catch (err) { return false; }
     const User = mongoose.dbs[decoded.tenant._id].model('User');

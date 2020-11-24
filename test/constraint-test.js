@@ -1,5 +1,3 @@
-
-
 process.env.ENV = 'test';
 process.env.LOG = 'false'; 
 
@@ -11,10 +9,11 @@ const server = require('../server.js');
 const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
-const UserRoles = require('../types/userRoles.js');
+const UserRoles = require('../types/userRoles.js')
 const errors = require('../commons/errors.js');
 const RelationshipTypes = require('../types/relationshipTypes.js');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 // Test the /GET route
 describe('/GET constraint', () => {
@@ -280,12 +279,12 @@ describe('/DELETE constraint', () => {
         const feature = await factory.createFeature("test-feature", user);
         const constraint1 = await factory.createConstraint(user, "Tag", "Feature", tag._id, feature._id, RelationshipTypes.dependency);
         const constraint2 = await factory.createConstraint(user, "Feature", "Tag", feature._id, tag._id, RelationshipTypes.dependency);
-        const constraints_before = await Constraint.find();
+        const constraints_before = await before.Constraint.find();
         constraints_before.length.should.be.eql(2);
         const res = await chai.request(server).keepOpen().delete('/v1/constraints/' + constraint1._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
-        const constraints_after = await Constraint.find();
+        const constraints_after = await before.Constraint.find();
         constraints_after.length.should.be.eql(1);
     });
 
@@ -294,13 +293,13 @@ describe('/DELETE constraint', () => {
         const tag = await factory.createTag("test-tag", user); 
         const feature = await factory.createFeature("test-feature", user);
         const constraint = await factory.createConstraint(user, "Tag", "Feature", tag._id, feature._id, RelationshipTypes.dependency);
-        const constraints_before = await Constraint.find();
+        const constraints_before = await before.Constraint.find();
         constraints_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/constraints/fake_constraint').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
-        const constraints_after = await Constraint.find();
+        const constraints_after = await before.Constraint.find();
         constraints_after.length.should.be.eql(1);
     });
 });

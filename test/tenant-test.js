@@ -13,6 +13,7 @@ const test = require('./before-test.js');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 // Test the /GET route
 describe('/GET tenant', () => {
@@ -134,24 +135,24 @@ describe('/POST tenant', () => {
 describe('/DELETE tenant', () => {
     it('it should DELETE a tenant', async () => {
         const tenant = await factory.createTenant("test-tenant-200", "organization-test-1", "test street", "test@email", "433232", "test", "test");
-        const tenants_before = await Tenant.find();
+        const tenants_before = await before.Tenant.find();
         tenants_before.length.should.be.eql(13);
         const res = await chai.request(server).keepOpen().delete('/v1/tenants/' + tenant._id).set("Authorization", process.env.API_TOKEN);
         res.should.have.status(200);
         res.body.should.be.a('object');
-        const tenants_after = await Tenant.find();
+        const tenants_after = await before.Tenant.find();
         tenants_after.length.should.be.eql(12);
     });
 
     it('it should not DELETE a fake tenant', async () => {
         const tenant = await factory.createTenant("test-tenant-200", "organization-test-1", "test street", "test@email", "433232", "test", "test");
-        const tenants_before = await Tenant.find();
+        const tenants_before = await before.Tenant.find();
         tenants_before.length.should.be.eql(13);
         const res = await chai.request(server).keepOpen().delete('/v1/tenants/fake_tenant').set("Authorization", process.env.API_TOKEN);
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
-        const tenants_after = await Tenant.find();
+        const tenants_after = await before.Tenant.find();
         tenants_after.length.should.be.eql(13);
     });
 

@@ -16,6 +16,7 @@ const UserRoles = require('../types/userRoles.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 // CREATE
 describe('Access create feature', () => {

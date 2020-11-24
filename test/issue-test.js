@@ -1,5 +1,3 @@
-
-
 process.env.ENV = 'test';
 process.env.LOG = 'false'; 
 
@@ -15,6 +13,7 @@ const IssueTypes = require('../types/issueTypes.js');
 const UserRoles = require('../types/UserRoles.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 // Test the /GET route
 describe('/GET issues', () => {

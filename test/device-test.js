@@ -1,5 +1,3 @@
-
-
 process.env.ENV = 'test';
 process.env.LOG = 'false'; 
 
@@ -14,6 +12,7 @@ const factory = require('../commons/factory.js');
 const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
+const before = require('./before-test.js');
 
 // Test the /GET route
 describe('/GET device', () => {
@@ -213,25 +212,25 @@ describe('/DELETE device', () => {
     it('it should DELETE a device', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = await factory.createDevice("test-device-1", user);
-        const devices_before = await Device.find();
+        const devices_before = await before.Device.find();
         devices_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
-        const devices_after = await Device.find();
+        const devices_after = await before.Device.find();
         devices_after.length.should.be.eql(0);
     });
 
     it('it should not DELETE a fake device', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = await factory.createDevice("test-device-2", user);
-        const devices_before = await Device.find();
+        const devices_before = await before.Device.find();
         devices_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/devices/fake_device').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
-        const devices_after = await Device.find();
+        const devices_after = await before.Device.find();
         devices_after.length.should.be.eql(1);
     });
     
@@ -239,13 +238,13 @@ describe('/DELETE device', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const device = await factory.createDevice("test-device-2", user);
-        const devices_before = await Device.find();
+        const devices_before = await before.Device.find();
         devices_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user2));
         res.should.have.status(errors.not_yours.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.not_yours.message);
-        const devices_after = await Device.find();
+        const devices_after = await before.Device.find();
         devices_after.length.should.be.eql(1);
     });
 
@@ -256,13 +255,13 @@ describe('/DELETE device', () => {
         const device = await factory.createDevice("test-device-2", user, [feature]);
         const thing = await factory.createThing("test-thing-2", user);
         const measurement = await factory.createMeasurement(user, feature, device, thing, [tag]);
-        const devices_before = await Device.find();
+        const devices_before = await before.Device.find();
         devices_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
-        const devices_after = await Device.find();
+        const devices_after = await before.Device.find();
         devices_after.length.should.be.eql(1);
     });
 });

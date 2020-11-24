@@ -9,13 +9,15 @@ exports.run = async function(computation, user, tenant) {
     for(const item of computation.items) results.push({ item: item, measurement: null, value: null });
     const buncher = new Buncher(computation, user, runner, process.env.COMPUTATION_BUNCH_SIZE, tenant);
     await buncher.init();
+    let page = null;
     while(page = await buncher.next()) {
         for(const measurement of page.docs) {
             for(const sample of measurement.samples) {
-                for(i=0; i<sample.values.length; i++) {
+                for(let i=0; i<sample.values.length; i++) {
                     const item = feature.items[i].name;
                     const value = sample.values[i];
                     if(!computation.items.includes(item)) continue;
+                    let result = null;
                     results.some(element => { if(element.item === item) { result = element; return true; }});
                     if(!result.measurement || value > result.value) { 
                         result.measurement = measurement._id;
