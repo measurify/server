@@ -6,11 +6,12 @@ exports.sendJson = async function(url, method, headers, json=true) {
             url: url,
             method: method,
             headers: headers,
-            json: json
+            json: json,
+            rejectUnauthorized: false
         }, (error, response, body) => {
-            if(error)   
+            if(error)
                 reject(error);
-            else        
+            else
                 resolve({response, body});
         });
     });
@@ -22,7 +23,8 @@ exports.sendForm = async function(url, method, headers, formData) {
             url: url,
             method: method,
             headers: headers,
-            formData: formData
+            formData: formData,
+            rejectUnauthorized: false
         }, (error, response, body) => {
             if(error)   
                 reject(error);
