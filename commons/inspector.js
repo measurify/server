@@ -21,11 +21,15 @@ function areSameDimension(value, item) {
 
 function areSameTypes(values, feature) {
     for(let[i, value] of values.entries()) {
-        if(!areSameDimension(value, feature.items[i]))
-            return 'No match between sample value size and feature items dimension  (' + value + ' != ' +  feature.items[i].dimension + ') [' + feature._id+ ']';
+        if(!areSameDimension(value, feature.items[i])) {
+            if(!Array.isArray(value)) {size=0;}
+            else if (!Array.isArray(value[0])) {size=1;}
+            else {size=2;}
+            return 'No match between sample value size and feature items dimension  (' + size + ' != ' +  feature.items[i].dimension + '). Item no. ' + i + ', value: ' + value + ' [' + feature._id+ ']'; // Franz xxx
+        }
         if( (isNumber(value) && !shouldBeNumber(feature.items[i])) ||
             (!isNumber(value) && shouldBeNumber(feature.items[i])) )
-            return 'No match between sample value type and feature items type  (' + value + ' != ' +  feature.items[i].type + ')';
+            return 'No match between sample value type and feature items type  (' + value + ' not of type ' +  feature.items[i].type + '). Item no. ' + i + ', value: ' + value; // Franz xxx
     }
     return true;
 }
@@ -37,7 +41,7 @@ exports.areCoherent = function(measurement, feature) {
         //if(feature.items.length!=1 && values.length==1 && values.isMongooseArray)
         //    values = values[0];    
         if(values.length != lenght)
-            return 'No match between sample values size and feature items size  (' + values.length + ' != ' +  lenght + ')'; 
+            return 'No match between sample values size and feature items size  (' + values.length + ' != ' +  lenght + '). Item no. ' + i; //Franz XXX
         let result = areSameTypes(values, feature); 
         if(result != true) return result;
     }
