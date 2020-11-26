@@ -220,9 +220,12 @@ measurementSchema.methods.toCSV = function toCSV() {
     if(!process.env.CSVVECTORDELIMITER ) process.env.CSVVECTORDELIMITER =';' 
     let csv = '';
     this.samples.forEach(sample => {
-        sample.values.forEach(value => {
+        sample.values.forEach((value, i) => {
             if (Array.isArray(value)) value = process.env.CSVVECTORSTART + value.join(process.env.CSVVECTORDELIMITER) + process.env.CSVVECTOREND
-            csv += value + process.env.CSVDELIMITER;
+            if(i!=sample.values.length-1)
+                csv += value + process.env.CSVDELIMITER;
+            else
+                csv += value;
         });
         csv += '\n';
     });
