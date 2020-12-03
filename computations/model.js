@@ -23,10 +23,10 @@ exports.run = async function(computation, user, tenant) {
     // Added output info
     metadata['output'] = {'is_dataset_test': true, 'dataset_test_size': 0.2}
 
-    // Added webhook
+    // Added webhook info
     metadata['webhook'] = {
-        url: 'https://localhost:443/v1/computations/' + computation._id,
-        method: 'PUT'
+        url: 'https://localhost:443/v1/hooks/' + computation._id,
+        method: 'POST'
     }
 
     // Send post request to create elm model
@@ -40,8 +40,8 @@ exports.run = async function(computation, user, tenant) {
         runner.progress(computation, 25, tenant);
         await Computation.findByIdAndUpdate(computation._id, {$set: {'metadata.model_id': model_id} }, {upsert: true});
     }
-    catch{
-        runner.error(computation, "ELM not found", tenant);
+    catch(err){
+        runner.error(computation, err, tenant);
         return;
     }
 
@@ -61,8 +61,8 @@ exports.run = async function(computation, user, tenant) {
         }
         runner.progress(computation, 75, tenant);
     }
-    catch{
-        runner.error(computation, "ELM not found", tenant);
+    catch(err){
+        runner.error(computation, err, tenant);
         return;
     }
 }
@@ -76,11 +76,17 @@ exports.update = async function(computation, user, tenant){
                 runner.error(computation, '[' + body['type'] + '] ' + body['details'], tenant);
                 return;
             }
-            const result = body['result'];
+            let result = {};
+            for(const [key, value] of Object.entries(body['result'])){
+                if(typeof value == 'object')
+                    result[key] = JSON.stringify(value);
+                else
+                    result[key] = value;
+            }
             runner.complete(computation, result, tenant);
         }
-        catch{
-            runner.error(computation, "ELM not found", tenant);
+        catch(err){
+            runner.error(computation, err, tenant);
             return;
         }
     }

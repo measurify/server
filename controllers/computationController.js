@@ -32,12 +32,11 @@ exports.post = async (req, res) => {
 
 exports.put = async (req, res) => { 
     const Computation = mongoose.dbs[req.tenant._id].model('Computation');
-    const fields = ['tags','progress'];
+    const fields = ['tags'];
     let result = await checker.isAvailable(req, res, Computation); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.canModify(req, res); if (result != true) return result;
     const answer = await controller.updateResource(req, res, fields, Computation);
-    runner.update(req.result, req.user, req.tenant);
     return answer;
 };
 
@@ -46,4 +45,13 @@ exports.delete = async (req, res) => {
     let result = await checker.isAvailable(req, res, Computation); if (result != true) return result;
     result = await checker.canDelete(req, res); if (result != true) return result;
     return await controller.deleteResource(req, res, Computation);
+};
+
+exports.hook = async (req, res) => { 
+    const Computation = mongoose.dbs[req.tenant._id].model('Computation');
+    const fields = ['progress'];
+    let result = await checker.isAvailable(req, res, Computation); if (result != true) return result;
+    const answer = await controller.updateResource(req, res, fields, Computation);
+    runner.update(req.resource, req.user, req.tenant);
+    return answer;
 };
