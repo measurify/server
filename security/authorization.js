@@ -13,6 +13,11 @@ exports.isProvider = function(user) {
     else return false;
 }
 
+exports.isSupplier = function(user) {
+    if (user.type == UserRoles.supplier) return true;
+    else return false;
+}
+
 exports.isAnalyst = function(user) {
     if (user.type == UserRoles.analyst) return true;
     else return false;
@@ -46,10 +51,12 @@ exports.isNotUsed = async function(resource, model, field) {
 exports.canCreate = function(user) {
     if (this.isAdministrator(user)) return true;
     if (this.isProvider(user)) return true;
+    if (this.isSupplier(user)) return true;
     return false;
 }
 
 exports.canRead = function(resource, user) {
+    if (this.isSupplier(user)) return false;
     if (!resource.visibility) resource.visibility = VisibilityTypes.private;
     if (resource.visibility == VisibilityTypes.public) return true;
     if (this.isAdministrator(user)) return true;
@@ -66,12 +73,14 @@ exports.canModify = function(resource, user) {
 
 exports.canDelete = function(resource, user) {
     if (this.isAdministrator(user)) return true;
+    if (this.isSupplier(user)) return true;
     if (this.isProvider(user) && this.isOwner(resource, user)) return true;
     return false;
 } 
 
 exports.canDeleteList = function(user) {
     if (this.isAdministrator(user)) return true;
+    if (this.isSupplier(user)) return true;
     if (this.isProvider(user)) return true;
     if (this.isAnalyst(user)) return false;
     return false;
@@ -79,6 +88,7 @@ exports.canDeleteList = function(user) {
 
 exports.whatCanRead = function(user) {
     let result = {};
+    if (this.isSupplier(user)) result = { visibility: VisibilityTypes.public };
     if (this.isAdministrator(user)) return result;
     if (this.isAnalyst(user)) return result;
     if (this.isProvider(user)) result = { $or: [  { owner: user._id }, { visibility: VisibilityTypes.public } ] };
@@ -150,6 +160,7 @@ exports.readJustOwned = function(user) {
 
 exports.whatCanDelete = function(user) {
     if (this.isAdministrator(user)) return null;
+    if (this.isSupplier(user)) return null;
     if (this.isProvider(user)) return { owner: user._id };
     return null;
 } 
