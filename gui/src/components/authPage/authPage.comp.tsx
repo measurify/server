@@ -14,12 +14,13 @@ const AuthPageComp = ({ context }: IProps) => {
   const { location, replace } = useHistory();
   const [user, setUser] = useState<string>('');
   const [pwd, setPwd] = useState<string>('');
+  const [tenant, setTenant] = useState<string>('');
   const { activePage, error, setError, httpService, config } = context;
 
   async function submitForm(e: any) {
     e.preventDefault();
     try {
-        const credentials = { username: `${user}`, password: `${pwd}`}
+        const credentials = { username: `${user}`, password: `${pwd}`, tenant: `${tenant}`}
         const result = await httpService.fetch({
             method: 'post',
             origUrl: httpService.loginUrl,
@@ -45,6 +46,10 @@ const AuthPageComp = ({ context }: IProps) => {
     setPwd(event.target.value);
   }
 
+  function handleTenantChange(event: any) {
+    setTenant(event.target.value);
+  }
+
   return (
     <div className="auth-page">
       <form className='form-content' onSubmit={submitForm}>
@@ -55,6 +60,10 @@ const AuthPageComp = ({ context }: IProps) => {
         <div className='form-row row'>
           <label>{locale.password}</label>
           <input type="password" placeholder={locale.password_suggenstion} onChange={handlePwdChange} />
+        </div>
+        <div className='form-row row'>
+          <label>{locale.tenant}</label>
+          <input type="text" placeholder={locale.tenant_suggenstion} onChange={handleTenantChange} />
         </div>
         <div className="buttons-wrapper center">
           <Button type="submit" onClick={submitForm} color="green">{locale.submit}</Button>
