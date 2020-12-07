@@ -1,3 +1,5 @@
+
+
 process.env.ENV = 'test';
 process.env.LOG = 'false'; 
 
@@ -13,7 +15,6 @@ const UserRoles = require('../types/userRoles.js');
 const ItemTypes = require('../types/itemTypes.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
-const before = require('./before-test.js');
 
 // Test the /POST route
 describe('POST computation', () => {
@@ -193,8 +194,5 @@ describe('POST computation', () => {
         res.body.status.should.be.eql("concluded");
         res.body.results[0].value.should.be.eql(74);
         res.body.results[1].value.should.be.eql(90);
-    });
-
-    it('it should post a max computation only over filtered measurement', async () => { 
     });
 });

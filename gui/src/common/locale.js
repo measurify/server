@@ -1,8 +1,10 @@
 const locale = Object.freeze({
     username: 'Nome utente',
     password: 'Password',
+    tenant: 'Organizzazione',
     username_suggestion: 'Inserisci il nome utente',
     password_suggenstion: 'Inserisci la password',
+    tenant_suggenstion: 'Inserisci la tua organizzazione',
     submit: 'Invia',
     login_error: 'Login errata!',
     search: 'Cerca',

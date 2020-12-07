@@ -1,4 +1,6 @@
 const ItemTypes = require('../types/itemTypes.js');
+const ComputationCodeTypes = require('../types/computationCodeTypes.js');
+
 const authorizator = require('../security/authorization.js');
 
 function shouldBeNumber(item) {
@@ -51,25 +53,5 @@ exports.hasSamples = function(measurement) {
 
 exports.hasValues =  function(sample) {
     if (!sample.values || sample.values.length == 0) return false;
-    return true;
-}
-
-exports.isComputable = async function(feature, items, model) {
-    feature = await authorizator.isAvailable(feature, null, model);
-    if(!feature) return 'A computation needs an existing feature';
-    const item_names = feature.items.map(item => item.name);
-    if(items) {
-        if(!items.every(item => item_names.includes(item))) return 'A computation has to work on items contained on the feature';
-        for(let item of feature.items) { 
-            if(item_names.includes(item) && item.type!=ItemTypes.number) return 'A computation needs a numeric feature';
-            if(item_names.includes(item) && item.dimension!=0) return 'A computation is valid just on 1D feature';
-        }
-    }
-    else {
-        for(let item of feature.items) { 
-            if(item.type!=ItemTypes.number) return 'A computation needs a numeric feature';
-            if(item.dimension!=0) return 'A computation is valid just on 1D feature';
-        }
-    } 
     return true;
 }
