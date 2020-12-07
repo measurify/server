@@ -76,14 +76,14 @@ exports.update = async function(computation, user, tenant){
                 runner.error(computation, '[' + body['type'] + '] ' + body['details'], tenant);
                 return;
             }
-            let result = {};
+            let results = {};
             for(const [key, value] of Object.entries(body['result'])){
                 if(typeof value == 'object')
-                    result[key] = JSON.stringify(value);
+                    results[key] = JSON.stringify(value);
                 else
-                    result[key] = value;
+                    results[key] = value;
             }
-            runner.complete(computation, result, tenant);
+            runner.complete(computation, results, tenant);
         }
         catch(err){
             runner.error(computation, err, tenant);
