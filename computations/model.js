@@ -4,6 +4,10 @@ const elm = require('../commons/elm');
 
 
 exports.run = async function(computation, user, tenant) {
+    if(computation['tags'].length != 2) {
+        runner.error(computation, 'Computation must be two tags for classification', tenant);
+        return;
+    }
     const Computation = mongoose.dbs[tenant._id].model('Computation');
     
     const Feature = mongoose.dbs[tenant._id].model('Feature');
@@ -51,7 +55,7 @@ exports.run = async function(computation, user, tenant) {
         feature: computation.feature,
         items: computation.items,
         filter: computation.filter,
-        target: computation.target
+        tags: computation.tags
     }
     try{
         const { response, body } = await elm.putMeasurify(data, model_id);

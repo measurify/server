@@ -66,8 +66,7 @@ const computationSchema = new mongoose.Schema({
     visibility: {type: String, default: VisibilityTypes.private },
     tags: { type: [String], ref: 'Tag' },
     timestamp: {type: Date, default: Date.now, select: false },
-    lastmod: {type: Date, default: Date.now, select: false },
-    target: { type: String }
+    lastmod: {type: Date, default: Date.now, select: false }
 });
 
 computationSchema.set('toJSON', { versionKey: false });
