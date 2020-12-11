@@ -13,7 +13,7 @@ exports.get = async function(id, field, model, select) {
     catch(err) { return null; }
 };
 
-exports.getStream = function(res, filter, sort, select, restriction, model) {
+exports.getPipe = function(res, filter, sort, select, restriction, model) {
     if (!filter) filter = '{}';
     if (!sort) sort = '{ "timestamp": "desc" }';
     if (!select) select = {};
