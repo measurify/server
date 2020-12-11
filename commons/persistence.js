@@ -13,6 +13,14 @@ exports.get = async function(id, field, model, select) {
     catch(err) { return null; }
 };
 
+exports.getStream = function(res, filter, sort, select, restriction, model) {
+    if (!filter) filter = '{}';
+    if (!sort) sort = '{ "timestamp": "desc" }';
+    if (!select) select = {};
+    filter = prepareFilter(filter, restriction);
+    model.find(filter).cursor({transform: JSON.stringify}).pipe(res.type('json'));
+}
+
 exports.getSize = async function(filter, restriction, model) {
     if (!filter) filter = '{}';
     filter = prepareFilter(filter, restriction);

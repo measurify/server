@@ -15,6 +15,15 @@ exports.getResource = async function(req, res, field, model, select) {
     }
 };
 
+exports.getResourceStream = function(req, res, sort, select, model, restriction) {
+    try {
+        const query = req.query;
+        if (!query.sort) query.sort = sort;
+        persistence.getStream(res, query.filter, query.sort, select, restriction, model )
+    }
+    catch (err) { return errors.manage(res, errors.get_request_error, err); }
+}
+
 exports.getResourceList = async function(req, res, sort, select, model, restriction) {
     try {
         const query = req.query;

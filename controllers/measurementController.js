@@ -11,6 +11,14 @@ exports.get = async (req, res) => {
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Measurement, restrictions);
 };
 
+exports.stream = async (req, res) => { 
+    const select = await checker.whatCanSee(req, res, Measurement)
+    const restriction_1 = await checker.whatCanRead(req, res);
+    const restriction_2 = await checker.whichRights(req, res, Measurement);
+    const restrictions = {...restriction_1, ...restriction_2};
+    controller.getResourceStream(req, res, '{ "timestamp": "desc" }', select, Measurement, restrictions);
+};
+
 exports.count = async (req, res) => { 
     const restriction_1 = await checker.whatCanRead(req, res);
     const restriction_2 = await checker.whichRights(req, res, Measurement);
