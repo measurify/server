@@ -16,7 +16,7 @@ export default {
           display: { type: "cards"},
           pagination: { type: "buttons", source: "query", params: { page: { name: "page" } }, fields: { total: { dataPath: "totalDocs" } } },
           fields: [
-            { name: "_id", type: "test", label: "Identifier" },
+            { name: "_id", type: "text", label: "pippo" },
             { name: "visibility", type: "text", label: "Visibility" }
           ]
         },

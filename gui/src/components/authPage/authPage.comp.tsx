@@ -15,7 +15,7 @@ const AuthPageComp = ({ context }: IProps) => {
   const [user, setUser] = useState<string>('');
   const [pwd, setPwd] = useState<string>('');
   const [tenant, setTenant] = useState<string>('');
-  const { activePage, error, setError, httpService, config } = context;
+  const { setError, httpService } = context;
 
   async function submitForm(e: any) {
     e.preventDefault();

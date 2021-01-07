@@ -5,7 +5,7 @@ const locale = Object.freeze({
     username_suggestion: 'Inserisci il nome utente',
     password_suggenstion: 'Inserisci la password',
     tenant_suggenstion: 'Inserisci la tua organizzazione',
-    submit: 'Invia',
+    submit: 'Submit',
     login_error: 'Login errata!',
     search: 'Cerca',
     previous_page: 'Pagina precedente',
