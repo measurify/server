@@ -23,6 +23,8 @@ const { catchErrors } = require('../commons/errorHandlers.js');
  */
 router.get('/',  catchErrors(subscriptionController.get));
 
+router.get('/pipe',  catchErrors(subscriptionController.pipe));
+
 /**
  * @swagger
  * /scripts/{id}:

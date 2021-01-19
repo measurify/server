@@ -15,6 +15,14 @@ exports.get = async (req, res) => {
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Feature, restrictions); 
 };
 
+exports.pipe = async (req, res) => { 
+    const select = await checker.whatCanSee(req, res, Feature)
+    const restriction_1 = await checker.whatCanRead(req, res);
+    const restriction_2 = await checker.whichRights(req, res, Feature);
+    const restrictions = {...restriction_1, ...restriction_2};
+    controller.getResourcePipe(req, res, '{ "timestamp": "desc" }', select, Feature, restrictions);
+};
+
 exports.getone = async (req, res) => { 
     const select = await checker.whatCanSee(req, res, Feature)
     let result = await checker.isAvailable(req, res, Feature); if (result != true) return result;

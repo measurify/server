@@ -11,6 +11,8 @@ const { catchErrors } = require('../commons/errorHandlers.js');
  */
 router.get('/',  catchErrors(rightController.get));
 
+router.get('/pipe',  catchErrors(rightController.pipe));
+
 /**
  * @swagger
  * /rights/{id}:

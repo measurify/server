@@ -13,12 +13,13 @@ exports.get = async function(id, field, model, select) {
     catch(err) { return null; }
 };
 
-exports.getPipe = function(res, filter, sort, select, restriction, model) {
+exports.getPipe = function(req, res, filter, sort, select, restriction, model) {
     if (!filter) filter = '{}';
     if (!sort) sort = '{ "timestamp": "desc" }';
     if (!select) select = {};
     filter = prepareFilter(filter, restriction);
-    model.find(filter).cursor({transform: JSON.stringify}).pipe(res.type('json'));
+    if(req.headers.accept == 'text/csv') model.find(filter).cursor({ transform: doc => doc.toCSV() }).pipe(res.type('text/csv'));
+    else model.find(filter).cursor({transform: JSON.stringify}).pipe(res.type('json'));
 }
 
 exports.getSize = async function(filter, restriction, model) {

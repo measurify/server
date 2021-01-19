@@ -14,6 +14,12 @@ exports.get = async (req, res) => {
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Fieldmask); 
 };
 
+exports.pipe = async (req, res) => { 
+    const select = await checker.whatCanSee(req, res, Feature)
+    const result = await checker.isAdminitrator(req, res); if (result != true) return result;
+    controller.getResourcePipe(req, res, '{ "timestamp": "desc" }', select, Fieldmask);
+};
+
 exports.getone = async (req, res) => {
     const select = await checker.whatCanSee(req, res, Fieldmask)
     let result = await checker.isAvailable(req, res, Fieldmask); if (result != true) return result;

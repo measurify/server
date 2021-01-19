@@ -22,6 +22,8 @@ const { catchErrors } = require('../commons/errorHandlers.js');
  */
 router.get('/',  catchErrors(computationController.get));
 
+router.get('/pipe',  catchErrors(computationController.pipe));
+
 /**
  * @swagger
  * /computations/{id}:

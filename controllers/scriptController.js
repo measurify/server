@@ -12,6 +12,12 @@ exports.get = async (req, res) => {
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Script, restriction); 
 };
 
+exports.pipe = async (req, res) => { 
+    const select = await checker.whatCanSee(req, res, Script)
+    const restriction = await checker.whatCanRead(req, res);
+    controller.getResourcePipe(req, res, '{ "timestamp": "desc" }', select, Script, restrictions);
+};
+
 exports.getone = async (req, res) => {
     const select = await checker.whatCanSee(req, res, Script)
     let result = await checker.isAvailable(req, res, Script); if (result != true) return result;
