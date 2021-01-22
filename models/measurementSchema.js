@@ -222,18 +222,12 @@ measurementSchema.methods.toCSV = function toCSV() {
     if(!process.env.CSV_VECTOR_DELIMITER ) process.env.CSV_VECTOR_DELIMITER =';' 
     let csv = '';
     this.samples.forEach(sample => {
-<<<<<<< HEAD
-        sample.values.forEach(value => {
-            if (Array.isArray(value)) value = process.env.CSV_VECTOR_START + value.join(process.env.CSV_VECTOR_DELIMITER) + process.env.CSV_VECTOR_END;
-            csv += value + process.env.CSV_VECTOR_DELIMITER;
-=======
         sample.values.forEach((value, i) => {
-            if (Array.isArray(value)) value = process.env.CSVVECTORSTART + value.join(process.env.CSVVECTORDELIMITER) + process.env.CSVVECTOREND
+            if (Array.isArray(value)) value = process.env.CSV_VECTOR_START + value.join(process.env.CSV_VECTOR_DELIMITER) + process.env.CSV_VECTOR_END
             if(i!=sample.values.length-1)
-                csv += value + process.env.CSVDELIMITER;
+                csv += value + process.env.CSV_VECTOR_DELIMITER;
             else
                 csv += value;
->>>>>>> 93f2517a2fc030ef1c333b597476406faf01a835
         });
         csv += '\n';
     });
