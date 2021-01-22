@@ -22,6 +22,8 @@ const { catchErrors } = require('../commons/errorHandlers.js');
  */
 router.get('/',  catchErrors(constraintController.get));
 
+router.get('/pipe',  catchErrors(constraintController.pipe));
+
 /**
  * @swagger
  * /constraints/{id}:

@@ -11,6 +11,8 @@ const { catchErrors } = require('../commons/errorHandlers.js');
  */
 router.get('/',  catchErrors(fieldmaskController.get));
 
+router.get('/pipe',  catchErrors(fieldmaskController.pipe));
+
 /**
  * @swagger
  * /fieldmasks/{id}:

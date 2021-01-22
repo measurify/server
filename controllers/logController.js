@@ -10,3 +10,8 @@ exports.get = async (req, res) => {
     return await controller.getResourceList(req, res, '{ "date": "desc" }', '{}', Log); 
 };
 
+exports.pipe = async (req, res) => { 
+    const result = await checker.isAdminitrator(req, res); if (result != true) return result;
+    controller.getResourcePipe(req, res, '{ "timestamp": "desc" }', select, Log);
+};
+

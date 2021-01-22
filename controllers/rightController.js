@@ -6,6 +6,16 @@ exports.get = async (req, res) => {
     const Right = mongoose.dbs[req.tenant._id].model('Right');
     const select = await checker.whatCanSee(req, res, Right)
     const restriction = await checker.whatCanRead(req, res);
+    if (req.query.hasOwnProperty('filter') ) { // Franz
+        const json = JSON.parse(req.query.filter) 
+        if(!mongoose.Types.ObjectId.isValid(json.user)) { 
+            const user = await User.findOne({username: json.user}); 
+            if(user) {
+                json.user = user._id;
+                req.query.filter = JSON.stringify(json)
+            }
+        }
+    }
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Right, restriction);
 };
 

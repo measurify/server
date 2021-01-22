@@ -89,6 +89,8 @@ router.get('/',  catchErrors(measurementController.get));
  */
 router.get('/count',  catchErrors(measurementController.count));
 
+router.get('/pipe',  catchErrors(measurementController.pipe));
+
 /**
  * @swagger
  * /measurements/{id}:

@@ -14,6 +14,14 @@ exports.get = async (req, res) => {
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Device, restrictions); 
 };
 
+exports.pipe = async (req, res) => { 
+    const select = await checker.whatCanSee(req, res, Device)
+    const restriction_1 = await checker.whatCanRead(req, res);
+    const restriction_2 = await checker.whichRights(req, res, Device);
+    const restrictions = {...restriction_1, ...restriction_2};
+    controller.getResourcePipe(req, res, '{ "timestamp": "desc" }', select, Device, restrictions);
+};
+
 exports.getone = async (req, res) => { 
     const Device = mongoose.dbs[req.tenant._id].model('Device');
     const select = await checker.whatCanSee(req, res, Device)

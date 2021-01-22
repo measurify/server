@@ -17,6 +17,13 @@ exports.get = async (req, res) => {
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, User); 
 };
 
+
+exports.pipe = async (req, res) => { 
+    const select = await checker.whatCanSee(req, res, User)
+    const result = await checker.isAdminitrator(req, res); if (result != true) return result;
+    controller.getResourcePipe(req, res, '{ "timestamp": "desc" }', select, User);
+};
+
 exports.getusernames = async (req, res) => { 
     const User = mongoose.dbs[req.tenant._id].model('User');
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', '{ "type": "0", "_id": "0" }', User); 

@@ -13,6 +13,14 @@ exports.get = async (req, res) => {
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Tag, restrictions);
 };
 
+exports.pipe = async (req, res) => { 
+    const select = await checker.whatCanSee(req, res, Tag)
+    const restriction_1 = await checker.whatCanRead(req, res);
+    const restriction_2 = await checker.whichRights(req, res, Tag);
+    const restrictions = {...restriction_1, ...restriction_2};
+    controller.getResourcePipe(req, res, '{ "timestamp": "desc" }', select, Tag, restrictions);
+};
+
 exports.getone = async (req, res) => { 
     const Tag = mongoose.dbs[req.tenant._id].model('Tag');
     const select = await checker.whatCanSee(req, res, Tag)

@@ -11,6 +11,12 @@ exports.get = async (req, res) => {
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Script, restriction); 
 };
 
+exports.pipe = async (req, res) => { 
+    const select = await checker.whatCanSee(req, res, Script)
+    const restriction = await checker.whatCanRead(req, res);
+    controller.getResourcePipe(req, res, '{ "timestamp": "desc" }', select, Script, restrictions);
+};
+
 exports.getone = async (req, res) => {
     const Script = mongoose.dbs[req.tenant._id].model('Script');
     const select = await checker.whatCanSee(req, res, Script)

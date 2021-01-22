@@ -9,6 +9,12 @@ exports.get = async (req, res) => {
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Subscription, restriction); 
 };
 
+exports.pipe = async (req, res) => { 
+    const select = await checker.whatCanSee(req, res, Subscription)
+    const restriction = await checker.whatCanRead(req, res);
+    controller.getResourcePipe(req, res, '{ "timestamp": "desc" }', select, Subscription, restrictions);
+};
+
 exports.getone = async (req, res) => {
     const Subscription = mongoose.dbs[req.tenant._id].model('Subscription');
     const select = await checker.whatCanSee(req, res, Subscription)

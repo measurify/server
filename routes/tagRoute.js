@@ -23,6 +23,8 @@ const { catchErrors } = require('../commons/errorHandlers.js');
  */
 router.get('/',  catchErrors(tagController.get));
 
+router.get('/pipe',  catchErrors(tagController.pipe));
+
 /**
  * @swagger
  * /tags/{id}:
