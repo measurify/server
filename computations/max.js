@@ -3,7 +3,7 @@ const runner = require('../computations/runner');
 const mongoose = require('mongoose');
 
 exports.run = async function(computation, user, tenant) { 
-    const Feature = mongoose.dbs[tenant._id].model('Feature');
+    const Feature = mongoose.dbs[tenant.database].model('Feature');
     const feature = await Feature.findById(computation.feature);
     const results = [];
     for(const item of computation.items) results.push({ item: item, measurement: null, value: null });

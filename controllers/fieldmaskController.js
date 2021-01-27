@@ -6,7 +6,7 @@ const errors = require('../commons/errors.js');
 const bcrypt = require('bcryptjs');
 
 exports.get = async (req, res) => { 
-    const Fieldmask = mongoose.dbs[req.tenant._id].model('Fieldmask');
+    const Fieldmask = mongoose.dbs[req.tenant.database].model('Fieldmask');
     const select = await checker.whatCanSee(req, res, Fieldmask)
     const result = await checker.isAdminitrator(req, res); if (result != true) return result;
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Fieldmask); 
@@ -19,7 +19,7 @@ exports.pipe = async (req, res) => {
 };
 
 exports.getone = async (req, res) => {
-    const Fieldmask = mongoose.dbs[req.tenant._id].model('Fieldmask');
+    const Fieldmask = mongoose.dbs[req.tenant.database].model('Fieldmask');
     const select = await checker.whatCanSee(req, res, Fieldmask)
     let result = await checker.isAvailable(req, res, Fieldmask); if (result != true) return result;
     result = await checker.isAdminitrator(req, res); if (result != true) return result;
@@ -27,13 +27,13 @@ exports.getone = async (req, res) => {
 };
 
 exports.post = async (req, res) => {
-    const Fieldmask = mongoose.dbs[req.tenant._id].model('Fieldmask');
+    const Fieldmask = mongoose.dbs[req.tenant.database].model('Fieldmask');
     let result = await checker.isAdminitrator(req, res); if (result != true) return result;
     return await controller.postResource(req, res, Fieldmask);
 };
 
 exports.put = async (req, res) => { 
-    const Fieldmask = mongoose.dbs[req.tenant._id].model('Fieldmask');
+    const Fieldmask = mongoose.dbs[req.tenant.database].model('Fieldmask');
     const fields = ['computation_fields', 'device_fields', 'feature_fields', 'measurement_fields', 'script_fields', 'tag_fields', 'thing_fields' ];
     let result = await checker.isAdminitrator(req, res); if (result != true) return result;
     result = await checker.isAvailable(req, res, Fieldmask); if (result != true) return result;
@@ -42,8 +42,8 @@ exports.put = async (req, res) => {
 };  
 
 exports.delete = async (req, res) => {
-    const Fieldmask = mongoose.dbs[req.tenant._id].model('Fieldmask');
-    const User = mongoose.dbs[req.tenant._id].model('User');
+    const Fieldmask = mongoose.dbs[req.tenant.database].model('Fieldmask');
+    const User = mongoose.dbs[req.tenant.database].model('User');
     let result = await checker.isAvailable(req, res, Fieldmask); if (result != true) return result;
     result = await checker.isAdminitrator(req, res); if (result != true) return result;
     result = await checker.isNotUsed(req, res, User, 'fieldmask'); if (result != true) return result;

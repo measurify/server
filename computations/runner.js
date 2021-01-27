@@ -6,19 +6,19 @@ const max = require('../computations/max');
 
 exports.progress = async function(computation, percentage, tenant) {
     console.log("Computation: " + computation._id + " progress: " + percentage);
-    const Computation = mongoose.dbs[tenant._id].model('Computation');
+    const Computation = mongoose.dbs[tenant.database].model('Computation');
     await Computation.findByIdAndUpdate(computation._id, { $set: { progress: percentage } });
 }
 
 exports.error = async function(computation, message, tenant) {
     console.log("Computation: " + computation._id + " error: " + message);
-    const Computation = mongoose.dbs[tenant._id].model('Computation');
+    const Computation = mongoose.dbs[tenant.database].model('Computation');
     await Computation.findByIdAndUpdate(computation._id, { $set: { status: ComputationStatusTypes.error } });
 }
 
 exports.complete = async function(computation, results, tenant) {
     console.log("Computation: " + computation._id + " completed");
-    const Computation = mongoose.dbs[tenant._id].model('Computation');
+    const Computation = mongoose.dbs[tenant.database].model('Computation');
     await Computation.findByIdAndUpdate(computation._id, { $set: { status: ComputationStatusTypes.concluded, results: results } });
 }
 

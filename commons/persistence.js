@@ -101,7 +101,7 @@ exports.update = async function(body, fields, resource, model, tenant) {
                 // List of resources
                 let field_model = null;
                 const field_model_name = field[0].toUpperCase() + field.slice(1, -1);
-                try { if (tenant) field_model = await mongoose.dbs[tenant._id].model(field_model_name) } catch(err) {};
+                try { if (tenant) field_model = await mongoose.dbs[tenant.database].model(field_model_name) } catch(err) {};
                 if (field_model) result = await modifyResourceList(body[field], field_model, resource, field);
                 if (result == true) break;
                 else if (result) throw result;
@@ -117,7 +117,7 @@ exports.update = async function(body, fields, resource, model, tenant) {
                 // List of fields of a resource
                 let fieldlist_model = null;
                 const fieldlist_model_name = (field.charAt(0).toUpperCase() + field.slice(1)).replace('_fields','');
-                try { if (tenant) fieldlist_model = await mongoose.dbs[tenant._id].model(fieldlist_model_name) } catch(err) {};
+                try { if (tenant) fieldlist_model = await mongoose.dbs[tenant.database].model(fieldlist_model_name) } catch(err) {};
                 if (fieldlist_model) result = await modifyFieldResourceList(body[field], fieldlist_model, resource, field);
                 if (result == true) break;
                 else if (result) throw result;

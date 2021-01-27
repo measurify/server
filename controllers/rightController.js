@@ -3,7 +3,7 @@ const controller = require('./controller');
 const checker = require('./checker');
 
 exports.get = async (req, res) => { 
-    const Right = mongoose.dbs[req.tenant._id].model('Right');
+    const Right = mongoose.dbs[req.tenant.database].model('Right');
     const select = await checker.whatCanSee(req, res, Right)
     const restriction = await checker.whatCanRead(req, res);
     if (req.query.hasOwnProperty('filter') ) { // Franz
@@ -20,7 +20,7 @@ exports.get = async (req, res) => {
 };
 
 exports.getone = async (req, res) => { 
-    const Right = mongoose.dbs[req.tenant._id].model('Right');
+    const Right = mongoose.dbs[req.tenant.database].model('Right');
     const select = await checker.whatCanSee(req, res, Right);
     let result = await checker.isAvailable(req, res, Right); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
@@ -28,8 +28,8 @@ exports.getone = async (req, res) => {
 };
 
 exports.post = async (req, res) => {
-    const Right = mongoose.dbs[req.tenant._id].model('Right');
-    const User = mongoose.dbs[req.tenant._id].model('User');
+    const Right = mongoose.dbs[req.tenant.database].model('Right');
+    const User = mongoose.dbs[req.tenant.database].model('User');
     let result = await checker.canCreate(req, res); if (result != true) return result;
     if(!mongoose.Types.ObjectId.isValid(req.body.user)) { 
         const user = await User.findOne({username: req.body.user}); 
@@ -39,7 +39,7 @@ exports.post = async (req, res) => {
 };
 
 exports.put = async (req, res) => { 
-    const Right = mongoose.dbs[req.tenant._id].model('Right');
+    const Right = mongoose.dbs[req.tenant.database].model('Right');
     const fields = ['tags'];
     let result = await checker.isAvailable(req, res, Right); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
@@ -48,7 +48,7 @@ exports.put = async (req, res) => {
 }
 
 exports.delete = async (req, res) => {
-    const Right = mongoose.dbs[req.tenant._id].model('Right');
+    const Right = mongoose.dbs[req.tenant.database].model('Right');
     let result = await checker.isAvailable(req, res, Right); if (result != true) return result;
     result = await checker.canDelete(req, res); if (result != true) return result;
     return await controller.deleteResource(req, res, Right);

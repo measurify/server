@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const runner = require('../computations/runner');
 
 exports.run = async function(filter, computation, tenant) { 
-    const Measurement = mongoose.dbs[tenant].model('Measurement');
+    const Measurement = mongoose.dbs[tenant.database].model('Measurement');
     const measurements = await Measurement.paginate(filter);
     const outliers = await find(measurements.docs.map(x => ({ id:x.id, value:x.samples[0].vlues[0][0] })), computation, tenant);
     for(let i=0; i<outliers.length; i++) 

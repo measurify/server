@@ -27,7 +27,7 @@ exports.publish = function(channel, title, what) {
 
 exports.notify = async function(what, tenant) {
     if(!tenant) return; 
-    const Subscription = mongoose.dbs[tenant._id].model('Subscription');
+    const Subscription = mongoose.dbs[tenant.database].model('Subscription');
     const subscribers = await Subscription.find({$or:[{'device': what.device}, {'thing': what.thing}]});
     for (let subscriber of subscribers) {      
         const title = what.device || what.thing;

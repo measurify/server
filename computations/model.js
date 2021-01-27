@@ -10,7 +10,7 @@ const sleep = function(ms){ return new Promise(resolve=>{ setTimeout(resolve, ms
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 exports.run = async function(computation, user, tenant) { 
-    const Feature = mongoose.dbs[tenant._id].model('Feature');
+    const Feature = mongoose.dbs[tenant.database].model('Feature');
     const feature = await Feature.findById(computation.feature);
 
     const buncher = new Buncher(computation, user, runner, process.env.COMPUTATION_BUNCH_SIZE, tenant);

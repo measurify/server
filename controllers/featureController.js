@@ -5,7 +5,7 @@ const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 
 exports.get = async (req, res) => { 
-    const Feature = mongoose.dbs[req.tenant._id].model('Feature');
+    const Feature = mongoose.dbs[req.tenant.database].model('Feature');
     const select = await checker.whatCanSee(req, res, Feature)
     const restriction_1 = await checker.whatCanRead(req, res);
     const restriction_2 = await checker.whichRights(req, res, Feature);
@@ -22,7 +22,7 @@ exports.pipe = async (req, res) => {
 };
 
 exports.getone = async (req, res) => { 
-    const Feature = mongoose.dbs[req.tenant._id].model('Feature');
+    const Feature = mongoose.dbs[req.tenant.database].model('Feature');
     const select = await checker.whatCanSee(req, res, Feature)
     let result = await checker.isAvailable(req, res, Feature); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
@@ -31,14 +31,14 @@ exports.getone = async (req, res) => {
 };
 
 exports.post = async (req, res) => {
-    const Feature = mongoose.dbs[req.tenant._id].model('Feature');
+    const Feature = mongoose.dbs[req.tenant.database].model('Feature');
     let result = await checker.canCreate(req, res); if (result != true) return result;
     result = await checker.hasRightsToCreate(req, res, ['tags']); if (result != true) return result;
     return await controller.postResource(req, res, Feature);
 };
 
 exports.put = async (req, res) => { 
-    const Feature = mongoose.dbs[req.tenant._id].model('Feature');
+    const Feature = mongoose.dbs[req.tenant.database].model('Feature');
     const fields = ['tags'];
     let result = await checker.isAvailable(req, res, Feature); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
@@ -48,9 +48,9 @@ exports.put = async (req, res) => {
 }; 
 
 exports.delete = async (req, res) => {
-    const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
-    const Device = mongoose.dbs[req.tenant._id].model('Device');
-    const Feature = mongoose.dbs[req.tenant._id].model('Feature');
+    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
+    const Device = mongoose.dbs[req.tenant.database].model('Device');
+    const Feature = mongoose.dbs[req.tenant.database].model('Feature');
     let result = await checker.isAvailable(req, res, Feature); if (result != true) return result;
     result = await checker.isOwned(req, res); if (result != true) return result;
     result = await checker.isNotUsed(req, res, Measurement, 'feature'); if (result != true) return result;

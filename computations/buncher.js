@@ -12,7 +12,7 @@ function Buncher(computation, user, runner, page_size, tenant) {
     this.restriction = null;
     this.size = 0
 
-    const Measurement = mongoose.dbs[tenant._id].model('Measurement');
+    const Measurement = mongoose.dbs[tenant.database].model('Measurement');
     
     this.init = async function() {
         this.restriction = await authorization.whatCanRead(this.user);

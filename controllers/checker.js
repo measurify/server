@@ -107,7 +107,7 @@ exports.isValid = async function(req, res, type, field) {
 }
 
 exports.whatCanSee = async function(req, res, model) {
-    const Fieldmask = mongoose.dbs[req.tenant._id].model('Fieldmask');
+    const Fieldmask = mongoose.dbs[req.tenant.database].model('Fieldmask');
     let select_base  = {owner: false, timestamp: false, lastmod: false, __v:false, password:false};
     if(!req.user.fieldmask) return select_base;
     const fieldmask = await Fieldmask.findById(req.user.fieldmask);
@@ -119,7 +119,7 @@ exports.whatCanSee = async function(req, res, model) {
 }
 
 exports.whichRights = async function(req, res, model) {
-    const Right = mongoose.dbs[req.tenant._id].model('Right');
+    const Right = mongoose.dbs[req.tenant.database].model('Right');
     if(model.modelName == "Measurement") {
         const rights = await Right.find({user: req.user._id});
         return authorizator.whichRights(req.user, rights, 'type');
@@ -133,7 +133,7 @@ exports.whichRights = async function(req, res, model) {
 } 
 
 exports.hasRights = async function(req, res, model) {
-    const Right = mongoose.dbs[req.tenant._id].model('Right');
+    const Right = mongoose.dbs[req.tenant.database].model('Right');
     const item = await authorizator.isAvailable(req.params.id, null, model);
     if(model.modelName == "Measurement") {
         const rights = await Right.find({user: req.user._id});
@@ -150,7 +150,7 @@ exports.hasRights = async function(req, res, model) {
 } 
 
 exports.hasRightsToCreate = async function(req, res, fields) {
-    const Right = mongoose.dbs[req.tenant._id].model('Right');
+    const Right = mongoose.dbs[req.tenant.database].model('Right');
     const rights = await Right.find({user: req.user._id});
     if(!authorizator.hasRightsToCreate(req.user, rights, req.body, fields)) return errors.manage(res, errors.restricted_access, 'You miss rigths on some resources');
     return true;

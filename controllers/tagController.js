@@ -5,7 +5,7 @@ const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 
 exports.get = async (req, res) => { 
-    const Tag = mongoose.dbs[req.tenant._id].model('Tag');
+    const Tag = mongoose.dbs[req.tenant.database].model('Tag');
     const select = await checker.whatCanSee(req, res, Tag)
     const restriction_1 = await checker.whatCanRead(req, res);
     const restriction_2 = await checker.whichRights(req, res, Tag);
@@ -22,7 +22,7 @@ exports.pipe = async (req, res) => {
 };
 
 exports.getone = async (req, res) => { 
-    const Tag = mongoose.dbs[req.tenant._id].model('Tag');
+    const Tag = mongoose.dbs[req.tenant.database].model('Tag');
     const select = await checker.whatCanSee(req, res, Tag)
     let result = await checker.isAvailable(req, res, Tag); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
@@ -31,14 +31,14 @@ exports.getone = async (req, res) => {
 };
 
 exports.post = async (req, res) => {
-    const Tag = mongoose.dbs[req.tenant._id].model('Tag');
+    const Tag = mongoose.dbs[req.tenant.database].model('Tag');
     let result = await checker.canCreate(req, res); if (result != true) return result;
     result = await checker.hasRightsToCreate(req, res, ['tags']); if (result != true) return result;
     return await controller.postResource(req, res, Tag);
 };
 
 exports.put = async (req, res) => { 
-    const Tag = mongoose.dbs[req.tenant._id].model('Tag');
+    const Tag = mongoose.dbs[req.tenant.database].model('Tag');
     const fields = ['tags'];
     let result = await checker.isAvailable(req, res, Tag); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
@@ -48,11 +48,11 @@ exports.put = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
-    const Device = mongoose.dbs[req.tenant._id].model('Device');
-    const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
-    const Feature = mongoose.dbs[req.tenant._id].model('Feature');
-    const Thing = mongoose.dbs[req.tenant._id].model('Thing');
-    const Tag = mongoose.dbs[req.tenant._id].model('Tag');
+    const Device = mongoose.dbs[req.tenant.database].model('Device');
+    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
+    const Feature = mongoose.dbs[req.tenant.database].model('Feature');
+    const Thing = mongoose.dbs[req.tenant.database].model('Thing');
+    const Tag = mongoose.dbs[req.tenant.database].model('Tag');
     let result = await checker.isAvailable(req, res, Tag); if (result != true) return result;
     result = await checker.isNotUsed(req, res, Device, 'tags'); if (result != true) return result;
     result = await checker.isNotUsed(req, res, Measurement, 'tags'); if (result != true) return result;

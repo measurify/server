@@ -48,6 +48,7 @@ mongoose.Promise = global.Promise;
 
 const tenantSchema = new mongoose.Schema({
     _id: { type: String, required: "Please, supply a valid name" },
+    database: { type: String },
     organization: { type: String },
     address: { type: String },
     email: { type: String },

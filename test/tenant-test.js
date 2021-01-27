@@ -57,6 +57,7 @@ describe('/GET tenant', () => {
 
 // Test the /POST route
 describe('/POST tenant', () => {
+    
     it('it should not POST a tenant without _id field', async () => {      
         const tenant = {}
         const res = await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", process.env.API_TOKEN).send(tenant);
@@ -85,6 +86,7 @@ describe('/POST tenant', () => {
         res.body.message.should.be.eql(errors.post_request_error.message);
         res.body.details.should.contain('duplicate key error');
     });
+
     it('it should POST a list of tenant', async () => {
         const tenants = [{ _id: "test-tenant-5" },
                          { _id: "test-tenant-6" }];
@@ -129,6 +131,26 @@ describe('/POST tenant', () => {
         const res = await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", "fake-token").send(tenant);
         res.should.have.status(errors.authentication_error.status);
     });
+
+    it('it should login to a new not-hashed tenant', async () => {
+        const tenant = { _id: "test-tenant-343242", database: "db-test-1", passwordhash: "false", admin_username: "test-username-1", admin_password: "test-password-1", }
+        let res = await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", process.env.API_TOKEN).send(tenant);
+        const request = { username: "test-username-1", password: "test-password-1", tenant: "test-tenant-343242" };
+        res = await chai.request(server).keepOpen().post('/v1/login').send(request);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('token');
+    });
+
+    it('it should login to a new hashed tenant', async () => {
+        const tenant = { _id: "test-tenant-343243", database: "db-test-343243", passwordhash: "true", admin_username: "test-username-1", admin_password: "test-password-1", }
+        let res = await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", process.env.API_TOKEN).send(tenant);
+        const request = { username: "test-username-1", password: "test-password-1", tenant: "test-tenant-343243" };
+        res = await chai.request(server).keepOpen().post('/v1/login').send(request);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('token');
+    });
 });
 
 // Test the /DELETE route
@@ -136,24 +158,24 @@ describe('/DELETE tenant', () => {
     it('it should DELETE a tenant', async () => {
         const tenant = await factory.createTenant("test-tenant-200", "organization-test-1", "test street", "test@email", "433232", "test", "test");
         const tenants_before = await before.Tenant.find();
-        tenants_before.length.should.be.eql(13);
+        tenants_before.length.should.be.eql(15);
         const res = await chai.request(server).keepOpen().delete('/v1/tenants/' + tenant._id).set("Authorization", process.env.API_TOKEN);
         res.should.have.status(200);
         res.body.should.be.a('object');
         const tenants_after = await before.Tenant.find();
-        tenants_after.length.should.be.eql(12);
+        tenants_after.length.should.be.eql(14);
     });
 
     it('it should not DELETE a fake tenant', async () => {
         const tenant = await factory.createTenant("test-tenant-200", "organization-test-1", "test street", "test@email", "433232", "test", "test");
         const tenants_before = await before.Tenant.find();
-        tenants_before.length.should.be.eql(13);
+        tenants_before.length.should.be.eql(15);
         const res = await chai.request(server).keepOpen().delete('/v1/tenants/fake_tenant').set("Authorization", process.env.API_TOKEN);
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
         const tenants_after = await before.Tenant.find();
-        tenants_after.length.should.be.eql(13);
+        tenants_after.length.should.be.eql(15);
     });
 
     it('it should not DELETE a tenant without API token', async () => {

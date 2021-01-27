@@ -21,14 +21,14 @@ passport.use(new strategy_local({
             const tenant = await Tenant.findById(req.body.tenant);
             if (!tenant) return done(null, false, 'Incorrect tenant');
             req.tenant = tenant;
-            const User = mongoose.dbs[tenant._id].model('User');
+            const User = mongoose.dbs[tenant.database].model('User');
             const user = await User.findOne({username: username}).select('+password');
             if (!user) return done(null, false, 'Incorrect username or password');
             if(user.status && user.status != UserStatusTypes.enabled) return done(null, false, 'user not enabled');
             let result = false;
             if(req.tenant.passwordhash == true || req.tenant.passwordhash == 'true') result = bcrypt.compareSync(password, user._doc.password);
             else if(password == user._doc.password) result = true; 
-            if (!result) return done(null, false, 'Incorrect username or password');
+            if (result == false) return done(null, false, 'Incorrect username or password');
             return done(null, user, 'Logged Successfully');
         }
         catch(error) { 
@@ -54,7 +54,7 @@ passport.use('jwt-token', new custom_strategy(
         try { 
             token = token.replace('JWT ', '');
             const info = jwt.verify(token, process.env.JWT_SECRET);
-            const User = mongoose.dbs[info.tenant._id].model('User');
+            const User = mongoose.dbs[info.tenant.database].model('User');
             const user = await User.findById(info.user._id);
             if (!user) return done(null, false, "Missing user");
             req.tenant = info.tenant;
@@ -85,7 +85,7 @@ exports.info = async function(token) {
     let decoded = null;
     try { decoded = jwt.verify(token,process.env.JWT_SECRET); } 
     catch (err) { return false; }
-    const User = mongoose.dbs[decoded.tenant._id].model('User');
+    const User = mongoose.dbs[decoded.tenant.database].model('User');
     info.user = await User.findById(decoded.user._id);
     info.tenant = decoded.tenant;
     return info;

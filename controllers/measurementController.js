@@ -4,7 +4,7 @@ const checker = require('./checker');
 const filemanager = require('../commons/filemanager');
 
 exports.get = async (req, res) => { 
-    const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
+    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
     const select = await checker.whatCanSee(req, res, Measurement)
     const restriction_1 = await checker.whatCanRead(req, res);
     const restriction_2 = await checker.whichRights(req, res, Measurement);
@@ -21,7 +21,7 @@ exports.pipe = async (req, res) => {
 };
 
 exports.count = async (req, res) => { 
-    const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
+    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
     const restriction_1 = await checker.whatCanRead(req, res);
     const restriction_2 = await checker.whichRights(req, res, Measurement);
     const restrictions = {...restriction_1, ...restriction_2};
@@ -29,7 +29,7 @@ exports.count = async (req, res) => {
 };
 
 exports.getone = async (req, res) => { 
-    const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
+    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
     const select = await checker.whatCanSee(req, res, Measurement)
     let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
@@ -38,7 +38,7 @@ exports.getone = async (req, res) => {
 };
 
 exports.post = async (req, res) => {
-    const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
+    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
     let result = await checker.canCreate(req, res); if (result != true) return result;
     result = await checker.hasRightsToCreate(req, res, ['thing','device', 'feature', 'tags']); if (result != true) return result;
     return await controller.postResource(req, res, Measurement);
@@ -46,7 +46,7 @@ exports.post = async (req, res) => {
 
 
 exports.put = async (req, res) => { 
-    const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
+    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
     const fields = ['tags'];
     let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
@@ -56,7 +56,7 @@ exports.put = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
-    const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
+    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
     const result = await checker.canDeleteList(req, res); if (result != true) return result;
     const restriction_1 = await checker.whatCanDelete(req, res);
     const restriction_2 = await checker.whichRights(req, res, Measurement);
@@ -65,7 +65,7 @@ exports.delete = async (req, res) => {
 };
 
 exports.deleteone = async (req, res) => {
-    const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
+    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
     let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
     result = await checker.canDelete(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Measurement); if (result != true) return result;
@@ -73,7 +73,7 @@ exports.deleteone = async (req, res) => {
 } 
 
 exports.getstream = async (ws, req) => { 
-    const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
+    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
     let result = await checker.isAvailable(req, ws, Measurement); if (result != true) return result;
     result = await checker.canRead(req, ws); if (result != true) return result;
     result = await checker.hasRights(req, ws, Measurement); if (result != true) return result;
@@ -81,7 +81,7 @@ exports.getstream = async (ws, req) => {
 };
 
 exports.getfile = async (req, res) => {
-    const Measurement = mongoose.dbs[req.tenant._id].model('Measurement');
+    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
     let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
     result = await checker.canDelete(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Measurement); if (result != true) return result;

@@ -20,7 +20,7 @@ exports.dropContents = async function(tenant){
     try{
         const Tenant = mongoose.dbs['catalog'].model('Tenant');  
         if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-        for (let collection in mongoose.dbs[tenant._id].collections) { await mongoose.dbs[tenant._id].collections[collection].deleteMany(); };  
+        for (let collection in mongoose.dbs[tenant.database].collections) { await mongoose.dbs[tenant.database].collections[collection].deleteMany(); };  
         tenancy.init(tenant);
     }
     catch (error) { console.log('Error in dropping databae ' + tenant + '('+ error + ')')} 
@@ -29,7 +29,7 @@ exports.dropContents = async function(tenant){
 exports.getAdminToken = async function(tenant) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-    const User = mongoose.dbs[tenant._id].model('User');
+    const User = mongoose.dbs[tenant.database].model('User');
     const admin = await User.findOne({ username: process.env.DEFAULT_TENANT_ADMIN_USERNAME });
     return authentication.encode(admin, tenant);
 };
@@ -46,6 +46,7 @@ exports.createTenant = async function(id, organization, address, email, phone, a
     if(!tenant) {
         const req = { 
             _id: id || uuid(),
+            database: id,
             organization: organization ||  uuid(),
             address: address,
             email: email,
@@ -64,7 +65,7 @@ exports.createUser = async function(username, password, type, fieldmask, email, 
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
     if(tenant.passwordhash == true || tenant.passwordhash == 'true') { password = bcrypt.hashSync(password, 8); }
-    const User = mongoose.dbs[tenant._id].model('User');
+    const User = mongoose.dbs[tenant.database].model('User');
     let user = await User.findOne( { username: username });
     if(!user) {
         const req = { 
@@ -92,7 +93,7 @@ exports.createSample = function (value, delta) {
 exports.createTag = async function(name, owner, tags, visibility, tenant) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-    const Tag = mongoose.dbs[tenant._id].model('Tag');
+    const Tag = mongoose.dbs[tenant.database].model('Tag');
     let tag = await Tag.findOne( { _id: name });
     if(!tag) {
         const req = { _id: name , owner: owner, tags: tags, visibility: visibility }
@@ -105,7 +106,7 @@ exports.createTag = async function(name, owner, tags, visibility, tenant) {
 exports.createFeature = async function(name, owner, items, tags, visibility, tenant) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-    const Feature = mongoose.dbs[tenant._id].model('Feature');
+    const Feature = mongoose.dbs[tenant.database].model('Feature');
     const req = { 
         _id: name,
         owner: owner,
@@ -121,7 +122,7 @@ exports.createFeature = async function(name, owner, items, tags, visibility, ten
 exports.createDevice = async function(name, owner, features, tags, scripts, visibility, tenant) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-    const Device = mongoose.dbs[tenant._id].model('Device');
+    const Device = mongoose.dbs[tenant.database].model('Device');
     const req = { 
         _id: name,
         owner: owner,
@@ -138,7 +139,7 @@ exports.createDevice = async function(name, owner, features, tags, scripts, visi
 exports.createIssue = async function(owner, device, date, message, type, tenant) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-    const Issue = mongoose.dbs[tenant._id].model('Issue');
+    const Issue = mongoose.dbs[tenant.database].model('Issue');
     const req = { 
         owner: owner,
         device: device,
@@ -155,7 +156,7 @@ exports.createIssue = async function(owner, device, date, message, type, tenant)
 exports.createConstraint = async function(owner, type1, type2, element1, element2, relationship, visibility, tags, tenant) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-    const Constraint = mongoose.dbs[tenant._id].model('Constraint');
+    const Constraint = mongoose.dbs[tenant.database].model('Constraint');
     const req = { 
         owner: owner,
         type1: type1,
@@ -174,7 +175,7 @@ exports.createConstraint = async function(owner, type1, type2, element1, element
 exports.createThing = async function(name, owner, tags, metadata, relations, visibility, tenant) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-    const Thing = mongoose.dbs[tenant._id].model('Thing');
+    const Thing = mongoose.dbs[tenant.database].model('Thing');
     const req = { 
         _id: name,
         owner: owner,
@@ -191,7 +192,7 @@ exports.createThing = async function(name, owner, tags, metadata, relations, vis
 exports.createScript = async function(name, owner, code, tags, visibility, tenant) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-    const Script = mongoose.dbs[tenant._id].model('Script');
+    const Script = mongoose.dbs[tenant.database].model('Script');
     const req = { 
         _id: name,
         owner: owner,
@@ -207,7 +208,7 @@ exports.createScript = async function(name, owner, code, tags, visibility, tenan
 exports.createSubscription = async function(token, owner, device, thing, tags, tenant) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-    const Subscription = mongoose.dbs[tenant._id].model('Subscription');
+    const Subscription = mongoose.dbs[tenant.database].model('Subscription');
     const req = { 
         token: token,
         owner: owner,
@@ -223,7 +224,7 @@ exports.createSubscription = async function(token, owner, device, thing, tags, t
 exports.createRight = async function(resource, type, user, owner, tags, tenant) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-    const Right = mongoose.dbs[tenant._id].model('Right');
+    const Right = mongoose.dbs[tenant.database].model('Right');
     const req = { 
         resource: resource,
         type: type,
@@ -239,7 +240,7 @@ exports.createRight = async function(resource, type, user, owner, tags, tenant) 
 exports.createReset = async function(user, tenant) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-    const PasswordReset = mongoose.dbs[tenant._id].model('PasswordReset');
+    const PasswordReset = mongoose.dbs[tenant.database].model('PasswordReset');
     const req = { user: user._id, status: PasswordResetStatusTypes.valid , created: Date.now() };
     const reset = new PasswordReset(req);
     await reset.save();
@@ -249,7 +250,7 @@ exports.createReset = async function(user, tenant) {
 exports.createFieldmask = async function(name, computation_fields, device_fields, feature_fields, measurement_fields, script_fields, tag_fields, thing_fields, owner, tenant) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-    const Fieldmask = mongoose.dbs[tenant._id].model('Fieldmask');
+    const Fieldmask = mongoose.dbs[tenant.database].model('Fieldmask');
     const req = { 
         _id: name,
         computation_fields: computation_fields,
@@ -269,7 +270,7 @@ exports.createFieldmask = async function(name, computation_fields, device_fields
 exports.createMeasurement = async function(owner, feature, device, thing, tags, samples, startdate, enddate, location, visibility, tenant) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-    const Measurement = mongoose.dbs[tenant._id].model('Measurement');
+    const Measurement = mongoose.dbs[tenant.database].model('Measurement');
     const req = {
         owner: owner,
         startDate: startdate || Date.now(),
@@ -290,7 +291,7 @@ exports.createMeasurement = async function(owner, feature, device, thing, tags, 
 exports.createComputation = async function(id, owner, code, feature, items, filter, tags, features, tenant) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-    const Computation = mongoose.dbs[tenant._id].model('Computation');
+    const Computation = mongoose.dbs[tenant.database].model('Computation');
     const req = { 
         _id: id,
         owner: owner,
