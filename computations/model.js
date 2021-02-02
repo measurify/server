@@ -4,18 +4,14 @@ const elm = require('../commons/elm');
 
 
 exports.run = async function(computation, user, tenant) {
-    if(computation['tags'].length != 2) {
-        runner.error(computation, 'Computation must be two tags for classification', tenant);
-        return;
-    }
+    if(computation['tags'].length != 2) { runner.error(computation, 'Computation must have two tags for classification', tenant); return; }
     const Computation = mongoose.dbs[tenant._id].model('Computation');
     
     const Feature = mongoose.dbs[tenant._id].model('Feature');
     const feature = await Feature.findById(computation.feature);
 
     let metadata = {};
-    let target = computation.target;
-    if(!target) target = computation.items[computation.items.length-1]; // default
+    let target = computation.target; if(!target) target = computation.items[computation.items.length-1]; // default
     let model_id = null;
 
     // Get info about the ELM model from "metadata" field of the measurement
@@ -25,13 +21,10 @@ exports.run = async function(computation, user, tenant) {
     });
 
     // Added output info
-    metadata['output'] = {'is_dataset_test': true, 'dataset_test_size': 0.2}
+    metadata['output'] = { 'is_dataset_test': true, 'dataset_test_size': 0.2 }
 
     // Added webhook info
-    metadata['webhook'] = {
-        url: 'https://localhost:443/v1/hooks/' + computation._id,
-        method: 'POST'
-    }
+    metadata['webhook'] = { url: 'https://localhost:443/v1/hooks/' + computation._id, method: 'POST' }
 
     // Send post request to create elm model
     try{
