@@ -151,6 +151,20 @@ describe('/POST tenant', () => {
         res.body.should.be.a('object');
         res.body.should.have.property('token');
     });
+
+    it('it should login as a new tenant user (password hashed)', async () => {
+        const tenant = { _id: "test-tenant-8747392", passwordhash: "true", admin_username: "test-username-1", admin_password: "test-password-1" }
+        let res = await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", process.env.API_TOKEN).send(tenant);
+        const admin_login_request = {username: "test-username-1", password: "test-password-1", tenant:"test-tenant-8747392"};
+        const token = (await chai.request(server).keepOpen().post('/v1/login').send(admin_login_request)).body.token;
+        const user_request = { username: "test-username-2", password: "test-password-2", type: UserRoles.analyst };
+        res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', token).send(user_request);
+        const user_login_request = { username: "test-username-2", password: "test-password-2", tenant: "test-tenant-8747392" };
+        res = await chai.request(server).keepOpen().post('/v1/login').send(user_login_request);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('token');
+    });
 });
 
 // Test the /DELETE route
@@ -158,24 +172,24 @@ describe('/DELETE tenant', () => {
     it('it should DELETE a tenant', async () => {
         const tenant = await factory.createTenant("test-tenant-200", "organization-test-1", "test street", "test@email", "433232", "test", "test");
         const tenants_before = await before.Tenant.find();
-        tenants_before.length.should.be.eql(15);
+        tenants_before.length.should.be.eql(16);
         const res = await chai.request(server).keepOpen().delete('/v1/tenants/' + tenant._id).set("Authorization", process.env.API_TOKEN);
         res.should.have.status(200);
         res.body.should.be.a('object');
         const tenants_after = await before.Tenant.find();
-        tenants_after.length.should.be.eql(14);
+        tenants_after.length.should.be.eql(15);
     });
 
     it('it should not DELETE a fake tenant', async () => {
         const tenant = await factory.createTenant("test-tenant-200", "organization-test-1", "test street", "test@email", "433232", "test", "test");
         const tenants_before = await before.Tenant.find();
-        tenants_before.length.should.be.eql(15);
+        tenants_before.length.should.be.eql(16);
         const res = await chai.request(server).keepOpen().delete('/v1/tenants/fake_tenant').set("Authorization", process.env.API_TOKEN);
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
         const tenants_after = await before.Tenant.find();
-        tenants_after.length.should.be.eql(15);
+        tenants_after.length.should.be.eql(16);
     });
 
     it('it should not DELETE a tenant without API token', async () => {

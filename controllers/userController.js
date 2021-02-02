@@ -40,7 +40,7 @@ exports.getone = async (req, res) => {
 exports.post = async (req, res) => {
     const User = mongoose.dbs[req.tenant.database].model('User');
     let result = await checker.isAdminitrator(req, res); if (result != true) return result;
-    if(req.tenant.passwordhash == 'true') req.password = bcrypt.hashSync(req.password, 8); 
+    if(req.body.password) if(req.tenant.passwordhash == true) req.body.password = bcrypt.hashSync(req.body.password, 8); 
     return await controller.postResource(req, res, User);
 };
 
