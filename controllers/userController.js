@@ -17,7 +17,6 @@ exports.get = async (req, res) => {
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, User); 
 };
 
-
 exports.pipe = async (req, res) => { 
     const select = await checker.whatCanSee(req, res, User)
     const result = await checker.isAdminitrator(req, res); if (result != true) return result;
@@ -40,7 +39,6 @@ exports.getone = async (req, res) => {
 exports.post = async (req, res) => {
     const User = mongoose.dbs[req.tenant.database].model('User');
     let result = await checker.isAdminitrator(req, res); if (result != true) return result;
-    if(req.body.password) if(req.tenant.passwordhash == true) req.body.password = bcrypt.hashSync(req.body.password, 8); 
     return await controller.postResource(req, res, User);
 };
 
@@ -51,7 +49,6 @@ exports.put = async (req, res) => {
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.isValid(req, res, UserStatusTypes, 'status'); if (result != true) return result;
     result = await checker.isHim(req, res); if (result != true) return result; 
-    if(req.body.password) if(req.tenant.passwordhash == 'true') req.body.password = bcrypt.hashSync(req.body.password, 8); 
     return await controller.updateResource(req, res, fields, User);
 };  
 
@@ -80,6 +77,7 @@ exports.self = async (req, res) => {
     const User = mongoose.dbs[tenant.database].model('User');
     req.body.status = UserStatusTypes.disabled;
     if(!req.body.email) return errors.manage(res, errors.missing_email);
+    if(req.body.password) if(tenant.passwordhash == 'true') req.body.password = bcrypt.hashSync(req.body.password, 8);
     let user=null;
     try { user = await (new User(req.body)).save()}
     catch (err) { return errors.manage(res, errors.post_request_error, err); }

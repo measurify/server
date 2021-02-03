@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const broker = require('../commons/broker');
 const tenancy = require('../commons/tenancy.js');
 const factory = require('../commons/factory.js');
+const bcrypt = require('bcryptjs');
 
 exports.get = async function(id, field, model, select) {
     try {
@@ -49,6 +50,7 @@ exports.getList = async function(filter, sort, select, page, limit, restriction,
 }
 
 const postOne = async function(body, model, tenant) {
+    if(body.password) if(tenant.passwordhash == true) body.password = bcrypt.hashSync(body.password, 8);
     const resource = await (new model(body)).save();
     if(model.modelName == 'Measurement') {
         broker.publish('device-' + body.device, body.device, body);
@@ -65,6 +67,7 @@ const postList = async function(body, model, tenant) {
     for (let [i, element] of body.entries()) {
         try {
             element.owner = body.owner;
+            if(element.password) if(tenant.passwordhash == true) element.password = bcrypt.hashSync(element.password, 8);
             const resource = await (new model(element)).save()
             if(model.modelName == "Measurement") {
                 broker.publish('device-' + resource.device, resource);
@@ -93,8 +96,11 @@ exports.delete = async function(id, model) {
 exports.update = async function(body, fields, resource, model, tenant) {
     for (let field in body) if(!fields.includes(field)) throw 'Request field cannot be updated (' + field + ')';
     for (let field of fields) {
-        if (typeof body[field] != 'object') { resource[field] = body[field]; continue; }
-        if (typeof body[field] == 'object') {
+        if (typeof body[field] != 'object' && body[field]) { 
+            if(field == 'password') if(tenant.passwordhash == true) body[field] = bcrypt.hashSync(body[field], 8);
+            resource[field] = body[field]; continue; 
+        }
+        if (typeof body[field] == 'object' && body[field]) {
             do {
                 let result = null;
 

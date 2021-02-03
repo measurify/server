@@ -165,6 +165,40 @@ describe('/POST tenant', () => {
         res.body.should.be.a('object');
         res.body.should.have.property('token');
     });
+
+    it('it should login as a new tenant user (password hashed) created from a list', async () => {
+        const tenant = { _id: "test-tenant-8747392", passwordhash: "true", admin_username: "test-username-1", admin_password: "test-password-1" }
+        let res = await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", process.env.API_TOKEN).send(tenant);
+        const admin_login_request = {username: "test-username-1", password: "test-password-1", tenant:"test-tenant-8747392"};
+        const token = (await chai.request(server).keepOpen().post('/v1/login').send(admin_login_request)).body.token;
+        const user_request = [ { username : "test-username-4", password : "test-password-4", type: UserRoles.analyst }, 
+                               { username : "test-username-5", password : "test-password-5", type: UserRoles.analyst } ]; 
+        res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', token).send(user_request);
+        const user_login_request = { username: "test-username-5", password: "test-password-5", tenant: "test-tenant-8747392" };
+        res = await chai.request(server).keepOpen().post('/v1/login').send(user_login_request);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('token');
+    });
+
+    it('it should login as a tenant user (password hashed) that modify his password', async () => {
+        const tenant = { _id: "test-tenant-8747392", passwordhash: "true", admin_username: "test-username-1", admin_password: "test-password-1" }
+        let res = await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", process.env.API_TOKEN).send(tenant);
+        const admin_login_request = {username: "test-username-1", password: "test-password-1", tenant:"test-tenant-8747392"};
+        const token = (await chai.request(server).keepOpen().post('/v1/login').send(admin_login_request)).body.token;
+        const user_request = { username: "test-username-6", password: "test-password-6", type: UserRoles.analyst };
+        res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', token).send(user_request);
+        const user_id = res.body._id;
+        const user_login_request = { username: "test-username-6", password: "test-password-6", tenant: "test-tenant-8747392" };
+        res = await chai.request(server).keepOpen().post('/v1/login').send(user_login_request);
+        const modification_requues = { password: 'new_password' };
+        res = await chai.request(server).keepOpen().put('/v1/users/' + user_id).set("Authorization", res.body.token).send(modification_requues);
+        const user_login_request_new = { username: "test-username-6", password: "new_password", tenant: "test-tenant-8747392" };
+        res = await chai.request(server).keepOpen().post('/v1/login').send(user_login_request_new);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('token');
+    });
 });
 
 // Test the /DELETE route

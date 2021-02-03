@@ -23,7 +23,6 @@ passport.use(new strategy_local({
             req.tenant = tenant;
             const User = mongoose.dbs[tenant.database].model('User');
             const user = await User.findOne({username: username}).select('+password');
-            console.log(username)
             if (!user) return done(null, false, 'Incorrect username or password');
             if(user.status && user.status != UserStatusTypes.enabled) return done(null, false, 'user not enabled');
             let result = false;
