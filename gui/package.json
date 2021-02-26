@@ -22,7 +22,8 @@
     "typescript": "^3.7.4"
   },
   "scripts": {
-    "build": "react-scripts build && cp -r ./build/* ../public/"
+    "build-mac": "react-scripts build && cp -r ./build/* ../public/",
+    "build-win": "react-scripts build && (robocopy build/ ../public/ /Mir) ^& IF %ERRORLEVEL% LSS 8 SET ERRORLEVEL=0"
   },
   "eslintConfig": {
     "extends": "react-app"

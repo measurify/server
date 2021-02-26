@@ -5,7 +5,7 @@ const locale = Object.freeze({
     username_suggestion: 'Inserisci il nome utente',
     password_suggenstion: 'Inserisci la password',
     tenant_suggenstion: 'Inserisci la tua organizzazione',
-    submit: 'Submit',
+    submit: 'Invio',
     login_error: 'Login errata!',
     search: 'Cerca',
     previous_page: 'Pagina precedente',
@@ -14,7 +14,10 @@ const locale = Object.freeze({
     out_of: "di",
     items: "totali",
     nothing_to_see: "Nessun risultato",
-    enter_text: "inserisci testo"
+    enter_text: "inserisci testo",
+    next : "Successivo",
+    previous : "Precedente"
+
 });
 
 module.exports = locale;

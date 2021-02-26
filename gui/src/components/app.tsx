@@ -116,6 +116,7 @@ function App() {
         <div className="app-error">
           {firstLoad ? 'Loading Configuration...' : 'Could not find config file.'}
         </div> :
+        
         <AppContext.Provider value={{ config, activePage, setActivePage, error, setError, httpService }}>
           {
             config.customStyles &&
@@ -124,6 +125,7 @@ function App() {
             />
           }
           <Router>
+          
             <aside>
               <h1 title={appName} onClick={() => scrollToTop()}>{appName}</h1>
               {
@@ -137,14 +139,17 @@ function App() {
                 <Route exact path="/:page" component={Page} />
                 <Redirect path="/" to={`/${config?.pages?.[0]?.id || '1'}`} />
               </Switch>
+               
             }
             <ToastContainer
               position={toast.POSITION.TOP_CENTER}
               autoClose={4000}
               draggable={false}
             />
+            
           </Router>
         </AppContext.Provider>
+        
       }
     </div>
   );

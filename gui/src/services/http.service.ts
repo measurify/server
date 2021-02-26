@@ -65,11 +65,16 @@ class HttpService {
       if (param.name === 'page') { page = param.value; continue; }
       if (param.name === 'info') value = '{"$regex":"' + param.value + '","$options":"i"}';
       else value = '"' + param.value + '"';
-      params.push(`"${param.name}":${value || ''}`);
+      //test regex
+      params.push(`"${param.name}":{"$regex" : ${value || ''}}`);
+      //params.push(`"${param.name}":${value || ''}`);
+
     }
 
     outputUrl += '?filter={' + params.join(',') + '}';
-    if(page != '-1') outputUrl += "&page" + page;
+    if(page != '-1') outputUrl += "&page=" + page;
+
+    console.log("Requested URL : "+outputUrl);
 
     return outputUrl;
   }

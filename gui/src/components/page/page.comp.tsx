@@ -121,7 +121,7 @@ const buildInitQueryParamsAndPaginationState = (
 };
 
 const PageComp = ({ context }: IProps) => {
-  const { page } = useParams();
+  const { page } : any = useParams();
   const { push, location } = useHistory();
   const { activePage, error, setError, httpService, config } = context;
   const pageHeaders: any = activePage?.requestHeaders || {};
@@ -235,6 +235,8 @@ const PageComp = ({ context }: IProps) => {
     dataTransform: any,
     sortBy: any
   }) {
+
+
     const result = await httpService.fetch({
       method: params.actualMethod || 'get',
       origUrl: params.url,
@@ -471,18 +473,18 @@ const PageComp = ({ context }: IProps) => {
       const newState: IBodyPaginationState = pagination ? pagination : {
         source: 'body',
         type: paginationConfig.type,
-        next: result[paginationConfig.params.nextPath || 'next'],
-        previous: result[paginationConfig.params.prevPath || 'previous'],
-        hasNextPage: !!result[paginationConfig.params.nextPath || 'next'],
-        hasPreviousPage: !!result[paginationConfig.params.prevPath || 'previous'],
+        next: result[paginationConfig.params.nextPath || locale.next],
+        previous: result[paginationConfig.params.prevPath || locale.previous],
+        hasNextPage: !!result[paginationConfig.params.nextPath || locale.next],
+        hasPreviousPage: !!result[paginationConfig.params.prevPath || locale.previous],
         limit: parseInt(paginationConfig.params?.limit?.value || '10'),
         total: result[paginationConfig.params.countPath || 'count']
       };
       if(result) {
-        newState.next = result[paginationConfig.params.nextPath || 'next'];
-        newState.previous = result[paginationConfig.params.prevPath || 'previous'];
-        newState.hasNextPage = !!result[paginationConfig.params.nextPath || 'next'];
-        newState.hasPreviousPage = !!result[paginationConfig.params.prevPath || 'previous'];
+        newState.next = result[paginationConfig.params.nextPath || locale.next];
+        newState.previous = result[paginationConfig.params.prevPath || locale.previous];
+        newState.hasNextPage = !!result[paginationConfig.params.nextPath || locale.next];
+        newState.hasPreviousPage = !!result[paginationConfig.params.prevPath || locale.previous];
         newState.total = result[paginationConfig.params.countPath || 'count'];
       }
       newState.limit = parseInt(updatedParams.find(param => param.name === paginationConfig?.params?.limit?.name)?.value) || newState.limit;
