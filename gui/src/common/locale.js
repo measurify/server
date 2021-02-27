@@ -14,9 +14,12 @@ const locale = Object.freeze({
     out_of: "di",
     items: "totali",
     nothing_to_see: "Nessun risultato",
-    enter_text: "inserisci testo",
+    enter_text: "Inserisci testo",
     next : "Successivo",
-    previous : "Precedente"
+    previous : "Precedente",
+    select : "-- Seleziona --",
+    add : "Aggiungi",
+    update : "Aggiorna"
 
 });
 

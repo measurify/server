@@ -7,7 +7,8 @@ export default {
     {
       name: "Things",
       id: "things",
-      description: "",
+      description: 'Visualizzazione e gestione delle Things',
+
 
       methods: {
         getAll: {
@@ -20,7 +21,20 @@ export default {
               name: "_id",
               value: "",
               type: "text",
-              label: "ID"
+              label: "Numero ID",
+            },
+            {
+              name: "limit",
+              value: "",
+              type: "select",
+              options: ["5", "10", "50"],
+              label: "Risultati per pagina",
+            },
+            {
+              name: "page",
+              value: "",
+              type: "text",
+              label: "Pagina",
             },
           ],
 
@@ -31,63 +45,84 @@ export default {
             {
               name: "_id",
               type: "text",
-              label: "ID",
+              label: "ID"
             },
             {
               name: "visibility",
               type: "text",
-              label: "Visibility",
+              label: "Visibility"
             },
             {
-              name: "relations",
+              name: "relations_enroll",
               type: "text",
-              label: "Relations",
+              label: "Relations"
             },
             {
-              name: "tags_pr",
+              name: "tags_enroll",
               type: "text",
-              label: "Tags",
+              label: "Tags"
             },
           ],
-          
-          "dataTransform": item => Object.assign(item.tags_pr, item.tags === undefined ? item.tags_pr = "No tags" : item.tags_pr= item.tags.map() ),
+
+          dataTransform: (items) =>
+            items.map((item) =>
+              Object.assign(item, {
+                tags_enroll: item.tags.join() !== "" ? '['+item.tags.join(' , ')+']' : "No tags",
+                relations_enroll:  item.relations.join() !== "" ? '['+item.relations.join()+']' : "No relations"
+              })
+            ),
 
           pagination: {
             type: "buttons",
             source: "query",
-            params: { page: { name: "page" }}, //, limit : {name: "limit", type : "text"} 
-            fields: { total: { dataPath: "totalDocs" } },
+            params: { page: { name: "page" } , limit : {name: "limit"}}, //, limit : {name: "limit", type : "text"}
+            fields: { total: { dataPath: "totalDocs" } }
           },
         },
         getSingle: {
           url: "/things/:_id/",
           dataPath: "docs",
           queryParams: [],
-          requestHeaders: {},
+          requestHeaders: {}
         },
         put: {
           url: "/things/:_id",
           fields: [
             {
-              name: "visibility",
-              type: "text",
-              label: "Visibility",
+              name: "tags",
+              type: "array",
+              arrayType : "text",
+              label: "Tags"
             },
           ],
         },
+
         post: {
           url: "/things/",
+          customLabels : true,
           fields: [
             {
               name: "_id",
-              type: "text",
               label: "ID",
+              type: "text"
             },
             {
               name: "visibility",
               type: "text",
-              label: "Visibility",
+              label: "Visibility"
             },
+            {
+              name: "relations",
+              type: "array",
+              arrayType : "text",
+              label: "Relations"
+            },
+            {
+              name: "tags",
+              type: "array",
+              arrayType : "text",
+              label: "Tags"
+            }
           ],
         },
         delete: {
@@ -120,25 +155,25 @@ export default {
             {
               name: "_id",
               type: "text",
-              label: "Id",
+              label: "Id"
             },
             {
               name: "item",
               type: "text",
-              label: "Items",
+              label: "Items"
             },
           ],
           pagination: {
             type: "buttons",
             source: "query",
             params: { page: { name: "page" } },
-            fields: { total: { dataPath: "totalDocs" } },
+            fields: { total: { dataPath: "totalDocs" } }
           },
         },
         getSingle: {
           url: "/features/:_id",
           queryParams: [],
-          requestHeaders: {},
+          requestHeaders: {}
         },
         put: {
           url: "/features/:_id",
@@ -146,7 +181,7 @@ export default {
             {
               name: "name",
               label: "Name",
-              type: "text",
+              type: "text"
             },
           ],
         },
@@ -156,7 +191,7 @@ export default {
             {
               name: "name",
               label: "Name",
-              type: "text",
+              type: "text"
             },
           ],
         },
@@ -175,17 +210,17 @@ export default {
             {
               name: "name",
               label: "Name",
-              type: "text",
+              type: "text"
             },
             {
               name: "unit",
               label: "Unit",
-              type: "text",
+              type: "text"
             },
             {
               name: "dimension",
               label: "Name",
-              type: "text",
+              type: "text"
             },
           ],
         },

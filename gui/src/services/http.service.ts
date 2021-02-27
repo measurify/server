@@ -58,11 +58,13 @@ class HttpService {
     let outputUrl = url;
     const params = [];
     let page = '-1'
+    let limit = '10'
 
     for (let param of queryParams) {
       let value = '';
       if (!param.name || typeof param.value === 'undefined') { continue; } 
       if (param.name === 'page') { page = param.value; continue; }
+      if (param.name === 'limit') { limit = param.value; continue; }
       if (param.name === 'info') value = '{"$regex":"' + param.value + '","$options":"i"}';
       else value = '"' + param.value + '"';
       //test regex
@@ -73,6 +75,7 @@ class HttpService {
 
     outputUrl += '?filter={' + params.join(',') + '}';
     if(page != '-1') outputUrl += "&page=" + page;
+    outputUrl += "&limit=" + limit;
 
     console.log("Requested URL : "+outputUrl);
 
