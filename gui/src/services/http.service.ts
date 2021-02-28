@@ -1,3 +1,4 @@
+import locale from '../common/locale';
 import { TConfigMethod, IQueryParam } from '../common/models/config.model';
 import { dataHelpers } from '../helpers/data.helpers';
 
@@ -65,6 +66,7 @@ class HttpService {
       if (!param.name || typeof param.value === 'undefined') { continue; } 
       if (param.name === 'page') { page = param.value; continue; }
       if (param.name === 'limit') { limit = param.value; continue; }
+      if (param.name === 'tags' && param.value === "") { continue; }
       if (param.name === 'info') value = '{"$regex":"' + param.value + '","$options":"i"}';
       else value = '"' + param.value + '"';
       //test regex

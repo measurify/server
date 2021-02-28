@@ -175,12 +175,13 @@ const PageComp = ({ context }: IProps) => {
   };
   const addItemLabel =
     customLabels?.buttons?.addItem ||
-    "+ " + locale.add + " " + activePage?.name;
+    "+ " + locale.add + " " + activePage?.itemName;
   const addItemFormTitle =
-    customLabels?.formTitles?.addItem || locale.add + " " + activePage?.name;
+    customLabels?.formTitles?.addItem ||
+    locale.add + " " + activePage?.itemName;
   const editItemFormTitle =
     customLabels?.formTitles?.editItem ||
-    locale.update + " " + activePage?.name;
+    locale.update + " " + activePage?.itemName;
   const {
     initQueryParams,
     initialPagination,

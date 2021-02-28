@@ -4,10 +4,13 @@ export default {
   loginUrl: "/login",
   unauthorizedRedirectUrl: "/#/login",
   pages: [
+
+    ///////////// THINGS PAGES
     {
       name: "Things",
       id: "things",
-      description: 'Visualizzazione e gestione delle Things',
+      description: 'Visualizzazione e gestione delle Thing',
+      itemName :"Thing",
 
 
       methods: {
@@ -21,7 +24,18 @@ export default {
               name: "_id",
               value: "",
               type: "text",
-              label: "Numero ID",
+              label: "ID",
+            },
+            {
+              "name": "tags",
+              "type": "select",
+              "label": "Filtra Tag",
+              "optionSource" : {
+                "url": "/tags",
+                "dataPath": "docs",
+                "displayPath": "_id",
+                "valuePath": "_id"
+              }
             },
             {
               name: "limit",
@@ -67,15 +81,15 @@ export default {
           dataTransform: (items) =>
             items.map((item) =>
               Object.assign(item, {
-                tags_enroll: item.tags.join() !== "" ? '['+item.tags.join(' , ')+']' : "No tags",
-                relations_enroll:  item.relations.join() !== "" ? '['+item.relations.join()+']' : "No relations"
+                tags_enroll: item.tags.join() !== "" ? '['+item.tags.join(' , ')+']' : "Nessun Tag",
+                relations_enroll:  item.relations.join() !== "" ? '['+item.relations.join()+']' : "Nessuna Relation"
               })
             ),
 
           pagination: {
             type: "buttons",
             source: "query",
-            params: { page: { name: "page" } , limit : {name: "limit"}}, //, limit : {name: "limit", type : "text"}
+            params: { page: { name: "page" } , limit : {name: "limit"}}, 
             fields: { total: { dataPath: "totalDocs" } }
           },
         },
@@ -99,7 +113,6 @@ export default {
 
         post: {
           url: "/things/",
-          customLabels : true,
           fields: [
             {
               name: "_id",
@@ -131,23 +144,49 @@ export default {
       },
     },
 
+    ///////////// FEATURES PAGE
     {
       name: "Features",
       id: "features",
-      description: "Manage features.",
+      description: "Visualizzazione e gestione delle Feature.",
+      itemName :"Feature",
       methods: {
         getAll: {
           label: "Get All",
           dataPath: "docs",
           url: "/features",
-          /*"queryParams": [
+          "queryParams": [
             {
-              "name": "search",
+              "name": "_id",
               "value": "",
-              "label": "Search",
+              "label": "ID",
               "type": "text"
-            }
-          ],*/
+            },
+            {
+              "name": "tags",
+              "type": "select",
+              "label": "Filtra Tag",
+              "optionSource" : {
+                "url": "/tags",
+                "dataPath": "docs",
+                "displayPath": "_id",
+                "valuePath": "_id"
+              }
+            },
+            {
+              name: "limit",
+              value: "",
+              type: "select",
+              options: ["5", "10", "50"],
+              label: "Risultati per pagina",
+            },
+            {
+              name: "page",
+              value: "",
+              type: "text",
+              label: "Pagina",
+            },
+          ],
           display: {
             type: "table",
           },
@@ -158,15 +197,34 @@ export default {
               label: "Id"
             },
             {
-              name: "item",
+              name: "visibility",
+              type: "text",
+              label: "Visibility"
+            },
+            {
+              name: "tags_enroll",
+              type: "text",
+              label: "Tags"
+            },
+            {
+              name: "item_name_enroll",
               type: "text",
               label: "Items"
             },
           ],
+
+          dataTransform: (items) =>
+            items.map((item) =>
+              Object.assign(item, {
+                tags_enroll: item.tags.join() !== "" ? '['+item.tags.join(' , ')+']' : "Nessun Tag",
+                item_name_enroll: item.items.map(e => e.name).join() !== "" ? '['+item.items.map(e => e.name).join(' , ')+']' : "Nessun Item"
+              })
+            ),
+
           pagination: {
             type: "buttons",
             source: "query",
-            params: { page: { name: "page" } },
+            params: { page: { name: "page" } , limit : {name: "limit"}}, 
             fields: { total: { dataPath: "totalDocs" } }
           },
         },
@@ -175,24 +233,39 @@ export default {
           queryParams: [],
           requestHeaders: {}
         },
-        put: {
-          url: "/features/:_id",
-          fields: [
-            {
-              name: "name",
-              label: "Name",
-              type: "text"
-            },
-          ],
-        },
         post: {
-          url: "/features",
+          url: "/features/",
           fields: [
             {
-              name: "name",
-              label: "Name",
+              name: "_id",
+              label: "ID",
               type: "text"
             },
+            {
+              name: "visibility",
+              type: "text",
+              label: "Visibility"
+            },
+            {
+              name: "tags",
+              type: "array",
+              arrayType : "text",
+              label: "Tags"
+            },
+            {
+              name: "items",
+              type: "array",
+              arrayType : "object",
+              label: "Items",
+              value : [
+                 { 
+                    "dimension": "0 scalar / 1 array / 2 matrix",
+                     "type": "", 
+                     "name": "", 
+                     "unit": "" 
+                    }
+                  ]
+            }
           ],
         },
         delete: {
@@ -202,382 +275,245 @@ export default {
 
       customActions: [
         {
-          name: "Expand",
-          url: "/things/:_id",
+          name: "Expand and edit",
+          url: "/features/:_id",
           dataPath: "items",
-          actualMethod: "get",
+          actualMethod: "put",
+          fields: [
+            {
+              name: "_id",
+              label: "ID",
+              type: "text"
+            },
+            {
+              name: "visibility",
+              label: "Visibility",
+              type: "text"
+            },
+            {
+              name: "tags",
+              label: "Tags",
+              type: "array",
+              arrayType : "text",
+            },{
+              name: "items",
+              type: "array",
+              arrayType : "object",
+              label: "Items"
+            },
+          ],
+        },
+      ],
+    },
+
+
+    //////////// DEVICES PAGE
+    {
+      name: "Devices",
+      id: "devices",
+      description: "Visualizzazione e gestione dei Device.",
+      itemName :"Device",
+      methods: {
+        getAll: {
+          label: "Get All",
+          dataPath: "docs",
+          url: "/devices",
+          "queryParams": [
+            {
+              "name": "_id",
+              "value": "",
+              "label": "ID",
+              "type": "text"
+            },
+            {
+              "name": "tags",
+              "type": "select",
+              "label": "Filtra Tag",
+              "optionSource" : {
+                "url": "/tags",
+                "dataPath": "docs",
+                "displayPath": "_id",
+                "valuePath": "_id"
+              }
+            },
+            {
+              name: "limit",
+              value: "",
+              type: "select",
+              options: ["5", "10", "50"],
+              label: "Risultati per pagina",
+            },
+            {
+              name: "page",
+              value: "",
+              type: "text",
+              label: "Pagina",
+            },
+          ],
+          display: {
+            type: "cards",
+          },
+          fields: [
+            {
+              name: "_id",
+              type: "text",
+              label: "Id"
+            },
+            {
+              name: "visibility",
+              type: "text",
+              label: "Visibility"
+            },
+            {
+              name: "period",
+              type: "text",
+              label: "Period"
+            },
+            {
+              name: "cycle",
+              type: "text",
+              label: "Cicle"
+            },
+            {
+              name: "tags_enroll",
+              type: "text",
+              label: "Tags"
+            },
+            {
+              name: "features_enroll",
+              type: "text",
+              label: "Features"
+            },
+            {
+              name: "scripts_enroll",
+              type: "text",
+              label: "Scripts"
+            }
+          ],
+
+          dataTransform: (items) =>
+            items.map((item) =>
+              Object.assign(item, {
+                tags_enroll: item.tags.join() !== "" ? '['+item.tags.join(' , ')+']' : "Nessun Tag",
+                features_enroll: item.features.join() !== "" ? '['+item.features.join(' , ')+']' : "Nessuna Feature",
+                scripts_enroll: item.scripts.join() !== "" ? '['+item.scripts.join(' , ')+']' : "Nessuno Script"
+              })
+            ),
+
+          pagination: {
+            type: "buttons",
+            source: "query",
+            params: { page: { name: "page" } , limit : {name: "limit"}}, 
+            fields: { total: { dataPath: "totalDocs" } }
+          },
+        },
+        getSingle: {
+          url: "/devices/:_id",
+          queryParams: [],
+          requestHeaders: {}
+        },
+        post: {
+          url: "/devices",
           fields: [
             {
               name: "name",
               label: "Name",
               type: "text"
             },
+          ],
+        },
+        delete: {
+          url: "/devices/:_id",
+        },
+      },
+
+      
+    },
+
+
+    //////////////////  TAGS PAGE
+    {
+      name: "Tags",
+      id: "tags",
+      description: "Visualizzazione e gestione dei Tag.",
+      itemName :"Tag",
+      methods: {
+        getAll: {
+          label: "Get All",
+          dataPath: "docs",
+          url: "/tags",
+          "queryParams": [
             {
-              name: "unit",
-              label: "Unit",
-              type: "text"
+              "name": "_id",
+              "value": "",
+              "label": "ID",
+              "type": "text"
             },
             {
-              name: "dimension",
+              name: "limit",
+              value: "10",
+              type: "select",
+              options: ["5", "10", "50"],
+              label: "Risultati per pagina",
+            },
+            {
+              name: "page",
+              value: "",
+              type: "text",
+              label: "Pagina",
+            },
+          ],
+          display: {
+            type: "table",
+          },
+          fields: [
+            {
+              name: "_id",
+              type: "text",
+              label: "Id"
+            },
+            {
+              name: "tags_enroll",
+              type: "text",
+              label: "Tags"
+            }
+          ],
+
+          dataTransform: (items) =>
+            items.map((item) =>
+              Object.assign(item, {
+                tags_enroll: item.tags.join() !== "" ? '['+item.tags.join(' , ')+']' : "Nessun Tag"
+              })
+            ),
+
+          pagination: {
+            type: "buttons",
+            source: "query",
+            params: { page: { name: "page" } , limit : {name: "limit"}}, 
+            fields: { total: { dataPath: "totalDocs" } }
+          },
+        },
+        getSingle: {
+          url: "/tags/:_id",
+          queryParams: [],
+          requestHeaders: {}
+        },
+        post: {
+          url: "/tags",
+          fields: [
+            {
+              name: "name",
               label: "Name",
               type: "text"
             },
           ],
         },
-      ],
+        delete: {
+          url: "/tags/:_id",
+        },
+      },
+
+      
     },
   ],
 };
-
-/*
-TESTING PART
-
-//base page (working)
-
- {
-      name: "Things",
-      id: "things",
-      description: "",
-      methods: {
-        getAll: {
-          label: "Things",
-          dataPath: "docs",
-          url: "/things",
-          display: { type: "cards"},
-          pagination: { type: "buttons", source: "query", params: { page: { name: "page" } }, fields: { total: { dataPath: "totalDocs" } } },
-          fields: [
-            { name: "_id", type: "text", label: "ID" },
-            { name: "visibility", type: "text", label: "Visibility" }
-          ]
-        }
-      }
-    }
-
-//working on
-
-
-export default {
-  "name": "Measurify GUI",
-  "baseUrl": "https://localhost/v1",
-  "pages": [
-    {
-      "name": "Things",
-      "id": "things",
-      "description": "Manage and visualize things in the database.",
-      "methods": {
-        "getAll": {
-          "label": "Get All",
-          "dataPath": "docs",
-          "url": "/things",
-          "queryParams": [
-            {
-              "name": "search",
-              "value": "",
-              "label": "Search",
-              "type": "text"
-            }
-          ],
-          "display": {
-            "type": "cards"
-          },
-
-          "fields": [
-            {
-              "name": "_id",
-              "type": "text",
-              "label": "ID"
-            },
-            {
-              "name": "visibility",
-              "type": "text",
-              "label": "Visibility"
-            }
-          ]
-        },
-        "getSingle": {
-          "url": "/things/:id",
-          "queryParams": [],
-          "requestHeaders": {}
-        },
-        "put": {
-          "url": "/things/:id",
-          "fields": [
-            {
-              "name": "visibility",
-              "type": "text",
-              "label": "Visibility"
-            }
-          ]
-        },
-        "post": {
-          "url": "/things",
-          "fields": [
-            {
-              "name": "_id",
-              "type": "text",
-              "label": "ID"
-            },
-            {
-              "name": "visibility",
-              "type": "text",
-              "label": "Visibility"
-            }
-          ]
-        },
-        "delete": {
-          "url": "/things/:id"
-        }
-      },
-      "customActions": [
-        {
-          "name":"Delete Thing",
-          "url": "/things/:id/",
-          "actualMethod": "delete",
-          "fields": [
-            {
-              "name": "id"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Employees",
-      "id": "employees",
-      "description": "Manage GOT employees, people and employees.",
-      "methods": {
-        "getAll": {
-          "label": "Get All",
-          "dataPath": "items",
-          "url": "/employee",
-          "queryParams": [
-            {
-              "name": "search",
-              "value": "",
-              "label": "Search",
-              "type": "text"
-            }
-          ],
-          "display": {
-            "type": "table"
-          },
-          "fields": [
-            {
-              "name": "id",
-              "type": "text",
-              "label": "ID"
-            },
-            {
-              "name": "name",
-              "type": "text",
-              "label": "Name"
-            },
-            {
-              "name": "jobTitle",
-              "type": "text",
-              "label": "Job Title"
-            },
-            {
-              "name": "isFired",
-              "type": "boolean",
-              "label": "Fired?"
-            }
-          ]
-        },
-        "getSingle": {
-          "url": "/employee/:id",
-          "queryParams": [],
-          "requestHeaders": {}
-        },
-        "put": {
-          "url": "/employee/:id",
-          "fields": [
-            {
-              "name": "name",
-              "label": "Name",
-              "type": "text"
-            },
-            {
-              "name": "jobTitle",
-              "type": "select",
-              "label": "Job Title",
-              "options": ["Executive Producer", "Co-Executive Producer", "RESTool creator 😎", "A Knows nothing dude."]
-            },
-            {
-              "name": "isFired",
-              "type": "boolean",
-              "label": "Fired?"
-            }
-          ]
-        },
-        "post": {
-          "url": "/employee",
-          "fields": [
-            {
-              "name": "name",
-              "label": "Name",
-              "type": "text"
-            },
-            {
-              "name": "jobTitle",
-              "type": "select",
-              "label": "Job Title",
-              "options": ["Executive Producer", "Co-Executive Producer", "RESTool creator 😎", "A Knows nothing dude."]
-            },
-            {
-              "name": "isFired",
-              "type": "boolean",
-              "label": "Fired?"
-            }
-          ]
-        },
-        "delete": {
-          "url": "/employee/:id"
-        }
-      }
-    },
-    {
-      "name": "Deads",
-      "id": "deads",
-      "description": "Manage GOT deads 😵",
-      "methods": {
-        "getAll": {
-          "label": "Get All",
-          "dataPath": "items",
-          "url": "/dead",
-          "queryParams": [
-            {
-              "name": "search",
-              "value": "",
-              "label": "Search",
-              "type": "text"
-            }
-          ],
-          "display": {
-            "type": "table"
-          },
-          "fields": [
-            {
-              "name": "id",
-              "type": "text",
-              "label": "ID"
-            },
-            {
-              "name": "name",
-              "type": "text",
-              "label": "Name"
-            },
-            {
-              "name": "reason",
-              "type": "text",
-              "label": "Death Reason"
-            }
-          ],
-          "dataTransform": item => Object.assign(item, { wiki: `https://en.wikipedia.org/wiki/${item.name}` })
-        },
-        "getSingle": {
-          "url": "/dead/:id",
-          "queryParams": [],
-          "requestHeaders": {}
-        },
-        "put": {
-          "url": "/dead/:id",
-          "fields": [
-            {
-              "name": "name",
-              "label": "Name",
-              "type": "text"
-            },
-            {
-              "name": "reason",
-              "label": "Reason",
-              "type": "text"
-            }
-          ]
-        },
-        "post": {
-          "url": "/dead",
-          "fields": [
-            {
-              "name": "name",
-              "label": "Name",
-              "type": "text"
-            },
-            {
-              "name": "reason",
-              "label": "Reason",
-              "type": "text"
-            }
-          ]
-        },
-        "delete": {
-          "url": "/dead/:id"
-        }
-      }
-    },
-    {
-      "name": "Extras",
-      "id": "extras",
-      "description": "Manage GOT extras location and budget.",
-      "methods": {
-        "getAll": {
-          "label": "Get All",
-          "dataPath": "items",
-          "url": "/extra",
-          "queryParams": [
-            {
-              "name": "search",
-              "value": "",
-              "label": "Search",
-              "type": "text"
-            }
-          ],
-          "display": {
-            "type": "table"
-          },
-          "fields": [
-            {
-              "name": "id",
-              "type": "text",
-              "label": "ID"
-            },
-            {
-              "name": "name",
-              "type": "text",
-              "label": "Name"
-            }
-          ]
-        },
-        "getSingle": {
-          "url": "/extra/:id",
-          "queryParams": [],
-          "requestHeaders": {}
-        },
-        "put": {
-          "url": "/extra/:id",
-          "fields": [
-            {
-              "name": "name",
-              "label": "Name",
-              "type": "text"
-            }
-          ]
-        },
-        "post": {
-          "url": "/extra",
-          "fields": [
-            {
-              "name": "name",
-              "label": "Name",
-              "type": "text"
-            }
-          ]
-        },
-        "delete": {
-          "url": "/extra/:id"
-        }
-      }
-    }
-  ]
-}
-*/

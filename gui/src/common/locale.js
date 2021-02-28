@@ -17,9 +17,10 @@ const locale = Object.freeze({
     enter_text: "Inserisci testo",
     next : "Successivo",
     previous : "Precedente",
-    select : "-- Seleziona --",
+    select : "",
     add : "Aggiungi",
-    update : "Aggiorna"
+    update : "Aggiorna",
+    no: "Nessun/a"
 
 });
 

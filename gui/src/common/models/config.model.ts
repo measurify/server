@@ -75,6 +75,7 @@ export interface ICustomPaginationLabels {
 
 export interface IConfigPage {
   name: string
+  itemName : string
   id: string
   description: string
   requestHeaders: any

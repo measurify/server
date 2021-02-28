@@ -124,6 +124,10 @@
           "type": "string",
           "description": "A short description about the page and its usage."
         },
+        "itemName": {
+          "type": "string",
+          "description": "The name of the entity visualized in this page."
+        },
         "requestHeaders": {
           "$ref": "#/definitions/requestHeaders"
         },
@@ -143,7 +147,8 @@
       },
       "required": [
         "name",
-        "id"
+        "id",
+        "itemName"
       ]
     },
     "requestHeaders": {
