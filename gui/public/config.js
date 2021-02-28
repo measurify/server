@@ -279,6 +279,7 @@ export default {
           url: "/features/:_id",
           dataPath: "items",
           actualMethod: "put",
+          icon : "search-plus",
           fields: [
             {
               name: "_id",
@@ -430,7 +431,246 @@ export default {
       
     },
 
+    ///////////// MEASUREMENTS PAGE
+    {
+      name: "Measurements",
+      id: "measurements",
+      description: "Visualizzazione e gestione delle Measure.",
+      itemName :"Measure",
+      methods: {
+        getAll: {
+          label: "Get All",
+          dataPath: "docs",
+          url: "/measurements",
+          "queryParams": [
+            {
+              "name": "thing",
+              "type": "select",
+              "label": "Filtra Thing",
+              "optionSource" : {
+                "url": "/things",
+                "dataPath": "docs",
+                "displayPath": "_id",
+                "valuePath": "_id"
+              }
+            },
+            {
+              "name": "feature",
+              "type": "select",
+              "label": "Filtra Feature",
+              "optionSource" : {
+                "url": "/features",
+                "dataPath": "docs",
+                "displayPath": "_id",
+                "valuePath": "_id"
+              }
+            },
+            {
+              "name": "device",
+              "type": "select",
+              "label": "Filtra Device",
+              "optionSource" : {
+                "url": "/devices",
+                "dataPath": "docs",
+                "displayPath": "_id",
+                "valuePath": "_id"
+              }
+            },
+            {
+              "name": "tags",
+              "type": "select",
+              "label": "Filtra Tag",
+              "optionSource" : {
+                "url": "/tags",
+                "dataPath": "docs",
+                "displayPath": "_id",
+                "valuePath": "_id"
+              }
+            },
+            {
+              name: "limit",
+              value: "",
+              type: "select",
+              options: ["5", "10", "50"],
+              label: "Risultati per pagina",
+            },
+            {
+              name: "page",
+              value: "",
+              type: "text",
+              label: "Pagina",
+            },
+          ],
+          display: {
+            type: "table",
+          },
+          fields: [
+            {
+              name: "_id",
+              type: "text",
+              label: "Id"
+            },
+            {
+              name: "feature",
+              type: "text",
+              label: "Feature"
+            },
+            {
+              name: "sample_enroll",
+              type: "text",
+              label: "Sample"
+            },
+            
+            {
+              name: "thing",
+              type: "text",
+              label: "Thing"
+            },
+            
+            {
+              name: "device",
+              type: "text",
+              label: "Device"
+            },
+            {
+              name: "visibility",
+              type: "text",
+              label: "Visibility"
+            },
+            {
+              name: "tags_enroll",
+              type: "text",
+              label: "Tags"
+            }
+            
+          ],
 
+          dataTransform: (items) =>
+            items.map((item) =>
+              Object.assign(item, {
+                tags_enroll: item.tags.join() !== "" ? '['+item.tags.join(' , ')+']' : "Nessun Tag",
+                sample_enroll:'['+item.samples.map(e => e.values).join(" , ")+']'
+              })
+            ),
+
+          pagination: {
+            type: "buttons",
+            source: "query",
+            params: { page: { name: "page" } , limit : {name: "limit"}}, 
+            fields: { total: { dataPath: "totalDocs" } }
+          },
+        },
+        getSingle: {
+          url: "/measurements/:_id",
+          queryParams: [],
+          requestHeaders: {}
+        },
+        /*post: {
+          url: "/measurements/",
+          fields: [
+            {
+              name: "_id",
+              label: "ID",
+              type: "text"
+            },
+            {
+              name: "visibility",
+              type: "text",
+              label: "Visibility"
+            },
+            {
+              name: "tags",
+              type: "array",
+              arrayType : "text",
+              label: "Tags"
+            },
+            {
+              name: "items",
+              type: "array",
+              arrayType : "object",
+              label: "Items",
+              value : [
+                 { 
+                    "dimension": "0 scalar / 1 array / 2 matrix",
+                     "type": "", 
+                     "name": "", 
+                     "unit": "" 
+                    }
+                  ]
+            }
+          ],
+        },*/
+        delete: {
+          url: "/features/:_id",
+        },
+      },
+
+      customActions: [
+        {
+          name: "Expand and edit",
+          url: "/features/:_id",
+          dataPath: "items",
+          actualMethod: "put",
+          icon : "search",
+          fields: [
+            {
+              name: "_id",
+              label: "ID",
+              type: "text",
+              readOnly : true
+            },
+            {
+              name: "startDate",
+              label: "Start Date",
+              type: "text",
+              readOnly : true
+            },
+            {
+              name: "endDate",
+              label: "End Date",
+              type: "text",
+              readOnly : true
+            },
+            {
+              name: "visibility",
+              label: "Visibility",
+              type: "text"
+            },
+            {
+              name: "thing",
+              label: "Thing",
+              type: "text",
+              readOnly : true
+            },
+            {
+              name: "feature",
+              label: "Feature",
+              type: "text",
+              readOnly : true
+            },
+            {
+              name: "device",
+              label: "Device",
+              type: "text",
+              readOnly : true
+            },
+            {
+              name: "samples",
+              type: "array",
+              arrayType : "object",
+              label: "Samples"
+            },
+            {
+              name: "tags",
+              label: "Tags",
+              type: "array",
+              arrayType : "text",
+            },
+            
+          ],
+        },
+      ],
+    },
     //////////////////  TAGS PAGE
     {
       name: "Tags",

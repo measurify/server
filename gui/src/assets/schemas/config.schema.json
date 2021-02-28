@@ -33,10 +33,6 @@
       "type": "string",
       "description": "A URL for you app's favicon."
     },
-    "loginUrl": {
-      "type": "string",
-      "description": "A URL for you app's login entry point."
-    },
     "customStyles": {
       "$ref": "#/definitions/customStyles"
     },
@@ -120,13 +116,13 @@
           "type": "string",
           "description": "A unique identifier for the page. RESTool will use it to navigate between pages."
         },
-        "description": {
-          "type": "string",
-          "description": "A short description about the page and its usage."
-        },
         "itemName": {
           "type": "string",
           "description": "The name of the entity visualized in this page."
+        },
+        "description": {
+          "type": "string",
+          "description": "A short description about the page and its usage."
         },
         "requestHeaders": {
           "$ref": "#/definitions/requestHeaders"
@@ -270,7 +266,12 @@
     },
     "getSingle": {
       "$ref": "#/definitions/method",
-      "description": "This method will be fired once you hit the edit button on an item in order to get a single item's data. By default, if this method hasn't been set, when editing an item, RESTool will take the raw data from the original getAll request."
+      "description": "This method will be fired once you hit the edit button on an item in order to get a single item's data. By default, if this method hasn't been set, when editing an item, RESTool will take the raw data from the original getAll request.",
+      "properties": {
+        "dataTransform": {
+          "description": "Relevant only when using dynamic (js) config. A function to allow manipulation on the response data. Useful for changing/adding data for display purposes."
+        }
+      }
     },
     "post": {
       "allOf": [
@@ -328,10 +329,6 @@
         "name": {
           "type": "string",
           "description": "The name of the field / parameter to be sent."
-        },
-        "hidden": {
-          "type": "boolean",
-          "description": "If the field shoud be showed or not"
         },
         "type": {
           "type": "string",
@@ -518,14 +515,14 @@
       "additionalProperties": false,
       "required": [
         "source",
+        "type",
         "params"
       ],
       "properties": {
         "source": {
           "enum": [
             "query",
-            "body",
-            "type"
+            "body"
           ],
           "description": "Where the pagination parameters are written to. Only supports query parameters for now."
         },
