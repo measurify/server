@@ -1,3 +1,4 @@
+import { toast } from 'react-toastify';
 import locale from '../common/locale';
 import { TConfigMethod, IQueryParam } from '../common/models/config.model';
 import { dataHelpers } from '../helpers/data.helpers';
@@ -122,9 +123,16 @@ class HttpService {
 
   private async handleError(res: Response) {
     // In case response status is "Unauthorized", redirect to relevant url
+
     if (res.status === 401 && this.unauthorizedRedirectUrl) {
+      //test
+      
+      sessionStorage.clear();
+
+      
+
       const redirectUrl: string = this.unauthorizedRedirectUrl.replace(':returnUrl', encodeURIComponent(document.location.href));
-      document.location.href = redirectUrl;
+      document.location.replace(redirectUrl);
       return;
     }
 

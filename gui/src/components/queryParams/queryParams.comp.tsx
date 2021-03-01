@@ -75,7 +75,7 @@ export const QueryParams = ({
       <form onSubmit={submit}>
         {queryParams.map((queryParam, idx) => {
           //if(queryParam.name == 'page') return "";
-          if (queryParam.hidden) return "";
+          //if (queryParam.hidden) return "";
           return (
             <FormRow
               key={`query_param_${idx}`}

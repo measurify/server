@@ -17,9 +17,9 @@ import { dataHelpers } from "../../helpers/data.helpers";
 import { fileHelpers } from "../../helpers/file.helpers";
 import { IAppContext } from "../app.context";
 import { withAppContext } from "../withContext/withContext.comp";
+import locale from "../../common/locale";
 
 import "./formPopup.scss";
-import locale from "../../common/locale";
 
 const unflatten = require("flat").unflatten;
 
@@ -72,6 +72,7 @@ export const FormPopup = withAppContext(
             dataPath,
             queryParams,
             responseType,
+            dataTransform,
           } = getSingleConfig;
           const result = await httpService.fetch({
             method: actualMethod || "get",
@@ -82,10 +83,14 @@ export const FormPopup = withAppContext(
             responseType,
           });
 
-          const extractedData = dataHelpers.extractDataByDataPath(
+          let extractedData = dataHelpers.extractDataByDataPath(
             result,
             dataPath
           );
+
+          if (typeof dataTransform === "function") {
+            extractedData = await dataTransform(extractedData);
+          }
 
           if (
             extractedData &&

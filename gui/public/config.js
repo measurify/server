@@ -2,7 +2,8 @@ export default {
   name: "Measurify GUI",
   baseUrl: "https://localhost/v1",
   loginUrl: "/login",
-  unauthorizedRedirectUrl: "/#/login",
+  unauthorizedRedirectUrl: "/#/",
+
   pages: [
 
     ///////////// THINGS PAGES
@@ -144,6 +145,7 @@ export default {
       },
     },
 
+ 
     ///////////// FEATURES PAGE
     {
       name: "Features",
@@ -431,6 +433,7 @@ export default {
       
     },
 
+
     ///////////// MEASUREMENTS PAGE
     {
       name: "Measurements",
@@ -565,41 +568,7 @@ export default {
           queryParams: [],
           requestHeaders: {}
         },
-        /*post: {
-          url: "/measurements/",
-          fields: [
-            {
-              name: "_id",
-              label: "ID",
-              type: "text"
-            },
-            {
-              name: "visibility",
-              type: "text",
-              label: "Visibility"
-            },
-            {
-              name: "tags",
-              type: "array",
-              arrayType : "text",
-              label: "Tags"
-            },
-            {
-              name: "items",
-              type: "array",
-              arrayType : "object",
-              label: "Items",
-              value : [
-                 { 
-                    "dimension": "0 scalar / 1 array / 2 matrix",
-                     "type": "", 
-                     "name": "", 
-                     "unit": "" 
-                    }
-                  ]
-            }
-          ],
-        },*/
+      
         delete: {
           url: "/features/:_id",
         },
@@ -617,19 +586,19 @@ export default {
               name: "_id",
               label: "ID",
               type: "text",
-              readOnly : true
+              readonly : true
             },
             {
               name: "startDate",
               label: "Start Date",
               type: "text",
-              readOnly : true
+              readonly : true
             },
             {
               name: "endDate",
               label: "End Date",
               type: "text",
-              readOnly : true
+              readonly : true
             },
             {
               name: "visibility",
@@ -640,19 +609,19 @@ export default {
               name: "thing",
               label: "Thing",
               type: "text",
-              readOnly : true
+              readonly : true
             },
             {
               name: "feature",
               label: "Feature",
               type: "text",
-              readOnly : true
+              readonly : true
             },
             {
               name: "device",
               label: "Device",
               type: "text",
-              readOnly : true
+              readonly : true
             },
             {
               name: "samples",
@@ -670,7 +639,10 @@ export default {
           ],
         },
       ],
+      
     },
+    
+
     //////////////////  TAGS PAGE
     {
       name: "Tags",
@@ -755,5 +727,6 @@ export default {
 
       
     },
+
   ],
 };

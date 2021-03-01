@@ -51,7 +51,7 @@ export const Cards = ({ items, fields, callbacks, customActions, customLabels, p
         if (!value) {
           return <React.Fragment></React.Fragment>;
         }
-        return <img src={value || ''} alt={value || origField.label || origField.name} onError={(e) => e.currentTarget.src = '/avatar.png' }/>;
+        return <img src={value || ''} alt={value || origField.label || origField.name} />;
       case 'url':
         let url: string = origField.url || value || '';
 

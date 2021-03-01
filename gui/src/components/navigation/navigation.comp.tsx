@@ -23,6 +23,7 @@ const NavigationComp = ({ context: { config } }: IProps) => {
           <i className="fa fa-bars" aria-hidden="true"></i>
         }
       </Button>
+
       <div className={`app-nav-wrapper ${isOpened ? 'opened' : ''}`}>
         <div className="app-nav-links">
           {

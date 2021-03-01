@@ -2,7 +2,7 @@ export type ConfigFunction = (context?: any) => Promise<any> | any;
 
 export interface IConfig {
   remoteUrl: string
-  loginUrl: string
+  loginUrl : string
   name: string
   favicon: string
   baseUrl: string
@@ -75,8 +75,8 @@ export interface ICustomPaginationLabels {
 
 export interface IConfigPage {
   name: string
-  itemName : string
   id: string
+  itemName : string
   description: string
   requestHeaders: any
   methods: IConfigMethods
@@ -107,7 +107,6 @@ export type TConfigInputField = 'text' | 'long-text' | 'object' | 'encode' | 'in
 export interface IConfigInputField {
   originalName?: string
   name: string
-  hidden?: boolean
   value: any
   type?: TConfigInputField
   label?: string
@@ -162,6 +161,7 @@ export interface IConfigGetAllMethod extends IConfigMethod {
 
 export interface IConfigGetSingleMethod extends IConfigMethod {
   dataPath: string,
+  dataTransform?: ConfigFunction,
   responseType: 'json' | 'text' | 'boolean' | 'status';
 }
 

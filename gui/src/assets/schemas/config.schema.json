@@ -33,6 +33,10 @@
       "type": "string",
       "description": "A URL for you app's favicon."
     },
+    "loginUrl": {
+      "type": "string",
+      "description": "A URL for you app's login entry point."
+    },
     "customStyles": {
       "$ref": "#/definitions/customStyles"
     },
