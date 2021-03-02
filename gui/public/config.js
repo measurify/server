@@ -5,14 +5,12 @@ export default {
   unauthorizedRedirectUrl: "/#/",
 
   pages: [
-
     ///////////// THINGS PAGES
     {
       name: "Things",
       id: "things",
-      description: 'Visualizzazione e gestione delle Thing',
-      itemName :"Thing",
-
+      description: "Visualizzazione e gestione delle Thing",
+      itemName: "Thing",
 
       methods: {
         getAll: {
@@ -28,15 +26,15 @@ export default {
               label: "ID",
             },
             {
-              "name": "tags",
-              "type": "select",
-              "label": "Filtra Tag",
-              "optionSource" : {
-                "url": "/tags",
-                "dataPath": "docs",
-                "displayPath": "_id",
-                "valuePath": "_id"
-              }
+              name: "tags",
+              type: "select",
+              label: "Filtra Tag",
+              optionSource: {
+                url: "/tags",
+                dataPath: "docs",
+                displayPath: "_id",
+                valuePath: "_id",
+              },
             },
             {
               name: "limit",
@@ -60,45 +58,51 @@ export default {
             {
               name: "_id",
               type: "text",
-              label: "ID"
+              label: "ID",
             },
             {
               name: "visibility",
               type: "text",
-              label: "Visibility"
+              label: "Visibility",
             },
             {
               name: "relations_enroll",
               type: "text",
-              label: "Relations"
+              label: "Relations",
             },
             {
               name: "tags_enroll",
               type: "text",
-              label: "Tags"
+              label: "Tags",
             },
           ],
 
           dataTransform: (items) =>
             items.map((item) =>
               Object.assign(item, {
-                tags_enroll: item.tags.join() !== "" ? '['+item.tags.join(' , ')+']' : "Nessun Tag",
-                relations_enroll:  item.relations.join() !== "" ? '['+item.relations.join()+']' : "Nessuna Relation"
+                tags_enroll:
+                  item.tags.join() !== ""
+                    ? "[" + item.tags.join(" , ") + "]"
+                    : "Nessun Tag",
+                relations_enroll:
+                  item.relations.join() !== ""
+                    ? "[" + item.relations.join() + "]"
+                    : "Nessuna Relation",
               })
             ),
 
           pagination: {
             type: "buttons",
             source: "query",
-            params: { page: { name: "page" } , limit : {name: "limit"}}, 
-            fields: { total: { dataPath: "totalDocs" } }
+            params: { page: { name: "page" }, limit: { name: "limit" } },
+            fields: { total: { dataPath: "totalDocs" } },
           },
         },
         getSingle: {
           url: "/things/:_id/",
           dataPath: "docs",
           queryParams: [],
-          requestHeaders: {}
+          requestHeaders: {},
         },
         put: {
           url: "/things/:_id",
@@ -106,8 +110,8 @@ export default {
             {
               name: "tags",
               type: "array",
-              arrayType : "text",
-              label: "Tags"
+              arrayType: "text",
+              label: "Tags",
             },
           ],
         },
@@ -118,25 +122,25 @@ export default {
             {
               name: "_id",
               label: "ID",
-              type: "text"
+              type: "text",
             },
             {
               name: "visibility",
               type: "text",
-              label: "Visibility"
+              label: "Visibility",
             },
             {
               name: "relations",
               type: "array",
-              arrayType : "text",
-              label: "Relations"
+              arrayType: "text",
+              label: "Relations",
             },
             {
               name: "tags",
               type: "array",
-              arrayType : "text",
-              label: "Tags"
-            }
+              arrayType: "text",
+              label: "Tags",
+            },
           ],
         },
         delete: {
@@ -145,35 +149,34 @@ export default {
       },
     },
 
- 
     ///////////// FEATURES PAGE
     {
       name: "Features",
       id: "features",
       description: "Visualizzazione e gestione delle Feature.",
-      itemName :"Feature",
+      itemName: "Feature",
       methods: {
         getAll: {
           label: "Get All",
           dataPath: "docs",
           url: "/features",
-          "queryParams": [
+          queryParams: [
             {
-              "name": "_id",
-              "value": "",
-              "label": "ID",
-              "type": "text"
+              name: "_id",
+              value: "",
+              label: "ID",
+              type: "text",
             },
             {
-              "name": "tags",
-              "type": "select",
-              "label": "Filtra Tag",
-              "optionSource" : {
-                "url": "/tags",
-                "dataPath": "docs",
-                "displayPath": "_id",
-                "valuePath": "_id"
-              }
+              name: "tags",
+              type: "select",
+              label: "Filtra Tag",
+              optionSource: {
+                url: "/tags",
+                dataPath: "docs",
+                displayPath: "_id",
+                valuePath: "_id",
+              },
             },
             {
               name: "limit",
@@ -196,44 +199,50 @@ export default {
             {
               name: "_id",
               type: "text",
-              label: "Id"
+              label: "Id",
             },
             {
               name: "visibility",
               type: "text",
-              label: "Visibility"
+              label: "Visibility",
             },
             {
               name: "tags_enroll",
               type: "text",
-              label: "Tags"
+              label: "Tags",
             },
             {
               name: "item_name_enroll",
               type: "text",
-              label: "Items"
+              label: "Items",
             },
           ],
 
           dataTransform: (items) =>
             items.map((item) =>
               Object.assign(item, {
-                tags_enroll: item.tags.join() !== "" ? '['+item.tags.join(' , ')+']' : "Nessun Tag",
-                item_name_enroll: item.items.map(e => e.name).join() !== "" ? '['+item.items.map(e => e.name).join(' , ')+']' : "Nessun Item"
+                tags_enroll:
+                  item.tags.join() !== ""
+                    ? "[" + item.tags.join(" , ") + "]"
+                    : "Nessun Tag",
+                item_name_enroll:
+                  item.items.map((e) => e.name).join() !== ""
+                    ? "[" + item.items.map((e) => e.name).join(" , ") + "]"
+                    : "Nessun Item",
               })
             ),
 
           pagination: {
             type: "buttons",
             source: "query",
-            params: { page: { name: "page" } , limit : {name: "limit"}}, 
-            fields: { total: { dataPath: "totalDocs" } }
+            params: { page: { name: "page" }, limit: { name: "limit" } },
+            fields: { total: { dataPath: "totalDocs" } },
           },
         },
         getSingle: {
           url: "/features/:_id",
           queryParams: [],
-          requestHeaders: {}
+          requestHeaders: {},
         },
         post: {
           url: "/features/",
@@ -241,33 +250,33 @@ export default {
             {
               name: "_id",
               label: "ID",
-              type: "text"
+              type: "text",
             },
             {
               name: "visibility",
               type: "text",
-              label: "Visibility"
+              label: "Visibility",
             },
             {
               name: "tags",
               type: "array",
-              arrayType : "text",
-              label: "Tags"
+              arrayType: "text",
+              label: "Tags",
             },
             {
               name: "items",
               type: "array",
-              arrayType : "object",
+              arrayType: "object",
               label: "Items",
-              value : [
-                 { 
-                    "dimension": "0 scalar / 1 array / 2 matrix",
-                     "type": "", 
-                     "name": "", 
-                     "unit": "" 
-                    }
-                  ]
-            }
+              value: [
+                {
+                  dimension: "0 scalar / 1 array / 2 matrix",
+                  type: "",
+                  name: "",
+                  unit: "",
+                },
+              ],
+            },
           ],
         },
         delete: {
@@ -281,63 +290,63 @@ export default {
           url: "/features/:_id",
           dataPath: "items",
           actualMethod: "put",
-          icon : "search-plus",
+          icon: "search-plus",
           fields: [
             {
               name: "_id",
               label: "ID",
-              type: "text"
+              type: "text",
             },
             {
               name: "visibility",
               label: "Visibility",
-              type: "text"
+              type: "text",
             },
             {
               name: "tags",
               label: "Tags",
               type: "array",
-              arrayType : "text",
-            },{
+              arrayType: "text",
+            },
+            {
               name: "items",
               type: "array",
-              arrayType : "object",
-              label: "Items"
+              arrayType: "object",
+              label: "Items",
             },
           ],
         },
       ],
     },
 
-
     //////////// DEVICES PAGE
     {
       name: "Devices",
       id: "devices",
       description: "Visualizzazione e gestione dei Device.",
-      itemName :"Device",
+      itemName: "Device",
       methods: {
         getAll: {
           label: "Get All",
           dataPath: "docs",
           url: "/devices",
-          "queryParams": [
+          queryParams: [
             {
-              "name": "_id",
-              "value": "",
-              "label": "ID",
-              "type": "text"
+              name: "_id",
+              value: "",
+              label: "ID",
+              type: "text",
             },
             {
-              "name": "tags",
-              "type": "select",
-              "label": "Filtra Tag",
-              "optionSource" : {
-                "url": "/tags",
-                "dataPath": "docs",
-                "displayPath": "_id",
-                "valuePath": "_id"
-              }
+              name: "tags",
+              type: "select",
+              label: "Filtra Tag",
+              optionSource: {
+                url: "/tags",
+                dataPath: "docs",
+                displayPath: "_id",
+                valuePath: "_id",
+              },
             },
             {
               name: "limit",
@@ -360,60 +369,69 @@ export default {
             {
               name: "_id",
               type: "text",
-              label: "Id"
+              label: "Id",
             },
             {
               name: "visibility",
               type: "text",
-              label: "Visibility"
+              label: "Visibility",
             },
             {
               name: "period",
               type: "text",
-              label: "Period"
+              label: "Period",
             },
             {
               name: "cycle",
               type: "text",
-              label: "Cicle"
+              label: "Cicle",
             },
             {
               name: "tags_enroll",
               type: "text",
-              label: "Tags"
+              label: "Tags",
             },
             {
               name: "features_enroll",
               type: "text",
-              label: "Features"
+              label: "Features",
             },
             {
               name: "scripts_enroll",
               type: "text",
-              label: "Scripts"
-            }
+              label: "Scripts",
+            },
           ],
 
           dataTransform: (items) =>
             items.map((item) =>
               Object.assign(item, {
-                tags_enroll: item.tags.join() !== "" ? '['+item.tags.join(' , ')+']' : "Nessun Tag",
-                features_enroll: item.features.join() !== "" ? '['+item.features.join(' , ')+']' : "Nessuna Feature",
-                scripts_enroll: item.scripts.join() !== "" ? '['+item.scripts.join(' , ')+']' : "Nessuno Script"
+                tags_enroll:
+                  item.tags.join() !== ""
+                    ? "[" + item.tags.join(" , ") + "]"
+                    : "Nessun Tag",
+                features_enroll:
+                  item.features.join() !== ""
+                    ? "[" + item.features.join(" , ") + "]"
+                    : "Nessuna Feature",
+                scripts_enroll:
+                  item.scripts.join() !== ""
+                    ? "[" + item.scripts.join(" , ") + "]"
+                    : "Nessuno Script",
               })
             ),
 
           pagination: {
             type: "buttons",
             source: "query",
-            params: { page: { name: "page" } , limit : {name: "limit"}}, 
-            fields: { total: { dataPath: "totalDocs" } }
+            params: { page: { name: "page" }, limit: { name: "limit" } },
+            fields: { total: { dataPath: "totalDocs" } },
           },
         },
         getSingle: {
           url: "/devices/:_id",
           queryParams: [],
-          requestHeaders: {}
+          requestHeaders: {},
         },
         post: {
           url: "/devices",
@@ -421,7 +439,7 @@ export default {
             {
               name: "name",
               label: "Name",
-              type: "text"
+              type: "text",
             },
           ],
         },
@@ -429,66 +447,63 @@ export default {
           url: "/devices/:_id",
         },
       },
-
-      
     },
-
 
     ///////////// MEASUREMENTS PAGE
     {
       name: "Measurements",
       id: "measurements",
       description: "Visualizzazione e gestione delle Measure.",
-      itemName :"Measure",
+      itemName: "Measure",
       methods: {
         getAll: {
           label: "Get All",
           dataPath: "docs",
           url: "/measurements",
-          "queryParams": [
+          queryParams: [
             {
-              "name": "thing",
-              "type": "select",
-              "label": "Filtra Thing",
-              "optionSource" : {
-                "url": "/things",
-                "dataPath": "docs",
-                "displayPath": "_id",
-                "valuePath": "_id"
-              }
+              name: "thing",
+              type: "select",
+              label: "Filtra Thing",
+              optionSource: {
+                url: "/things",
+                dataPath: "docs",
+                displayPath: "_id",
+                valuePath: "_id",
+              },
             },
             {
-              "name": "feature",
-              "type": "select",
-              "label": "Filtra Feature",
-              "optionSource" : {
-                "url": "/features",
-                "dataPath": "docs",
-                "displayPath": "_id",
-                "valuePath": "_id"
-              }
+              name: "feature",
+              type: "select",
+              label: "Filtra Feature",
+              optionSource: {
+                url: "/features",
+                dataPath: "docs",
+                displayPath: "_id",
+                valuePath: "_id",
+              },
             },
             {
-              "name": "device",
-              "type": "select",
-              "label": "Filtra Device",
-              "optionSource" : {
-                "url": "/devices",
-                "dataPath": "docs",
-                "displayPath": "_id",
-                "valuePath": "_id"
-              }
+              name: "device",
+              type: "select",
+              label: "Filtra Device",
+              optionSource: {
+                url: "/devices",
+                dataPath: "docs",
+                displayPath: "_id",
+                valuePath: "_id",
+              },
             },
             {
-              "name": "tags",
-              "type": "select",
-              "label": "Filtra Tag",
-              "optionSource" : {
-                "url": "/tags",
-                "dataPath": "docs",
-                "displayPath": "_id",
-                "valuePath": "_id"
-              }
+              name: "tags",
+              type: "select",
+              label: "Filtra Tag",
+              optionSource: {
+                url: "/tags",
+                dataPath: "docs",
+                displayPath: "_id",
+                valuePath: "_id",
+              },
             },
             {
               name: "limit",
@@ -511,64 +526,97 @@ export default {
             {
               name: "_id",
               type: "text",
-              label: "Id"
+              label: "Id",
             },
             {
               name: "feature",
               type: "text",
-              label: "Feature"
+              label: "Feature",
             },
             {
               name: "sample_enroll",
               type: "text",
-              label: "Sample"
+              label: "Sample",
             },
-            
+
             {
               name: "thing",
               type: "text",
-              label: "Thing"
+              label: "Thing",
             },
-            
+
             {
               name: "device",
               type: "text",
-              label: "Device"
+              label: "Device",
             },
             {
               name: "visibility",
               type: "text",
-              label: "Visibility"
+              label: "Visibility",
             },
             {
               name: "tags_enroll",
               type: "text",
-              label: "Tags"
-            }
-            
+              label: "Tags",
+            },
           ],
 
           dataTransform: (items) =>
             items.map((item) =>
               Object.assign(item, {
-                tags_enroll: item.tags.join() !== "" ? '['+item.tags.join(' , ')+']' : "Nessun Tag",
-                sample_enroll:'['+item.samples.map(e => e.values).join(" , ")+']'
+                tags_enroll:
+                  item.tags.join() !== ""
+                    ? "[" + item.tags.join(" , ") + "]"
+                    : "Nessun Tag",
+                sample_enroll:
+                  "[" + item.samples.map((e) => e.values).join(" , ") + "]",
               })
             ),
 
           pagination: {
             type: "buttons",
             source: "query",
-            params: { page: { name: "page" } , limit : {name: "limit"}}, 
-            fields: { total: { dataPath: "totalDocs" } }
+            params: { page: { name: "page" }, limit: { name: "limit" } },
+            fields: { total: { dataPath: "totalDocs" } },
           },
         },
         getSingle: {
           url: "/measurements/:_id",
           queryParams: [],
-          requestHeaders: {}
+          requestHeaders: {},
         },
-      
+
+        graph: {
+          url: "/measurements/",
+          fields: [
+            {
+              name: "feature",
+              required : true,
+              type: "select",
+              label: "Sel. Feature",
+              optionSource: {
+                url: "/features",
+                dataPath: "docs",
+                displayPath: "_id",
+                valuePath: "_id",
+              },
+            },
+
+            {
+              name: "device",
+              type: "select",
+              label: "Sel. Device",
+              optionSource: {
+                url: "/devices",
+                dataPath: "docs",
+                displayPath: "_id",
+                valuePath: "_id",
+              },
+            },
+          ],
+        },
+
         delete: {
           url: "/features/:_id",
         },
@@ -580,86 +628,83 @@ export default {
           url: "/features/:_id",
           dataPath: "items",
           actualMethod: "put",
-          icon : "search",
+          icon: "search",
           fields: [
             {
               name: "_id",
               label: "ID",
               type: "text",
-              readonly : true
+              readonly: true,
             },
             {
               name: "startDate",
               label: "Start Date",
               type: "text",
-              readonly : true
+              readonly: true,
             },
             {
               name: "endDate",
               label: "End Date",
               type: "text",
-              readonly : true
+              readonly: true,
             },
             {
               name: "visibility",
               label: "Visibility",
-              type: "text"
+              type: "text",
             },
             {
               name: "thing",
               label: "Thing",
               type: "text",
-              readonly : true
+              readonly: true,
             },
             {
               name: "feature",
               label: "Feature",
               type: "text",
-              readonly : true
+              readonly: true,
             },
             {
               name: "device",
               label: "Device",
               type: "text",
-              readonly : true
+              readonly: true,
             },
             {
               name: "samples",
               type: "array",
-              arrayType : "object",
-              label: "Samples"
+              arrayType: "object",
+              label: "Samples",
             },
             {
               name: "tags",
               label: "Tags",
               type: "array",
-              arrayType : "text",
+              arrayType: "text",
             },
-            
           ],
         },
       ],
-      
     },
-    
 
     //////////////////  TAGS PAGE
     {
       name: "Tags",
       id: "tags",
       description: "Visualizzazione e gestione dei Tag.",
-      itemName :"Tag",
+      itemName: "Tag",
       methods: {
         getAll: {
           label: "Get All",
           dataPath: "docs",
           url: "/tags",
-          "queryParams": [
+          queryParams: [
             {
-              "name": "_id",
-              "value": "",
-              "label": "ID",
-              "type": "text"
+              name: "_id",
+              value: "",
+              label: "ID",
+              type: "text",
             },
             {
               name: "limit",
@@ -682,33 +727,36 @@ export default {
             {
               name: "_id",
               type: "text",
-              label: "Id"
+              label: "Id",
             },
             {
               name: "tags_enroll",
               type: "text",
-              label: "Tags"
-            }
+              label: "Tags",
+            },
           ],
 
           dataTransform: (items) =>
             items.map((item) =>
               Object.assign(item, {
-                tags_enroll: item.tags.join() !== "" ? '['+item.tags.join(' , ')+']' : "Nessun Tag"
+                tags_enroll:
+                  item.tags.join() !== ""
+                    ? "[" + item.tags.join(" , ") + "]"
+                    : "Nessun Tag",
               })
             ),
 
           pagination: {
             type: "buttons",
             source: "query",
-            params: { page: { name: "page" } , limit : {name: "limit"}}, 
-            fields: { total: { dataPath: "totalDocs" } }
+            params: { page: { name: "page" }, limit: { name: "limit" } },
+            fields: { total: { dataPath: "totalDocs" } },
           },
         },
         getSingle: {
           url: "/tags/:_id",
           queryParams: [],
-          requestHeaders: {}
+          requestHeaders: {},
         },
         post: {
           url: "/tags",
@@ -716,7 +764,7 @@ export default {
             {
               name: "name",
               label: "Name",
-              type: "text"
+              type: "text",
             },
           ],
         },
@@ -724,9 +772,6 @@ export default {
           url: "/tags/:_id",
         },
       },
-
-      
     },
-
   ],
 };

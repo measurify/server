@@ -20,7 +20,8 @@ const locale = Object.freeze({
     select : "",
     add : "Aggiungi",
     update : "Aggiorna",
-    session_expired : "Sessione scaduta"
+    session_expired : "Sessione scaduta",
+    graph : "Grafico"
 
 });
 

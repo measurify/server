@@ -90,6 +90,7 @@ export interface IConfigMethods {
   post: IConfigPostMethod
   put: IConfigPutMethod
   delete: IConfigDeleteMethod
+  graph : IConfigGraphMethod
 }
 
 export type TConfigMethod = 'get' | 'post' | 'put' | 'delete' | 'patch';
@@ -175,6 +176,10 @@ export interface IConfigPutMethod extends IConfigMethod {
 }
 
 export interface IConfigDeleteMethod extends IConfigMethod { }
+
+export interface IConfigGraphMethod extends IConfigMethod {
+  fields: IConfigInputField[]
+}
 
 export interface IConfigCustomAction extends IConfigMethod {
   name: string

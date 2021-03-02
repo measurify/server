@@ -172,6 +172,9 @@
         "post": {
           "$ref": "#/definitions/post"
         },
+        "graph": {
+          "$ref": "#/definitions/post"
+        },
         "put": {
           "$ref": "#/definitions/put"
         },
@@ -297,6 +300,27 @@
         }
       ],
       "description": "The post method will be used to create new items in your API resource."
+    },
+    "graph": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/method"
+        },
+        {
+          "properties": {
+            "fields": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/inputField"
+              }
+            }
+          },
+          "required": [
+            "fields"
+          ]
+        }
+      ],
+      "description": "This method will be used to create graph with the resource within the page."
     },
     "put": {
       "allOf": [

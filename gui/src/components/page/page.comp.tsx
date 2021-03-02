@@ -18,6 +18,7 @@ import {
   IConfigGetSingleMethod,
   ICustomLabels,
   IConfigPagination,
+  IConfigGraphMethod,
 } from "../../common/models/config.model";
 import {
   IPaginationState,
@@ -45,6 +46,7 @@ import {
 import locale from "../../common/locale.js";
 
 import "./page.scss";
+import { GraphPopup } from "../graphPopup/graphPopup.comp";
 
 interface IProps {
   context: IAppContext;
@@ -56,6 +58,13 @@ interface IPopupProps {
   config: IConfigPostMethod | IConfigPutMethod;
   submitCallback: (body: any, containFiles: boolean) => void;
   getSingleConfig?: IConfigGetSingleMethod;
+  rawData?: {};
+}
+
+interface IGraphProps {
+  title: string;
+  config: IConfigGraphMethod;
+  getAllConfig?: IConfigGetAllMethod;
   rawData?: {};
 }
 
@@ -167,6 +176,7 @@ const PageComp = ({ context }: IProps) => {
   const getSingleConfig: IConfigGetSingleMethod | undefined =
     pageMethods?.getSingle;
   const postConfig: IConfigPostMethod | undefined = pageMethods?.post;
+  const graphConfig: IConfigGraphMethod | undefined = pageMethods?.graph;
   const putConfig: IConfigPutMethod | undefined = pageMethods?.put;
   const deleteConfig: IConfigDeleteMethod | undefined = pageMethods?.delete;
   const customLabels: ICustomLabels | undefined = {
@@ -176,12 +186,14 @@ const PageComp = ({ context }: IProps) => {
   const addItemLabel =
     customLabels?.buttons?.addItem ||
     "+ " + locale.add + " " + activePage?.itemName;
+  const openGraphLabel = locale.graph + " " + activePage?.itemName;
   const addItemFormTitle =
     customLabels?.formTitles?.addItem ||
     locale.add + " " + activePage?.itemName;
   const editItemFormTitle =
     customLabels?.formTitles?.editItem ||
     locale.update + " " + activePage?.itemName;
+  const graphTitle = locale.graph + " " + activePage?.itemName;
   const {
     initQueryParams,
     initialPagination,
@@ -191,6 +203,7 @@ const PageComp = ({ context }: IProps) => {
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [openedPopup, setOpenedPopup] = useState<null | IPopupProps>(null);
+  const [openedGraph, setOpenedGraph] = useState<null | IGraphProps>(null);
   const [queryParams, setQueryParams] = useState<IConfigInputField[]>(
     initQueryParams
   );
@@ -202,6 +215,28 @@ const PageComp = ({ context }: IProps) => {
 
   function closeFormPopup(refreshData: boolean = false) {
     setOpenedPopup(null);
+
+    if (refreshData === true) {
+      if (pagination?.type === "infinite-scroll") {
+        setItems([]);
+        const updatedParams = [...queryParams];
+        remove(updatedParams, (param) =>
+          ["page", "limit"].includes(param.name)
+        );
+        setQueryParams(
+          buildInitQueryParamsAndPaginationState(
+            updatedParams,
+            paginationConfig
+          ).initQueryParams
+        );
+      } else {
+        getAllRequest();
+      }
+    }
+  }
+
+  function closeGraph(refreshData: boolean = false) {
+    setOpenedGraph(null);
 
     if (refreshData === true) {
       if (pagination?.type === "infinite-scroll") {
@@ -247,8 +282,18 @@ const PageComp = ({ context }: IProps) => {
         return await performAction(body, rawData, action, containFiles);
       },
     };
-
     setOpenedPopup(params);
+  }
+
+  async function openGraphPopup(rawData: any) {
+    const params: IGraphProps = {
+      rawData,
+      title: graphTitle,
+      config: graphConfig as IConfigGraphMethod,
+      getAllConfig,
+    };
+
+    setOpenedGraph(params);
   }
 
   async function performAction(
@@ -922,6 +967,20 @@ const PageComp = ({ context }: IProps) => {
           <h2>{activePage?.name}</h2>
           {activePage?.description && <h4>{activePage?.description}</h4>}
         </hgroup>
+        {graphConfig && (
+          <Button
+            className="add-item"
+            color="green"
+            onClick={() =>
+              setOpenedGraph({
+                title: graphTitle,
+                config: graphConfig,
+              })
+            }
+          >
+            {openGraphLabel}
+          </Button>
+        )}
         {postConfig && (
           <Button
             className="add-item"
@@ -949,6 +1008,15 @@ const PageComp = ({ context }: IProps) => {
           rawData={openedPopup.rawData}
           getSingleConfig={openedPopup.getSingleConfig}
           methodConfig={openedPopup.config}
+        />
+      )}
+      {openedGraph && (
+        <GraphPopup
+          title={openedGraph.title}
+          closeCallback={closeGraph}
+          fields={openedGraph.config?.fields || []}
+          rawData={openedGraph.rawData}
+          getAllConfig={openedGraph.getAllConfig}
         />
       )}
     </div>
