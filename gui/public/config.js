@@ -270,7 +270,7 @@ export default {
               label: "Items",
               value: [
                 {
-                  dimension: "0 scalar / 1 array / 2 matrix",
+                  dimension: "0 scalar / 1 array / 2 matrix || remove quotes ||",
                   type: "",
                   name: "",
                   unit: "",
@@ -286,7 +286,7 @@ export default {
 
       customActions: [
         {
-          name: "Expand and edit",
+          name: "Expand and Edit",
           url: "/features/:_id",
           dataPath: "items",
           actualMethod: "put",
@@ -295,6 +295,38 @@ export default {
             {
               name: "_id",
               label: "ID",
+              type: "text",
+              readonly: true,
+            },
+            {
+              name: "visibility",
+              label: "Visibility",
+              type: "text",
+            },
+            {
+              name: "tags",
+              label: "Tags",
+              type: "array",
+              arrayType: "text",
+            },
+            {
+              name: "items",
+              type: "array",
+              arrayType: "object",
+              label: "Items",
+            },
+          ],
+        },
+        {
+          name: "Clone and Edit",
+          url: "/features/",
+          dataPath: "items",
+          actualMethod: "post",
+          icon: "copy",
+          fields: [
+            {
+              name: "_id",
+              label: "Insert new ID",
               type: "text",
             },
             {
@@ -437,10 +469,43 @@ export default {
           url: "/devices",
           fields: [
             {
-              name: "name",
-              label: "Name",
+              name: "_id",
               type: "text",
+              label: "Id",
             },
+            {
+              name: "visibility",
+              type: "text",
+              label: "Visibility",
+            },
+            {
+              name: "period",
+              type: "text",
+              label: "Period",
+            },
+            {
+              name: "cycle",
+              type: "text",
+              label: "Cicle",
+            },
+            {
+              name: "tags",
+              type: "array",
+              arrayType: "text",
+              label: "Tags",
+            },
+            {
+              name: "features",
+              type: "array",
+              arrayType: "text",
+              label: "Features",
+            },
+            {
+              name: "scripts",
+              type: "array",
+              arrayType: "text",
+              label: "Scripts",
+            }
           ],
         },
         delete: {
@@ -570,7 +635,7 @@ export default {
                     ? "[" + item.tags.join(" , ") + "]"
                     : "Nessun Tag",
                 sample_enroll:
-                  "[" + item.samples.map((e) => e.values).join(" , ") + "]",
+                  ""+ item.samples.map((e) => " { "+ e.values.map((j) =>" [ "+ j +" ] " )+" } ") + "",
               })
             ),
 
@@ -589,6 +654,7 @@ export default {
 
         graph: {
           url: "/measurements/",
+          dataPath: "docs",
           fields: [
             {
               name: "feature",
@@ -614,6 +680,7 @@ export default {
                 valuePath: "_id",
               },
             },
+
           ],
         },
 
@@ -762,8 +829,8 @@ export default {
           url: "/tags",
           fields: [
             {
-              name: "name",
-              label: "Name",
+              name: "_id",
+              label: "Tag ID",
               type: "text",
             },
           ],

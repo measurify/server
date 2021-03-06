@@ -20,8 +20,13 @@ import { fileHelpers } from "../../helpers/file.helpers";
 import { IAppContext } from "../app.context";
 import { withAppContext } from "../withContext/withContext.comp";
 import locale from "../../common/locale";
+import { GraphHolder } from "../graphHolder/graphHolder";
 
 import "./graphPopup.scss";
+import { QueryParams } from "../queryParams/queryParams.comp";
+import "../queryParams/queryParams.scss";
+import { IFetchParams } from "../../services/http.service";
+import { createEmitAndSemanticDiagnosticsBuilderProgram } from "typescript";
 
 const unflatten = require("flat").unflatten;
 
@@ -29,168 +34,187 @@ interface IProps {
   context: IAppContext;
   title: string;
   fields: IConfigInputField[];
-  rawData?: any;
-  getAllConfig?: IConfigGetAllMethod;
-  methodConfig: IConfigGraphMethod;
+
+  graphConfig: IConfigGraphMethod;
   closeCallback: (reloadData: boolean) => void;
 }
 
+interface IGraphData {
+  nameStruct: string;
+  unitMeasure: string;
+  dataStruct: any;
+}
+
 export const GraphPopup = withAppContext(
-  ({
-    context,
-    title,
-    fields,
-    rawData,
-    getAllConfig,
-    methodConfig,
-    closeCallback,
-  }: IProps) => {
+  ({ context, title, fields, graphConfig, closeCallback }: IProps) => {
     const fieldsCopy: IConfigInputField[] = JSON.parse(JSON.stringify(fields));
     const { httpService, activePage, config } = context;
     const [loading, setLoading] = useState<boolean>(true);
-    const [formFields, setFormFields] = useState<IConfigInputField[]>([]);
-    const [finalRawData, setFinalRawData] = useState<any>(null);
+    const [doneQuery, setDoneQuery] = useState<boolean>(true);
+    const [showGraph, setShowGraph] = useState<boolean>(true);
+    const [titleState, setTitleState] = useState<String>(title);
     const pageHeaders: any = activePage?.requestHeaders || {};
+    const [formFields, setFormFields] = useState<IConfigInputField[]>(
+      fieldsCopy
+    );
+    const [graphData, setGraphData] = useState<IGraphData[]>();
+
     const customLabels: ICustomLabels | undefined = {
       ...config?.customLabels,
       ...activePage?.customLabels,
     };
 
-    async function initFormFields() {
-      let finalRawData: any = rawData || {};
-
-      if (getAllConfig && getAllConfig.url) {
-        try {
-          const {
-            url,
-            requestHeaders,
-            actualMethod,
-            dataPath,
-            queryParams,
-            dataTransform,
-          } = getAllConfig;
-          const result = await httpService.fetch({
-            method: "get",
-            origUrl: url,
-            queryParams,
-            headers: Object.assign({}, pageHeaders, requestHeaders || {}),
-            rawData,
-          });
-
-          let extractedData = dataHelpers.extractDataByDataPath(
-            result,
-            dataPath
-          );
-
-          if (typeof dataTransform === "function") {
-            extractedData = await dataTransform(extractedData);
+    function graphChanged(
+      fieldName: string,
+      value: any,
+      submitAfterChange?: boolean
+    ) {
+      const updatedQueryParams: IConfigInputField[] = [...formFields].map(
+        (formFields) => {
+          if (formFields.name === fieldName) {
+            formFields.value = value;
           }
-
-          if (
-            extractedData &&
-            (typeof extractedData === "object" ||
-              typeof extractedData === "string")
-          ) {
-            finalRawData = extractedData;
-          }
-        } catch (e) {
-          console.error("Could not load single item's data.", e);
-          toast.error("Could not load single item's data.");
+          return formFields;
         }
+      );
+      setFormFields(updatedQueryParams);
+      if (submitAfterChange) {
+        submitGraph();
       }
+    }
 
-      setFinalRawData(finalRawData); // Store the raw data for later.
+    async function submitGraph() {
+      console.log(formFields.map((e) => e.value));
 
-      setFormFields(
-        fieldsCopy.map((field) => {
-          let key = field.name;
+      setLoading(true);
+      setDoneQuery(true);
 
-          field.originalName = field.name;
+      const results = await httpService.fetch({
+        method: "get",
+        origUrl: graphConfig.url,
+        queryParams: formFields,
+        headers: pageHeaders,
+      });
 
-          let dataPathSplit: string[] = [];
+      let queryFeature = "";
 
-          if (field.dataPath) {
-            dataPathSplit = field.dataPath.split(".");
-            key = `${field.dataPath}.${field.name}`;
-          }
+      formFields.map((f) =>
+        f.name === "feature" ? (queryFeature = f.value) : {}
+      );
 
-          const lookup = () => {
-            let objToLookIn = finalRawData;
-            for (const pathElem of dataPathSplit) {
-              if (
-                objToLookIn[pathElem] !== undefined &&
-                objToLookIn[pathElem] !== null
-              ) {
-                objToLookIn = objToLookIn[pathElem];
-              } else {
-                return undefined;
-              }
-            }
-            return objToLookIn[field.name];
-          };
+      const resultsFeature = await httpService.fetch({
+        method: "get",
+        origUrl: "/features/",
+        queryParams: formFields.filter((obj) => {
+          return obj.name === "feature" && (obj.name = "_id");
+        }),
+        headers: pageHeaders,
+      });
 
-          const lookupValue = lookup();
+      let extractedData = dataHelpers.extractDataByDataPath(
+        results,
+        graphConfig.dataPath
+      );
 
-          // Changing field name to include datapath
-          // This will use us later for unflatten the final object
-          field.name = key;
+      let extractedFeature = dataHelpers.extractDataByDataPath(
+        resultsFeature,
+        "docs"
+      );
 
-          if (dataHelpers.checkIfFieldIsObject(field)) {
-            if (lookupValue || field.value) {
-              field.value =
-                JSON.stringify(lookupValue || field.value, null, "  ") || "";
-            }
-            return field;
-          }
+      console.log(extractedFeature);
 
-          if (field.type === "array") {
-            field.value = lookupValue || field.value || [];
-            return field;
-          }
+      var goodFeatures = new Array();
+      var dataFeatName = new Array<string>();
+      var dataFeatUnit = new Array<string>();
 
-          if (typeof lookupValue !== "undefined") {
-            field.value = lookupValue;
-          } else {
-            // important in order to prevent controlled / uncontrolled components error
-            field.value = typeof field.value === "undefined" ? "" : field.value;
-          }
+      console.log(goodFeatures);
 
-          if (
-            (field.type === "long-text" || field.type === "text") &&
-            typeof finalRawData === "string"
-          ) {
-            field.value = finalRawData;
-          }
-
-          return field;
+      extractedFeature.map((ft: any) =>
+        ft.items.map((comp: any, index: number) => {
+          if (comp.dimension === 0 && comp.type === "number") {
+            goodFeatures.push(index);
+            dataFeatName.push(comp.name);
+            dataFeatUnit.push(comp.unit);
+          } else return;
         })
       );
 
-      setLoading(false);
-    }
+      if (goodFeatures.length === 0) {
+        console.log("No features to plot");
+        return;
+      }
 
-    function formChanged(fieldName: string, value: any) {
-      let updatedFormFields: IConfigInputField[] = JSON.parse(
-        JSON.stringify(formFields)
+      console.log("Goodfeatures.lenght : " + goodFeatures.length);
+
+      console.log("Graph Config");
+      console.log(graphConfig);
+
+      console.log("Query results");
+      console.log(results);
+
+      console.log("Extracted data");
+      console.log(extractedData);
+
+      console.log("Extracted feature");
+      console.log(extractedFeature);
+
+      var dataStruct = new Array(goodFeatures.length);
+
+      console.log(dataStruct);
+
+      for (var i = 0; i < dataStruct.length; i++) {
+        dataStruct[i] = new Array();
+      }
+      console.log(dataStruct);
+
+      console.log("Samples");
+      extractedData.map((data: any) =>
+        data["samples"].map((sample: any) =>
+          sample["values"].map((feature: any, indexFeat: number) => {
+            if (goodFeatures.includes(indexFeat))
+              dataStruct[goodFeatures.indexOf(indexFeat)].push({
+                x: Date.parse(data["startDate"]),
+                y: feature,
+              });
+          })
+        )
       );
 
-      updatedFormFields = updatedFormFields.map((field: IConfigInputField) => {
-        if (field.name === fieldName) {
-          field.value = value;
-        }
+      var finalData = Array<IGraphData>();
+      for (i = 0; i < dataFeatName.length; i++) {
+        finalData[i] = {
+          nameStruct: dataFeatName[i],
+          dataStruct: dataStruct[i],
+          unitMeasure: dataFeatUnit[i],
+        };
+      }
 
-        return field;
-      });
+      setGraphData(finalData);
 
-      setFormFields(updatedFormFields);
+      console.log(finalData);
+
+      setShowGraph(true);
+
+      setTitleState(locale.graph + " " + extractedFeature[0]._id);
+
+      /*
+      const jsonObject = JSON.stringify(extractedData);
+
+      const toCsv = dataHelpers.arrayToCSV(jsonObject);
+
+      console.log("CSV");
+      console.log(toCsv);
+      */
+
+      setLoading(false);
     }
-
-    function submitForm() {}
 
     useEffect(() => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
 
       setLoading(false);
+      setDoneQuery(false);
+      setShowGraph(false);
     }, []);
 
     return (
@@ -201,29 +225,33 @@ export const GraphPopup = withAppContext(
         customLabels={customLabels}
       >
         <React.Fragment>
-          <h2>{title}</h2>
+          <h2>{titleState}</h2>
 
           {loading ? (
             <Loader />
-          ) : (
+          ) : !doneQuery ? (
             <section className="query-params-form">
-              <h5>{locale.search}</h5>
-              <form onSubmit={submitForm}>
-                {fieldsCopy.map((queryParam, idx) => {
+              <h5>{locale.graph}</h5>
+              <form onSubmit={submitGraph}>
+                {formFields.map((queryParam, idx) => {
                   return (
                     <FormRow
                       key={`query_param_${idx}`}
                       field={queryParam}
-                      onChange={formChanged}
+                      onChange={graphChanged}
                       showReset={!queryParam.type || queryParam.type === "text"}
                     />
                   );
                 })}
-                <Button type="submit" onClick={submitForm}>
+                <Button type="submit" onClick={submitGraph}>
                   {locale.submit}
                 </Button>
               </form>
             </section>
+          ) : showGraph ? (
+            <GraphHolder dataMat={graphData} />
+          ) : (
+            <h1>Nessun grafico da mostrare</h1>
           )}
         </React.Fragment>
       </Popup>

@@ -64,7 +64,6 @@ interface IPopupProps {
 interface IGraphProps {
   title: string;
   config: IConfigGraphMethod;
-  getAllConfig?: IConfigGetAllMethod;
   rawData?: {};
 }
 
@@ -285,15 +284,16 @@ const PageComp = ({ context }: IProps) => {
     setOpenedPopup(params);
   }
 
-  async function openGraphPopup(rawData: any) {
+  async function openGraphPopup(graphConfig: IConfigGraphMethod) {
     const params: IGraphProps = {
-      rawData,
       title: graphTitle,
-      config: graphConfig as IConfigGraphMethod,
-      getAllConfig,
+      config: graphConfig,
     };
 
     setOpenedGraph(params);
+
+    console.log(params);
+    console.log(openedGraph);
   }
 
   async function performAction(
@@ -561,7 +561,7 @@ const PageComp = ({ context }: IProps) => {
     }
 
     updatedParams.map((queryParam, idx) => {
-      if (queryParam.type === "select" && queryParam.value === "-- Select --") {
+      if (queryParam.type === "select" && queryParam.value === locale.select) {
         // default value means nothing was selected and thus we explicitly
         // empty out the value in this case; otherwise the string '-- Select --'
         // is used as the value for the given queryParams
@@ -971,12 +971,7 @@ const PageComp = ({ context }: IProps) => {
           <Button
             className="add-item"
             color="green"
-            onClick={() =>
-              setOpenedGraph({
-                title: graphTitle,
-                config: graphConfig,
-              })
-            }
+            onClick={() => openGraphPopup(graphConfig)}
           >
             {openGraphLabel}
           </Button>
@@ -1015,8 +1010,7 @@ const PageComp = ({ context }: IProps) => {
           title={openedGraph.title}
           closeCallback={closeGraph}
           fields={openedGraph.config?.fields || []}
-          rawData={openedGraph.rawData}
-          getAllConfig={openedGraph.getAllConfig}
+          graphConfig={openedGraph.config}
         />
       )}
     </div>

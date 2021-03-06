@@ -178,7 +178,8 @@ export interface IConfigPutMethod extends IConfigMethod {
 export interface IConfigDeleteMethod extends IConfigMethod { }
 
 export interface IConfigGraphMethod extends IConfigMethod {
-  fields: IConfigInputField[]
+  fields: IConfigInputField[],
+  dataPath: string
 }
 
 export interface IConfigCustomAction extends IConfigMethod {

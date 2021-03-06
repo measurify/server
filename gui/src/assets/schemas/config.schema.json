@@ -313,6 +313,10 @@
               "items": {
                 "$ref": "#/definitions/inputField"
               }
+              },
+            "dataPath": {
+              "type": "string",
+              "description": "TODO"
             }
           },
           "required": [
