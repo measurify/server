@@ -15,13 +15,21 @@ const locale = Object.freeze({
     items: "totali",
     nothing_to_see: "Nessun risultato",
     enter_text: "Inserisci testo",
+    enter_email: "Inserisci email",
+    enter_date: "Inserisci data",
+    enter_color: "Inserisci colore",
+    enter_password: "Inserisci password",
     next : "Successivo",
     previous : "Precedente",
     select : "",
     add : "Aggiungi",
     update : "Aggiorna",
     session_expired : "Sessione scaduta",
-    graph : "Grafico"
+    login : "Accedi",
+    logout : "Esci",
+    graph : "Grafico",
+    no_graph_error : "Questa versione del software non può costruire un grafico delle feature selezionate. Possono essere mostrati i grafici solamente di feature aventi almeno una componente scalare e numerica",
+    add_tenant : "Aggiungi organizzazione"
 
 });
 

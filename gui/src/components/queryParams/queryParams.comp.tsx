@@ -74,7 +74,7 @@ export const QueryParams = ({
       <h5>{locale.search}</h5>
       <form onSubmit={submit}>
         {queryParams.map((queryParam, idx) => {
-          //if(queryParam.name == 'page') return "";
+          if (queryParam.name == "page") return "";
           //if (queryParam.hidden) return "";
           return (
             <FormRow

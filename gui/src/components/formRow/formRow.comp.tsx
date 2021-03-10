@@ -280,7 +280,7 @@ export const FormRow = withAppContext(
             <input
               type="color"
               {...inputProps(
-                customLabels?.placeholders?.color || "Enter color..."
+                customLabels?.placeholders?.color || locale.enter_color
               )}
             />
           );
@@ -289,7 +289,7 @@ export const FormRow = withAppContext(
             <input
               type="email"
               {...inputProps(
-                customLabels?.placeholders?.email || "Enter email..."
+                customLabels?.placeholders?.email || locale.enter_email
               )}
             />
           );
@@ -298,7 +298,7 @@ export const FormRow = withAppContext(
             <input
               type="password"
               {...inputProps(
-                customLabels?.placeholders?.password || "Enter password..."
+                customLabels?.placeholders?.password || locale.enter_password
               )}
             />
           );
@@ -326,7 +326,7 @@ export const FormRow = withAppContext(
             <input
               type="date"
               {...inputProps(
-                customLabels?.placeholders?.date || "Enter date..."
+                customLabels?.placeholders?.date || locale.enter_date
               )}
             />
           );

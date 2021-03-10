@@ -5,6 +5,105 @@ export default {
   unauthorizedRedirectUrl: "/#/",
 
   pages: [
+
+      ///////////// USERS PAGES
+      {
+        name: "Users",
+        id: "users",
+        description: "Visualizzazione e gestione degli User",
+        itemName: "User",
+  
+        methods: {
+          getAll: {
+            dataPath: "docs",
+            label: "Users",
+            url: "/users/",
+  
+            queryParams: [
+              {
+                name: "username",
+                value: "",
+                type: "text",
+                label: "Username",
+              },
+              {
+                name: "limit",
+                value: "",
+                type: "select",
+                options: ["5", "10", "50"],
+                label: "Risultati per pagina",
+              },
+            ],
+  
+            display: {
+              type: "table",
+            },
+            fields: [
+              
+              {
+                name: "username",
+                type: "text",
+                label: "Username",
+              },
+              {
+                name: "_id",
+                type: "text",
+                label: "ID",
+              },
+              {
+                name: "status",
+                type: "text",
+                label: "Status",
+              },
+              {
+                name: "type",
+                type: "text",
+                label: "Type",
+              },
+            ],
+  
+            
+            pagination: {
+              type: "buttons",
+              source: "query",
+              params: {page: { name: "page" }, limit: { name: "limit" } },
+              fields: { total: { dataPath: "totalDocs" } },
+            },
+          },
+          getSingle: {
+            url: "/users/:_id/",
+            dataPath: "docs",
+            queryParams: [],
+            requestHeaders: {},
+          },
+            
+          post: {
+            url: "/users/",
+            fields: [
+              {
+                name: "username",
+                label: "Username",
+                type: "text",
+              },
+              {
+                name: "password",
+                type: "text",
+                label: "Password",
+              },
+              {
+                name: "type",
+                type: "text",
+                label: "Type",
+              },
+            ],
+          },
+          delete: {
+            url: "/users/:_id",
+          },
+        },
+      },
+  
+
     ///////////// THINGS PAGES
     {
       name: "Things",
@@ -519,7 +618,7 @@ export default {
       name: "Measurements",
       id: "measurements",
       description: "Visualizzazione e gestione delle Measure.",
-      itemName: "Measure",
+      itemName: "Measurement",
       methods: {
         getAll: {
           label: "Get All",

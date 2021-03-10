@@ -28,7 +28,7 @@ import "../queryParams/queryParams.scss";
 import { IFetchParams } from "../../services/http.service";
 import { createEmitAndSemanticDiagnosticsBuilderProgram } from "typescript";
 
-const unflatten = require("flat").unflatten;
+//const unflatten = require("flat").unflatten;
 
 interface IProps {
   context: IAppContext;
@@ -141,6 +141,7 @@ export const GraphPopup = withAppContext(
 
       if (goodFeatures.length === 0) {
         console.log("No features to plot");
+        setLoading(false);
         return;
       }
 
@@ -184,9 +185,10 @@ export const GraphPopup = withAppContext(
       for (i = 0; i < dataFeatName.length; i++) {
         finalData[i] = {
           nameStruct: dataFeatName[i],
-          dataStruct: dataStruct[i],
+          dataStruct: dataStruct[i].reverse(),
           unitMeasure: dataFeatUnit[i],
         };
+        console.log(finalData[i]);
       }
 
       setGraphData(finalData);
@@ -251,7 +253,7 @@ export const GraphPopup = withAppContext(
           ) : showGraph ? (
             <GraphHolder dataMat={graphData} />
           ) : (
-            <h1>Nessun grafico da mostrare</h1>
+            <h1>{locale.no_graph_error}</h1>
           )}
         </React.Fragment>
       </Popup>
