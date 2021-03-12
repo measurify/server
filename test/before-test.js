@@ -25,6 +25,7 @@ exports.Computation = null;
 exports.Constraint = null;
 exports.PasswordReset = null;
 exports.Tenant = null;
+exports.tenant = null;
 
 before(async () => { 
     await database.init('test');
