@@ -51,13 +51,28 @@ export const GraphPopup = withAppContext(
     const { httpService, activePage, config } = context;
     const [loading, setLoading] = useState<boolean>(true);
     const [doneQuery, setDoneQuery] = useState<boolean>(true);
-    const [showGraph, setShowGraph] = useState<boolean>(true);
+    const [showGraph, setShowGraph] = useState<boolean>(false);
     const [titleState, setTitleState] = useState<String>(title);
-    const pageHeaders: any = activePage?.requestHeaders || {};
     const [formFields, setFormFields] = useState<IConfigInputField[]>(
       fieldsCopy
     );
-    const [graphData, setGraphData] = useState<IGraphData[]>();
+    const [graphData, setGraphData] = useState<IGraphData[] | null>();
+    const [prevGraphData, setPrevGraphData] = useState<IGraphData[] | null>();
+    const [nextGraphData, setNextGraphData] = useState<IGraphData[] | null>();
+
+    const [next, setNext] = useState<boolean>();
+    const [prev, setPrev] = useState<boolean>();
+    const [zoomIn, setZoomIn] = useState<boolean>();
+    const [zoomOut, setZoomOut] = useState<boolean>(true);
+    const [pageNum, setPageNum] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(0);
+    const [error, setError] = useState<string>();
+
+    const [fetchedData, setFetchedData] = useState<null | any>(null);
+    const [fetchedFeature, setFetchedFeature] = useState<null | any>(null);
+
+    const [totalDocs, setTotalDocs] = useState<number>(0);
+    const [limit, setLimit] = useState<number>(0);
 
     const customLabels: ICustomLabels | undefined = {
       ...config?.customLabels,
@@ -83,93 +98,96 @@ export const GraphPopup = withAppContext(
       }
     }
 
-    async function submitGraph() {
-      console.log(formFields.map((e) => e.value));
-
-      setLoading(true);
-      setDoneQuery(true);
-
-      const results = await httpService.fetch({
+    async function fetchFeatureData(fetchFeatureData: boolean = false) {
+      //get the data for the selected feature
+      const resultsData = await httpService.fetch({
         method: "get",
         origUrl: graphConfig.url,
         queryParams: formFields,
-        headers: pageHeaders,
+        exactMatch: true,
+        headers: { "content-type": "application/json" },
       });
 
-      let queryFeature = "";
+      var fF = fetchedFeature;
+      if (fetchFeatureData === true) {
+        let queryFeature = "";
 
-      formFields.map((f) =>
-        f.name === "feature" ? (queryFeature = f.value) : {}
-      );
+        //get the name of the selected feature
+        formFields.map((f) =>
+          f.name === "feature" ? (queryFeature = f.value) : {}
+        );
 
-      const resultsFeature = await httpService.fetch({
-        method: "get",
-        origUrl: "/features/",
-        queryParams: formFields.filter((obj) => {
-          return obj.name === "feature" && (obj.name = "_id");
-        }),
-        headers: pageHeaders,
-      });
+        //fetch the feature
+        const resultsFeature = await httpService.fetch({
+          method: "get",
+          origUrl: "/features/",
+          queryParams: formFields.filter((obj) => {
+            return obj.name === "feature" && (obj.name = "_id");
+          }),
+          exactMatch: true,
+          headers: { "content-type": "application/json" },
+        });
 
-      let extractedData = dataHelpers.extractDataByDataPath(
-        results,
+        formFields.filter((obj) => {
+          return obj.name === "_id" && (obj.name = "feature");
+        });
+
+        //extract the data for the feature
+        fF = dataHelpers.extractDataByDataPath(resultsFeature, "docs");
+      }
+
+      const pG = resultsData["page"];
+
+      const tP = resultsData["totalPages"];
+
+      const tD = resultsData["totalDocs"];
+
+      const limit = resultsData["limit"];
+
+      //extract the data for the measurements
+      const fD = dataHelpers.extractDataByDataPath(
+        resultsData,
         graphConfig.dataPath
       );
 
-      let extractedFeature = dataHelpers.extractDataByDataPath(
-        resultsFeature,
-        "docs"
-      );
+      //return data
+      return {
+        fetchedData: fD,
+        fetchedFeature: fF,
+        pageNum: pG,
+        totalPages: tP,
+        totalDocs: tD,
+        limit: limit,
+      };
+    }
 
-      console.log(extractedFeature);
-
+    function buildData(fetchedData: any, fetchedFeature: any) {
       var goodFeatures = new Array();
       var dataFeatName = new Array<string>();
       var dataFeatUnit = new Array<string>();
 
-      console.log(goodFeatures);
-
-      extractedFeature.map((ft: any) =>
+      fetchedFeature.map((ft: any) =>
         ft.items.map((comp: any, index: number) => {
           if (comp.dimension === 0 && comp.type === "number") {
             goodFeatures.push(index);
             dataFeatName.push(comp.name);
             dataFeatUnit.push(comp.unit);
-          } else return;
+          } else return null;
         })
       );
 
       if (goodFeatures.length === 0) {
-        console.log("No features to plot");
         setLoading(false);
-        return;
+        return null;
       }
 
-      console.log("Goodfeatures.lenght : " + goodFeatures.length);
-
-      console.log("Graph Config");
-      console.log(graphConfig);
-
-      console.log("Query results");
-      console.log(results);
-
-      console.log("Extracted data");
-      console.log(extractedData);
-
-      console.log("Extracted feature");
-      console.log(extractedFeature);
-
       var dataStruct = new Array(goodFeatures.length);
-
-      console.log(dataStruct);
 
       for (var i = 0; i < dataStruct.length; i++) {
         dataStruct[i] = new Array();
       }
-      console.log(dataStruct);
 
-      console.log("Samples");
-      extractedData.map((data: any) =>
+      fetchedData.map((data: any) =>
         data["samples"].map((sample: any) =>
           sample["values"].map((feature: any, indexFeat: number) => {
             if (goodFeatures.includes(indexFeat))
@@ -188,32 +206,263 @@ export const GraphPopup = withAppContext(
           dataStruct: dataStruct[i].reverse(),
           unitMeasure: dataFeatUnit[i],
         };
-        console.log(finalData[i]);
       }
 
+      return finalData;
+    }
+
+    async function buildPrev(
+      formFields: IConfigInputField[],
+      fetchedFeature: any
+    ) {
+      var tempField = formFields;
+      tempField.filter((obj) => {
+        return (
+          obj.name === "page" && (obj.value = 1 + parseInt(obj.value) + "")
+        );
+      });
+
+      const resultsData = await httpService.fetch({
+        method: "get",
+        origUrl: graphConfig.url,
+        queryParams: tempField,
+        exactMatch: true,
+        headers: { "content-type": "application/json" },
+      });
+      const prData = dataHelpers.extractDataByDataPath(
+        resultsData,
+        graphConfig.dataPath
+      );
+
+      tempField.filter((obj) => {
+        return (
+          obj.name === "page" && (obj.value = parseInt(obj.value) - 1 + "")
+        );
+      });
+
+      const pPage = buildData(prData, fetchedFeature);
+      return pPage;
+    }
+    async function buildNext(
+      formFields: IConfigInputField[],
+      fetchedFeature: any
+    ) {
+      var tempField = formFields;
+      tempField.filter((obj) => {
+        return (
+          obj.name === "page" && (obj.value = parseInt(obj.value) - 1 + "")
+        );
+      });
+
+      const resultsData = await httpService.fetch({
+        method: "get",
+        origUrl: graphConfig.url,
+        queryParams: tempField,
+        exactMatch: true,
+        headers: { "content-type": "application/json" },
+      });
+      const nxData = dataHelpers.extractDataByDataPath(
+        resultsData,
+        graphConfig.dataPath
+      );
+
+      tempField.filter((obj) => {
+        return (
+          obj.name === "page" && (obj.value = parseInt(obj.value) + 1 + "")
+        );
+      });
+
+      const nPage = buildData(nxData, fetchedFeature);
+      return nPage;
+    }
+    async function submitGraph() {
+      setLoading(true);
+      setDoneQuery(true);
+
+      console.log("Entered submitGraph");
+
+      const {
+        fetchedData,
+        fetchedFeature,
+        pageNum,
+        totalPages,
+        totalDocs,
+        limit,
+      } = await fetchFeatureData(true);
+
+      setFetchedData(fetchedData);
+      setFetchedFeature(fetchedFeature);
+      setPageNum(pageNum);
+      setTotalPages(totalPages);
+      setTotalDocs(totalDocs);
+      setLimit(limit);
+
+      const finalData = buildData(fetchedData, fetchedFeature);
+
+      if (finalData === null) {
+        setError(locale.wrong_feature_error);
+        return;
+      }
+
+      if (finalData[0].dataStruct.length === 0) {
+        setError(locale.no_data_error);
+        setLoading(false);
+        return;
+      }
       setGraphData(finalData);
 
-      console.log(finalData);
+      const next = pageNum > 1;
+      const prev = pageNum < totalPages;
+
+      const zoomIn = limit > 3;
+      const zoomOut = limit < totalDocs;
+
+      setNext(next);
+      setPrev(prev);
+
+      setZoomIn(zoomIn);
+      setZoomOut(zoomOut);
 
       setShowGraph(true);
 
-      setTitleState(locale.graph + " " + extractedFeature[0]._id);
+      setTitleState(locale.graph + " " + fetchedFeature[0]._id);
 
-      /*
-      const jsonObject = JSON.stringify(extractedData);
+      setLoading(false);
 
-      const toCsv = dataHelpers.arrayToCSV(jsonObject);
+      var pPage = null;
+      var nPage = null;
+      if (prev === true) {
+        pPage = await buildPrev(formFields, fetchedFeature);
+      }
+      if (next === true) {
+        nPage = await buildNext(formFields, fetchedFeature);
+      }
+      setPrevGraphData(pPage);
+      setNextGraphData(nPage);
+    }
 
-      console.log("CSV");
-      console.log(toCsv);
-      */
+    async function buildMain() {
+      const {
+        fetchedData,
+        pageNum,
+        totalPages,
+        totalDocs,
+        limit,
+      } = await fetchFeatureData();
 
+      console.log("Entered BuildMain");
+
+      setLoading(true);
+
+      setPageNum(pageNum);
+      setTotalPages(totalPages);
+
+      const finalData = buildData(fetchedData, fetchedFeature);
+
+      if (finalData === null) {
+        setError(locale.wrong_feature_error);
+        return;
+      }
+
+      if (finalData[0].dataStruct.length === 0) {
+        setError(locale.no_data_error);
+        setLoading(false);
+        return;
+      }
+      setGraphData(finalData);
+
+      const next = pageNum > 1;
+      const prev = pageNum < totalPages;
+
+      const zoomIn = limit > 3;
+      const zoomOut = limit < totalDocs;
+
+      setNext(next);
+      setPrev(prev);
+
+      setZoomIn(zoomIn);
+      setZoomOut(zoomOut);
+
+      setTotalDocs(totalDocs);
+      setLimit(limit);
+
+      setLoading(false);
+
+      var pPage = null;
+      var nPage = null;
+      if (prev === true) {
+        pPage = await buildPrev(formFields, fetchedFeature);
+      }
+      if (next === true) {
+        nPage = await buildNext(formFields, fetchedFeature);
+      }
+      setPrevGraphData(pPage);
+      setNextGraphData(nPage);
+    }
+
+    async function prevShifting() {
+      setLoading(true);
+
+      console.log("Entered PrevShifting");
+
+      setNextGraphData(graphData);
+      setGraphData(prevGraphData);
+
+      setLoading(false);
+
+      setPrev(pageNum + 1 < totalPages);
+      setNext(pageNum + 1 > 1);
+      setPageNum(pageNum + 1);
+      const prPage = await buildPrev(formFields, fetchedFeature);
+
+      setPrevGraphData(prPage);
+    }
+
+    async function nextShifting() {
+      setLoading(true);
+      console.log("Entered NextShifting");
+
+      setPrevGraphData(graphData);
+      setGraphData(nextGraphData);
+      setPrev(pageNum - 1 < totalPages);
+      setNext(pageNum - 1 > 1);
+      setPageNum(pageNum - 1);
+      const nxPage = await buildNext(formFields, fetchedFeature);
+
+      setNextGraphData(nxPage);
+    }
+
+    async function increaseSamples() {
+      setLoading(true);
+      console.log("Entered Increase Sample");
+
+      var tempField = formFields;
+
+      tempField.filter((obj) => {
+        return obj.name === "limit" && (obj.value = 2 + limit + "");
+      });
+
+      setFormFields(tempField);
+      buildMain();
+      setLoading(false);
+    }
+
+    async function decreaseSamples() {
+      setLoading(true);
+      console.log("Entered Decrease Sample");
+
+      var tempField = formFields;
+
+      tempField.filter((obj) => {
+        return obj.name === "limit" && (obj.value = limit - 2 + "");
+      });
+
+      setFormFields(tempField);
+      buildMain();
       setLoading(false);
     }
 
     useEffect(() => {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-
       setLoading(false);
       setDoneQuery(false);
       setShowGraph(false);
@@ -236,6 +485,7 @@ export const GraphPopup = withAppContext(
               <h5>{locale.graph}</h5>
               <form onSubmit={submitGraph}>
                 {formFields.map((queryParam, idx) => {
+                  if (queryParam.name == "page") return "";
                   return (
                     <FormRow
                       key={`query_param_${idx}`}
@@ -251,9 +501,19 @@ export const GraphPopup = withAppContext(
               </form>
             </section>
           ) : showGraph ? (
-            <GraphHolder dataMat={graphData} />
+            <GraphHolder
+              dataMat={graphData}
+              prev={prev}
+              prevCallback={prevShifting}
+              next={next}
+              nextCallback={nextShifting}
+              zoomIn={zoomIn}
+              zoomInCallback={decreaseSamples}
+              zoomOut={zoomOut}
+              zoomOutCallback={increaseSamples}
+            />
           ) : (
-            <h1>{locale.no_graph_error}</h1>
+            <h1>{error}</h1>
           )}
         </React.Fragment>
       </Popup>

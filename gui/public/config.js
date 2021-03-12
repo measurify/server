@@ -769,9 +769,20 @@ export default {
             },
 
             {
+              name: "thing",
+              type: "select",
+              label: "Filtra Thing",
+              optionSource: {
+                url: "/things",
+                dataPath: "docs",
+                displayPath: "_id",
+                valuePath: "_id",
+              },
+            },
+            {
               name: "device",
               type: "select",
-              label: "Sel. Device",
+              label: "Filtra Device",
               optionSource: {
                 url: "/devices",
                 dataPath: "docs",
@@ -779,7 +790,19 @@ export default {
                 valuePath: "_id",
               },
             },
-
+            {
+              name: "limit",
+              value: "",
+              type: "select",
+              options: ["5", "10", "50"],
+              label: "Campioni",
+            },
+            {
+              name: "page",
+              type: "text",
+              label: "Pagina",
+              value: "1"
+            },
           ],
         },
 

@@ -28,8 +28,12 @@ const locale = Object.freeze({
     login : "Accedi",
     logout : "Esci",
     graph : "Grafico",
-    no_graph_error : "Questa versione del software non può costruire un grafico delle feature selezionate. Possono essere mostrati i grafici solamente di feature aventi almeno una componente scalare e numerica",
-    add_tenant : "Aggiungi organizzazione"
+    wrong_feature_error : "Questa versione del software non può costruire un grafico delle feature selezionate. Possono essere mostrati i grafici solamente di feature aventi almeno una componente scalare e numerica",
+    no_data_error : "Non sono presenti dati per poter elaborare un grafico",
+    add_tenant : "Aggiungi organizzazione",
+    zoomIn : "Ingrandisci",
+    zoomOut : "Riduci",
+    value : "Valore"
 
 });
 

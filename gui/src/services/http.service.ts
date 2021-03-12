@@ -10,6 +10,7 @@ export interface IFetchParams {
   method?: TConfigMethod
   headers?: any
   queryParams?: IQueryParam[]
+  exactMatch?: boolean
   rawData?: any
   body?: any
   responseType?: ResponseType
@@ -52,7 +53,7 @@ class HttpService {
     return outputUrl;
   }
 
-  private buildUrl(url: string, queryParams: IQueryParam[] = [], rawData?: any): string {
+  private buildUrl(url: string, queryParams: IQueryParam[] = [], exactMatch : boolean = false, rawData?: any): string {
     if (!queryParams || !queryParams.length) {
       return this.replaceParamsInUrl(url, rawData);
     }
@@ -70,9 +71,17 @@ class HttpService {
       if (param.name === 'tags' && param.value === "") { continue; }
       if (param.name === 'info') value = '{"$regex":"' + param.value + '","$options":"i"}';
       else value = '"' + param.value + '"';
-      //test regex
-      params.push(`"${param.name}":{"$regex" : ${value || ''}}`);
-      //params.push(`"${param.name}":${value || ''}`);
+      
+      if(exactMatch === true)
+      {
+        params.push(`"${param.name}":${value || ''}`);
+      }
+      else
+      {
+        params.push(`"${param.name}":{"$regex" : ${value || ''}}`);
+      }
+      
+      
 
     }
 
@@ -87,7 +96,7 @@ class HttpService {
 
   private buildRequest(params: IFetchParams): { url: string, params: any } {
     const reqUrl: string = this.urlIsAbsolute(params.origUrl) ? params.origUrl : this.baseUrl + params.origUrl;
-    const finalUrl: string = this.buildUrl(reqUrl, params.queryParams, params.rawData);
+    const finalUrl: string = this.buildUrl(reqUrl, params.queryParams,params.exactMatch, params.rawData);
     const authorization = sessionStorage.getItem('diten-token') ? { Authorization: sessionStorage.getItem('diten-token'), } : {};
     const requestParams = {
       method: params.method ? params.method.toUpperCase() : 'GET',
@@ -158,8 +167,8 @@ class HttpService {
     await this.handleError(res);
   }
 
-  public async fetch({ method, origUrl, queryParams, rawData, body, headers, responseType }: IFetchParams) {
-    const { url, params } = this.buildRequest({ method, origUrl, queryParams, rawData, body, headers });
+  public async fetch({ method, origUrl, queryParams, exactMatch, rawData, body, headers, responseType }: IFetchParams) {
+    const { url, params } = this.buildRequest({ method, origUrl, queryParams,exactMatch, rawData, body, headers });
     return await this.makeRequest(url, params, responseType);
   }
 }
