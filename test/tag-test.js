@@ -13,6 +13,7 @@ const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
 const before = require('./before-test.js');
+const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
 // Test the /GET route
 describe('/GET tags', () => {
@@ -251,5 +252,97 @@ describe('/DELETE tag', () => {
         res.body.message.should.contain(errors.already_used.message);
         const tags_after = await before.Tag.find();
         tags_after.length.should.be.eql(2);
+    });
+});
+
+describe('/PUT tag', () => {
+    it('it should PUT a tag visibility', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag = await factory.createTag("test-tag-1", user, [], VisibilityTypes.public);
+        const request = { visibility: VisibilityTypes.private };
+        const res = await chai.request(server).keepOpen().put('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('visibility');
+        res.body.visibility.should.be.eql(VisibilityTypes.private);
+    });
+
+    it('it should PUT a tag description', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag = await factory.createTag("test-tag-1", user, [], VisibilityTypes.public);
+        const request = { description: 'second' };
+        const res = await chai.request(server).keepOpen().put('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('description');
+        res.body.description.should.be.eql('second');
+    });
+
+    it('it should PUT a tag list of tags', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag_1 = await factory.createTag("test-tag-1", user, [], VisibilityTypes.public);
+        const tag_2 = await factory.createTag("test-tag-2", user, [], VisibilityTypes.public);
+        const tag_3 = await factory.createTag("test-tag-3", user, [], VisibilityTypes.public);
+        const tag_4 = await factory.createTag("test-tag-4", user, [], VisibilityTypes.public);
+        const tag = await factory.createTag("test-tag", user, ['test-tag-1', 'test-tag-2'], VisibilityTypes.public);
+        const request = { tags: { add: ['test-tag-3', 'test-tag-4'], remove: ['test-tag-1'] } };
+        const res = await chai.request(server).keepOpen().put('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('tags');
+        res.body.tags.length.should.be.eql(3);
+    });
+
+    it('it should not PUT a tag owner', async () => {
+        const user_1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user_2 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag = await factory.createTag("test-tag-1", user_1, [], VisibilityTypes.public);
+        const request = { ownser: user_2._id };
+        const res = await chai.request(server).keepOpen().put('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user_1)).send(request);
+        res.should.have.status(errors.incorrect_info.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.incorrect_info.message);
+    });
+
+    it('it should not PUT a tag as analyst', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.analyst);
+        const tag = await factory.createTag("test-tag-1", user, [], VisibilityTypes.public);
+        const request = { description: 'second' };
+        const res = await chai.request(server).keepOpen().put('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(errors.restricted_access_modify.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.restricted_access_modify.message);
+    });
+
+    it('it should not PUT a tag of another provider', async () => {
+        const user_1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user_2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
+        const tag = await factory.createTag("test-tag-1", user_1, [], VisibilityTypes.public);
+        const request = { description: 'second' };
+        const res = await chai.request(server).keepOpen().put('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user_2)).send(request);
+        res.should.have.status(errors.restricted_access_modify.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.restricted_access_modify.message);
+    });
+
+    it('it should not PUT a tag without any field', async () => {
+        const user_1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user_2 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag = await factory.createTag("test-tag-1", user_1, [], VisibilityTypes.public);
+        const request = { };
+        const res = await chai.request(server).keepOpen().put('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user_1)).send(request);
+        res.should.have.status(errors.missing_info.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.missing_info.message);
+    });
+
+    it('it should not PUT a fake tag', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag = await factory.createTag("test-tag-2", user);
+        const request = { visibility: VisibilityTypes.private };
+        const res = await chai.request(server).keepOpen().put('/v1/tags/fake_tag').set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(errors.resource_not_found.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.resource_not_found.message);
     });
 });
