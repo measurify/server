@@ -18,7 +18,7 @@ exports.admin_restricted_access              = { status: 403, value: 15, message
 exports.demo_content_request_not_implemented = { status: 403, value: 16, message: 'Demo content on the request not yet implemented' };
 exports.not_yours                            = { status: 403, value: 17, message: 'You are not the owner of this resource' };
 exports.already_used                         = { status: 403, value: 18, message: 'The resource is already used' };
-exports.missing_info                         = { status: 401, value: 19, message: 'Please, the request body misses information' }; 
+exports.missing_info                         = { status: 401, value: 19, message: 'Please, the request body is empty' }; 
 exports.user_authorization_error             = { status: 401, value: 20, message: 'Only the administrator can manage users' };
 exports.cannot_create                        = { status: 401, value: 21, message: 'Only administrators and provides can create new resources' };
 exports.filter_required                      = { status: 403, value: 22, message: 'The request needs a valid filter' };
@@ -30,6 +30,7 @@ exports.missing_email                        = { status: 401, value: 27, message
 exports.missing_password                     = { status: 401, value: 28, message: 'Please, specify the user password' };
 exports.reset_invalid                        = { status: 403, value: 29, message: 'The reset password request is not valid' };
 exports.unknown_value                        = { status: 404, value: 30, message: 'Status value' };
+exports.incorrect_info                       = { status: 401, value: 31, message: 'Please, the body information is missing valid fields'}; 
 
 exports.manage = function(res, error, more) {
     if( typeof more === 'object' && more !== null) more = more.toString();
