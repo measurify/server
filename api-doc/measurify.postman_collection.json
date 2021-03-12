@@ -14,7 +14,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"postman.setEnvironmentVariable(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -57,7 +56,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "7d02614a-551a-49bd-a4ac-a25d3cb5e476",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"",
@@ -107,7 +105,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "7d02614a-551a-49bd-a4ac-a25d3cb5e476",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"",
@@ -160,7 +157,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "7d02614a-551a-49bd-a4ac-a25d3cb5e476",
 								"exec": [
 									""
 								],
@@ -205,7 +201,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "e932d7e0-5127-4508-aa36-c330f7fed26e",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"if(data.docs) pm.environment.set('tenant', data.docs[0]._id);"
@@ -267,7 +262,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "4600cb40-a98b-40bf-9041-405103c220ed",
 								"exec": [
 									""
 								],
@@ -277,7 +271,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "bbe3c7f2-7f84-46a6-a565-999b247a2c68",
 								"exec": [
 									"pm.environment.set(\"tenant\", JSON.parse(responseBody)._id);"
 								],
@@ -300,7 +293,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"_id\": \"measurify-tenat-test\",\r\n    \"organization\": \"Measurify org\",\r\n    \"address\": \"Measurify Street, Genova\",\r\n    \"email\": \"info@measurify.org\",\r\n    \"phone\": \"+39103218793817\",\r\n    \"admin_username\": \"test-username\",\r\n    \"admin_password\": \"test-password\"\r\n}"
+							"raw": "{\r\n    \"_id\": \"measurify-tenat-test\",\r\n    \"organization\": \"Measurify org\",\r\n    \"address\": \"Measurify Street, Genova\",\r\n    \"email\": \"info@measurify.org\",\r\n    \"phone\": \"+39103218793817\",\r\n    \"admin_username\": \"pluto\",\r\n    \"admin_password\": \"pippo\",\r\n    \"passwordhash\": \"true\"\r\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/tenants/",
@@ -322,7 +315,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b6a7d6f3-bcd9-4146-b0a9-6be3757e84c6",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -365,7 +357,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "bbcbe4a7-0aef-4e46-9a55-1a1594efa034",
 								"exec": [
 									""
 								],
@@ -375,7 +366,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "d8387940-9023-45c0-862f-01f851b9d12d",
 								"exec": [
 									"pm.environment.set(\"tenant\", JSON.parse(responseBody)._id);"
 								],
@@ -448,7 +438,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "6e94a923-a3b6-446e-918c-6500654d3b9b",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -458,15 +447,13 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "f44d86e8-1113-428d-a9e9-38658f0286a0",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "LOGIN",
@@ -477,7 +464,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -520,7 +506,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);"
 								],
@@ -530,7 +515,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "44025a2f-7f86-402f-8415-2bdb26e380bb",
 								"exec": [
 									"var users = JSON.parse(pm.environment.get(\"users\"));",
 									"pm.environment.set('provider_username', users[1].username);",
@@ -572,7 +556,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);"
 								],
@@ -582,7 +565,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "44025a2f-7f86-402f-8415-2bdb26e380bb",
 								"exec": [
 									"var users = JSON.parse(pm.environment.get(\"users\"));",
 									"pm.environment.set('analyst_username', users[2].username);",
@@ -628,7 +610,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -733,7 +714,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"user\", JSON.parse(responseBody)._id);",
 									"pm.environment.set(\"username\", JSON.parse(responseBody).username);"
@@ -810,7 +790,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -853,7 +832,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
 								"exec": [
 									""
 								],
@@ -863,7 +841,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
 								"exec": [
 									""
 								],
@@ -908,7 +885,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -951,7 +927,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
 								"exec": [
 									""
 								],
@@ -961,7 +936,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
 								"exec": [
 									""
 								],
@@ -1006,7 +980,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -1049,7 +1022,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "ac6fb60f-7c09-436a-ba38-f566a11f51c0",
 								"exec": [
 									"var users = JSON.parse(pm.environment.get(\"users\"));",
 									"pm.environment.set('user_id', users[1]._id);"
@@ -1100,7 +1072,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -1170,7 +1141,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "76819835-2375-4dfe-8aa8-fae946a42057",
 								"exec": [
 									""
 								],
@@ -1180,7 +1150,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "bd874835-93b3-4a87-a6ca-aafede282d25",
 								"exec": [
 									"pm.environment.set(\"tag\", JSON.parse(responseBody)._id);"
 								],
@@ -1219,12 +1188,39 @@
 					"response": []
 				},
 				{
+					"name": "GET a tag",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/tags/{{tag}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"tags",
+								"{{tag}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "POST a list of new tags (tagged)",
 					"event": [
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "981648d0-4153-4d98-9273-49fbcfd23e04",
 								"exec": [
 									""
 								],
@@ -1234,7 +1230,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "4ec82747-a423-4ab5-b8e3-2e24cd7f56fc",
 								"exec": [
 									""
 								],
@@ -1273,12 +1268,48 @@
 					"response": []
 				},
 				{
+					"name": "PUT a tag",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"visibility\": \"private\",\n    \"tags\": {\n        \"remove\": [],\n        \"add\": [\"tagged-tag-1\", \"tagged-tag-2\"]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/tags/{{tag}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"tags",
+								"{{tag}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "GET all tags filtered by tag",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "164db961-624c-4869-8013-891731c7d870",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"if(data.docs) pm.environment.set('tag', data.docs[0]._id);"
@@ -1324,7 +1355,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "cd6a833f-3c29-4c26-aec0-18d6ba8611bf",
 								"exec": [
 									""
 								],
@@ -1370,7 +1400,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -1413,7 +1442,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "8eaff9c0-fdbc-4288-9f4f-9c2e4dfa4a83",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"if(data.docs) pm.environment.set('feature', data.docs[0]._id);"
@@ -1475,7 +1503,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "2e852dd1-b983-4f2e-b17b-e20748f69c69",
 								"exec": [
 									""
 								],
@@ -1485,7 +1512,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "175d28d8-231a-46db-a349-1575bea419e9",
 								"exec": [
 									"pm.environment.set(\"feature\", JSON.parse(responseBody)._id);"
 								],
@@ -1529,7 +1555,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "981648d0-4153-4d98-9273-49fbcfd23e04",
 								"exec": [
 									""
 								],
@@ -1601,7 +1626,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "456fc2af-4476-4ca2-93e5-dd906d435c6d",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -1611,7 +1635,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "d85e52bf-edb2-4a2c-9091-9ef9a7fafe10",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -1629,7 +1652,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -1672,7 +1694,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a7324839-b51b-4903-b355-dbef14f112b8",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"if(data.docs) pm.environment.set('thing', data.docs[0]._id);"
@@ -1734,7 +1755,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
 								"exec": [
 									""
 								],
@@ -1744,7 +1764,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
 								"exec": [
 									"pm.environment.set(\"thing\", JSON.parse(responseBody)._id);"
 								],
@@ -1789,7 +1808,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "e0b58b11-cc9a-4f7b-9e75-32f1f239da49",
 								"exec": [
 									"var tags = JSON.parse(pm.environment.get(\"tags\"));",
 									"pm.environment.set('tag1', tags[0]._id);",
@@ -1863,7 +1881,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "d1485609-c27d-45f7-ae95-28528344c308",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -1873,7 +1890,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c5825004-8324-4962-8058-cf927abe398c",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -1891,7 +1907,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -1934,7 +1949,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "7a842a86-4aad-493d-bcc5-2550c20d5d9f",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"if(data.docs) pm.environment.set('device', data.docs[0]._id);"
@@ -1971,7 +1985,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "7ccd41a2-55d2-4233-a8af-cbe664425404",
 								"exec": [
 									""
 								],
@@ -2008,7 +2021,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
 								"exec": [
 									""
 								],
@@ -2018,7 +2030,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "bf934b5a-b6e0-41dd-bd48-bdf0559f4d97",
 								"exec": [
 									"pm.environment.set(\"device\", JSON.parse(responseBody)._id);"
 								],
@@ -2063,7 +2074,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "e0b58b11-cc9a-4f7b-9e75-32f1f239da49",
 								"exec": [
 									"var tags = JSON.parse(pm.environment.get(\"tags\"));",
 									"pm.environment.set('tag1', tags[0]._id);",
@@ -2137,7 +2147,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "ce4981b5-c96d-4a5c-addf-fe25424c5391",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -2147,7 +2156,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "23a90929-2746-4cef-a360-fd4858ef9b4a",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -2165,7 +2173,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);"
 								],
@@ -2175,7 +2182,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "44025a2f-7f86-402f-8415-2bdb26e380bb",
 								"exec": [
 									"var users = JSON.parse(pm.environment.get(\"users\"));",
 									"pm.environment.set('provider_username', users[1].username);",
@@ -2217,7 +2223,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
 								"exec": [
 									"var devices = JSON.parse(pm.environment.get(\"devices\"));",
 									"pm.environment.set('device_id', devices[0]._id);",
@@ -2230,7 +2235,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "bf934b5a-b6e0-41dd-bd48-bdf0559f4d97",
 								"exec": [
 									"pm.environment.set(\"device\", JSON.parse(responseBody)._id);"
 								],
@@ -2275,7 +2279,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "7a842a86-4aad-493d-bcc5-2550c20d5d9f",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"if(data.docs) pm.environment.set('issue', data.docs[0]._id);"
@@ -2312,7 +2315,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
 								"exec": [
 									""
 								],
@@ -2322,7 +2324,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "bf934b5a-b6e0-41dd-bd48-bdf0559f4d97",
 								"exec": [
 									""
 								],
@@ -2369,7 +2370,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "ce4981b5-c96d-4a5c-addf-fe25424c5391",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -2379,15 +2379,13 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "23a90929-2746-4cef-a360-fd4858ef9b4a",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "CONSTRAINTS",
@@ -2398,7 +2396,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -2441,7 +2438,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "0b14ad3a-95cf-49c8-aa0f-84028b69423c",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"if(data.docs) pm.environment.set('constraint', data.docs[0]._id);"
@@ -2503,7 +2499,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "be9c2cbb-da3b-4c75-a6de-9b34c5bf0c74",
 								"exec": [
 									"var tags = JSON.parse(pm.environment.get(\"tags\"));",
 									"var features = JSON.parse(pm.environment.get(\"features\"));",
@@ -2553,7 +2548,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "e73d95be-8d19-4e56-be35-91ee6926af92",
 								"exec": [
 									"var tags = JSON.parse(pm.environment.get(\"tags\"));",
 									"var features = JSON.parse(pm.environment.get(\"features\"));",
@@ -2644,7 +2638,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -2687,7 +2680,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
 								"exec": [
 									"",
 									""
@@ -2698,7 +2690,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
 								"exec": [
 									"pm.environment.set(\"fieldmask\", JSON.parse(responseBody)._id);"
 								],
@@ -2743,7 +2734,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
 								"exec": [
 									""
 								],
@@ -2753,7 +2743,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
 								"exec": [
 									""
 								],
@@ -2798,7 +2787,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "c4769826-e12f-420b-a3f4-bce00c9b7b78",
 								"exec": [
 									"var users = JSON.parse(pm.environment.get(\"users\"));",
 									"pm.environment.set('user', users[2]._id);"
@@ -2851,7 +2839,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -2894,7 +2881,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "11f2ec22-be75-49e1-8378-53150d88f0c5",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"if(data.docs) pm.environment.set('measurement', data.docs[0]._id);"
@@ -2928,8 +2914,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "MEASUREMENTS",
@@ -2940,7 +2925,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -2983,7 +2967,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "11f2ec22-be75-49e1-8378-53150d88f0c5",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"if(data.docs) pm.environment.set('measurement', data.docs[0]._id);"
@@ -3023,7 +3006,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "11f2ec22-be75-49e1-8378-53150d88f0c5",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"if(data.docs) pm.environment.set('measurement', data.docs[0]._id);"
@@ -3068,7 +3050,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "11f2ec22-be75-49e1-8378-53150d88f0c5",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"if(data.docs) pm.environment.set('measurement', data.docs[0]._id);"
@@ -3373,7 +3354,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "981648d0-4153-4d98-9273-49fbcfd23e04",
 								"exec": [
 									"var current_timestamp = new Date();",
 									"postman.setEnvironmentVariable(\"current_timestamp\", current_timestamp.toISOString());"
@@ -3418,7 +3398,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "981648d0-4153-4d98-9273-49fbcfd23e04",
 								"exec": [
 									"var current_timestamp = new Date();",
 									"postman.setEnvironmentVariable(\"current_timestamp\", current_timestamp.toISOString());"
@@ -3536,7 +3515,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -3579,7 +3557,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a7324839-b51b-4903-b355-dbef14f112b8",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"if(data.docs) pm.environment.set('script', data.docs[0]._id);"
@@ -3641,7 +3618,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
 								"exec": [
 									"var tags = JSON.parse(pm.environment.get(\"tags\"));",
 									"pm.environment.set('tag1', tags[0]._id);"
@@ -3652,7 +3628,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
 								"exec": [
 									"pm.environment.set(\"script\", JSON.parse(responseBody)._id);"
 								],
@@ -3697,7 +3672,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
 								"exec": [
 									"var tags = JSON.parse(pm.environment.get(\"tags\"));",
 									"pm.environment.set('tag1', tags[0]._id);",
@@ -3710,7 +3684,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
 								"exec": [
 									""
 								],
@@ -3755,7 +3728,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "e0b58b11-cc9a-4f7b-9e75-32f1f239da49",
 								"exec": [
 									""
 								],
@@ -3827,7 +3799,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "d1485609-c27d-45f7-ae95-28528344c308",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -3837,18 +3808,16 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c5825004-8324-4962-8058-cf927abe398c",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
-			"name": "COMPUTATIONS (OUTLIERS)",
+			"name": "COMPUTATIONS (MAX)",
 			"item": [
 				{
 					"name": "LOGIN as admin",
@@ -3856,7 +3825,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -3894,12 +3862,11 @@
 					"response": []
 				},
 				{
-					"name": "POST a thing called office",
+					"name": "POST a thing",
 					"event": [
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
 								"exec": [
 									""
 								],
@@ -3909,7 +3876,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
 								"exec": [
 									"pm.environment.set(\"thing\", JSON.parse(responseBody)._id);"
 								],
@@ -3932,7 +3898,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"_id\": \"office\"\r\n}"
+							"raw": "{\r\n  \"_id\": \"thing\"\r\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/things/",
@@ -3949,12 +3915,11 @@
 					"response": []
 				},
 				{
-					"name": "POST temperature feature",
+					"name": "POST a feature",
 					"event": [
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "981648d0-4153-4d98-9273-49fbcfd23e04",
 								"exec": [
 									""
 								],
@@ -3964,7 +3929,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "e57057a1-0744-4e29-9285-2182096eb533",
 								"exec": [
 									"pm.environment.set(\"feature\", JSON.parse(responseBody)._id);"
 								],
@@ -3987,7 +3951,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"_id\": \"temperature\",\r\n   \"items\": [\r\n\t   \t{\r\n\t      \t\"name\": \"value\",\r\n\t        \"unit\": \"celsius degrees\",\r\n\t        \"type\": \"number\",\r\n            \"dimension\": 0\r\n\t    }\r\n\t]\r\n}"
+							"raw": "{\r\n   \"_id\": \"feature\",\r\n   \"items\": [\r\n\t   \t{\r\n\t      \t\"name\": \"item-one\",\r\n\t        \"unit\": \"unit-one\",\r\n\t        \"type\": \"number\",\r\n            \"dimension\": 0\r\n\t    },\r\n\t\t{\r\n\t      \t\"name\": \"item-two\",\r\n\t        \"unit\": \"unit-two\",\r\n\t        \"type\": \"number\",\r\n            \"dimension\": 0\r\n\t    },\r\n\t\t{\r\n\t      \t\"name\": \"item-three\",\r\n\t        \"unit\": \"unit-three\",\r\n\t        \"type\": \"number\",\r\n            \"dimension\": 1\r\n\t    },\r\n\t\t{\r\n\t      \t\"name\": \"item-four\",\r\n\t        \"unit\": \"unit-four\",\r\n\t        \"type\": \"text\"\r\n\t    }\r\n\t]\r\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/features",
@@ -4003,12 +3967,11 @@
 					"response": []
 				},
 				{
-					"name": "POST a thermometer device",
+					"name": "POST a device",
 					"event": [
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
 								"exec": [
 									""
 								],
@@ -4018,9 +3981,8 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "bf934b5a-b6e0-41dd-bd48-bdf0559f4d97",
 								"exec": [
-									"pm.environment.set(\"device\", JSON.parse(responseBody)._id);"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -4041,7 +4003,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"_id\": \"thermometer\",\r\n    \"features\": [\"{{feature}}\"]\r\n}\r\n"
+							"raw": "{\r\n\t\"_id\": \"device\",\r\n    \"features\": [\"feature\"]\r\n}\r\n"
 						},
 						"url": {
 							"raw": "{{url}}/v1/devices/",
@@ -4058,12 +4020,11 @@
 					"response": []
 				},
 				{
-					"name": "POST temperature measurements",
+					"name": "POST measurements",
 					"event": [
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "981648d0-4153-4d98-9273-49fbcfd23e04",
 								"exec": [
 									""
 								],
@@ -4086,7 +4047,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\": [ { \"numbers\": [\"12\"] } ] \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\": [ { \"numbers\": [\"14\"] } ] \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\",  \n\t\t\"samples\": [ { \"numbers\": [\"51\"] } ] \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\": [ { \"numbers\": [\"12\"] } ] \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\": [ { \"numbers\": [\"10\"] } ] \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\",  \n\t\t\"samples\": [ { \"numbers\": [\"9\"] } ] \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\": [ { \"numbers\": [\"16\"] } ] \n\t},\n\t{ \n\t\t\"thing\": \"{{thing}}\", \n\t\t\"feature\": \"{{feature}}\",\n\t\t\"device\": \"{{device}}\", \n\t\t\"samples\": [ { \"numbers\": [\"1\"] } ] \n\t}\n]\n"
+							"raw": "[\n\t{ \n\t\t\"thing\": \"thing\", \n\t\t\"feature\": \"feature\",\n\t\t\"device\": \"device\", \n\t\t\"samples\":  [{ \"values\": [12, 23, [34, 44], \"pippo\"] },\n\t\t\t\t\t { \"values\": [34, 78, [34, 44], \"pluto\"] },\n\t\t\t\t\t { \"values\": [10, 73, [22, 11], \"paperino\"] }]  \n\t},\n\t{ \n\t\t\"thing\": \"thing\", \n\t\t\"feature\": \"feature\",\n\t\t\"device\": \"device\", \n\t\t\"samples\":  [{ \"values\": [45, 43, [32, 12], \"pluto\"] }]  \n\t},\n\t{ \n\t\t\"thing\": \"thing\", \n\t\t\"feature\": \"feature\",\n\t\t\"device\": \"device\", \n\t\t\"samples\":  [{ \"values\": [72, 15, [12, 76], \"paperino\"] }]  \n\t},\n\t{ \n\t\t\"thing\": \"thing\", \n\t\t\"feature\": \"feature\",\n\t\t\"device\": \"device\", \n\t\t\"samples\":  [{ \"values\": [11, 2, [34, 12], \"qui\"] }]  \n\t},\n\t{ \n\t\t\"thing\": \"thing\", \n\t\t\"feature\": \"feature\",\n\t\t\"device\": \"device\", \n\t\t\"samples\":  [{ \"values\": [34, 15, [54, 321], \"quo\"] }]  \n\t},\n\t{ \n\t\t\"thing\": \"thing\", \n\t\t\"feature\": \"feature\",\n\t\t\"device\": \"device\", \n\t\t\"samples\":  [{ \"values\": [12, 23, [22, 1], \"qua\"] }]  \n\t}\n]\n"
 						},
 						"url": {
 							"raw": "{{url}}/v1/measurements",
@@ -4102,7 +4063,7 @@
 					"response": []
 				},
 				{
-					"name": "GET all temperature of office paginated",
+					"name": "GET all measurements of thing paginated",
 					"request": {
 						"auth": {
 							"type": "noauth"
@@ -4116,7 +4077,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{url}}/v1/measurements?filter={\"thing\":\"{{thing}}\"}&limit=5&page=1 ",
+							"raw": "{{url}}/v1/measurements?filter={\"thing\":\"thing\"}&limit=5&page=1 ",
 							"host": [
 								"{{url}}"
 							],
@@ -4127,7 +4088,7 @@
 							"query": [
 								{
 									"key": "filter",
-									"value": "{\"thing\":\"{{thing}}\"}"
+									"value": "{\"thing\":\"thing\"}"
 								},
 								{
 									"key": "limit",
@@ -4143,12 +4104,11 @@
 					"response": []
 				},
 				{
-					"name": "POST a computation to identify temperature outliers",
+					"name": "POST a computation to identify max values",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "d5804f46-8442-49cf-a4ef-4156def6e3ae",
 								"exec": [
 									"pm.environment.set(\"computation\", JSON.parse(responseBody)._id);",
 									""
@@ -4172,7 +4132,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"name\": \"Find outliers from temperature in office\",\r\n\t\"code\": \"outliers()\",\r\n\t\"filter\": \"{\\\"thing\\\":\\\"{{thing}}\\\", \\\"feature\\\":\\\"{{feature}}\\\"}\"\r\n}"
+							"raw": "{\r\n\t\"_id\": \"Find Max\",\r\n\t\"code\": \"max\",  \r\n\t\"feature\": \"feature\",\r\n\t\"items\": [\"item-one\", \"item-two\"],\r\n\t\"filter\": \"{\\\"thing\\\":\\\"thing\\\", \\\"feature\\\":\\\"feature\\\"}\"\r\n}\r\n"
 						},
 						"url": {
 							"raw": "{{url}}/v1/computations",
@@ -4207,47 +4167,6 @@
 								"v1",
 								"computations",
 								"{{computation}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET all outliers from temperature of office paginated",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"type": "text",
-								"value": "{{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{url}}/v1/measurements?filter={\"thing\":\"{{thing}}\", \"tags\":\"outlier\"}&limit=5&page=1 ",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"measurements"
-							],
-							"query": [
-								{
-									"key": "filter",
-									"value": "{\"thing\":\"{{thing}}\", \"tags\":\"outlier\"}"
-								},
-								{
-									"key": "limit",
-									"value": "5"
-								},
-								{
-									"key": "page",
-									"value": "1 "
-								}
 							]
 						}
 					},
@@ -4293,7 +4212,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -4336,7 +4254,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a7324839-b51b-4903-b355-dbef14f112b8",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"if(data.docs) pm.environment.set('right', data.docs[0]._id);"
@@ -4398,7 +4315,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
 								"exec": [
 									"var things = JSON.parse(pm.environment.get(\"things\"));",
 									"var users = JSON.parse(pm.environment.get(\"users\"));",
@@ -4411,7 +4327,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
 								"exec": [
 									"pm.environment.set(\"right\", JSON.parse(responseBody)._id);"
 								],
@@ -4456,7 +4371,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
 								"exec": [
 									"var things = JSON.parse(pm.environment.get(\"things\"));",
 									"var users = JSON.parse(pm.environment.get(\"users\"));",
@@ -4469,7 +4383,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
 								"exec": [
 									"pm.environment.set(\"right\", JSON.parse(responseBody)._id);"
 								],
@@ -4514,7 +4427,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
 								"exec": [
 									"var tags = JSON.parse(pm.environment.get(\"tags\"));",
 									"pm.environment.set('tag1', tags[0]._id);",
@@ -4527,7 +4439,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
 								"exec": [
 									""
 								],
@@ -4572,7 +4483,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "e0b58b11-cc9a-4f7b-9e75-32f1f239da49",
 								"exec": [
 									"var things = JSON.parse(pm.environment.get(\"things\"));",
 									"var users = JSON.parse(pm.environment.get(\"users\"));",
@@ -4648,7 +4558,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "d1485609-c27d-45f7-ae95-28528344c308",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -4658,15 +4567,13 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "c5825004-8324-4962-8058-cf927abe398c",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "LOGS",
@@ -4677,7 +4584,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									""
 								],
@@ -4722,7 +4628,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -4765,7 +4670,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "981648d0-4153-4d98-9273-49fbcfd23e04",
 								"exec": [
 									""
 								],
@@ -4775,7 +4679,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "4ec82747-a423-4ab5-b8e3-2e24cd7f56fc",
 								"exec": [
 									""
 								],
@@ -4819,7 +4722,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "e0b58b11-cc9a-4f7b-9e75-32f1f239da49",
 								"exec": [
 									""
 								],
@@ -4863,7 +4765,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "981648d0-4153-4d98-9273-49fbcfd23e04",
 								"exec": [
 									""
 								],
@@ -4907,7 +4808,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "e0b58b11-cc9a-4f7b-9e75-32f1f239da49",
 								"exec": [
 									"var tags = JSON.parse(pm.environment.get(\"tags\"));",
 									"pm.environment.set('tag1', tags[0]._id);",
@@ -4953,7 +4853,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "031a7bf6-1907-4e98-928d-c8ac62bf00d6",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"pm.environment.set('analyst-1', data.users[0]._id);",
@@ -5000,7 +4899,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "e0b58b11-cc9a-4f7b-9e75-32f1f239da49",
 								"exec": [
 									""
 								],
@@ -5044,7 +4942,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "981648d0-4153-4d98-9273-49fbcfd23e04",
 								"exec": [
 									"var current_timestamp = new Date();",
 									"postman.setEnvironmentVariable(\"current_timestamp\", current_timestamp.toISOString());"
@@ -5089,7 +4986,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "11f2ec22-be75-49e1-8378-53150d88f0c5",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"if(data.docs) pm.environment.set('measurement', data.docs[0]._id);",
@@ -5130,7 +5026,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);"
 								],
@@ -5140,7 +5035,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "44025a2f-7f86-402f-8415-2bdb26e380bb",
 								"exec": [
 									"",
 									""
@@ -5180,7 +5074,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "11f2ec22-be75-49e1-8378-53150d88f0c5",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"if(data.docs) pm.environment.set('measurement', data.docs[0]._id);"
@@ -5220,7 +5113,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);"
 								],
@@ -5230,7 +5122,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "44025a2f-7f86-402f-8415-2bdb26e380bb",
 								"exec": [
 									"",
 									""
@@ -5270,7 +5161,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "11f2ec22-be75-49e1-8378-53150d88f0c5",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"if(data.docs) pm.environment.set('measurement', data.docs[0]._id);"
@@ -5310,7 +5200,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);"
 								],
@@ -5320,7 +5209,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "44025a2f-7f86-402f-8415-2bdb26e380bb",
 								"exec": [
 									"",
 									""
@@ -5360,7 +5248,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "981648d0-4153-4d98-9273-49fbcfd23e04",
 								"exec": [
 									"var current_timestamp = new Date();",
 									"postman.setEnvironmentVariable(\"current_timestamp\", current_timestamp.toISOString());"
@@ -5405,7 +5292,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "11f2ec22-be75-49e1-8378-53150d88f0c5",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"if(data.docs) pm.environment.set('measurement', data.docs[0]._id);"
@@ -5439,8 +5325,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "REGISTRATION",
@@ -5451,7 +5336,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"postman.setEnvironmentVariable(\"user\", JSON.parse(responseBody)._id);",
 									"postman.setEnvironmentVariable(\"email\", JSON.parse(responseBody).email);"
@@ -5491,7 +5375,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									""
 								],
@@ -5540,7 +5423,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -5617,7 +5499,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									""
 								],
@@ -5663,7 +5544,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"postman.setEnvironmentVariable(\"token\", JSON.parse(responseBody).token);",
 									"postman.setEnvironmentVariable(\"user_id\", JSON.parse(responseBody).user._id);"
@@ -5674,7 +5554,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "44025a2f-7f86-402f-8415-2bdb26e380bb",
 								"exec": [
 									""
 								],
@@ -5713,7 +5592,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									""
 								],
@@ -5759,7 +5637,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									""
 								],
@@ -5815,7 +5692,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"postman.setEnvironmentVariable(\"token\", JSON.parse(responseBody).token);",
 									"postman.setEnvironmentVariable(\"user_id\", JSON.parse(responseBody).user._id);"
@@ -5826,7 +5702,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "44025a2f-7f86-402f-8415-2bdb26e380bb",
 								"exec": [
 									""
 								],
@@ -5859,8 +5734,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "STREAM",
@@ -5871,7 +5745,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -5914,7 +5787,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"provider\", JSON.parse(responseBody)._id);",
 									"pm.environment.set(\"provider_username\", JSON.parse(responseBody).username);"
@@ -5959,7 +5831,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"analyst\", JSON.parse(responseBody)._id);",
 									"pm.environment.set(\"analyst_username\", JSON.parse(responseBody).username);"
@@ -6004,7 +5875,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "2e852dd1-b983-4f2e-b17b-e20748f69c69",
 								"exec": [
 									""
 								],
@@ -6014,7 +5884,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "175d28d8-231a-46db-a349-1575bea419e9",
 								"exec": [
 									"pm.environment.set(\"feature\", JSON.parse(responseBody)._id);"
 								],
@@ -6058,7 +5927,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
 								"exec": [
 									""
 								],
@@ -6068,7 +5936,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "bf934b5a-b6e0-41dd-bd48-bdf0559f4d97",
 								"exec": [
 									"pm.environment.set(\"device\", JSON.parse(responseBody)._id);"
 								],
@@ -6113,7 +5980,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "0b7eff8d-42e7-41d2-843b-ff43801a3062",
 								"exec": [
 									""
 								],
@@ -6123,7 +5989,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3ffc77c6-991b-44a1-bbbb-db203d7d50c5",
 								"exec": [
 									"pm.environment.set(\"thing\", JSON.parse(responseBody)._id);"
 								],
@@ -6168,7 +6033,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -6211,7 +6075,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "981648d0-4153-4d98-9273-49fbcfd23e04",
 								"exec": [
 									"var current_timestamp = new Date();",
 									"postman.setEnvironmentVariable(\"current_timestamp\", current_timestamp.toISOString());",
@@ -6258,7 +6121,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -6321,8 +6183,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "SUBSCRIPTIONS",
@@ -6333,7 +6194,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "1d597e8a-3d59-4cab-8bd6-f02a081ceb42",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -6376,7 +6236,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "28c7fcb2-c270-42b9-a40e-79f3d8f167f2",
 								"exec": [
 									"pm.environment.set(\"provider\", JSON.parse(responseBody)._id);",
 									"pm.environment.set(\"provider_username\", JSON.parse(responseBody).username);"
@@ -6421,7 +6280,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "949d2966-7d04-4c22-a65a-8280313ef27e",
 								"exec": [
 									""
 								],
@@ -6431,7 +6289,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b0a5d3fd-f141-4148-a5e8-25dad071bf1a",
 								"exec": [
 									"pm.environment.set(\"feature\", JSON.parse(responseBody)._id);"
 								],
@@ -6475,7 +6332,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "b72fefe2-65ed-4890-a06c-67079a3b4728",
 								"exec": [
 									""
 								],
@@ -6485,7 +6341,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "b34d5266-a3f1-413e-8c4f-ec6eeddee272",
 								"exec": [
 									"pm.environment.set(\"device\", JSON.parse(responseBody)._id);"
 								],
@@ -6530,7 +6385,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "113148c9-02da-40b3-8692-094cf01ad35e",
 								"exec": [
 									""
 								],
@@ -6540,7 +6394,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "2beff83f-51da-4ede-bdf5-7017a38f573c",
 								"exec": [
 									"pm.environment.set(\"thing\", JSON.parse(responseBody)._id);"
 								],
@@ -6585,7 +6438,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "18ddd60b-5981-49d7-aec2-b62831bf1cb4",
 								"exec": [
 									""
 								],
@@ -6595,7 +6447,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "913c6f03-1087-4d06-a937-0b6d308faa45",
 								"exec": [
 									"pm.environment.set(\"thing\", JSON.parse(responseBody)._id);"
 								],
@@ -6640,7 +6491,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "fe916a8d-8367-4b23-98dc-f713821cc5d1",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -6683,7 +6533,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "fe0b104f-9781-40d2-bde8-919c17fa875f",
 								"exec": [
 									"var current_timestamp = new Date();",
 									"postman.setEnvironmentVariable(\"current_timestamp\", current_timestamp.toISOString());",
@@ -6724,8 +6573,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "MULTI-TENANCY",
@@ -6736,7 +6584,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "16b91f2d-2425-4879-874a-b89254db63f9",
 								"exec": [
 									""
 								],
@@ -6746,7 +6593,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "99645ab0-4e58-4b2a-a4cc-e14e7cd851d1",
 								"exec": [
 									"pm.environment.set(\"tenant\", JSON.parse(responseBody)._id);"
 								],
@@ -6769,10 +6615,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"_id\": \"tenat-1\",\r\n    \"organization\": \"Measurify org\",\r\n    \"address\": \"Measurify Street, Genova\",\r\n    \"email\": \"info@measurify.org\",\r\n    \"phone\": \"+39103218793817\",\r\n    \"admin_username\": \"test-username-1\",\r\n    \"admin_password\": \"test-password-1\",\r\n    \"passwordhash\" : \"true\"\r\n}\t",
-							"options": {
-								"raw": {}
-							}
+							"raw": "{\r\n    \"_id\": \"tenat-1\",\r\n    \"database\": \"measurify-database-tenant-1\",\r\n    \"organization\": \"Measurify org\",\r\n    \"address\": \"Measurify Street, Genova\",\r\n    \"email\": \"info@measurify.org\",\r\n    \"phone\": \"+39103218793817\",\r\n    \"admin_username\": \"test-username-1\",\r\n    \"admin_password\": \"test-password-1\",\r\n    \"passwordhash\" : \"false\"\r\n}\t"
 						},
 						"url": {
 							"raw": "{{url}}/v1/tenants/",
@@ -6794,7 +6637,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "9f4299c9-1b5d-4ea6-bf32-34a43f69db0a",
 								"exec": [
 									""
 								],
@@ -6804,7 +6646,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "a91a8831-d42f-47b3-9294-5a3bdfcf9760",
 								"exec": [
 									"pm.environment.set(\"tenant\", JSON.parse(responseBody)._id);"
 								],
@@ -6827,10 +6668,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"_id\": \"tenat-2\",\r\n    \"organization\": \"Measurify org\",\r\n    \"address\": \"Measurify Street, Genova\",\r\n    \"email\": \"info@measurify.org\",\r\n    \"phone\": \"+39103218793817\",\r\n    \"admin_username\": \"test-username-2\",\r\n    \"admin_password\": \"test-password-2\",\r\n    \"passwordhash\" : \"true\"\r\n}",
-							"options": {
-								"raw": {}
-							}
+							"raw": "{\r\n    \"_id\": \"tenat-2\",\r\n    \"organization\": \"Measurify org\",\r\n    \"address\": \"Measurify Street, Genova\",\r\n    \"email\": \"info@measurify.org\",\r\n    \"phone\": \"+39103218793817\",\r\n    \"admin_username\": \"test-username-2\",\r\n    \"admin_password\": \"test-password-2\",\r\n    \"passwordhash\" : \"true\"\r\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/tenants/",
@@ -6852,7 +6690,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "e148dad6-c769-475f-9527-46c12a2734c3",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -6874,10 +6711,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"test-username-1\",\n\t\"password\" : \"test-password-1\",\n\t\"tenant\": \"tenat-1\"\n}",
-							"options": {
-								"raw": {}
-							}
+							"raw": "{\n\t\"username\" : \"test-username-1\",\n\t\"password\" : \"test-password-1\",\n\t\"tenant\": \"tenat-1\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/login",
@@ -6898,7 +6732,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "be53f2a7-af4e-479d-8bc3-aaf93f0b32f8",
 								"exec": [
 									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
 									""
@@ -6920,10 +6753,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"test-username-2\",\n\t\"password\" : \"test-password-2\",\n\t\"tenant\": \"tenat-2\"\n}",
-							"options": {
-								"raw": {}
-							}
+							"raw": "{\n\t\"username\" : \"test-username-2\",\n\t\"password\" : \"test-password-2\",\n\t\"tenant\": \"tenat-2\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/login",
@@ -6944,7 +6774,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "aa989db6-f0fd-4d3d-9db5-c24151a8b7c8",
 								"exec": [
 									""
 								],
@@ -6954,7 +6783,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "28b3bdaf-3628-40ff-85e3-ee9ad0f595e5",
 								"exec": [
 									"pm.environment.set(\"tenant\", JSON.parse(responseBody)._id);"
 								],
@@ -6977,10 +6805,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"organization\": \"Measurify org 2\"\r\n}",
-							"options": {
-								"raw": {}
-							}
+							"raw": "{\r\n    \"organization\": \"Measurify org 2\"\r\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/tenants/{{tenant}}",
@@ -7031,7 +6856,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"id": "6514f779-d497-43cd-ac00-03ab5b8a4285",
 								"exec": [
 									""
 								],
@@ -7041,7 +6865,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "dccaef45-5ff2-4614-9dbb-ac532966afc0",
 								"exec": [
 									"pm.environment.set(\"thing\", JSON.parse(responseBody)._id);"
 								],
@@ -7064,10 +6887,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"_id\": \"car-test\"\r\n}",
-							"options": {
-								"raw": {}
-							}
+							"raw": "{\r\n  \"_id\": \"car-test\"\r\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/things/",
@@ -7089,7 +6909,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "cbd8ea82-4a59-4398-933b-bea92324bdbf",
 								"exec": [
 									"var data = JSON.parse(responseBody);",
 									"if(data.docs) pm.environment.set('thing', data.docs[0]._id);"
@@ -7125,7 +6944,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "0f1495f7-0459-443d-b122-23bea06436e7",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -7135,15 +6953,13 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "aa469eb6-d4b9-4737-aa59-0566d6fce90f",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "API docs",
@@ -7151,7 +6967,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "6d2ffb23-3edf-49a5-bd66-1b69012c7ef6",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"postman.setEnvironmentVariable(\"demo\", jsonData);",
@@ -7182,7 +6997,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "6d2ffb23-3edf-49a5-bd66-1b69012c7ef6",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"postman.setEnvironmentVariable(\"demo\", jsonData);",
@@ -7209,12 +7023,11 @@
 			"response": []
 		},
 		{
-			"name": "API version",
+			"name": "API docs Copy",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "6d2ffb23-3edf-49a5-bd66-1b69012c7ef6",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"postman.setEnvironmentVariable(\"demo\", jsonData);",
@@ -7228,13 +7041,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/v1/version",
+					"raw": "{{url}}/",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
-						"v1",
-						"version"
+						""
 					]
 				}
 			},
@@ -7246,7 +7058,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "b8b396eb-9ab8-4738-b284-64d604978545",
 						"exec": [
 							"postman.setEnvironmentVariable(\"token\", JSON.parse(responseBody).token);",
 							""
@@ -7289,7 +7100,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "6d2ffb23-3edf-49a5-bd66-1b69012c7ef6",
 						"exec": [
 							"var jsonData = JSON.parse(responseBody);",
 							"postman.setEnvironmentVariable(\"demo\", jsonData);",
