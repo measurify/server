@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import * as QueryString from "query-string";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { orderBy } from "natural-orderby";
 import { find, remove } from "lodash";
 
@@ -45,6 +45,7 @@ import {
 } from "../../common/models/config.types.helper";
 import locale from "../../common/locale.js";
 
+import "react-toastify/dist/ReactToastify.css";
 import "./page.scss";
 import { GraphPopup } from "../graphPopup/graphPopup.comp";
 
@@ -539,7 +540,9 @@ const PageComp = ({ context }: IProps) => {
         }
       }
     } catch (e) {
-      toast.error(e.message);
+      toast.error(e.message, {
+        position: toast.POSITION.TOP_CENTER,
+      });
     }
   }
 
@@ -1013,6 +1016,7 @@ const PageComp = ({ context }: IProps) => {
           graphConfig={openedGraph.config}
         />
       )}
+      <ToastContainer />
     </div>
   );
 };

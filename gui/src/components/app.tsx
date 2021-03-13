@@ -118,7 +118,9 @@ function App() {
 
     if (!isValid) {
       setError(errorMessage);
-      toast.error(errorMessage);
+      toast.error(errorMessage, {
+        position: toast.POSITION.TOP_CENTER,
+      });
       return;
     }
   }, [config]);

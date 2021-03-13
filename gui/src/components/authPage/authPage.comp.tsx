@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Button } from "../button/button.comp";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { withAppContext } from "../withContext/withContext.comp";
 import locale from "../../common/locale.js";
 import { IAppContext } from "../app.context";
+import "react-toastify/dist/ReactToastify.css";
 
 import {
   IConfigPage,
@@ -29,7 +30,7 @@ interface IProps {
 }
 
 interface IPopupProps {
-  type: "add" | "update" | "action";
+  type: "add";
   title: string;
   config: IConfigPostMethod | IConfigPutMethod;
   submitCallback: (body: any, containFiles: boolean) => void;
@@ -98,6 +99,14 @@ const AuthPageComp = ({ context }: IProps) => {
       if (!result) {
         throw new Error(locale.login_error);
       }
+      if (result.status === 401) {
+        throw new Error(locale.login_error);
+      }
+
+      if (result.user.type !== "admin") {
+        throw new Error(locale.login_unauthorised_user);
+      }
+
       sessionStorage.setItem("diten-token", result.token);
 
       console.log("token impostato");
@@ -108,7 +117,9 @@ const AuthPageComp = ({ context }: IProps) => {
       //replace(from);
     } catch (e) {
       setError(e.message);
-      toast.error(e.message);
+      toast.error(e.message, {
+        position: toast.POSITION.TOP_CENTER,
+      });
     }
   }
 
@@ -216,6 +227,7 @@ const AuthPageComp = ({ context }: IProps) => {
           methodConfig={openedAddTenant.config}
         />
       )}
+      <ToastContainer />
     </div>
   );
 };

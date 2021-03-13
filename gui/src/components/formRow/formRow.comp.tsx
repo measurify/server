@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { orderBy } from "natural-orderby";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 import {
   IConfigInputField,
@@ -95,7 +95,9 @@ export const FormRow = withAppContext(
           [fieldName]: optionSourceData,
         });
       } catch (e) {
-        toast.error(e.message);
+        toast.error(e.message, {
+          position: toast.POSITION.TOP_CENTER,
+        });
       }
     }
 
@@ -363,6 +365,7 @@ export const FormRow = withAppContext(
               className="clear-input fa fa-times"
             ></i>
           )}
+        <ToastContainer />
       </div>
     );
   }

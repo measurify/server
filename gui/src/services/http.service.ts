@@ -1,4 +1,3 @@
-import { toast } from 'react-toastify';
 import locale from '../common/locale';
 import { TConfigMethod, IQueryParam } from '../common/models/config.model';
 import { dataHelpers } from '../helpers/data.helpers';

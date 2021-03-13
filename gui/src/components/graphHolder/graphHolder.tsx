@@ -1,5 +1,5 @@
 import React, { Component, useState, useEffect } from "react";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import {
   XYPlot,
   XAxis,
@@ -186,6 +186,7 @@ export const GraphHolder = withAppContext(
             </div>
           );
         })}
+        <ToastContainer />
       </div>
     );
   }

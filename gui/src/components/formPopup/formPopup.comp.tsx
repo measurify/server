@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 import { Popup } from "../popup/popup.comp";
 import {
@@ -101,7 +101,9 @@ export const FormPopup = withAppContext(
           }
         } catch (e) {
           console.error("Could not load single item's data.", e);
-          toast.error("Could not load single item's data.");
+          toast.error("Could not load single item's data.", {
+            position: toast.POSITION.TOP_CENTER,
+          });
         }
       }
 
@@ -239,7 +241,9 @@ export const FormPopup = withAppContext(
       });
 
       if (validationError) {
-        toast.error(validationError);
+        toast.error(validationError, {
+          position: toast.POSITION.TOP_CENTER,
+        });
         return;
       }
 
@@ -249,11 +253,15 @@ export const FormPopup = withAppContext(
         const body = containFiles ? formData : unflatten(finalObject);
         await submitCallback(body, containFiles, queryParams);
 
-        toast.success("Great Success!");
+        toast.success("Great Success!", {
+          position: toast.POSITION.TOP_CENTER,
+        });
 
         closeCallback(true);
       } catch (e) {
-        toast.error(e.message);
+        toast.error(e.message, {
+          position: toast.POSITION.TOP_CENTER,
+        });
       }
 
       setLoading(false);
@@ -316,6 +324,7 @@ export const FormPopup = withAppContext(
               </form>
             )}
           </section>
+          <ToastContainer />
         </React.Fragment>
       </Popup>
     );

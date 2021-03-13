@@ -7,6 +7,7 @@ const locale = Object.freeze({
     tenant_suggenstion: 'Inserisci la tua organizzazione',
     submit: 'Invio',
     login_error: 'Login errata!',
+    login_unauthorised_user : "Al momento solamente gli utenti con i privilegi di amministratore possono accedere",
     search: 'Cerca',
     previous_page: 'Pagina precedente',
     next_page: 'Prossima pagina',
@@ -33,7 +34,8 @@ const locale = Object.freeze({
     add_tenant : "Aggiungi organizzazione",
     zoomIn : "Ingrandisci",
     zoomOut : "Riduci",
-    value : "Valore"
+    value : "Valore",
+
 
 });
 
