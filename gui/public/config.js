@@ -919,6 +919,11 @@ export default {
               label: "Id",
             },
             {
+              name: "visibility",
+              type: "text",
+              label: "VIsibility",
+            },
+            {
               name: "tags_enroll",
               type: "text",
               label: "Tags",
@@ -952,11 +957,41 @@ export default {
           fields: [
             {
               name: "_id",
-              label: "Tag ID",
               type: "text",
+              label: "Id",
+            },
+            {
+              name: "visibility",
+              type: "text",
+              label: "VIsibility",
+            },
+            {
+              name: "tags",
+              type: "array",
+              arrayType: "text",
+              label: "Tags",
             },
           ],
         },
+
+
+        put: {
+          url: "/tags/:_id",
+          fields: [
+            {
+              name: "visibility",
+              type: "text",
+              label: "VIsibility",
+            },
+            {
+              name: "tags",
+              type: "array",
+              arrayType: "text",
+              label: "Tags",
+            },
+          ],
+        },
+
         delete: {
           url: "/tags/:_id",
         },

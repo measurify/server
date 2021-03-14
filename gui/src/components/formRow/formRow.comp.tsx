@@ -23,12 +23,13 @@ interface IProps {
     value: any,
     submitAfterChange?: boolean
   ) => void;
+  onRemove: (fieldName: string, value: any) => void;
   showReset?: boolean;
   direction?: "row" | "column";
 }
 
 export const FormRow = withAppContext(
-  ({ context, field, direction, showReset, onChange }: IProps) => {
+  ({ context, field, direction, showReset, onChange, onRemove }: IProps) => {
     const [optionSources, setOptionSources] = useState<any>({});
     const { httpService, activePage, config } = context;
     const pageHeaders: any = activePage?.requestHeaders || {};
@@ -113,7 +114,9 @@ export const FormRow = withAppContext(
     ) {
       const updatedArray = [...(originalField.value || [])];
 
-      updatedArray.splice(idx, 1);
+      const test = updatedArray.splice(idx, 1);
+
+      onRemove(field.name, test);
 
       onChange(field.name, updatedArray);
     }

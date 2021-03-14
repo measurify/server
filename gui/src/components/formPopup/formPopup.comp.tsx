@@ -38,6 +38,11 @@ interface IProps {
   ) => void;
 }
 
+interface IDeleteFields {
+  fieldName: string;
+  values: Array<string>;
+}
+
 export const FormPopup = withAppContext(
   ({
     context,
@@ -53,6 +58,7 @@ export const FormPopup = withAppContext(
     const { httpService, activePage, config } = context;
     const [loading, setLoading] = useState<boolean>(true);
     const [formFields, setFormFields] = useState<IConfigInputField[]>([]);
+    const [deleteValues, setDeleteValues] = useState<IDeleteFields[]>([]);
     const [finalRawData, setFinalRawData] = useState<any>(null);
     const pageHeaders: any = activePage?.requestHeaders || {};
     const customLabels: ICustomLabels | undefined = {
@@ -231,6 +237,38 @@ export const FormPopup = withAppContext(
           finalObject[field.name] = field.value || false;
         }
 
+        if (field.type === "array" && field.arrayType === "text") {
+          var temp = "{";
+
+          const rmVal = deleteValues.filter((e) => e.fieldName === field.name);
+          console.log("rmval");
+          console.log(rmVal);
+
+          if (field.value.length !== 0) {
+            temp += ` "add": ["` + field.value.join('" , "') + `"]`;
+          }
+          if (field.value.length !== 0 && rmVal.length !== 0) {
+            temp += ",";
+          }
+          if (rmVal.length !== 0) {
+            temp +=
+              `"remove": ["` + rmVal.map((e) => e.values).join('" , "') + `"]`;
+          }
+          temp += "}";
+          /*temp =
+            `{ "add": ["` +
+            field.value.join('" , "') +
+            `"], "remove": ["` +
+            rmVal.map((e) => e.values.join('" , "')) +
+            `"]}`;
+           } else {
+            temp = `{ "add": ["` + field.value.join('" , "') + `"]}`;
+          }*/
+
+          console.log(temp);
+          finalObject[field.name] = JSON.parse(temp);
+        }
+
         if (field.type === "encode") {
           finalObject[field.name] = encodeURIComponent(field.value);
         }
@@ -250,7 +288,11 @@ export const FormPopup = withAppContext(
       setLoading(true);
 
       try {
+        console.log(finalObject);
         const body = containFiles ? formData : unflatten(finalObject);
+
+        console.log("unflatted:");
+        console.log(body);
         await submitCallback(body, containFiles, queryParams);
 
         toast.success("Great Success!", {
@@ -283,8 +325,15 @@ export const FormPopup = withAppContext(
       setFormFields(updatedFormFields);
     }
 
+    function saveRemovedValues(fieldName: string, value: string[]) {
+      var delVal = [...deleteValues];
+      delVal.push({ fieldName: fieldName, values: value });
+
+      setDeleteValues(delVal);
+    }
     useEffect(() => {
       initFormFields();
+
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -309,6 +358,7 @@ export const FormPopup = withAppContext(
                         key={`field_${idx}`}
                         field={field}
                         onChange={formChanged}
+                        onRemove={saveRemovedValues}
                         showReset={!field.type || field.type === "text"}
                       />
                       <br />

@@ -121,6 +121,7 @@ export interface IConfigInputField {
   useInUrl?: boolean
   accept?: string
   urlReplaceOnly?: boolean
+  toDelete? : Array<any>
 }
 
 export interface IConfigOptionSource {
