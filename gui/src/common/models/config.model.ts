@@ -114,6 +114,7 @@ export interface IConfigInputField {
   dataPath?: string
   placeholder?: string
   readonly?: boolean
+  disabled?: boolean
   options?: [string | { display: string, value: string }],
   optionSource?: IConfigOptionSource
   arrayType?: 'object' | 'text' | 'number' | 'integer'
@@ -121,7 +122,6 @@ export interface IConfigInputField {
   useInUrl?: boolean
   accept?: string
   urlReplaceOnly?: boolean
-  toDelete? : Array<any>
 }
 
 export interface IConfigOptionSource {

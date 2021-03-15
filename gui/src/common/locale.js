@@ -35,6 +35,7 @@ const locale = Object.freeze({
     zoomIn : "Ingrandisci",
     zoomOut : "Riduci",
     value : "Valore",
+    full_privileges : "Privilegi completi"
 
 
 });

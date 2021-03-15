@@ -1002,6 +1002,7 @@ const PageComp = ({ context }: IProps) => {
           title={openedPopup.title}
           closeCallback={closeFormPopup}
           submitCallback={openedPopup.submitCallback}
+          type={openedPopup.type}
           fields={openedPopup.config?.fields || []}
           rawData={openedPopup.rawData}
           getSingleConfig={openedPopup.getSingleConfig}

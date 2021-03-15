@@ -116,7 +116,9 @@ export const FormRow = withAppContext(
 
       const test = updatedArray.splice(idx, 1);
 
-      onRemove(field.name, test);
+      test.forEach((e) => {
+        onRemove(field.name, e);
+      });
 
       onChange(field.name, updatedArray);
     }
@@ -162,6 +164,7 @@ export const FormRow = withAppContext(
             className="add-array-item"
             onClick={(e) => addItemToFieldArray(e, originalField)}
             title={addArrayItemLabel}
+            disabled={originalField.disabled || originalField.readonly}
           >
             <i className="fa fa-plus" aria-hidden="true"></i>
           </Button>
@@ -181,7 +184,7 @@ export const FormRow = withAppContext(
         return {
           value: field.value,
           placeholder: field.placeholder || defaultPlaceholder,
-          disabled: field.readonly,
+          disabled: field.readonly || field.disabled,
           required: field.required,
           onChange: (e: any) => changeCallback(field.name, e.target.value),
         };

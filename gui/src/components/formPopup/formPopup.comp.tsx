@@ -27,6 +27,7 @@ interface IProps {
   context: IAppContext;
   title: string;
   fields: IConfigInputField[];
+  type: string;
   rawData?: any;
   getSingleConfig?: IConfigGetSingleMethod;
   methodConfig: IConfigPostMethod | IConfigPutMethod;
@@ -40,7 +41,7 @@ interface IProps {
 
 interface IDeleteFields {
   fieldName: string;
-  values: Array<string>;
+  value: string;
 }
 
 export const FormPopup = withAppContext(
@@ -49,6 +50,7 @@ export const FormPopup = withAppContext(
     title,
     fields,
     rawData,
+    type,
     getSingleConfig,
     methodConfig,
     submitCallback,
@@ -233,15 +235,25 @@ export const FormPopup = withAppContext(
           }
         }
 
+        if (field.disabled === true) {
+          delete finalObject[field.name];
+          console.log(finalObject);
+        }
+
         if (field.type === "boolean") {
           finalObject[field.name] = field.value || false;
         }
 
-        if (field.type === "array" && field.arrayType === "text") {
+        if (
+          type !== "add" &&
+          field.type === "array" &&
+          field.arrayType === "text"
+        ) {
           var temp = "{";
 
-          const rmVal = deleteValues.filter((e) => e.fieldName === field.name);
-          console.log("rmval");
+          var rmVal = deleteValues.filter((e) => e.fieldName === field.name);
+          rmVal = rmVal.filter((e) => e.value !== "");
+
           console.log(rmVal);
 
           if (field.value.length !== 0) {
@@ -252,20 +264,10 @@ export const FormPopup = withAppContext(
           }
           if (rmVal.length !== 0) {
             temp +=
-              `"remove": ["` + rmVal.map((e) => e.values).join('" , "') + `"]`;
+              `"remove": ["` + rmVal.map((e) => e.value).join('" , "') + `"]`;
           }
           temp += "}";
-          /*temp =
-            `{ "add": ["` +
-            field.value.join('" , "') +
-            `"], "remove": ["` +
-            rmVal.map((e) => e.values.join('" , "')) +
-            `"]}`;
-           } else {
-            temp = `{ "add": ["` + field.value.join('" , "') + `"]}`;
-          }*/
 
-          console.log(temp);
           finalObject[field.name] = JSON.parse(temp);
         }
 
@@ -288,11 +290,8 @@ export const FormPopup = withAppContext(
       setLoading(true);
 
       try {
-        console.log(finalObject);
         const body = containFiles ? formData : unflatten(finalObject);
 
-        console.log("unflatted:");
-        console.log(body);
         await submitCallback(body, containFiles, queryParams);
 
         toast.success("Great Success!", {
@@ -325,9 +324,9 @@ export const FormPopup = withAppContext(
       setFormFields(updatedFormFields);
     }
 
-    function saveRemovedValues(fieldName: string, value: string[]) {
+    function saveRemovedValues(fieldName: string, value: string) {
       var delVal = [...deleteValues];
-      delVal.push({ fieldName: fieldName, values: value });
+      delVal.push({ fieldName: fieldName, value: value });
 
       setDeleteValues(delVal);
     }

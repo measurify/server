@@ -6,103 +6,158 @@ export default {
 
   pages: [
 
-      ///////////// USERS PAGES
-      {
-        name: "Users",
-        id: "users",
-        description: "Visualizzazione e gestione degli User",
-        itemName: "User",
-  
-        methods: {
-          getAll: {
-            dataPath: "docs",
-            label: "Users",
-            url: "/users/",
-  
-            queryParams: [
-              {
-                name: "username",
-                value: "",
-                type: "text",
-                label: "Username",
-              },
-              {
-                name: "limit",
-                value: "",
-                type: "select",
-                options: ["5", "10", "50"],
-                label: "Risultati per pagina",
-              },
-            ],
-  
-            display: {
-              type: "table",
+    ///////////// USERS PAGES
+    {
+      name: "Users",
+      id: "users",
+      description: "Visualizzazione e gestione degli User",
+      itemName: "User",
+
+      methods: {
+        getAll: {
+          dataPath: "docs",
+          label: "Users",
+          url: "/users/",
+
+          queryParams: [
+            {
+              name: "username",
+              value: "",
+              type: "text",
+              label: "Username",
             },
-            fields: [
-              
-              {
-                name: "username",
-                type: "text",
-                label: "Username",
-              },
-              {
-                name: "_id",
-                type: "text",
-                label: "ID",
-              },
-              {
-                name: "status",
-                type: "text",
-                label: "Status",
-              },
-              {
-                name: "type",
-                type: "text",
-                label: "Type",
-              },
-            ],
-  
-            
-            pagination: {
-              type: "buttons",
-              source: "query",
-              params: {page: { name: "page" }, limit: { name: "limit" } },
-              fields: { total: { dataPath: "totalDocs" } },
+            {
+              name: "limit",
+              value: "",
+              type: "select",
+              options: ["5", "10", "50"],
+              label: "Risultati per pagina",
             },
+          ],
+
+          display: {
+            type: "table",
           },
-          getSingle: {
-            url: "/users/:_id/",
-            dataPath: "docs",
-            queryParams: [],
-            requestHeaders: {},
-          },
-            
-          post: {
-            url: "/users/",
-            fields: [
-              {
-                name: "username",
-                label: "Username",
-                type: "text",
-              },
-              {
-                name: "password",
-                type: "text",
-                label: "Password",
-              },
-              {
-                name: "type",
-                type: "text",
-                label: "Type",
-              },
-            ],
-          },
-          delete: {
-            url: "/users/:_id",
+          fields: [
+
+            {
+              name: "username",
+              type: "text",
+              label: "Username",
+            },
+            {
+              name: "_id",
+              type: "text",
+              label: "ID",
+            },
+            {
+              name: "status",
+              type: "text",
+              label: "Status",
+            },
+            {
+              name: "email",
+              type: "text",
+              label: "Email",
+            },
+            {
+              name: "type",
+              type: "text",
+              label: "Type",
+            },
+            {
+              name: "fieldmask",
+              type: "text",
+              label: "Fieldmask",
+            },
+          ],
+
+
+          pagination: {
+            type: "buttons",
+            source: "query",
+            params: { page: { name: "page" }, limit: { name: "limit" } },
+            fields: { total: { dataPath: "totalDocs" } },
           },
         },
+        getSingle: {
+          url: "/users/:_id/",
+          dataPath: "docs",
+          queryParams: [],
+          requestHeaders: {},
+        },
+
+        post: {
+          url: "/users/",
+          fields: [
+            {
+              name: "username",
+              label: "Username",
+              type: "text",
+            },
+            {
+              name: "password",
+              type: "text",
+              label: "Password",
+            },
+            {
+              name: "email",
+              type: "text",
+              label: "Email",
+            },
+            {
+              name: "type",
+              type: "text",
+              label: "Type",
+            },
+            {
+              name: "fieldmask",
+              type: "text",
+              label: "Fieldmask",
+            },
+          ],
+        },
+
+        put: {
+          url: "/users/:_id",
+          fields: [
+            {
+              name: "username",
+              label: "Username",
+              type: "text",
+              disabled: true,
+            },
+            {
+              name: "password",
+              type: "text",
+              label: "Password",
+              required: true
+            },
+            {
+              name: "email",
+              type: "text",
+              label: "Email",
+              disabled: true,
+            },
+            {
+              name: "type",
+              type: "text",
+              label: "Type",
+              disabled: true,
+            },
+            {
+              name: "fieldmask",
+              type: "text",
+              label: "Fieldmask",
+            },
+          ],
+        },
+        delete: {
+          url: "/users/:_id",
+        },
       },
-  
+    },
+
 
     ///////////// THINGS PAGES
     {
@@ -206,6 +261,18 @@ export default {
         put: {
           url: "/things/:_id",
           fields: [
+            {
+              name: "_id",
+              type: "text",
+              label: "ID",
+              disabled: true,
+            },
+            {
+              name: "visibility",
+              type: "text",
+              label: "Visibility",
+              disabled: true,
+            },
             {
               name: "tags",
               type: "array",
@@ -395,12 +462,13 @@ export default {
               name: "_id",
               label: "ID",
               type: "text",
-              readonly: true,
+              disabled: true,
             },
             {
               name: "visibility",
               label: "Visibility",
               type: "text",
+              disabled: true,
             },
             {
               name: "tags",
@@ -413,6 +481,7 @@ export default {
               type: "array",
               arrayType: "object",
               label: "Items",
+              disabled: true,
             },
           ],
         },
@@ -588,6 +657,11 @@ export default {
               label: "Cicle",
             },
             {
+              name: "retryTime",
+              type: "text",
+              label: "Retry Time",
+            },
+            {
               name: "tags",
               type: "array",
               arrayType: "text",
@@ -604,15 +678,145 @@ export default {
               type: "array",
               arrayType: "text",
               label: "Scripts",
-            }
+            },
+            {
+              name: "scriptListMaxSize",
+              type: "number",
+              label: "Script List Max Size",
+            },
+            {
+              name: "measurementBufferSize",
+              type: "number",
+              label: "Measurement Buffer Size",
+            },
+            {
+              name: "issueBufferSize",
+              type: "number",
+              label: "Issue Buffer Size",
+            },
+            {
+              name: "sendBufferSize",
+              type: "number",
+              label: "Send Buffer Size",
+            },
+            {
+              name: "scriptStatementMaxSize",
+              type: "number",
+              label: "Script Statement Max Size",
+            },
+            {
+              name: "statementBufferSize",
+              type: "number",
+              label: "Statement Buffer Size",
+            },
+            {
+              name: "measurementBufferPolicy",
+              type: "text",
+              label: "Measurement Buffer Policy",
+            },
           ],
         },
+
+
+
         delete: {
           url: "/devices/:_id",
         },
-      },
-    },
 
+      },
+      customActions: [
+        {
+          name: "Expand and Edit",
+          url: "/devices/:_id",
+          dataPath: "items",
+          actualMethod: "put",
+          icon: "search-plus",
+          fields: [
+            {
+              name: "_id",
+              type: "text",
+              label: "Id",
+              disabled: true,
+            },
+            {
+              name: "visibility",
+              type: "text",
+              label: "Visibility",
+              disabled: true,
+            },
+            {
+              name: "period",
+              type: "text",
+              label: "Period",
+            },
+            {
+              name: "cycle",
+              type: "text",
+              label: "Cicle",
+            },
+            {
+              name: "retryTime",
+              type: "text",
+              label: "Retry Time",
+            },
+            {
+              name: "tags",
+              type: "array",
+              arrayType: "text",
+              label: "Tags",
+            },
+            {
+              name: "features",
+              type: "array",
+              arrayType: "text",
+              label: "Features",
+            },
+            {
+              name: "scripts",
+              type: "array",
+              arrayType: "text",
+              label: "Scripts",
+            },
+            {
+              name: "scriptListMaxSize",
+              type: "number",
+              label: "Script List Max Size",
+            },
+            {
+              name: "measurementBufferSize",
+              type: "number",
+              label: "Measurement Buffer Size",
+            },
+            {
+              name: "issueBufferSize",
+              type: "number",
+              label: "Issue Buffer Size",
+            },
+            {
+              name: "sendBufferSize",
+              type: "number",
+              label: "Send Buffer Size",
+            },
+            {
+              name: "scriptStatementMaxSize",
+              type: "number",
+              label: "Script Statement Max Size",
+            },
+            {
+              name: "statementBufferSize",
+              type: "number",
+              label: "Statement Buffer Size",
+            },
+            {
+              name: "measurementBufferPolicy",
+              type: "text",
+              label: "Measurement Buffer Policy",
+            },
+          ]
+        },
+      ],
+
+    },
     ///////////// MEASUREMENTS PAGE
     {
       name: "Measurements",
@@ -734,7 +938,7 @@ export default {
                     ? "[" + item.tags.join(" , ") + "]"
                     : "Nessun Tag",
                 sample_enroll:
-                  ""+ item.samples.map((e) => " { "+ e.values.map((j) =>" [ "+ j +" ] " )+" } ") + "",
+                  "" + item.samples.map((e) => " { " + e.values.map((j) => " [ " + j + " ] ") + " } ") + "",
               })
             ),
 
@@ -757,7 +961,7 @@ export default {
           fields: [
             {
               name: "feature",
-              required : true,
+              required: true,
               type: "select",
               label: "Sel. Feature",
               optionSource: {
@@ -813,8 +1017,8 @@ export default {
 
       customActions: [
         {
-          name: "Expand and edit",
-          url: "/features/:_id",
+          name: "Expand",
+          url: "/measurements/:_id",
           dataPath: "items",
           actualMethod: "put",
           icon: "search",
@@ -823,54 +1027,57 @@ export default {
               name: "_id",
               label: "ID",
               type: "text",
-              readonly: true,
+              disabled: true,
             },
             {
               name: "startDate",
               label: "Start Date",
               type: "text",
-              readonly: true,
+              disabled: true,
             },
             {
               name: "endDate",
               label: "End Date",
               type: "text",
-              readonly: true,
+              disabled: true,
             },
             {
               name: "visibility",
               label: "Visibility",
               type: "text",
+              disabled: true,
             },
             {
               name: "thing",
               label: "Thing",
               type: "text",
-              readonly: true,
+              disabled: true,
             },
             {
               name: "feature",
               label: "Feature",
               type: "text",
-              readonly: true,
+              disabled: true,
             },
             {
               name: "device",
               label: "Device",
               type: "text",
-              readonly: true,
+              disabled: true,
             },
             {
               name: "samples",
               type: "array",
               arrayType: "object",
               label: "Samples",
+              disabled: true,
             },
             {
               name: "tags",
               label: "Tags",
               type: "array",
               arrayType: "text",
+              disabled: true,
             },
           ],
         },
@@ -928,6 +1135,11 @@ export default {
               type: "text",
               label: "Tags",
             },
+            {
+              name: "description",
+              type: "text",
+              label: "Description",
+            },
           ],
 
           dataTransform: (items) =>
@@ -971,6 +1183,11 @@ export default {
               arrayType: "text",
               label: "Tags",
             },
+            {
+              name: "description",
+              type: "text",
+              label: "Description",
+            },
           ],
         },
 
@@ -978,6 +1195,12 @@ export default {
         put: {
           url: "/tags/:_id",
           fields: [
+            {
+              name: "_id",
+              type: "text",
+              label: "Id",
+              disabled: true,
+            },
             {
               name: "visibility",
               type: "text",
@@ -989,11 +1212,247 @@ export default {
               arrayType: "text",
               label: "Tags",
             },
+            {
+              name: "description",
+              type: "text",
+              label: "Description",
+            },
           ],
         },
 
         delete: {
           url: "/tags/:_id",
+        },
+      },
+    },
+
+    //////////// FIELDMASKS PAGE
+    {
+      name: "Fieldmasks",
+      id: "fieldmasks",
+      description: "Visualizzazione e gestione delle Fieldmask.",
+      itemName: "Fieldmask",
+      methods: {
+        getAll: {
+          label: "Get All",
+          dataPath: "docs",
+          url: "/fieldmasks",
+          queryParams: [
+            {
+              name: "_id",
+              value: "",
+              label: "ID",
+              type: "text",
+            },
+            {
+              name: "limit",
+              value: "",
+              type: "select",
+              options: ["5", "10", "50"],
+              label: "Risultati per pagina",
+            }
+          ],
+          display: {
+            type: "table",
+          },
+          fields: [
+            {
+              name: "_id",
+              type: "text",
+              label: "Id",
+            },
+            {
+              name: "computation_enroll",
+              type: "text",
+              label: "Computation Fields",
+            },
+            {
+              name: "device_enroll",
+              type: "text",
+              label: "Device Fields",
+            },
+            {
+              name: "feature_enroll",
+              type: "text",
+              label: "Feature Fields",
+            },
+            {
+              name: "measurement_enroll",
+              type: "text",
+              label: "Measurement Fields",
+            },
+            {
+              name: "script_enroll",
+              type: "text",
+              label: "Script Fields",
+            },
+            {
+              name: "tag_enroll",
+              type: "text",
+              label: "Tag Fields",
+            },
+            {
+              name: "thing_enroll",
+              type: "text",
+              label: "Thing Fields",
+            },
+          ],
+
+          dataTransform: (items) =>
+            items.map((item) =>
+              Object.assign(item, {
+                computation_enroll:
+                  item.computation_fields.join() !== ""
+                    ? "[" + item.computation_fields.join(" , ") + "]"
+                    : "Privilegi completi",
+                device_enroll:
+                  item.device_fields.join() !== ""
+                    ? "[" + item.device_fields.join(" , ") + "]"
+                    : "Privilegi completi",
+                feature_enroll:
+                  item.feature_fields.join() !== ""
+                    ? "[" + item.feature_fields.join(" , ") + "]"
+                    : "Privilegi completi",
+                measurement_enroll:
+                  item.measurement_fields.join() !== ""
+                    ? "[" + item.measurement_fields.join(" , ") + "]"
+                    : "Privilegi completi",
+                script_enroll:
+                  item.script_fields.join() !== ""
+                    ? "[" + item.script_fields.join(" , ") + "]"
+                    : "Privilegi completi",
+                tag_enroll:
+                  item.tag_fields.join() !== ""
+                    ? "[" + item.tag_fields.join(" , ") + "]"
+                    : "Privilegi completi",
+                thing_enroll:
+                  item.thing_fields.join() !== ""
+                    ? "[" + item.thing_fields.join(" , ") + "]"
+                    : "Privilegi completi",
+              })
+            ),
+
+          pagination: {
+            type: "buttons",
+            source: "query",
+            params: { page: { name: "page" }, limit: { name: "limit" } },
+            fields: { total: { dataPath: "totalDocs" } },
+          },
+        },
+        getSingle: {
+          url: "/fieldmasks/:_id",
+          queryParams: [],
+          requestHeaders: {},
+        },
+        post: {
+          url: "/fieldmasks",
+          fields: [
+            {
+              name: "_id",
+              type: "text",
+              label: "Id",
+            },
+            {
+              name: "computation_fields",
+              type: "array",
+              arrayType: "text",
+              label: "Computation Fields",
+            },
+            {
+              name: "device_fields",
+              type: "array",
+              arrayType: "text",
+              label: "Device Fields",
+            },
+            {
+              name: "feature_fields",
+              type: "array",
+              arrayType: "text",
+              label: "Feature Fields",
+            },
+            {
+              name: "measurement_fields",
+              type: "array",
+              arrayType: "text",
+              label: "Measurement Fields",
+            },
+            {
+              name: "script_fields",
+              type: "array",
+              arrayType: "text",
+              label: "Script Fields",
+            },
+            {
+              name: "tag_fields",
+              type: "array",
+              arrayType: "text",
+              label: "Tag Fields",
+            },
+            {
+              name: "thing_fields",
+              type: "array",
+              arrayType: "text",
+              label: "Thing Fields",
+            }
+          ],
+        },
+        put: {
+          url: "/fieldmasks/:_id",
+          fields: [
+            {
+              name: "_id",
+              type: "text",
+              label: "Id",
+              disabled: true,
+            },
+            {
+              name: "computation_fields",
+              type: "array",
+              arrayType: "text",
+              label: "Computation Fields",
+            },
+            {
+              name: "device_fields",
+              type: "array",
+              arrayType: "text",
+              label: "Device Fields",
+            },
+            {
+              name: "feature_fields",
+              type: "array",
+              arrayType: "text",
+              label: "Feature Fields",
+            },
+            {
+              name: "measurement_fields",
+              type: "array",
+              arrayType: "text",
+              label: "Measurement Fields",
+            },
+            {
+              name: "script_fields",
+              type: "array",
+              arrayType: "text",
+              label: "Script Fields",
+            },
+            {
+              name: "tag_fields",
+              type: "array",
+              arrayType: "text",
+              label: "Tag Fields",
+            },
+            {
+              name: "thing_fields",
+              type: "array",
+              arrayType: "text",
+              label: "Thing Fields",
+            }
+          ],
+        },
+
+
+        delete: {
+          url: "/fieldmasks/:_id",
         },
       },
     },
