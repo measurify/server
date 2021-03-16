@@ -27,6 +27,7 @@ const RightTypes  = require('../types/rightTypes.js');
  *       
  */
 const rightSchema = new mongoose.Schema({ 
+    _id: { type: String, required: "Please, supply an _id" },
     type: { type: String, required: "Please, supply the resource type" },
     resource: { type: String, required: "Please, supply a resource" },
     user: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: "Please, supply the user", autopopulate: true },
