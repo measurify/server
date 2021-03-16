@@ -12,7 +12,7 @@ const IssueTypes = require('../types/issueTypes.js');
 const VisibilityTypes = require('../types/visibilityTypes.js');
 const bcrypt = require('bcryptjs');
 const UserStatusTypes = require('../types/userStatusTypes');
-const StatusTypes = require('../types/statusTypes');
+const IssueStatusTypes = require('../types/issueStatusTypes');
 
 exports.uuid = function() {  return crypto.randomBytes(16).toString("hex"); }
 
@@ -148,7 +148,7 @@ exports.createIssue = async function(owner, device, date, message, type, tenant,
         date: date || Date.now(),
         message: message || "this is a message",
         type: type || IssueTypes.generic,
-        status: status || StatusTypes.open,
+        status: status || IssueStatusTypes.open,
         typestamp: Date.now()
     }
     const issue = new Issue(req);

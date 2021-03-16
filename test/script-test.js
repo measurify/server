@@ -220,10 +220,9 @@ describe('/PUT script', () => {
         const script = await factory.createScript("test-script-1", user, "test-code-1", []);
         const modification = { visibility: "invalid"}
         const res = await chai.request(server).keepOpen().put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
-        res.should.have.status(errors.put_request_error.status);
+        res.should.have.status(errors.unknown_value.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.put_request_error.message);
-        res.body.details.should.contain('is invalid for field visibility');
+        res.body.message.should.contain(errors.unknown_value.message);
     });
 
     it('it should PUT a script to add a tag', async () => {

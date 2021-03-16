@@ -1,8 +1,8 @@
-const StatusTypes = Object.freeze({
+const IssueStatusTypes = Object.freeze({
     open: 'open', 
     progress: 'progres',
     solved: 'solved',
     closed: 'closed'
 });
 
-module.exports = StatusTypes;
+module.exports = IssueStatusTypes;

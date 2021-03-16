@@ -10,7 +10,7 @@ const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
 const IssueTypes = require('../types/issueTypes.js');
-const StatusTypes = require('../types/statusTypes.js');
+const IssueStatusTypes = require('../types/issueStatusTypes.js');
 const UserRoles = require('../types/UserRoles.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
@@ -232,12 +232,12 @@ describe('/PUT issue', () => {
         const feature = await factory.createFeature("test-feature", user);
         const device = await factory.createDevice("test-device-1", user, [feature]);
         const issue = await factory.createIssue(user, device, null, "message1", null);
-        const request = { status: StatusTypes.closed };
+        const request = { status: IssueStatusTypes.closed };
         const res = await chai.request(server).keepOpen().put('/v1/issues/' + issue._id).set("Authorization", await factory.getUserToken(user)).send(request);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('status');
-        res.body.status.should.be.eql(StatusTypes.closed);
+        res.body.status.should.be.eql(IssueStatusTypes.closed);
     });
 
     it('it should not PUT a issue owner', async () => {
@@ -258,7 +258,7 @@ describe('/PUT issue', () => {
         const feature = await factory.createFeature("test-feature", user);
         const device = await factory.createDevice("test-device-1", user, [feature]);
         const issue = await factory.createIssue(user, device, null, "message1", null);
-        const request = { status: StatusTypes.closed };
+        const request = { status: IssueStatusTypes.closed };
         const res = await chai.request(server).keepOpen().put('/v1/issues/' + issue._id).set("Authorization", await factory.getUserToken(user)).send(request);
         res.should.have.status(errors.restricted_access_modify.status);
         res.body.should.be.a('object');
@@ -271,7 +271,7 @@ describe('/PUT issue', () => {
         const feature = await factory.createFeature("test-feature", user_1);
         const device = await factory.createDevice("test-device-1", user_1, [feature]);
         const issue = await factory.createIssue(user_1, device, null, "message1", null);
-        const request = { status: StatusTypes.closed };
+        const request = { status: IssueStatusTypes.closed };
         const res = await chai.request(server).keepOpen().put('/v1/issues/' + issue._id).set("Authorization", await factory.getUserToken(user_2)).send(request);
         res.should.have.status(errors.restricted_access_modify.status);
         res.body.should.be.a('object');
@@ -297,9 +297,9 @@ describe('/PUT issue', () => {
         const issue = await factory.createIssue(user, device, null, "message1", null);
         const request = { status: "invalid" };
         const res = await chai.request(server).keepOpen().put('/v1/issues/' + issue._id).set("Authorization", await factory.getUserToken(user)).send(request);
-        res.should.have.status(errors.put_request_error.status);
+        res.should.have.status(errors.unknown_value.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.put_request_error.message);
+        res.body.message.should.contain(errors.unknown_value.message);
     });
 
     it('it should not PUT a fake issue', async () => {
@@ -307,7 +307,7 @@ describe('/PUT issue', () => {
         const feature = await factory.createFeature("test-feature", user);
         const device = await factory.createDevice("test-device-1", user, [feature]);
         const issue = await factory.createIssue(user, device, null, "message1", null);
-        const request = { status: StatusTypes.closed };
+        const request = { status: IssueStatusTypes.closed };
         const res = await chai.request(server).keepOpen().put('/v1/issues/fake_device').set("Authorization", await factory.getUserToken(user)).send(request);
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
