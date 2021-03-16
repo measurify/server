@@ -517,7 +517,7 @@
       "properties": {
         "url": {
           "type": "string",
-          "description": "url to fetch data from"
+          "description": "url to fetch data from "
         },
         "dataPath": {
           "type": [
@@ -533,6 +533,14 @@
         "valuePath": {
           "type": "string",
           "description": "property of the object to take the option value from"
+        },
+        "preLoad": {
+          "type": "boolean",
+          "description": "property of the object that will force the load of values only once at beginning"
+        },
+        "name": {
+          "type": "string",
+          "description": "the name of the item to get values from"
         },
         "sortBy": {
           "type": [

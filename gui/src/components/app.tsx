@@ -18,6 +18,11 @@ import { CustomStyles } from "./customStyles/customStyles.comp";
 import "./app.scss";
 import "react-toastify/dist/ReactToastify.css";
 
+interface ILoadedFields {
+  fieldName: string;
+  values: Array<string>;
+}
+
 const httpService = new HttpService();
 const defaultAppName: string = "RESTool App";
 
@@ -33,7 +38,20 @@ function changeFavicon(src: string) {
   document.head.appendChild(link);
 }
 
+async function preloadData() {
+  const resultsData = await httpService.fetch({
+    method: "get",
+    origUrl: httpService.baseUrl + "/v1/types",
+    headers: { "content-type": "application/json" },
+  });
+  console.log(resultsData);
+}
+
 function App() {
+  const [loadedFields, setLoadedFields] = useState<ILoadedFields[]>(
+    Array<ILoadedFields>(0)
+  );
+  const [fetchedData, setFetchedData] = useState<boolean>();
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
   const [config, setConfig] = useState<IConfig | null>(null);
   const [activePage, setActivePage] = useState<IConfigPage | null>(
@@ -110,6 +128,7 @@ function App() {
 
   useEffect(() => {
     loadConfig();
+    setFetchedData(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -146,6 +165,13 @@ function App() {
         </AppContext.Provider>
       </div>
     );
+
+  if (tkn !== null && fetchedData === false) {
+    console.log("fetch data here");
+    preloadData();
+
+    setFetchedData(true);
+  }
 
   return (
     <div className="restool-app">

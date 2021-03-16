@@ -132,6 +132,8 @@ export interface IConfigOptionSource {
   actualMethod: TConfigMethod
   sortBy: string
   requestHeaders: any
+  preload : boolean
+  name : string
 }
 
 export type TConfigDisplayField = 'text' | 'url' | 'image' | 'colorbox' | 'boolean' | 'html';

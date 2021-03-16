@@ -1746,8 +1746,13 @@ export default {
               },
               {
                 name: "type",
-                type: "text",
-                label: "Type",                
+                type: "select",
+                label: "Type",
+                optionSource: {
+                  url: "",
+                  preLoad: true,
+                  name : "IssueTypes",
+                },
               },
               {
                 name: "message",
@@ -2009,7 +2014,7 @@ export default {
           {
             name: "code",
             type: "text",
-            label: "Cose",
+            label: "Code",
           },
       
           {

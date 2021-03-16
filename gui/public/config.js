@@ -1746,8 +1746,13 @@ export default {
               },
               {
                 name: "type",
-                type: "text",
-                label: "Type",                
+                type: "select",
+                label: "Type",
+                optionSource: {
+                  url: "",
+                  preLoad: true,
+                  name : "IssueTypes",
+                },
               },
               {
                 name: "message",

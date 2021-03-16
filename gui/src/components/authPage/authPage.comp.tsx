@@ -108,10 +108,8 @@ const AuthPageComp = ({ context }: IProps) => {
       }
 
       sessionStorage.setItem("diten-token", result.token);
-
-      console.log("token impostato");
-
       window.location.replace("/");
+      console.log("token impostato");
 
       //const { from } = location.state || { from: { pathname: "/" } };
       //replace(from);
