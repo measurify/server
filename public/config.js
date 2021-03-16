@@ -645,21 +645,25 @@ export default {
               name: "visibility",
               type: "text",
               label: "Visibility",
+              value : "private",
             },
             {
               name: "period",
               type: "text",
               label: "Period",
+              value : "5s",
             },
             {
               name: "cycle",
               type: "text",
               label: "Cicle",
+              value : "10m",
             },
             {
               name: "retryTime",
               type: "text",
               label: "Retry Time",
+              value : "10s",
             },
             {
               name: "tags",
@@ -683,36 +687,43 @@ export default {
               name: "scriptListMaxSize",
               type: "number",
               label: "Script List Max Size",
+              value : 5,
             },
             {
               name: "measurementBufferSize",
               type: "number",
               label: "Measurement Buffer Size",
+              value : 20,
             },
             {
               name: "issueBufferSize",
               type: "number",
               label: "Issue Buffer Size",
+              value : 20,
             },
             {
               name: "sendBufferSize",
               type: "number",
               label: "Send Buffer Size",
+              value : 20,
             },
             {
               name: "scriptStatementMaxSize",
               type: "number",
               label: "Script Statement Max Size",
+              value : 5,
             },
             {
               name: "statementBufferSize",
               type: "number",
               label: "Statement Buffer Size",
+              value : 10,
             },
             {
               name: "measurementBufferPolicy",
               type: "text",
               label: "Measurement Buffer Policy",
+              value : "MeasurementBufferPolicyTypes.newest",
             },
           ],
         },
@@ -1468,8 +1479,8 @@ export default {
               label: "Get All",
               dataPath: "docs",
               url: "/rights/",
-              /*queryParams: [
-                /*{
+              queryParams: [
+                {
                   name: "_id",
                   value: "",
                   label: "ID",
@@ -1482,7 +1493,7 @@ export default {
                   options: ["5", "10", "50"],
                   label: "Risultati per pagina",
                 }
-              ],*/
+              ],
               display: {
                 type: "table",
               },
@@ -1566,6 +1577,11 @@ export default {
             post: {
               url: "/rights",
               fields: [
+                {
+                  name: "_id",
+                  type: "text",
+                  label: "ID",
+                },
                 {
                   name: "resource",
                   type: "text",
@@ -1750,8 +1766,8 @@ export default {
   },
 
 
-///////////// CONSTRAINTS PAGE
-{
+  /////////// CONSTRAINTS PAGE
+  {
       name: "Constraints",
       id: "constraints",
       description: "Visualizzazione e gestione dei Constraint.",
@@ -1882,7 +1898,161 @@ export default {
           url: "/constraints/:_id",
         },
       },
-},
+  },
+
+  //////////// SCRIPTS PAGE
+  {
+    name: "Scripts",
+    id: "scripts",
+    description: "Visualizzazione e gestione degli Scripts.",
+    itemName: "Scripts",
+    methods: {
+      getAll: {
+        label: "Get All",
+        dataPath: "docs",
+        url: "/scripts",
+        queryParams: [
+          {
+            name: "_id",
+            value: "",
+            label: "ID",
+            type: "text",
+          },
+          {
+            name: "tags",
+            type: "select",
+            label: "Filtra Tag",
+            optionSource: {
+              url: "/tags",
+              dataPath: "docs",
+              displayPath: "_id",
+              valuePath: "_id",
+            },
+          },
+          {
+            name: "limit",
+            value: "",
+            type: "select",
+            options: ["5", "10", "50"],
+            label: "Risultati per pagina",
+          },
+          {
+            name: "page",
+            value: "",
+            type: "text",
+            label: "Pagina",
+          },
+        ],
+        display: {
+          type: "cards",
+        },
+        fields: [
+          {
+            name: "_id",
+            type: "text",
+            label: "Id",
+          },
+          {
+            name: "visibility",
+            type: "text",
+            label: "Visibility",
+          },
+          {
+            name: "code",
+            type: "text",
+            label: "Code",
+          },
+          {
+            name: "tags_enroll",
+            type: "text",
+            label: "Tags",
+          },
+         
+        ],
+
+        dataTransform: (items) =>
+          items.map((item) =>
+            Object.assign(item, {
+              tags_enroll:
+                item.tags.join() !== ""
+                  ? "[" + item.tags.join(" , ") + "]"
+                  : "Nessun Tag",
+            })
+          ),
+
+        pagination: {
+          type: "buttons",
+          source: "query",
+          params: { page: { name: "page" }, limit: { name: "limit" } },
+          fields: { total: { dataPath: "totalDocs" } },
+        },
+      },
+      getSingle: {
+        url: "/scripts/:_id",
+        queryParams: [],
+        requestHeaders: {},
+      },
+      post: {
+        url: "/scripts",
+        fields: [
+          {
+            name: "_id",
+            type: "text",
+            label: "Id",
+          },
+          {
+            name: "visibility",
+            type: "text",
+            label: "Visibility",
+            value : "private",
+          },
+          {
+            name: "code",
+            type: "text",
+            label: "Cose",
+          },
+      
+          {
+            name: "tags",
+            type: "array",
+            arrayType: "text",
+            label: "Tags",
+          },
+       
+        ],
+      },
+
+      put: {
+        url: "/scripts/:_id",
+        fields: [
+          {
+            name: "_id",
+            type: "text",
+            label: "Id",
+            disabled: true,
+          },
+          {
+            name: "code",
+            type: "text",
+            label: "Code",
+          },
+          {
+            name: "tags",
+            type: "array",
+            arrayType: "text",
+            label: "Tags",
+          },
+        ],
+      },
+
+
+      delete: {
+        url: "/scripts/:_id",
+      },
+
+    },
+  
+  },
 
   ],
 };
