@@ -6,6 +6,151 @@
 	},
 	"item": [
 		{
+			"name": "INFO",
+			"item": [
+				{
+					"name": "LOGIN as SuperAdmin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"postman.setEnvironmentVariable(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "API docs",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"demo\", jsonData);",
+									"tests[\"demo = \" + jsonData] = true;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "API error codes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"demo\", jsonData);",
+									"tests[\"demo = \" + jsonData] = true;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/v1/errors",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"errors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "API info",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"demo\", jsonData);",
+									"tests[\"demo = \" + jsonData] = true;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/info",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"info"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "DEMOS",
 			"item": [
 				{
@@ -2069,6 +2214,43 @@
 					"response": []
 				},
 				{
+					"name": "PUT a device",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"visibility\": \"private\",\n    \"tags\": {\n        \"remove\": [],\n        \"add\": [\"tagged-tag-1\", \"tagged-tag-2\"]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/deviuces/{{device}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"deviuces",
+								"{{device}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "POST a list of new devices",
 					"event": [
 						{
@@ -2274,7 +2456,7 @@
 					"response": []
 				},
 				{
-					"name": "GET all his issues",
+					"name": "GET all issues",
 					"event": [
 						{
 							"listen": "test",
@@ -2304,6 +2486,96 @@
 							"path": [
 								"v1",
 								"issues"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT an issue",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"closed\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/issues/{{issue}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"issues",
+								"{{issue}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE an issue",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"closed\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/issues/{{issue}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"issues",
+								"{{issue}}"
 							]
 						}
 					},
@@ -2360,6 +2632,62 @@
 								"v1",
 								"issues",
 								"types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET the list of issue status",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/v1/issues/status",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"issues",
+								"status"
 							]
 						}
 					},
@@ -3723,6 +4051,46 @@
 					"response": []
 				},
 				{
+					"name": "PUT to associate the script to a device",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"scripts\": {\n\t\t\"add\": [\"threshold-temperature-script\"],\n\t\t\"remove\": []\n\t}\n}\n\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/devices/{{device}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"devices",
+								"{{device}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "POST a list of new scripts",
 					"event": [
 						{
@@ -4272,13 +4640,19 @@
 							}
 						],
 						"url": {
-							"raw": "{{url}}/v1/rights",
+							"raw": "{{url}}/v1/rights?",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"v1",
 								"rights"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null
+								}
 							]
 						}
 					},
@@ -4405,7 +4779,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"resource\": \"{{thing}}\",\r\n  \"type\": \"Thing\",\r\n  \"user\": \"{{username}}\"\r\n}"
+							"raw": "{\r\n  \"_id\": \"MyRight2\",    \r\n  \"resource\": \"{{thing}}\",\r\n  \"type\": \"Thing\",\r\n  \"user\": \"{{username}}\"\r\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/rights/",
@@ -4509,7 +4883,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\r\n\t{\r\n\t  \"resource\": \"{{thing1}}\",\r\n\t  \"type\": \"Thing\",\r\n\t  \"user\": \"{{user}}\"\r\n\t},\r\n\t{\r\n\t  \"resource\": \"{{thing2}}\",\r\n\t  \"type\": \"Thing\",\r\n\t  \"user\": \"{{user}}\"\r\n\t}\r\n]"
+							"raw": "[\r\n\t{\r\n      \"_id\": \"MyRight_1\",  \r\n\t  \"resource\": \"{{thing1}}\",\r\n\t  \"type\": \"Thing\",\r\n\t  \"user\": \"{{user}}\"\r\n\t},\r\n\t{\r\n      \"_id\": \"MyRight_2\",\r\n\t  \"resource\": \"{{thing2}}\",\r\n\t  \"type\": \"Thing\",\r\n\t  \"user\": \"{{user}}\"\r\n\t}\r\n]"
 						},
 						"url": {
 							"raw": "{{url}}/v1/rights",
@@ -6960,176 +7334,6 @@
 					}
 				}
 			]
-		},
-		{
-			"name": "API docs",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"postman.setEnvironmentVariable(\"demo\", jsonData);",
-							"tests[\"demo = \" + jsonData] = true;"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{url}}/",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "API error codes",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"postman.setEnvironmentVariable(\"demo\", jsonData);",
-							"tests[\"demo = \" + jsonData] = true;"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{url}}/v1/errors",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"v1",
-						"errors"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "API docs Copy",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"postman.setEnvironmentVariable(\"demo\", jsonData);",
-							"tests[\"demo = \" + jsonData] = true;"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{url}}/",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "LOGIN as SuperAdmin",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"postman.setEnvironmentVariable(\"token\", JSON.parse(responseBody).token);",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
-				},
-				"url": {
-					"raw": "{{url}}/v1/login",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"v1",
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "API info",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"postman.setEnvironmentVariable(\"demo\", jsonData);",
-							"tests[\"demo = \" + jsonData] = true;"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "{{token}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{url}}/v1/info",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"v1",
-						"info"
-					]
-				}
-			},
-			"response": []
 		}
 	]
 }

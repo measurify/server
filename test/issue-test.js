@@ -10,6 +10,7 @@ const mongoose = require('mongoose');
 const should = chai.should();
 const factory = require('../commons/factory.js');
 const IssueTypes = require('../types/issueTypes.js');
+const StatusTypes = require('../types/statusTypes.js');
 const UserRoles = require('../types/UserRoles.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
@@ -221,5 +222,143 @@ describe('/POST issue', () => {
         res.body.should.be.a('object');
         res.body.saved.should.be.eql(3);
         res.body.errors.should.be.eql(1);
+    });
+});
+
+
+describe('/PUT issue', () => {
+    it('it should PUT a issue status', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature", user);
+        const device = await factory.createDevice("test-device-1", user, [feature]);
+        const issue = await factory.createIssue(user, device, null, "message1", null);
+        const request = { status: StatusTypes.closed };
+        const res = await chai.request(server).keepOpen().put('/v1/issues/' + issue._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('status');
+        res.body.status.should.be.eql(StatusTypes.closed);
+    });
+
+    it('it should not PUT a issue owner', async () => {
+        const user_1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user_2 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature", user_1);
+        const device = await factory.createDevice("test-device-1", user_1, [feature]);
+        const issue = await factory.createIssue(user_1, device, null, "message1", null);
+        const request = { owner: user_2._id };
+        const res = await chai.request(server).keepOpen().put('/v1/issues/' + issue._id).set("Authorization", await factory.getUserToken(user_1)).send(request);
+        res.should.have.status(errors.incorrect_info.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.incorrect_info.message);
+    });
+
+    it('it should not PUT a issue as analyst', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.analyst);
+        const feature = await factory.createFeature("test-feature", user);
+        const device = await factory.createDevice("test-device-1", user, [feature]);
+        const issue = await factory.createIssue(user, device, null, "message1", null);
+        const request = { status: StatusTypes.closed };
+        const res = await chai.request(server).keepOpen().put('/v1/issues/' + issue._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(errors.restricted_access_modify.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.restricted_access_modify.message);
+    });
+
+    it('it should not PUT a issue of another provider', async () => {
+        const user_1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user_2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature", user_1);
+        const device = await factory.createDevice("test-device-1", user_1, [feature]);
+        const issue = await factory.createIssue(user_1, device, null, "message1", null);
+        const request = { status: StatusTypes.closed };
+        const res = await chai.request(server).keepOpen().put('/v1/issues/' + issue._id).set("Authorization", await factory.getUserToken(user_2)).send(request);
+        res.should.have.status(errors.restricted_access_modify.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.restricted_access_modify.message);
+    });
+
+    it('it should not PUT a issue without any field', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature", user);
+        const device = await factory.createDevice("test-device-1", user, [feature]);
+        const issue = await factory.createIssue(user, device, null, "message1", null);
+        const request = { };
+        const res = await chai.request(server).keepOpen().put('/v1/issues/' + issue._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(errors.missing_info.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.missing_info.message);
+    });
+
+    it('it should not PUT a issue status with an invalid value any field', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature", user);
+        const device = await factory.createDevice("test-device-1", user, [feature]);
+        const issue = await factory.createIssue(user, device, null, "message1", null);
+        const request = { status: "invalid" };
+        const res = await chai.request(server).keepOpen().put('/v1/issues/' + issue._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(errors.put_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.put_request_error.message);
+    });
+
+    it('it should not PUT a fake issue', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature", user);
+        const device = await factory.createDevice("test-device-1", user, [feature]);
+        const issue = await factory.createIssue(user, device, null, "message1", null);
+        const request = { status: StatusTypes.closed };
+        const res = await chai.request(server).keepOpen().put('/v1/issues/fake_device').set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(errors.resource_not_found.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.resource_not_found.message);
+    });
+});
+
+// Test the /DELETE route
+describe('/DELETE issue', () => {
+    it('it should DELETE an issue', async () => {      
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature", user);
+        const device = await factory.createDevice("test-device-1", user, [feature]);
+        const issue = await factory.createIssue(user, device, null, "message1", null);
+        const issues_before = await before.Issue.find();
+        issues_before.length.should.be.eql(1);
+        const res = await chai.request(server).keepOpen().delete('/v1/issues/' + issue._id).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        const issues_after = await before.Issue.find();
+        issues_after.length.should.be.eql(0);
+    });
+
+    it('it should not DELETE a fake issue', async () => {      
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature", user);
+        const device = await factory.createDevice("test-device-1", user, [feature]);
+        const issue = await factory.createIssue(user, device, null, "message1", null);
+        const issues_before = await before.Issue.find();
+        issues_before.length.should.be.eql(1);
+        const res = await chai.request(server).keepOpen().delete('/v1/issues/fake_issue').set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(errors.resource_not_found.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.resource_not_found.message);
+        const issues_after = await before.Issue.find();
+        issues_after.length.should.be.eql(1);
+    });
+    
+    it('it should not DELETE a issue by non-owner', async () => {      
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature", user);
+        const device = await factory.createDevice("test-device-1", user, [feature]);
+        const issue = await factory.createIssue(user, device, null, "message1", null);
+        const issues_before = await before.Issue.find();
+        issues_before.length.should.be.eql(1);
+        const res = await chai.request(server).keepOpen().delete('/v1/issues/' + issue._id).set("Authorization", await factory.getUserToken(user2));
+        res.should.have.status(errors.not_yours.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.not_yours.message);
+        const issues_after = await before.Issue.find();
+        issues_after.length.should.be.eql(1);
     });
 });

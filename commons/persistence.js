@@ -98,6 +98,13 @@ exports.update = async function(body, fields, resource, model, tenant) {
     for (let field of fields) {
         if (typeof body[field] != 'object' && body[field]) { 
             if(field == 'password') if(tenant.passwordhash == true) body[field] = bcrypt.hashSync(body[field], 8);
+
+            //categorical data
+            let field_type = null;
+            const field_type_name = field[0].toUpperCase() + field.slice(1) + "Types";
+            try { field_type = require('../types/' + field_type_name + '.js'); } catch(err) {};
+            if (field_type) if (!Object.values(field_type).includes(body[field]))  throw 'Value ' + body[field] + " is invalid for field " + field;
+
             resource[field] = body[field]; continue; 
         }
         if (typeof body[field] == 'object' && body[field]) {
