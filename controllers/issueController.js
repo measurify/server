@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const controller = require('./controller');
 const checker = require('./checker');
 const IssueTypes = require('../types/issueTypes');
-const StatusTypes = require('../types/statusTypes');
+const IssueStatusTypes = require('../types/issueStatusTypes');
 
 exports.get = async (req, res) => { 
     const Issue = mongoose.dbs[req.tenant.database].model('Issue');
@@ -21,7 +21,7 @@ exports.getTypes = async (req, res) => {
 };
 
 exports.getStatusTypes = async (req, res) => {
-    return res.status(200).json(StatusTypes);
+    return res.status(200).json(IssueStatusTypes);
 };
 
 exports.put = async (req, res) => { 
@@ -29,6 +29,7 @@ exports.put = async (req, res) => {
     const fields = ['status' ];
     let result = await checker.isAvailable(req, res, Issue); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
+    result = await checker.isValid(req, res, IssueStatusTypes, 'status'); if (result != true) return result;
     result = await checker.canModify(req, res); if (result != true) return result;
     return await controller.updateResource(req, res, fields, Issue);
 }
