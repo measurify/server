@@ -13,6 +13,7 @@ const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
 const before = require('./before-test.js');
+const VisibilityTypes = require('../types/visibilityTypes.js');
 
 // Test the /GET route
 describe('/GET scripts', () => {
@@ -201,6 +202,28 @@ describe('/PUT script', () => {
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
         res.body.code.should.be.eql("this is the new code");
+    });
+
+    it('it should PUT a script to modify visibility', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const script = await factory.createScript("test-script-1", user, "test-code-1", []);
+        const modification = { visibility: VisibilityTypes.public}
+        const res = await chai.request(server).keepOpen().put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('visibility');
+        res.body.visibility.should.be.eql(VisibilityTypes.public);
+    });
+
+    it('it should not PUT a script with a invalid value for visibility', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider)
+        const script = await factory.createScript("test-script-1", user, "test-code-1", []);
+        const modification = { visibility: "invalid"}
+        const res = await chai.request(server).keepOpen().put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(errors.put_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.put_request_error.message);
+        res.body.details.should.contain('is invalid for field visibility');
     });
 
     it('it should PUT a script to add a tag', async () => {

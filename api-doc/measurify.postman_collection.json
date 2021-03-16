@@ -4034,7 +4034,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"code\": \"this is my modified test code\",\r\n  \"tags\": {\r\n\t\"remove\": [\"{{tag1}}\"],\r\n  \t\"add\": [\"{{tag2}}\",\"{{tag3}}\"]\r\n  }\r\n}"
+							"raw": "{\r\n  \"code\": \"this is my modified test code\",\r\n  \"visibility\": \"public\",\r\n  \"tags\": {\r\n\t\"remove\": [\"{{tag1}}\"],\r\n  \t\"add\": [\"{{tag2}}\",\"{{tag3}}\"]\r\n  }\r\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/scripts/{{script}}",
@@ -4052,6 +4052,18 @@
 				},
 				{
 					"name": "PUT to associate the script to a device",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var devices = JSON.parse(pm.environment.get(\"devices\"));",
+									"pm.environment.set('device', devices[0]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "PUT",
 						"header": [
@@ -4069,7 +4081,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"scripts\": {\n\t\t\"add\": [\"threshold-temperature-script\"],\n\t\t\"remove\": []\n\t}\n}\n\n",
+							"raw": "{\n\t\"scripts\": {\n\t\t\"add\": [\"{{script}}\"],\n\t\t\"remove\": []\n\t}\n}\n\n",
 							"options": {
 								"raw": {
 									"language": "json"
