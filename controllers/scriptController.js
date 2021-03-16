@@ -33,7 +33,7 @@ exports.post = async (req, res) => {
 
 exports.put = async (req, res) => { 
     const Script = mongoose.dbs[req.tenant.database].model('Script');
-    const fields = ['code','tags'];
+    const fields = ['code','tags', 'visibility'];
     let result = await checker.isAvailable(req, res, Script); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.canModify(req, res); if (result != true) return result;
