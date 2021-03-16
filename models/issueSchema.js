@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
 const IssueTypes = require('../types/issueTypes.js'); 
+const StatusTypes = require('../types/statusTypes.js'); 
+
 
 /**
  * @swagger
@@ -29,6 +31,7 @@ const issueSchema = new mongoose.Schema({
     date: {type: Date, default: Date.now },
     message: { type: String },
     type: { type: String, required: "Please, supply an issue type", },
+    status: { type: String, default: StatusTypes.open },
     timestamp: {type: Date, default: Date.now, select: false },
 });
 
@@ -52,6 +55,12 @@ issueSchema.path('owner').validate({
 issueSchema.pre('save', async function() {
     if(!this.type) throw new Error('Issue validation failed: supply an issue type');  
     if(!Object.values(IssueTypes).includes(this.type)) throw new Error('Issue validation failed: unrecognized issue type');                      
+});
+
+// check status
+issueSchema.pre('save', async function() {
+    if(!this.status) throw new Error('Issue validation failed: supply an issue status');  
+    if(!Object.values(StatusTypes).includes(this.status)) throw new Error('Issue validation failed: unrecognized issue status');                      
 });
 
 // validate device

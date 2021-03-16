@@ -11,6 +11,8 @@ const PasswordResetStatusTypes = require('../types/passwordResetStatusTypes.js')
 const IssueTypes = require('../types/issueTypes.js');
 const VisibilityTypes = require('../types/visibilityTypes.js');
 const bcrypt = require('bcryptjs');
+const UserStatusTypes = require('../types/userStatusTypes');
+const StatusTypes = require('../types/statusTypes');
 
 exports.uuid = function() {  return crypto.randomBytes(16).toString("hex"); }
 
@@ -21,7 +23,7 @@ exports.dropContents = async function(tenant){
         const Tenant = mongoose.dbs['catalog'].model('Tenant');  
         if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
         for (let collection in mongoose.dbs[tenant.database].collections) { await mongoose.dbs[tenant.database].collections[collection].deleteMany(); };  
-        tenancy.init(tenant);
+        tenancy.init(tenant);   
     }
     catch (error) { console.log('Error in dropping databae ' + tenant + '('+ error + ')')} 
 }
@@ -136,7 +138,7 @@ exports.createDevice = async function(name, owner, features, tags, scripts, visi
     return device._doc;
 };
 
-exports.createIssue = async function(owner, device, date, message, type, tenant) {
+exports.createIssue = async function(owner, device, date, message, type, tenant, status) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
     const Issue = mongoose.dbs[tenant.database].model('Issue');
@@ -146,6 +148,7 @@ exports.createIssue = async function(owner, device, date, message, type, tenant)
         date: date || Date.now(),
         message: message || "this is a message",
         type: type || IssueTypes.generic,
+        status: status || StatusTypes.open,
         typestamp: Date.now()
     }
     const issue = new Issue(req);
@@ -314,8 +317,8 @@ exports.createDemoContent = async function(tenant) {
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
 
     const users = [];
-    users.push(await this.createUser('user-provider-name-1', 'provider-password-1', UserRoles.provider, null, "user1@measurify.org", tenant));
-    users.push(await this.createUser('user-analyst-name-1', 'analyst-password-1', UserRoles.analyst, null, "user2@measurify.org", tenant));
+    users.push(await this.createUser('user-provider-name-1','password', UserRoles.provider, null, "user1@measurify.org", tenant));
+    users.push(await this.createUser('user-analyst-name-1', 'password', UserRoles.analyst, null, "user2@measurify.org", tenant));
 
     const tags = [];
     tags.push(await this.createTag('diesel', users[0], [], VisibilityTypes.public, tenant));
@@ -349,8 +352,8 @@ exports.createDemoContent = async function(tenant) {
     constraints.push(await this.createConstraint(users[0], "Tag", "Device", tags[2]._id, devices[1]._id, RelationshipTypes.dependency, VisibilityTypes.public, [], tenant));
 
     const rights = [];
-    rights.push(await this.createRight(things[0], "Thing", users[1], users[0], [], tenant));
-    rights.push(await this.createRight(things[1], "Thing", users[1] , users[0], [], tenant));
+    rights.push(await this.createRight("right-1", things[0], "Thing", users[1], users[0], [], tenant));
+    rights.push(await this.createRight("right-2", things[1], "Thing", users[1] , users[0], [], tenant));
  
     const measurements = [];
     measurements.push(await this.createMeasurement(users[0], "speed", "speedometer", "car1", ["urban"], [{values: [60], delta: 0}], null, null, null, VisibilityTypes.public, tenant));

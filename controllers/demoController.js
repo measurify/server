@@ -28,9 +28,7 @@ exports.get = async (req, res) => {
 
 exports.post = async (req, res) => {
     if (!Authorization.isAdministrator(req.user)) return errors.manage(res, errors.admin_restricted_access); 
-    await factory.dropContents(req.tenant);
-    if (req.body != '{}') await factory.createDemoContent(req.tenant._id); 
-    else return errors.manage(res, errors.demo_content_request_not_implemented);
+
     const User = mongoose.dbs[req.tenant.database].model('User');
     const Tag = mongoose.dbs[req.tenant.database].model('Tag');
     const Feature = mongoose.dbs[req.tenant.database].model('Feature');
@@ -40,9 +38,13 @@ exports.post = async (req, res) => {
     const Right = mongoose.dbs[req.tenant.database].model('Right');  
     const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
     const Constraint = mongoose.dbs[req.tenant.database].model('Constraint');
-    const users = await User.find({}).select("+password");
+
+    let features = await Feature.find({});
+    if(features.length == 0) await factory.createDemoContent(req.tenant); 
+
+    const users = await User.find({});
     const tags = await Tag.find({});
-    const features = await Feature.find({});
+    features = await Feature.find({});
     const devices = await Device.find({});
     const things = await Thing.find({});
     const measurements = await Measurement.find({});

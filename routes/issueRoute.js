@@ -26,6 +26,8 @@ router.get('/pipe',  catchErrors(issueController.pipe));
 
 router.get('/types',  catchErrors(issueController.getTypes));
 
+router.get('/status',  catchErrors(issueController.getStatusTypes));
+
 /**
  * @swagger
  * /scripts:
@@ -57,5 +59,9 @@ router.get('/types',  catchErrors(issueController.getTypes));
  *                  $ref: '#/paths/definitions/thing'
  */
 router.post('/', catchErrors(issueController.post));
+
+router.delete('/:id',  catchErrors(issueController.delete));
+
+router.put('/:id',  catchErrors(issueController.put));
 
 module.exports = router;
