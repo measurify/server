@@ -58,7 +58,7 @@ const admin = await factory.createUser("test-username-1", "test-password-1", Use
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const thingnoright = await factory.createThing("test-thing-1", admin);
         const thingright = await factory.createThing("test-thing-2", admin);
-        const right = await factory.createRight(thingright, "Thing", user, admin, []);
+        const right = await factory.createRight("right-test-1", thingright, "Thing", user, admin, []);
         const subscription = { token: "subscription-id", thing: thingnoright._id, tags: [] };
         const res = await chai.request(server).keepOpen().post('/v1/subscriptions').set("Authorization", await factory.getUserToken(user)).send(subscription);
         res.should.have.status(errors.restricted_access.status);
@@ -73,7 +73,7 @@ const admin = await factory.createUser("test-username-1", "test-password-1", Use
         const feature = await factory.createFeature("test-feature-1", admin);
         const deviceright = await factory.createDevice("test-device-1", admin, [feature]);
         const devicenoright = await factory.createDevice("test-device-2", admin, [feature]);
-        const right = await factory.createRight(deviceright, "Device", user, admin, []);
+        const right = await factory.createRight("right-test-1", deviceright, "Device", user, admin, []);
         const subscription = { token: "subscription-id", device: devicenoright._id, tags: [] };
         const res = await chai.request(server).keepOpen().post('/v1/subscriptions').set("Authorization", await factory.getUserToken(user)).send(subscription);
         res.should.have.status(errors.restricted_access.status);
@@ -88,7 +88,7 @@ const admin = await factory.createUser("test-username-1", "test-password-1", Use
         const feature = await factory.createFeature("test-feature-1", admin);
         const deviceright = await factory.createDevice("test-device-1", admin, [feature]);
         const devicenoright = await factory.createDevice("test-device-2", admin, [feature]);
-        const right = await factory.createRight(deviceright, "Device", user, admin, []);
+        const right = await factory.createRight("right-test-1", deviceright, "Device", user, admin, []);
         const subscription = { token: "subscription-id", device: deviceright._id, tags: [] };
         const res = await chai.request(server).keepOpen().post('/v1/subscriptions').set("Authorization", await factory.getUserToken(user)).send(subscription);
         res.should.have.status(200);

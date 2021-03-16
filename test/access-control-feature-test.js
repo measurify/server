@@ -293,9 +293,9 @@ const user_admin = await factory.createUser("test-username-user-1", "test-passwo
         const feature_private_1 = await factory.createFeature("test-feature-1-private", owner, null, [], VisibilityTypes.private);
         const feature_private_2 = await factory.createFeature("test-feature-2-private", owner, null, [], VisibilityTypes.private);
         const feature_private_3 = await factory.createFeature("test-feature-3-private", owner, null, [], VisibilityTypes.private);
-        const right_1 = await factory.createRight(feature_public_1, "Feature", user_analyst, owner, []);
-        const right_2 = await factory.createRight(feature_public_2, "Feature", user_analyst, owner, []);
-        const right_3 = await factory.createRight(feature_private_1, "Feature", user_analyst, owner, []);
+        const right_1 = await factory.createRight("right-test-1", feature_public_1, "Feature", user_analyst, owner, []);
+        const right_2 = await factory.createRight("right-test-2", feature_public_2, "Feature", user_analyst, owner, []);
+        const right_3 = await factory.createRight("right-test-3", feature_private_1, "Feature", user_analyst, owner, []);
         let res = await chai.request(server).keepOpen().get('/v1/features/').set("Authorization", await factory.getUserToken(user_admin));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
@@ -318,10 +318,10 @@ const user_admin = await factory.createUser("test-username-user-1", "test-passwo
         const feature_private_1 = await factory.createFeature("test-feature-1-private", owner, null, [], VisibilityTypes.private);
         const feature_private_2 = await factory.createFeature("test-feature-2-private", user_provider, null, [], VisibilityTypes.private);
         const feature_private_3 = await factory.createFeature("test-feature-3-private", owner, null, [], VisibilityTypes.private);
-        const right_1 = await factory.createRight(feature_private_2, "Feature", user_provider, owner, []);
-        const right_2 = await factory.createRight(feature_private_1, "Feature", user_provider, owner, []);
-        const right_3 = await factory.createRight(feature_public_1, "Feature", user_provider, owner, []);
-        const right_4 = await factory.createRight(feature_public_2, "Feature", user_provider, owner, []);
+        const right_1 = await factory.createRight("right-test-1", feature_private_2, "Feature", user_provider, owner, []);
+        const right_2 = await factory.createRight("right-test-2", feature_private_1, "Feature", user_provider, owner, []);
+        const right_3 = await factory.createRight("right-test-3", feature_public_1, "Feature", user_provider, owner, []);
+        const right_4 = await factory.createRight("right-test-4", feature_public_2, "Feature", user_provider, owner, []);
         let res = await chai.request(server).keepOpen().get('/v1/features/').set("Authorization", await factory.getUserToken(user_admin));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
@@ -338,8 +338,8 @@ const user_admin = await factory.createUser("test-username-user-1", "test-passwo
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner, null, [], VisibilityTypes.public);
         const feature_owned = await factory.createFeature("test-feature-2", owner, null, [], VisibilityTypes.public);
-        const right_1 = await factory.createRight(feature_owned, "Feature", user_provider, owner, []);
-        const right_2 = await factory.createRight(feature_owned, "Feature", user_analyst, owner, []);
+        const right_1 = await factory.createRight("right-test-1", feature_owned, "Feature", user_provider, owner, []);
+        const right_2 = await factory.createRight("right-test-2", feature_owned, "Feature", user_analyst, owner, []);
         let res = await chai.request(server).keepOpen().get('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(errors.restricted_access_read.status);
         res.body.should.be.a('object');
@@ -357,8 +357,8 @@ const user_admin = await factory.createUser("test-username-user-1", "test-passwo
         const user_analyst = await factory.createUser("test-username-user-2", "test-password-user-2", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner, null, [], VisibilityTypes.public);
-        const right_1 = await factory.createRight(feature, "Feature", user_provider, owner, []);
-        const right_2 = await factory.createRight(feature, "Feature", user_analyst, owner, []);
+        const right_1 = await factory.createRight("right-test-1", feature, "Feature", user_provider, owner, []);
+        const right_2 = await factory.createRight("right-test-2", feature, "Feature", user_analyst, owner, []);
         let res = await chai.request(server).keepOpen().get('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -376,7 +376,7 @@ describe('Delete features with rights', () => {
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user_provider, null, [], VisibilityTypes.public);
         const feature_owned = await factory.createFeature("test-feature-2", owner, null, [], VisibilityTypes.public);
-        const right = await factory.createRight(feature_owned, "Feature", user_provider, owner, []);
+        const right = await factory.createRight("right-test-1", feature_owned, "Feature", user_provider, owner, []);
         let res = await chai.request(server).keepOpen().delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(errors.restricted_access_read.status);
         res.body.should.be.a('object');
@@ -388,7 +388,7 @@ describe('Delete features with rights', () => {
         const user_provider = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user_provider, null, [], VisibilityTypes.public);
-        const right = await factory.createRight(feature, "Feature", user_provider, owner, []);
+        const right = await factory.createRight("right-test-1", feature, "Feature", user_provider, owner, []);
         let res = await chai.request(server).keepOpen().delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -401,7 +401,7 @@ describe('Modify features with rights', () => {
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user_provider, null, [], VisibilityTypes.public);
         const feature_owned = await factory.createFeature("test-feature-2", owner, null, [], VisibilityTypes.public);
-        const right = await factory.createRight(feature_owned, "Feature", user_provider, owner, []);
+        const right = await factory.createRight("right-test-1", feature_owned, "Feature", user_provider, owner, []);
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
         let res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user_provider)).send(modification);
@@ -415,7 +415,7 @@ describe('Modify features with rights', () => {
         const user_provider = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user_provider, null, [], VisibilityTypes.public);
-        const right = await factory.createRight(feature, "Feature", user_provider, owner, []);
+        const right = await factory.createRight("right-test-1", feature, "Feature", user_provider, owner, []);
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
         let res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user_provider)).send(modification);
@@ -430,7 +430,7 @@ const provider = await factory.createUser("test-username-admin", "test-password-
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", owner);
         const tag_other = await factory.createTag("test-tag-2", owner);
-        const right = await factory.createRight(tag_other, "Tag", provider, owner, []);
+        const right = await factory.createRight("right-test-1", tag_other, "Tag", provider, owner, []);
         const request = { _id: "feature-name-text", items: [{ name: 'item-name-1', unit: 'item-unit-1'}], tags:[tag._id]};
         let res = await chai.request(server).keepOpen().post('/v1/features/').set('Authorization', await factory.getUserToken(provider)).send(request);
         res.body.message.should.be.a('string');
@@ -443,7 +443,7 @@ const provider = await factory.createUser("test-username-admin", "test-password-
 const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", owner);
-        const right = await factory.createRight(tag, "Tag", provider, owner, []);
+        const right = await factory.createRight("right-test-1", tag, "Tag", provider, owner, []);
         const request = { _id: "feature-name-text", items: [ { name: 'item-name-1', unit: 'item-unit-1'}], tags:[tag._id]}
         let res = await chai.request(server).keepOpen().post('/v1/features/').set('Authorization', await factory.getUserToken(provider)).send(request);
         res.should.have.status(200);

@@ -281,9 +281,9 @@ describe('/PUT fieldmasks', () => {
         const fieldmask = await factory.createFieldmask("fieldmask-test-1", [], [], [], ['samples', 'startDate'], [], [], [], admin)
         const modification = { fakefield: { remove: ['samples'] } };
         const res = await chai.request(server).keepOpen().put('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
-        res.should.have.status(errors.missing_info.status);
+        res.should.have.status(errors.incorrect_info.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.missing_info.message);
+        res.body.message.should.contain(errors.incorrect_info.message);
     });
 
     it('it should not PUT a fake fieldmasks', async () => {      
