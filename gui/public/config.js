@@ -1456,5 +1456,433 @@ export default {
         },
       },
     },
+
+    //////////// RIGHTS PAGE
+    {
+          name: "Rights",
+          id: "rights",
+          description: "Visualizzazione e gestione dei Rights.",
+          itemName: "Right",
+          methods: {
+            getAll: {
+              label: "Get All",
+              dataPath: "docs",
+              url: "/rights/",
+              /*queryParams: [
+                /*{
+                  name: "_id",
+                  value: "",
+                  label: "ID",
+                  type: "text",
+                },
+                {
+                  name: "limit",
+                  value: "",
+                  type: "select",
+                  options: ["5", "10", "50"],
+                  label: "Risultati per pagina",
+                }
+              ],*/
+              display: {
+                type: "table",
+              },
+              fields: [
+                {
+                  name: "_id",
+                  type: "text",
+                  label: "Id",
+                },
+                {
+                  name: "resource",
+                  type: "text",
+                  label: "Resource",
+                },
+                {
+                  name: "type",
+                  type: "text",
+                  label: "Type",
+                },
+                {
+                  name: "tag_enroll",
+                  type: "text",
+                  label: "Tags",
+                },
+                {
+                  name: "user_id",
+                  type: "text",
+                  label: "User's ID",
+                },
+                {
+                  name: "user_username",
+                  type: "text",
+                  label: "User's Username",
+                },
+                
+                {
+                  name: "user_status",
+                  type: "text",
+                  label: "User' Status",
+                },
+                {
+                  name: "user_fieldmask",
+                  type: "text",
+                  label: "User's Fieldmask",
+                },
+                {
+                  name: "user_type",
+                  type: "text",
+                  label: "User's Type",
+                },
+              ],
+    
+              dataTransform: (items) =>
+                items.map((item) =>
+                  Object.assign(item, {
+                   
+                    tag_enroll:
+                      item.tag_fields.join() !== ""
+                        ? "[" + item.tag_fields.join(" , ") + "]"
+                        : "Nessun Tag",
+                    user_id:  item.user._id,
+                    user_status:  item.user.status,
+                    user_username:  item.user.username,
+                    user_fieldmask:  item.user.fieldmask,
+                    user_type:  item.user.type,
+                  })
+                ),
+    
+              pagination: {
+                type: "buttons",
+                source: "query",
+                params: { page: { name: "page" }, limit: { name: "limit" } },
+                fields: { total: { dataPath: "totalDocs" } },
+              },
+            },
+            getSingle: {
+              url: "/rights/:_id",
+              queryParams: [],
+              requestHeaders: {},
+            },
+            post: {
+              url: "/rights",
+              fields: [
+                {
+                  name: "resource",
+                  type: "text",
+                  label: "Resource",
+                },
+                {
+                  name: "type",
+                  type: "text",
+                  label: "Type",
+                },
+                {
+                  name: "user",
+                  type: "text",
+                  label: "User ID",
+                },
+                
+              ],
+            },
+            put: {
+              url: "/rights/:_id",
+              fields: [
+                {
+                  name: "_id",
+                  type: "text",
+                  label: "Id",
+                  disabled: true,
+                },
+                {
+                  name: "resource",
+                  type: "text",
+                  label: "Resource",
+                  disabled: true,
+                },
+                {
+                  name: "type",
+                  type: "text",
+                  label: "Type",
+                  disabled: true,
+                },
+                {
+                  name: "tags",
+                  type: "array",
+                  arrayType: "text",
+                  label: "Tags",
+                },
+              ],
+            },
+    
+    
+            delete: {
+              url: "/rights/:_id",
+            },
+          },
+    },
+
+
+  ///////////// ISSUES PAGE
+  {
+        name: "Issues",
+        id: "issues",
+        description: "Visualizzazione e gestione degli Issues.",
+        itemName: "Issue",
+        methods: {
+          getAll: {
+            label: "Get All",
+            dataPath: "docs",
+            url: "/issues/",
+            queryParams: [
+              /*{
+                name: "_id",
+                value: "",
+                label: "ID",
+                type: "text",
+              },*/
+              {
+                name: "device",
+                type: "select",
+                label: "Filtra Device",
+                optionSource: {
+                  url: "/devices",
+                  dataPath: "docs",
+                  displayPath: "_id",
+                  valuePath: "_id",
+                },
+              },
+              {
+                name: "limit",
+                value: "",
+                type: "select",
+                options: ["5", "10", "50"],
+                label: "Risultati per pagina",
+              }
+            ],
+            display: {
+              type: "table",
+            },
+            fields: [
+              {
+                name: "_id",
+                type: "text",
+                label: "Id",
+              },
+              {
+                name: "device_id",
+                type: "text",
+                label: "Device",
+              },
+              {
+                name: "type",
+                type: "text",
+                label: "Type",
+              },
+              {
+                name: "message",
+                type: "text",
+                label: "Message",
+              },
+              {
+                name: "date",
+                type: "text",
+                label: "Date",
+              },
+              {
+                name: "owner",
+                type: "text",
+                label: "Owner",
+              },
+            
+            ],
+
+            dataTransform: (items) =>
+            items.map((item) =>
+              Object.assign(item, {
+                device_id:  item.device._id
+              })
+            ),
+
+            pagination: {
+              type: "buttons",
+              source: "query",
+              params: { page: { name: "page" }, limit: { name: "limit" } },
+              fields: { total: { dataPath: "totalDocs" } },
+            },
+          },
+          getSingle: {
+            url: "/issues/:_id",
+            queryParams: [],
+            requestHeaders: {},
+          },
+          post: {
+            url: "/issues",
+            fields: [
+              {
+                name: "device",
+                type: "text",
+                label: "Device",
+              },
+              {
+                name: "date",
+                type: "date",
+                label: "Date",
+              },
+              {
+                name: "type",
+                type: "text",
+                label: "Type",                
+              },
+              {
+                name: "message",
+                type: "text",
+                label: "Message",
+              },
+              
+            ],
+          },
+        
+  
+          delete: {
+            url: "/issues/:_id",
+          },
+        },
+  },
+
+
+///////////// CONSTRAINTS PAGE
+{
+      name: "Constraints",
+      id: "constraints",
+      description: "Visualizzazione e gestione dei Constraint.",
+      itemName: "Constraint",
+      methods: {
+        getAll: {
+          label: "Get All",
+          dataPath: "docs",
+          url: "/constraints/",
+          queryParams: [
+            
+          ],
+          display: {
+            type: "table",
+          },
+          fields: [
+            {
+              name: "_id",
+              type: "text",
+              label: "Id",
+            },
+            {
+              name: "visibility",
+              type: "text",
+              label: "Visibility",
+            },
+            {
+              name: "type1",
+              type: "text",
+              label: "Type 1",
+            },
+            {
+              name: "element1",
+              type: "text",
+              label: "Element 1",
+            },
+            {
+              name: "type2",
+              type: "text",
+              label: "Type 2",
+            },
+            {
+              name: "element2",
+              type: "text",
+              label: "Element 2",
+            },
+            {
+              name: "relationship",
+              type: "text",
+              label: "Relationship",
+            },
+            {
+              name: "tags_enroll",
+              type: "text",
+              label: "Tags",
+            },
+          
+          ],
+
+          dataTransform: (items) =>
+            items.map((item) =>
+              Object.assign(item, {
+                tags_enroll:
+                  item.tags.join() !== ""
+                    ? "[" + item.tags.join(" , ") + "]"
+                    : "Nessun Tag",
+               
+              })
+            ),
+
+          pagination: {
+            type: "buttons",
+            source: "query",
+            params: { page: { name: "page" }, limit: { name: "limit" } },
+            fields: { total: { dataPath: "totalDocs" } },
+          },
+        },
+        getSingle: {
+          url: "/constraints/:_id",
+          queryParams: [],
+          requestHeaders: {},
+        },
+        post: {
+          url: "/constraints/",
+          fields: [
+            {
+              name: "visibility",
+              type: "text",
+              label: "Visibility",
+            },
+            {
+              name: "type1",
+              type: "text",
+              label: "Type 1",
+            },
+            {
+              name: "element1",
+              type: "text",
+              label: "Element 1",
+            },
+            {
+              name: "type2",
+              type: "text",
+              label: "Type 2",
+            },
+            {
+              name: "element2",
+              type: "text",
+              label: "Element 2",
+            },
+            {
+              name: "relationship",
+              type: "text",
+              label: "Relationship",
+            },
+            {
+              name: "tags",
+              type: "array",
+              arrayType: "text",
+              label: "Tags",
+            },
+            
+          ],
+        },
+      
+
+        delete: {
+          url: "/constraints/:_id",
+        },
+      },
+},
+
   ],
 };
