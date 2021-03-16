@@ -221,11 +221,12 @@ exports.createSubscription = async function(token, owner, device, thing, tags, t
     return subscription._doc;
 };
 
-exports.createRight = async function(resource, type, user, owner, tags, tenant) {
+exports.createRight = async function(name, resource, type, user, owner, tags, tenant) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
     const Right = mongoose.dbs[tenant.database].model('Right');
     const req = { 
+        _id: name,
         resource: resource,
         type: type,
         user: user,

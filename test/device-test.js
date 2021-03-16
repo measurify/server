@@ -13,6 +13,7 @@ const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
 const before = require('./before-test.js');
+const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
 // Test the /GET route
 describe('/GET device', () => {
@@ -263,5 +264,136 @@ describe('/DELETE device', () => {
         res.body.message.should.contain(errors.already_used.message);
         const devices_after = await before.Device.find();
         devices_after.length.should.be.eql(1);
+    });
+});
+
+
+describe('/PUT device', () => {
+    it('it should PUT a device visibility', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature-1", user);
+        const device = await factory.createDevice("test-device-1", user, [feature]);
+        const request = { visibility: VisibilityTypes.public };
+        const res = await chai.request(server).keepOpen().put('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('visibility');
+        res.body.visibility.should.be.eql(VisibilityTypes.public);
+    });
+
+    it('it should PUT a device period', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature-1", user);
+        const device = await factory.createDevice("test-device-1", user, [feature]);
+        const request = { period: '25s' };
+        const res = await chai.request(server).keepOpen().put('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('period');
+        res.body.period.should.be.eql('25s');
+    });
+
+    it('it should PUT a device list of tags', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag_1 = await factory.createTag("test-tag-1", user, [], VisibilityTypes.public);
+        const tag_2 = await factory.createTag("test-tag-2", user, [], VisibilityTypes.public);
+        const tag_3 = await factory.createTag("test-tag-3", user, [], VisibilityTypes.public);
+        const tag_4 = await factory.createTag("test-tag-4", user, [], VisibilityTypes.public);
+        const feature = await factory.createFeature("test-feature-1", user);
+        const device = await factory.createDevice("test-device-1", user, [feature], ['test-tag-1', 'test-tag-2']);
+        const request = { tags: { add: ['test-tag-3', 'test-tag-4'], remove: ['test-tag-1'] } };
+        const res = await chai.request(server).keepOpen().put('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('tags');
+        res.body.tags.length.should.be.eql(3);
+    });
+
+    it('it should PUT a device list of features', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature_1 = await factory.createFeature("test-feature-1", user);
+        const feature_2 = await factory.createFeature("test-feature-2", user);
+        const feature_3 = await factory.createFeature("test-feature-3", user);
+        const feature_4 = await factory.createFeature("test-feature-4", user);
+        const device = await factory.createDevice("test-device-1", user, ['test-feature-1', 'test-feature-2']);
+        const request = { features: { add: ['test-feature-3', 'test-feature-4'], remove: ['test-feature-1'] } };
+        const res = await chai.request(server).keepOpen().put('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('features');
+        res.body.features.length.should.be.eql(3);
+    });
+
+    it('it should PUT a device list of scripts', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const script_1 = await factory.createScript("test-script-1", user, "test-code-1");
+        const script_2 = await factory.createScript("test-script-2", user, "test-code-2");
+        const script_3 = await factory.createScript("test-script-3", user, "test-code-3");
+        const script_4 = await factory.createScript("test-script-4", user, "test-code-4");
+        const feature = await factory.createFeature("test-feature-1", user);
+        const device = await factory.createDevice("test-device-1", user, feature, [], [script_1._id, script_2._id]);
+        const request = { scripts: { add: [script_3._id, script_4._id], remove: [script_1._id] } };
+        const res = await chai.request(server).keepOpen().put('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('scripts');
+        res.body.scripts.length.should.be.eql(3);
+    });
+
+    it('it should not PUT a device owner', async () => {
+        const user_1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user_2 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature-1", user_1);
+        const device = await factory.createDevice("test-device-1", user_1, [feature]);
+        const request = { owner: user_2._id };
+        const res = await chai.request(server).keepOpen().put('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user_1)).send(request);
+        res.should.have.status(errors.incorrect_info.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.incorrect_info.message);
+    });
+
+    it('it should not PUT a device as analyst', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.analyst);
+        const feature = await factory.createFeature("test-feature-1", user);
+        const device = await factory.createDevice("test-device-1", user, [feature]);
+        const request = { period: '25s' };
+        const res = await chai.request(server).keepOpen().put('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(errors.restricted_access_modify.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.restricted_access_modify.message);
+    });
+
+    it('it should not PUT a device of another provider', async () => {
+        const user_1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user_2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature-1", user_1);
+        const device = await factory.createDevice("test-device-1", user_1, [feature]);
+        const request = { period: '25s' };
+        const res = await chai.request(server).keepOpen().put('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user_2)).send(request);
+        res.should.have.status(errors.restricted_access_modify.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.restricted_access_modify.message);
+    });
+
+    it('it should not PUT a device without any field', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature-1", user);
+        const device = await factory.createDevice("test-device-1", user, [feature]);
+        const request = { };
+        const res = await chai.request(server).keepOpen().put('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(errors.missing_info.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.missing_info.message);
+    });
+
+    it('it should not PUT a fake device', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature-1", user);
+        const device = await factory.createDevice("test-device-1", user, [feature]);
+        const request = { visibility: VisibilityTypes.private };
+        const res = await chai.request(server).keepOpen().put('/v1/devices/fake_device').set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(errors.resource_not_found.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.resource_not_found.message);
     });
 });

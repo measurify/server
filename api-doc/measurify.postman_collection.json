@@ -4349,7 +4349,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"resource\": \"{{thing}}\",\r\n  \"type\": \"Thing\",\r\n  \"user\": \"{{user}}\"\r\n}"
+							"raw": "{\r\n  \"_id\": \"MyRight\",  \r\n  \"resource\": \"{{thing}}\",\r\n  \"type\": \"Thing\",\r\n  \"user\": \"{{user}}\"\r\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/rights/",
