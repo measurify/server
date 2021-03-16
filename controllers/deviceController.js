@@ -58,10 +58,10 @@ exports.delete = async (req, res) => {
 
 exports.put = async (req, res) => { 
     const Device = mongoose.dbs[req.tenant.database].model('Device');
-    const fields = ['features', 'scripts', 'tags', 'period', 'cycle', 'retryTime', 'scriptListMaxSize', 'measurementBufferSize', 'issueBufferSize', 'sendBufferSize', 'scriptStatementMaxSize', 'statementBufferSize', 'measurementBufferPolicy'  ];
+    const fields = ['features', 'scripts', 'tags', 'visibility', 'period', 'cycle', 'retryTime', 'scriptListMaxSize', 'measurementBufferSize', 'issueBufferSize', 'sendBufferSize', 'scriptStatementMaxSize', 'statementBufferSize', 'measurementBufferPolicy'  ];
     let result = await checker.isAvailable(req, res, Device); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
-    result = await checker.isOwned(req, res); if (result != true) return result;
+    result = await checker.canModify(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Device); if (result != true) return result;
     return await controller.updateResource(req, res, fields, Device);
 }
