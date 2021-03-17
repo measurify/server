@@ -14,10 +14,22 @@ import { dataHelpers } from "../../helpers/data.helpers";
 import locale from "../../common/locale.js";
 
 import "./formRow.scss";
+import { stringify } from "query-string";
+
+interface ILoadedFields {
+  fieldName: string;
+  values: Array<string>;
+}
+
+interface IOption {
+  display: string;
+  value: string;
+}
 
 interface IProps {
   context: IAppContext;
   field: IConfigInputField;
+  loadedFields: ILoadedFields[];
   onChange: (
     fieldName: string,
     value: any,
@@ -29,8 +41,17 @@ interface IProps {
 }
 
 export const FormRow = withAppContext(
-  ({ context, field, direction, showReset, onChange, onRemove }: IProps) => {
+  ({
+    context,
+    field,
+    loadedFields,
+    direction,
+    showReset,
+    onChange,
+    onRemove,
+  }: IProps) => {
     const [optionSources, setOptionSources] = useState<any>({});
+    const [loadedOptionSources, setLoadedOptionSources] = useState<any>();
     const { httpService, activePage, config } = context;
     const pageHeaders: any = activePage?.requestHeaders || {};
     const customLabels: ICustomLabels | undefined = {
@@ -40,14 +61,45 @@ export const FormRow = withAppContext(
     const addArrayItemLabel = customLabels?.buttons?.addArrayItem || "Add Item";
     const clearLabel = customLabels?.buttons?.clearInput || "Clear";
 
+    function insertPreloadedData(
+      fieldName: string,
+      optionSource: IConfigOptionSource
+    ) {
+      var optionsData = Array<string>(0).fill("");
+
+      console.log("loaded");
+      console.log(loadedFields);
+      loadedFields.map((e) => {
+        if (e.fieldName === optionSource.name) optionsData = e.values;
+      });
+
+      console.log(optionsData);
+
+      var optionDisplay = new Array<IOption>(optionsData.length);
+      optionsData.map((opt: string, i: number) => {
+        optionDisplay[i] = { display: opt, value: opt };
+      });
+
+      console.log(optionDisplay);
+      //const temp = { [fieldName]: optionDisplay };
+
+      //setLoadedOptionSources(temp);
+      return { fieldname: fieldName, options: optionDisplay };
+    }
     async function loadOptionSourceFromRemote(
       fieldName: string,
       optionSource: IConfigOptionSource
     ) {
       try {
-        const { url, dataPath, actualMethod, requestHeaders } = optionSource;
+        const {
+          url,
+          dataPath,
+          preLoad,
+          actualMethod,
+          requestHeaders,
+        } = optionSource;
 
-        if (!url) {
+        if (!url && !preLoad) {
           throw new Error(
             `URL option source (for field "${fieldName}") is empty.`
           );
@@ -91,6 +143,7 @@ export const FormRow = withAppContext(
           }
         );
 
+        console.log(optionSourceData);
         setOptionSources({
           ...optionSources,
           [fieldName]: optionSourceData,
@@ -205,43 +258,68 @@ export const FormRow = withAppContext(
         case "select": {
           const { optionSource } = field;
 
-          if (optionSource && !optionSources[field.name]) {
-            loadOptionSourceFromRemote(field.name, optionSource);
+          if (optionSource && optionSource.preLoad) {
+            const loadedOption = insertPreloadedData(field.name, optionSource);
+            console.log(loadedOption);
+
             return (
               <select {...inputProps()}>
-                <option>-- Loading Options... --</option>
+                <option>{locale.select}</option>
+                {loadedOption.options.map((option, idx) => {
+                  const key = `option_${idx}_`;
+                  return (
+                    <option key={`${key}_${option.value}`} value={option.value}>
+                      {option.display || option.value}
+                    </option>
+                  );
+                })}
+              </select>
+            );
+          } else {
+            if (optionSource && !optionSources[field.name]) {
+              loadOptionSourceFromRemote(field.name, optionSource);
+              return (
+                <select {...inputProps()}>
+                  <option>-- Loading Options... --</option>
+                </select>
+              );
+            }
+
+            const sortBy = field.optionSource?.sortBy;
+            const finalOptions: { value: string; display: string }[] =
+              optionSources[field.name] || field.options || [];
+            const sortedOptions = orderBy(
+              finalOptions,
+              typeof sortBy === "string" ? [sortBy] : sortBy || []
+            );
+
+            console.log("final option");
+            console.log(finalOptions);
+
+            console.log("sorted option");
+            console.log(sortedOptions);
+
+            return (
+              <select {...inputProps()}>
+                <option>{locale.select}</option>
+                {sortedOptions.map((option, idx) => {
+                  const key = `option_${idx}_`;
+                  if (typeof option !== "object") {
+                    return (
+                      <option key={`${key}_${option}`} value={option}>
+                        {option}
+                      </option>
+                    );
+                  }
+                  return (
+                    <option key={`${key}_${option.value}`} value={option.value}>
+                      {option.display || option.value}
+                    </option>
+                  );
+                })}
               </select>
             );
           }
-
-          const sortBy = field.optionSource?.sortBy;
-          const finalOptions: { value: string; display: string }[] =
-            optionSources[field.name] || field.options || [];
-          const sortedOptions = orderBy(
-            finalOptions,
-            typeof sortBy === "string" ? [sortBy] : sortBy || []
-          );
-
-          return (
-            <select {...inputProps()}>
-              <option>{locale.select}</option>
-              {sortedOptions.map((option, idx) => {
-                const key = `option_${idx}_`;
-                if (typeof option !== "object") {
-                  return (
-                    <option key={`${key}_${option}`} value={option}>
-                      {option}
-                    </option>
-                  );
-                }
-                return (
-                  <option key={`${key}_${option.value}`} value={option.value}>
-                    {option.display || option.value}
-                  </option>
-                );
-              })}
-            </select>
-          );
         }
         case "object":
           return (

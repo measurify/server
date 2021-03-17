@@ -132,7 +132,7 @@ export interface IConfigOptionSource {
   actualMethod: TConfigMethod
   sortBy: string
   requestHeaders: any
-  preload : boolean
+  preLoad : boolean
   name : string
 }
 

@@ -23,10 +23,16 @@ import "./formPopup.scss";
 
 const unflatten = require("flat").unflatten;
 
+interface ILoadedFields {
+  fieldName: string;
+  values: Array<string>;
+}
+
 interface IProps {
   context: IAppContext;
   title: string;
   fields: IConfigInputField[];
+  loadedFields: ILoadedFields[];
   type: string;
   rawData?: any;
   getSingleConfig?: IConfigGetSingleMethod;
@@ -49,6 +55,7 @@ export const FormPopup = withAppContext(
     context,
     title,
     fields,
+    loadedFields,
     rawData,
     type,
     getSingleConfig,
@@ -356,6 +363,7 @@ export const FormPopup = withAppContext(
                       <FormRow
                         key={`field_${idx}`}
                         field={field}
+                        loadedFields={loadedFields}
                         onChange={formChanged}
                         onRemove={saveRemovedValues}
                         showReset={!field.type || field.type === "text"}

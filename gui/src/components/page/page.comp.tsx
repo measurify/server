@@ -49,8 +49,14 @@ import "react-toastify/dist/ReactToastify.css";
 import "./page.scss";
 import { GraphPopup } from "../graphPopup/graphPopup.comp";
 
+interface ILoadedFields {
+  fieldName: string;
+  values: Array<string>;
+}
+
 interface IProps {
   context: IAppContext;
+  loadedFields: ILoadedFields[];
 }
 
 interface IPopupProps {
@@ -163,7 +169,7 @@ const buildInitQueryParamsAndPaginationState = (
   };
 };
 
-const PageComp = ({ context }: IProps) => {
+const PageComp = ({ context, loadedFields }: IProps) => {
   const { page }: any = useParams();
   const { push, location } = useHistory();
   const { activePage, error, setError, httpService, config } = context;
@@ -1004,6 +1010,7 @@ const PageComp = ({ context }: IProps) => {
           submitCallback={openedPopup.submitCallback}
           type={openedPopup.type}
           fields={openedPopup.config?.fields || []}
+          loadedFields={loadedFields}
           rawData={openedPopup.rawData}
           getSingleConfig={openedPopup.getSingleConfig}
           methodConfig={openedPopup.config}

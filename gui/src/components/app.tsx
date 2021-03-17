@@ -38,15 +38,6 @@ function changeFavicon(src: string) {
   document.head.appendChild(link);
 }
 
-async function preloadData() {
-  const resultsData = await httpService.fetch({
-    method: "get",
-    origUrl: httpService.baseUrl + "/v1/types",
-    headers: { "content-type": "application/json" },
-  });
-  console.log(resultsData);
-}
-
 function App() {
   const [loadedFields, setLoadedFields] = useState<ILoadedFields[]>(
     Array<ILoadedFields>(0)
@@ -97,6 +88,27 @@ function App() {
     }
 
     setFirstLoad(false);
+  }
+
+  async function preloadData() {
+    const resultsData = await httpService.fetch({
+      method: "get",
+      origUrl: httpService.baseUrl + "/v1/types",
+      headers: { "content-type": "application/json" },
+    });
+
+    var tempLD = Array<ILoadedFields>(12).fill({
+      fieldName: "",
+      values: [],
+    });
+    const keys = Object.keys(resultsData);
+    const values: Array<string> = Object.values(resultsData);
+
+    for (var i in tempLD) {
+      tempLD[i] = { fieldName: keys[i], values: Object.values(values[i]) };
+    }
+
+    setLoadedFields(tempLD);
   }
 
   function scrollToTop(scrollDuration: number = 250) {
@@ -167,7 +179,6 @@ function App() {
     );
 
   if (tkn !== null && fetchedData === false) {
-    console.log("fetch data here");
     preloadData();
 
     setFetchedData(true);
@@ -203,7 +214,11 @@ function App() {
             {config && (
               <Switch>
                 <Route exact path="/login" component={AuthPage} />
-                <Route exact path="/:page" component={Page} />
+                <Route
+                  exact
+                  path="/:page"
+                  component={() => <Page loadedFields={loadedFields} />}
+                />
                 <Redirect path="/" to={`/${config?.pages?.[0]?.id || "1"}`} />
               </Switch>
             )}
