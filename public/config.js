@@ -101,19 +101,40 @@ export default {
               label: "Password",
             },
             {
+              name: "status",
+              type: "select",
+              label: "Status",
+              optionSource: {
+                url: "",
+                preLoad: true,
+                name : "UserStatusTypes",
+              },
+            },
+            {
               name: "email",
               type: "text",
               label: "Email",
             },
             {
               name: "type",
-              type: "text",
+              type: "select",
               label: "Type",
+              optionSource: {
+                url: "",
+                preLoad: true,
+                name : "UserRoles",
+              },
             },
             {
               name: "fieldmask",
-              type: "text",
+              type: "select",
               label: "Fieldmask",
+              optionSource: {
+                url: "/fieldmasks",
+                dataPath: "docs",
+                displayPath: "_id",
+                valuePath: "_id",
+              },
             },
           ],
         },
@@ -147,8 +168,14 @@ export default {
             },
             {
               name: "fieldmask",
-              type: "text",
+              type: "select",
               label: "Fieldmask",
+              optionSource: {
+                url: "/fieldmasks",
+                dataPath: "docs",
+                displayPath: "_id",
+                valuePath: "_id",
+              },
             },
           ],
         },
@@ -269,9 +296,13 @@ export default {
             },
             {
               name: "visibility",
-              type: "text",
+              type: "select",
               label: "Visibility",
-              disabled: true,
+              optionSource: {
+                url: "",
+                preLoad: true,
+                name : "VisibilityTypes",
+              },
             },
             {
               name: "tags",
@@ -292,8 +323,13 @@ export default {
             },
             {
               name: "visibility",
-              type: "text",
+              type: "select",
               label: "Visibility",
+              optionSource: {
+                url: "",
+                preLoad: true,
+                name : "VisibilityTypes",
+              },
             },
             {
               name: "relations",
@@ -420,8 +456,13 @@ export default {
             },
             {
               name: "visibility",
-              type: "text",
+              type: "select",
               label: "Visibility",
+              optionSource: {
+                url: "",
+                preLoad: true,
+                name : "VisibilityTypes",
+              },
             },
             {
               name: "tags",
@@ -499,8 +540,13 @@ export default {
             },
             {
               name: "visibility",
+              type: "select",
               label: "Visibility",
-              type: "text",
+              optionSource: {
+                url: "",
+                preLoad: true,
+                name : "VisibilityTypes",
+              },
             },
             {
               name: "tags",
@@ -643,9 +689,13 @@ export default {
             },
             {
               name: "visibility",
-              type: "text",
+              type: "select",
               label: "Visibility",
-              value : "private",
+              optionSource: {
+                url: "",
+                preLoad: true,
+                name : "VisibilityTypes",
+              },
             },
             {
               name: "period",
@@ -1185,8 +1235,13 @@ export default {
             },
             {
               name: "visibility",
-              type: "text",
-              label: "VIsibility",
+              type: "select",
+              label: "Visibility",
+              optionSource: {
+                url: "",
+                preLoad: true,
+                name : "VisibilityTypes",
+              },
             },
             {
               name: "tags",
@@ -1214,8 +1269,13 @@ export default {
             },
             {
               name: "visibility",
-              type: "text",
-              label: "VIsibility",
+              type: "select",
+              label: "Visibility",
+              optionSource: {
+                url: "",
+                preLoad: true,
+                name : "VisibilityTypes",
+              },
             },
             {
               name: "tags",
@@ -1650,12 +1710,7 @@ export default {
             dataPath: "docs",
             url: "/issues/",
             queryParams: [
-              /*{
-                name: "_id",
-                value: "",
-                label: "ID",
-                type: "text",
-              },*/
+              
               {
                 name: "device",
                 type: "select",
@@ -1693,6 +1748,11 @@ export default {
                 name: "type",
                 type: "text",
                 label: "Type",
+              },
+              {
+                name: "status",
+                type: "text",
+                label: "Status",
               },
               {
                 name: "message",
@@ -1755,6 +1815,16 @@ export default {
                 },
               },
               {
+                name: "status",
+                type: "select",
+                label: "Status",
+                optionSource: {
+                  url: "",
+                  preLoad: true,
+                  name : "IssueStatusTypes",
+                },
+              },
+              {
                 name: "message",
                 type: "text",
                 label: "Message",
@@ -1763,7 +1833,22 @@ export default {
             ],
           },
         
-  
+          put: {
+            url: "/issues/:_id",
+            fields: [
+              {
+                name: "status",
+                type: "select",
+                label: "Status",
+                optionSource: {
+                  url: "",
+                  preLoad: true,
+                  name : "IssueStatusTypes",
+                },
+              },
+              
+            ],
+          },
           delete: {
             url: "/issues/:_id",
           },
@@ -1860,8 +1945,13 @@ export default {
           fields: [
             {
               name: "visibility",
-              type: "text",
+              type: "select",
               label: "Visibility",
+              optionSource: {
+                url: "",
+                preLoad: true,
+                name : "VisibilityTypes",
+              },
             },
             {
               name: "type1",
@@ -1885,8 +1975,13 @@ export default {
             },
             {
               name: "relationship",
-              type: "text",
+              type: "select",
               label: "Relationship",
+              optionSource: {
+                url: "",
+                preLoad: true,
+                name : "RelationshipTypes",
+              },
             },
             {
               name: "tags",
@@ -2007,9 +2102,13 @@ export default {
           },
           {
             name: "visibility",
-            type: "text",
+            type: "select",
             label: "Visibility",
-            value : "private",
+            optionSource: {
+              url: "",
+              preLoad: true,
+              name : "VisibilityTypes",
+            },
           },
           {
             name: "code",
