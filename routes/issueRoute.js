@@ -22,6 +22,8 @@ const { catchErrors } = require('../commons/errorHandlers.js');
  */
 router.get('/',  catchErrors(issueController.get));
 
+router.get('/:id', catchErrors(issueController.getone));
+
 router.get('/pipe',  catchErrors(issueController.pipe));
 
 router.get('/types',  catchErrors(issueController.getTypes));

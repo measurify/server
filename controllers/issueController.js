@@ -11,6 +11,13 @@ exports.get = async (req, res) => {
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Issue, restriction); 
 };
 
+exports.getone = async (req, res) => { 
+    const Issue = mongoose.dbs[req.tenant.database].model('Issue');
+    let result = await checker.isAvailable(req, res, Issue); if (result != true) return result;
+    result = await checker.canRead(req, res); if (result != true) return result;
+    return await controller.getResource(req, res, null, Issue, select); 
+};
+
 exports.post = async (req, res) => {
     const Issue = mongoose.dbs[req.tenant.database].model('Issue');
     return await controller.postResource(req, res, Issue);
@@ -33,7 +40,6 @@ exports.put = async (req, res) => {
     result = await checker.canModify(req, res); if (result != true) return result;
     return await controller.updateResource(req, res, fields, Issue);
 }
-
 
 exports.delete = async (req, res) => {
     const Issue = mongoose.dbs[req.tenant.database].model('Issue');
