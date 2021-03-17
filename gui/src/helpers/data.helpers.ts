@@ -1,27 +1,30 @@
 import { IConfigInputField } from "../common/models/config.model";
 
 class DataHelpers {
-
-  public extractDataByDataPath(data: any, dataPath: string, attr: string | null = null) {
+  public extractDataByDataPath(
+    data: any,
+    dataPath: string,
+    attr: string | null = null
+  ) {
     if (!data || !dataPath) {
       if (attr) {
         return data[attr];
       }
       return data;
     }
-	
+
     let extractedData: any = data;
-    const digProps: string[] = dataPath.split('.');
+    const digProps: string[] = dataPath.split(".");
 
     for (let prop of digProps) {
-      if (typeof extractedData[prop] !== 'undefined') {
+      if (typeof extractedData[prop] !== "undefined") {
         extractedData = extractedData[prop];
       } else {
         return null;
       }
     }
 
-    if (typeof extractedData === 'undefined') {
+    if (typeof extractedData === "undefined") {
       return null;
     }
 
@@ -33,12 +36,12 @@ class DataHelpers {
   }
 
   public checkIfFieldIsObject(field: IConfigInputField): boolean {
-    if (field.type === 'object') {
+    if (field.type === "object") {
       return true;
     }
 
-    if (field.type === 'array') {
-      if (!field.arrayType || field.arrayType === 'object') {
+    if (field.type === "array") {
+      if (!field.arrayType || field.arrayType === "object") {
         return true;
       }
     }
@@ -46,6 +49,22 @@ class DataHelpers {
     return false;
   }
 
+  public arrayToCSV(objArray: any) {
+    const array =
+      typeof objArray !== "object" ? JSON.parse(objArray) : objArray;
+    let str =
+      `${Object.keys(array[0])
+        .map((value) => `"${value}"`)
+        .join(",")}` + "\r\n";
+
+    return array.reduce((str: any, next: any) => {
+      str +=
+        `${Object.values(next)
+          .map((value) => `"${value}"`)
+          .join(",")}` + "\r\n";
+      return str;
+    }, str);
+  }
 }
 
 export const dataHelpers = new DataHelpers();

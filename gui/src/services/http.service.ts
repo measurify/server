@@ -1,3 +1,5 @@
+import { toast } from 'react-toastify';
+import locale, { session_expired } from '../common/locale';
 import { TConfigMethod, IQueryParam } from '../common/models/config.model';
 import { dataHelpers } from '../helpers/data.helpers';
 
@@ -8,6 +10,7 @@ export interface IFetchParams {
   method?: TConfigMethod
   headers?: any
   queryParams?: IQueryParam[]
+  exactMatch?: boolean
   rawData?: any
   body?: any
   responseType?: ResponseType
@@ -50,7 +53,7 @@ class HttpService {
     return outputUrl;
   }
 
-  private buildUrl(url: string, queryParams: IQueryParam[] = [], rawData?: any): string {
+  private buildUrl(url: string, queryParams: IQueryParam[] = [], exactMatch : boolean = false, rawData?: any): string {
     if (!queryParams || !queryParams.length) {
       return this.replaceParamsInUrl(url, rawData);
     }
@@ -58,25 +61,42 @@ class HttpService {
     let outputUrl = url;
     const params = [];
     let page = '-1'
+    let limit = '10'
 
     for (let param of queryParams) {
       let value = '';
       if (!param.name || typeof param.value === 'undefined') { continue; } 
       if (param.name === 'page') { page = param.value; continue; }
+      if (param.name === 'limit') { limit = param.value; continue; }
+      if (param.name === 'tags' && param.value === "") { continue; }
       if (param.name === 'info') value = '{"$regex":"' + param.value + '","$options":"i"}';
       else value = '"' + param.value + '"';
-      params.push(`"${param.name}":${value || ''}`);
+      
+      if(exactMatch === true)
+      {
+        params.push(`"${param.name}":${value || ''}`);
+      }
+      else
+      {
+        params.push(`"${param.name}":{"$regex" : ${value || ''}}`);
+      }
+      
+      
+
     }
 
     outputUrl += '?filter={' + params.join(',') + '}';
-    if(page != '-1') outputUrl += "&page" + page;
+    if(page != '-1') outputUrl += "&page=" + page;
+    outputUrl += "&limit=" + limit;
+
+    console.log("Requested URL : "+outputUrl);
 
     return outputUrl;
   }
 
   private buildRequest(params: IFetchParams): { url: string, params: any } {
     const reqUrl: string = this.urlIsAbsolute(params.origUrl) ? params.origUrl : this.baseUrl + params.origUrl;
-    const finalUrl: string = this.buildUrl(reqUrl, params.queryParams, params.rawData);
+    const finalUrl: string = this.buildUrl(reqUrl, params.queryParams,params.exactMatch, params.rawData);
     const authorization = sessionStorage.getItem('diten-token') ? { Authorization: sessionStorage.getItem('diten-token'), } : {};
     const requestParams = {
       method: params.method ? params.method.toUpperCase() : 'GET',
@@ -112,9 +132,16 @@ class HttpService {
 
   private async handleError(res: Response) {
     // In case response status is "Unauthorized", redirect to relevant url
+
     if (res.status === 401 && this.unauthorizedRedirectUrl) {
+      //test
+      
+      sessionStorage.clear();
+
+      
+
       const redirectUrl: string = this.unauthorizedRedirectUrl.replace(':returnUrl', encodeURIComponent(document.location.href));
-      document.location.href = redirectUrl;
+      document.location.replace(redirectUrl);
       return;
     }
 
@@ -140,8 +167,8 @@ class HttpService {
     await this.handleError(res);
   }
 
-  public async fetch({ method, origUrl, queryParams, rawData, body, headers, responseType }: IFetchParams) {
-    const { url, params } = this.buildRequest({ method, origUrl, queryParams, rawData, body, headers });
+  public async fetch({ method, origUrl, queryParams, exactMatch, rawData, body, headers, responseType }: IFetchParams) {
+    const { url, params } = this.buildRequest({ method, origUrl, queryParams,exactMatch, rawData, body, headers });
     return await this.makeRequest(url, params, responseType);
   }
 }

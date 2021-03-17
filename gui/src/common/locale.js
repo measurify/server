@@ -5,8 +5,9 @@ const locale = Object.freeze({
     username_suggestion: 'Inserisci il nome utente',
     password_suggenstion: 'Inserisci la password',
     tenant_suggenstion: 'Inserisci la tua organizzazione',
-    submit: 'Submit',
+    submit: 'Invio',
     login_error: 'Login errata!',
+    login_unauthorised_user : "Al momento solamente gli utenti con i privilegi di amministratore possono accedere",
     search: 'Cerca',
     previous_page: 'Pagina precedente',
     next_page: 'Prossima pagina',
@@ -14,7 +15,29 @@ const locale = Object.freeze({
     out_of: "di",
     items: "totali",
     nothing_to_see: "Nessun risultato",
-    enter_text: "inserisci testo"
+    enter_text: "Inserisci testo",
+    enter_email: "Inserisci email",
+    enter_date: "Inserisci data",
+    enter_color: "Inserisci colore",
+    enter_password: "Inserisci password",
+    next : "Successivo",
+    previous : "Precedente",
+    select : "",
+    add : "Aggiungi",
+    update : "Aggiorna",
+    session_expired : "Sessione scaduta",
+    login : "Accedi",
+    logout : "Esci",
+    graph : "Grafico",
+    wrong_feature_error : "Questa versione del software non può costruire un grafico delle feature selezionate. Possono essere mostrati i grafici solamente di feature aventi almeno una componente scalare e numerica",
+    no_data_error : "Non sono presenti dati per poter elaborare un grafico",
+    add_tenant : "Aggiungi organizzazione",
+    zoomIn : "Ingrandisci",
+    zoomOut : "Riduci",
+    value : "Valore",
+    full_privileges : "Privilegi completi"
+
+
 });
 
 module.exports = locale;

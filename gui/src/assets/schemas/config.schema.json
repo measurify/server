@@ -120,6 +120,10 @@
           "type": "string",
           "description": "A unique identifier for the page. RESTool will use it to navigate between pages."
         },
+        "itemName": {
+          "type": "string",
+          "description": "The name of the entity visualized in this page."
+        },
         "description": {
           "type": "string",
           "description": "A short description about the page and its usage."
@@ -143,7 +147,8 @@
       },
       "required": [
         "name",
-        "id"
+        "id",
+        "itemName"
       ]
     },
     "requestHeaders": {
@@ -165,6 +170,9 @@
           "$ref": "#/definitions/getSingle"
         },
         "post": {
+          "$ref": "#/definitions/post"
+        },
+        "graph": {
           "$ref": "#/definitions/post"
         },
         "put": {
@@ -265,7 +273,12 @@
     },
     "getSingle": {
       "$ref": "#/definitions/method",
-      "description": "This method will be fired once you hit the edit button on an item in order to get a single item's data. By default, if this method hasn't been set, when editing an item, RESTool will take the raw data from the original getAll request."
+      "description": "This method will be fired once you hit the edit button on an item in order to get a single item's data. By default, if this method hasn't been set, when editing an item, RESTool will take the raw data from the original getAll request.",
+      "properties": {
+        "dataTransform": {
+          "description": "Relevant only when using dynamic (js) config. A function to allow manipulation on the response data. Useful for changing/adding data for display purposes."
+        }
+      }
     },
     "post": {
       "allOf": [
@@ -287,6 +300,31 @@
         }
       ],
       "description": "The post method will be used to create new items in your API resource."
+    },
+    "graph": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/method"
+        },
+        {
+          "properties": {
+            "fields": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/inputField"
+              }
+              },
+            "dataPath": {
+              "type": "string",
+              "description": "TODO"
+            }
+          },
+          "required": [
+            "fields"
+          ]
+        }
+      ],
+      "description": "This method will be used to create graph with the resource within the page."
     },
     "put": {
       "allOf": [
@@ -324,10 +362,6 @@
           "type": "string",
           "description": "The name of the field / parameter to be sent."
         },
-        "hidden": {
-          "type": "boolean",
-          "description": "If the field shoud be showed or not"
-        },
         "type": {
           "type": "string",
           "enum": [
@@ -351,6 +385,9 @@
           "description": "Use the type field to define the type of the field."
         },
         "readonly": {
+          "type": "boolean"
+        },
+        "disabled": {
           "type": "boolean"
         },
         "label": {
@@ -480,7 +517,7 @@
       "properties": {
         "url": {
           "type": "string",
-          "description": "url to fetch data from"
+          "description": "url to fetch data from "
         },
         "dataPath": {
           "type": [
@@ -496,6 +533,14 @@
         "valuePath": {
           "type": "string",
           "description": "property of the object to take the option value from"
+        },
+        "preLoad": {
+          "type": "boolean",
+          "description": "property of the object that will force the load of values only once at beginning"
+        },
+        "name": {
+          "type": "string",
+          "description": "the name of the item to get values from"
         },
         "sortBy": {
           "type": [
@@ -513,14 +558,14 @@
       "additionalProperties": false,
       "required": [
         "source",
+        "type",
         "params"
       ],
       "properties": {
         "source": {
           "enum": [
             "query",
-            "body",
-            "type"
+            "body"
           ],
           "description": "Where the pagination parameters are written to. Only supports query parameters for now."
         },

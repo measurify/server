@@ -2,7 +2,6 @@ import React from 'react';
 import { ICustomLabels } from '../../common/models/config.model';
 import { IPaginationState } from '../../common/models/states.model';
 import { Button } from '../button/button.comp';
-import locale from '../../common/locale.js';
 
 import './pagination.scss';
 
@@ -16,8 +15,8 @@ interface IProps {
 }
 
 export const Pagination = ({ callbacks, pagination, customLabels }: IProps) => {
-  const previousTitle = locale.previous_page;
-  const nextTitle = locale.next_page;
+  const previousTitle = customLabels?.pagination?.previousPageTitle || 'Previous page';
+  const nextTitle = customLabels?.pagination?.nextPageTitle || 'Next page';
   return (
     <div className="pagination-wrapper">
       <Button disabled={!pagination.hasPreviousPage} onClick={() => callbacks.previousPage()} title={previousTitle}>
