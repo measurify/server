@@ -4,6 +4,8 @@ const checker = require('./checker');
 const broker = require('../commons/broker');
 const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
+const VisibilityTypes = require('../types/visibilityTypes.js'); 
+const MeasurementBufferPolicyTypes = require('../types/measurementBufferPolicyTypes.js'); 
 
 exports.get = async (req, res) => { 
     const Device = mongoose.dbs[req.tenant.database].model('Device');
@@ -63,5 +65,7 @@ exports.put = async (req, res) => {
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.canModify(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Device); if (result != true) return result;
+    result = await checker.isValid(req, res, VisibilityTypes, 'visibility'); if (result != true) return result;
+    result = await checker.isValid(req, res, MeasurementBufferPolicyTypes, 'measurementBufferPolicy'); if (result != true) return result;
     return await controller.updateResource(req, res, fields, Device);
 }

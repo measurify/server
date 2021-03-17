@@ -94,6 +94,17 @@ describe('/POST device', () => {
 
     it('it should not POST a device with a fake buffer policy', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const device = { _id: "test-device-2", owner: user, visibility: "fake-visibility", features: [await factory.createFeature("test-device-2-feature-good", user)] }
+        const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
+        res.should.have.status(errors.post_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.post_request_error.message);
+        res.body.details.should.contain('is not a valid enum value for path ');
+    });
+
+    it('it should not POST a device with an invalid visibility', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = { _id: "test-device-2", owner: user, measurementBufferPolicy: "fake-policy", features: [await factory.createFeature("test-device-2-feature-good", user)] }
         const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
         res.should.have.status(errors.post_request_error.status);

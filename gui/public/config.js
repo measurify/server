@@ -1,7 +1,7 @@
 
 export default {
   name: "Measurify GUI",
-  baseUrl: "https://localhost/v1",
+  baseUrl: "http://students.atmosphere.tools/v1",
   loginUrl: "/login",
   unauthorizedRedirectUrl: "/#/",
 
