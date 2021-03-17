@@ -440,6 +440,7 @@ export const FormRow = withAppContext(
         {renderFieldInput(field, onChange)}
         {showReset &&
           !field.readonly &&
+          !field.disabled &&
           field.value &&
           field.value.length > 0 && (
             <i

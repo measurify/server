@@ -1,3 +1,4 @@
+
 export default {
   name: "Measurify GUI",
   baseUrl: "https://localhost/v1",
