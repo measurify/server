@@ -3,6 +3,7 @@ const controller = require('./controller');
 const checker = require('./checker');
 const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
+const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
 exports.get = async (req, res) => { 
     const Tag = mongoose.dbs[req.tenant.database].model('Tag');
@@ -44,6 +45,7 @@ exports.put = async (req, res) => {
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.canModify(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Tag); if (result != true) return result;
+    result = await checker.isValid(req, res, VisibilityTypes, 'visibility'); if (result != true) return result;
     return await controller.updateResource(req, res, fields, Tag);
 };
 

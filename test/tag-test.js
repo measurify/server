@@ -69,6 +69,17 @@ describe('/POST tag', () => {
         res.body._id.should.be.eql(tag._id);
     });
 
+    it('it should not POST a tag with an invalid visibility', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag = { _id: "test-text", visibility: "invalid" };
+        const res = await chai.request(server).keepOpen().post('/v1/tags').set("Authorization", await factory.getUserToken(user)).send(tag);
+        res.should.have.status(errors.post_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.be.eql(errors.post_request_error.message);
+        res.body.details.should.contain('is not a valid enum value');
+    });
+
     it('it should POST a tagged tag', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);
@@ -265,6 +276,16 @@ describe('/PUT tag', () => {
         res.body.should.be.a('object');
         res.body.should.have.property('visibility');
         res.body.visibility.should.be.eql(VisibilityTypes.private);
+    });
+
+    it('it should not PUT a tag with an invalid visibility', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag = await factory.createTag("test-tag-1", user, [], VisibilityTypes.public);
+        const request = { visibility: "invalid" };
+        const res = await chai.request(server).keepOpen().put('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(errors.unknown_value.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.unknown_value.message);
     });
 
     it('it should PUT a tag description', async () => {

@@ -129,7 +129,7 @@ describe('/POST issue', () => {
         res.body.message.should.be.a('string');
         res.should.have.status(errors.post_request_error.status);
         res.body.message.should.contain(errors.post_request_error.message);
-        res.body.details.should.contain('unrecognized issue type');
+        res.body.details.should.contain('is not a valid enum value for path');
     });
 
     it('it should POST in a idempotent way', async () => {      

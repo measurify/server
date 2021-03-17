@@ -8,9 +8,9 @@ const userSchema = new mongoose.Schema({
     username: { type: String, required: true, index: true },
     password: { type: String, required: true, select: false },
     email: { type: String, index: true },
-    type: { type: String, required: true },
+    type: { type: String, enum: UserRoles, required: true },
     fieldmask: { type: String, ref: 'Fieldmask' },
-    status: { type: String, default: 'enabled' },
+    status: { type: String, enum: UserStatusTypes, default: UserStatusTypes.enabled },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });

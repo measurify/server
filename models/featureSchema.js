@@ -24,7 +24,7 @@ const itemSchema = new mongoose.Schema({
     name: { type: String, required: "Please, supply a name" },
     unit: { type: String, required: "Please, supply a unit" },
     dimension: { type: Number, default: 0 },
-    type: { type: String, default: ItemTypes.number }, },
+    type: { type: String, enum: ItemTypes, default: ItemTypes.number }, },
     { _id: false }  
 );
 

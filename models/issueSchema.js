@@ -30,8 +30,8 @@ const issueSchema = new mongoose.Schema({
     device: { type: String, required: "Please, supply a device", ref: 'Device', autopopulate: true, index: true },
     date: {type: Date, default: Date.now },
     message: { type: String },
-    type: { type: String, required: "Please, supply an issue type", },
-    status: { type: String, default: IssueStatusTypes.open },
+    type: { type: String, enum: IssueTypes, required: "Please, supply an issue type", },
+    status: { type: String, enum: IssueStatusTypes, default: IssueStatusTypes.open },
     timestamp: {type: Date, default: Date.now, select: false },
 });
 

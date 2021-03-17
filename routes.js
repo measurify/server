@@ -72,6 +72,10 @@ router.use('/' + process.env.VERSION + '/features', passport.authenticate('jwt-t
 const typesRoute = require('./routes/typeRoute');
 router.use('/' + process.env.VERSION + '/types', typesRoute);
 
+// model
+const modelsRoute = require('./routes/modelRoute');
+router.use('/' + process.env.VERSION + '/models', modelsRoute);
+
 // fieldmask
 const fieldmasksRoute = require('./routes/fieldmaskRoute');
 router.use('/' + process.env.VERSION + '/fieldmasks', passport.authenticate('jwt-token', {session: false}), fieldmasksRoute);

@@ -15,7 +15,7 @@ exports.getone = async (req, res) => {
     const Issue = mongoose.dbs[req.tenant.database].model('Issue');
     let result = await checker.isAvailable(req, res, Issue); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
-    return await controller.getResource(req, res, null, Issue, select); 
+    return await controller.getResource(req, res, null, Issue); 
 };
 
 exports.post = async (req, res) => {

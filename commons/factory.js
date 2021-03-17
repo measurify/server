@@ -185,7 +185,7 @@ exports.createThing = async function(name, owner, tags, metadata, relations, vis
         tags: tags,
         metadata: metadata,
         relations: relations,
-        visibility: visibility
+        visibility: visibility || VisibilityTypes.private
     }
     const thing = new Thing(req);
     await thing.save();

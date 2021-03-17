@@ -100,7 +100,7 @@ describe('/POST device', () => {
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.post_request_error.message);
-        res.body.details.should.contain('unrecognized measurement buffer policy');
+        res.body.details.should.contain('is not a valid enum value for path ');
     });
 
     it('it should POST a device', async () => {

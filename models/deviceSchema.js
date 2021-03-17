@@ -37,7 +37,7 @@ const deviceSchema = new mongoose.Schema({
     features: { type: [String], required: "Please, supply a feature array", ref:'Feature' },
     tags: { type: [String], ref:'Tag' },
     scripts: { type: [String], ref:'Script' },
-    visibility: {type: String, default: VisibilityTypes.private },
+    visibility: {type: String, enum: VisibilityTypes, default: VisibilityTypes.private },
     period: {type: String, default: "5s" },
     cycle: {type: String, default: "10m" },
     retryTime: {type: String, default: "10s" },
@@ -47,7 +47,7 @@ const deviceSchema = new mongoose.Schema({
     sendBufferSize: {type: Number, default: 20 },
     scriptStatementMaxSize: {type: Number, default: 5 },
     statementBufferSize: {type: Number, default: 10 },
-    measurementBufferPolicy: {type: String, default: MeasurementBufferPolicyTypes.newest },
+    measurementBufferPolicy: {type: String, enum: MeasurementBufferPolicyTypes, default: MeasurementBufferPolicyTypes.newest },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });
