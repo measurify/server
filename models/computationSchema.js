@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
 const ComputationStatusTypes = require('../types/computationStatusTypes.js'); 
-const ComputationCodeTypes = require('../types/ComputationCodeTypes.js'); 
+const ComputationCodeTypes = require('../types/computationCodeTypes.js'); 
 const ItemTypes = require('../types/itemTypes.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
