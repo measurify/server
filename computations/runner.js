@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const ComputationStatusTypes = require('../types/computationStatusTypes'); 
 const OutlierFinder = require('../computations/outliers');
 //const model = require('../computations/model');
-//const max = require('../computations/max');
+const max = require('../computations/max');
 
 exports.progress = async function(computation, percentage, tenant) {
     console.log("Computation: " + computation._id + " progress: " + percentage);
@@ -25,7 +25,7 @@ exports.complete = async function(computation, results, tenant) {
 exports.go = function(computation, user, tenant) { 
     console.log("Computation: " + computation._id + " started");
     switch (computation.code) {
-        //case "max": max.run(computation, user, tenant); return true; break;
+        case "max": max.run(computation, user, tenant); return true; break;
         //case "model": model.run(computation, user, tenant); return true; break;
         default : this.error(computation, 'Code not found', tenant);
     }

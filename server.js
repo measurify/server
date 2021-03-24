@@ -23,31 +23,6 @@ const app = express();
 // compress all responses
 app.use(compression());
 
-// Doc engine
-const options = {
-    swaggerDefinition: {
-        info: {
-          title: info.name,
-          version: info.version,
-          description: info.description,
-        },
-        basePath: '/' + process.env.VERSION + '/',
-        tags: [
-            { name:"Tenent", description:"An organization" },
-            { name:"Thing", description:"A generic object that is the subject of a measurement (e.g. persons, houses, cars, cities, trips, etc.)" },
-            { name:"Device", description:"A sensor, real or virtual, which provides measurements about a thing or an actuator that acts on a thing to modify its status (e.g. environmental sensors, physiological parameters monitors, domotic appliances, LEDs, etc.)" },
-            { name:"Feature", description:"A physical dimension measured by a device (e.g. heart rate, speed, stat, histogram, etc.)" },
-            { name:"Measurement", description:"A value of a feature measured by a device for a specific thing (e.g. the temperature in a car measured by the internal temperature sensor and captured by the car controller.)" },
-            { name:"Tag", description:"A label attached to a measurement or to a thing in order to identify it. A Measurement can be described by one or more tags." },
-            { name:"Computation", description:"An operation on a group of measurements (e.g. statistical operation: max, min, etc..) " },
-            { name:"Constraint", description:"A relathionship between to different resources" }
-        ]
-      },
-    // path to the API docs
-    apis: ['./models/*.js', './routes/*.js']
-};
-const apidoc = swagger(options);
-
 // View engine
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -110,12 +85,6 @@ app.use(require('./routes'));
 
 // Attach Web Socket routes
 require('./routes/streamRoute').init(server);
-
-// serve documentation
-app.get('/' + process.env.VERSION + '/swagger.json', function(req, res) {
-    res.setHeader('Content-Type', 'application/json');
-    res.send(apidoc);
-});
 
 // If that above routes didnt work, 
 // we 404 them and forward to error handler

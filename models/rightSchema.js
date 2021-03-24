@@ -3,29 +3,6 @@ const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
 const RightTypes  = require('../types/rightTypes.js');
 
-/**
- * @swagger
- * definitions:
- *      constraint:
- *          type: object
- *          properties:
- *              type1: 
- *                  description: a resource type for element1
- *                  type: string
- *              type2: 
- *                  description: a resource type for element2
- *                  type: string
- *              element1: 
- *                  description: id of a record in a resource
- *                  type: string
- *              element2: 
- *                  description: id of a record in a resource
- *                  type: string
- *              relationship: 
- *                  description: type of constraint
- *                  type: string
- *       
- */
 const rightSchema = new mongoose.Schema({ 
     _id: { type: String, required: "Please, supply an _id" },
     type: { type: String, required: "Please, supply the resource type" },

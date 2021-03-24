@@ -4,29 +4,6 @@ mongoose.Promise = global.Promise;
 const RelationshipTypes = require('../types/relationshipTypes.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
  
-/**
- * @swagger
- * definitions:
- *      constraint:
- *          type: object
- *          properties:
- *              type1: 
- *                  description: a resource type for element1
- *                  type: string
- *              type2: 
- *                  description: a resource type for element2
- *                  type: string
- *              element1: 
- *                  description: id of a record in a resource
- *                  type: string
- *              element2: 
- *                  description: id of a record in a resource
- *                  type: string
- *              relationship: 
- *                  description: type of constraint
- *                  type: string
- *       
- */
 const constraintSchema = new mongoose.Schema({ 
     owner: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true },
     type1: { type: String, required: "Please, supply type1" },

@@ -2,33 +2,6 @@ const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
  
-/**
- * @swagger
- * definitions:
- *      subscription:
- *          type: object
- *          required:
- *              - _id
- *              - features
- *              - owner
- *          properties:
- *              _id: 
- *                  type: string
- *              features: 
- *                  description: list of features sensed by the device
- *                  type: array
- *                  items:
- *                      $ref: '#/paths/definitions/feature'
- *              owner:
- *                  description: the user how creates the device
- *                  type: 
- *                      $ref: '#/paths/definitions/tag'
- *              tags: 
- *                  description: list of labels related to the device
- *                  type: array
- *                  items:
- *                      $ref: '#/paths/definitions/tag'
- */
 const subscriptionSchema = new mongoose.Schema({ 
     token: { type: String, required: "Please, supply your Firebase push notification token" },
     owner: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true },

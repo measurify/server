@@ -3,26 +3,6 @@ const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
-/**
- * @swagger
- * definitions:
- *      script:
- *          type: object
- *          required:
- *              - _id
- *              - owner
- *          properties:
- *              _id: 
- *                  type: string
- *              source: 
- *                  description: a nested document to store the edge code
- *                  type: string 
- *              tags: 
- *                  description: list of labels related to the script
- *                  type: array
- *                  items:
- *                      $ref: '#/paths/definitions/script'
- */
 const scriptSchema = new mongoose.Schema({
     _id: { type: String, required: "Please, supply an _id" },
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },

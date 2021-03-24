@@ -4,27 +4,6 @@ mongoose.Promise = global.Promise;
 const IssueTypes = require('../types/issueTypes.js'); 
 const IssueStatusTypes = require('../types/issueStatusTypes.js'); 
 
-
-/**
- * @swagger
- * definitions:
- *      script:
- *          type: object
- *          required:
- *              - _id
- *              - owner
- *          properties:
- *              _id: 
- *                  type: string
- *              source: 
- *                  description: a nested document to store the edge code
- *                  type: string 
- *              tags: 
- *                  description: list of labels related to the script
- *                  type: array
- *                  items:
- *                      $ref: '#/paths/definitions/script'
- */
 const issueSchema = new mongoose.Schema({
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     device: { type: String, required: "Please, supply a device", ref: 'Device', autopopulate: true, index: true },

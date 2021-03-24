@@ -2,14 +2,6 @@ const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
 
-/**
- * @swagger
- * definitions:
- *      constraint:
- *          type: object
- *          properties:
- *       
- */
 const fieldmaskSchema = new mongoose.Schema({ 
     _id: { type: String, required: "Please, supply an _id" },
     computation_fields: [{ type: String }],
