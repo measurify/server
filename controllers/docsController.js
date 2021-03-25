@@ -1,4 +1,4 @@
-const docs = require('../commons/docs.js');
+const docs = require('../commons/docs');
 
 exports.get = async (req, res) => {
     const doc = docs.create(req.app);
