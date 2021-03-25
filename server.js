@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const path = require('path');
 const errorHandlers = require('./commons/errorHandlers.js');
-const swagger = require('swagger-jsdoc');
 const info = require('./package.json');
 const cors = require('cors');
 const https = require('https');

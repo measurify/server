@@ -12,7 +12,7 @@ const constraintSchema = new mongoose.Schema({
     element2: { type: String, required: "Please, supply element2"  },
     relationship: { type: String, required: "Please, supply a relationship"  },
     visibility: {type: String, enum: VisibilityTypes, default: VisibilityTypes.public },
-    tags: [{ type: String, ref: 'Tag' }],
+    tags: { type: [String], ref: 'Tag' },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });

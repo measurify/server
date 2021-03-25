@@ -9,7 +9,7 @@ const rightSchema = new mongoose.Schema({
     resource: { type: String, required: "Please, supply a resource" },
     user: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: "Please, supply the user", autopopulate: true },
     owner: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true },
-    tags: [{ type: String, ref: 'Tag' }],
+    tags: { type: [String], ref: 'Tag' },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });

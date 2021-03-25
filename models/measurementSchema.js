@@ -22,7 +22,7 @@ const measurementSchema = new mongoose.Schema({
     script: { type: String, ref: 'Script', index: true },
     samples: [sampleSchema],
     visibility: {type: String, enum: VisibilityTypes, default: VisibilityTypes.private },
-    tags: [{ type: String, ref: 'Tag' }],
+    tags: { type: [String], ref: 'Tag' },
     timestamp: { type: Date, default: Date.now },
     lastmod: { type: Date, default: Date.now, select: false }
 });

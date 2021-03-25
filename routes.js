@@ -21,8 +21,12 @@ const logRoute = require('./routes/logRoute');
 router.use('/' + process.env.VERSION + '/log', passport.authenticate('jwt-token', {session: false}), logRoute);
 
 // errors
-const errorRoute = require('./routes/errorRoute');
-router.use('/' + process.env.VERSION + '/errors', errorRoute);
+const errorRoute = require('./routes/docsRoute');
+router.use('/' + process.env.VERSION + '/docs', errorRoute);
+
+// docs
+const docsRoute = require('./routes/errorRoute');
+router.use('/' + process.env.VERSION + '/errors', docsRoute);
 
 // user
 const userRoute = require('./routes/userRoute');
@@ -71,10 +75,6 @@ router.use('/' + process.env.VERSION + '/features', passport.authenticate('jwt-t
 // type
 const typesRoute = require('./routes/typeRoute');
 router.use('/' + process.env.VERSION + '/types', typesRoute);
-
-// model
-const modelsRoute = require('./routes/modelRoute');
-router.use('/' + process.env.VERSION + '/models', modelsRoute);
 
 // fieldmask
 const fieldmasksRoute = require('./routes/fieldmaskRoute');

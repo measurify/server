@@ -8,7 +8,7 @@ const scriptSchema = new mongoose.Schema({
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     code: { type: String, required: "Please, supply the code" },
     visibility: {type: String, enum: VisibilityTypes, default: VisibilityTypes.private },
-    tags: [{ type: String, ref: 'Tag' }],
+    tags: { type: [String], ref: 'Tag' },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });
