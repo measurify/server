@@ -979,7 +979,7 @@ const PageComp = ({ context, loadedFields }: IProps) => {
         {graphConfig && (
           <Button
             className="add-item"
-            color="green"
+            color="blue"
             onClick={() => openGraphPopup(graphConfig)}
           >
             {openGraphLabel}

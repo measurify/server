@@ -172,7 +172,7 @@ const AuthPageComp = ({ context }: IProps) => {
           <label>{locale.password}</label>
           <input
             type="password"
-            placeholder={locale.password_suggenstion}
+            placeholder={locale.password_suggestion}
             onChange={handlePwdChange}
           />
         </div>
@@ -180,7 +180,7 @@ const AuthPageComp = ({ context }: IProps) => {
           <label>{locale.tenant}</label>
           <input
             type="text"
-            placeholder={locale.tenant_suggenstion}
+            placeholder={locale.tenant_suggestion}
             onChange={handleTenantChange}
           />
         </div>

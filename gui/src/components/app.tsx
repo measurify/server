@@ -17,6 +17,7 @@ import { CustomStyles } from "./customStyles/customStyles.comp";
 
 import "./app.scss";
 import "react-toastify/dist/ReactToastify.css";
+import { remoteConfig } from "firebase-admin";
 
 interface ILoadedFields {
   fieldName: string;
@@ -24,7 +25,7 @@ interface ILoadedFields {
 }
 
 const httpService = new HttpService();
-const defaultAppName: string = "RESTool App";
+const defaultAppName: string = "Measurify GUI";
 
 function changeFavicon(src: string) {
   const link = document.createElement("link");
@@ -54,7 +55,9 @@ function App() {
   async function loadConfig(url?: string): Promise<void> {
     try {
       const windowConfig = (window as any).RESTool?.config;
+
       let remoteConfig: IConfig;
+
       // Try to load config from window object first
       if (!url && windowConfig) {
         remoteConfig = Object.assign({}, windowConfig, {});
@@ -65,6 +68,9 @@ function App() {
       }
 
       // Setting global config for httpService
+
+      console.log("setting global");
+
       httpService.baseUrl = remoteConfig.baseUrl || "";
       httpService.loginUrl = remoteConfig.loginUrl || "";
       httpService.errorMessageDataPath =
@@ -82,6 +88,7 @@ function App() {
         return await loadConfig(remoteConfig.remoteUrl);
       }
 
+      console.log("set config");
       setConfig(remoteConfig);
     } catch (e) {
       console.error("Could not load config file", e);

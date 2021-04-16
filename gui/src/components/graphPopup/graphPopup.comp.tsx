@@ -18,7 +18,7 @@ import { dataHelpers } from "../../helpers/data.helpers";
 import { fileHelpers } from "../../helpers/file.helpers";
 import { IAppContext } from "../app.context";
 import { withAppContext } from "../withContext/withContext.comp";
-import locale from "../../common/locale";
+import locale from "../../common/locale.js";
 import { GraphHolder } from "../graphHolder/graphHolder";
 
 import "./graphPopup.scss";

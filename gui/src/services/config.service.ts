@@ -1,6 +1,7 @@
 import HTTPService from './http.service';
 import { IConfig } from '../common/models/config.model';
 import Ajv from 'ajv';
+import locale from "../common/locale.js";
 
 const httpService: HTTPService = new HTTPService();
 
@@ -8,7 +9,8 @@ class ConfigService extends HTTPService {
 
   public async getRemoteConfig(url: string) {
     if (url.endsWith('.js')) {
-      return (await import(/* webpackIgnore: true */url)).default;
+      console.log("fetch config.js");
+      return (await import(/* webpackIgnore: true */url)).configurator(locale);
     }
     return await httpService.fetch({
       origUrl: url,

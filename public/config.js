@@ -1,6 +1,6 @@
-
-export default {
+export function configurator(locale){return  {
   name: "Measurify GUI",
+  //baseUrl: "https://students.atmosphere.tools/v1",
   baseUrl: "https://localhost/v1",
   loginUrl: "/login",
   unauthorizedRedirectUrl: "/#/",
@@ -11,7 +11,7 @@ export default {
     {
       name: "Users",
       id: "users",
-      description: "Visualizzazione e gestione degli User",
+      description: locale.user_page_description,
       itemName: "User",
 
       methods: {
@@ -32,7 +32,7 @@ export default {
               value: "",
               type: "select",
               options: ["5", "10", "50"],
-              label: "Risultati per pagina",
+              label: locale.results_for_page,
             },
           ],
 
@@ -191,7 +191,7 @@ export default {
     {
       name: "Things",
       id: "things",
-      description: "Visualizzazione e gestione delle Thing",
+      description: locale.thing_page_description,
       itemName: "Thing",
 
       methods: {
@@ -210,7 +210,7 @@ export default {
             {
               name: "tags",
               type: "select",
-              label: "Filtra Tag",
+              label: locale.filter_tag,
               optionSource: {
                 url: "/tags",
                 dataPath: "docs",
@@ -223,13 +223,13 @@ export default {
               value: "",
               type: "select",
               options: ["5", "10", "50"],
-              label: "Risultati per pagina",
+              label: locale.results_for_page,
             },
             {
               name: "page",
               value: "",
               type: "text",
-              label: "Pagina",
+              label: locale.page,
             },
           ],
 
@@ -265,11 +265,11 @@ export default {
                 tags_enroll:
                   item.tags.join() !== ""
                     ? "[" + item.tags.join(" , ") + "]"
-                    : "Nessun Tag",
+                    : locale.no_tag,
                 relations_enroll:
                   item.relations.join() !== ""
                     ? "[" + item.relations.join() + "]"
-                    : "Nessuna Relation",
+                    : locale.no_relation,
               })
             ),
 
@@ -356,7 +356,7 @@ export default {
     {
       name: "Features",
       id: "features",
-      description: "Visualizzazione e gestione delle Feature.",
+      description: locale.feature_page_description,
       itemName: "Feature",
       methods: {
         getAll: {
@@ -373,7 +373,7 @@ export default {
             {
               name: "tags",
               type: "select",
-              label: "Filtra Tag",
+              label: locale.filter_tag,
               optionSource: {
                 url: "/tags",
                 dataPath: "docs",
@@ -386,13 +386,13 @@ export default {
               value: "",
               type: "select",
               options: ["5", "10", "50"],
-              label: "Risultati per pagina",
+              label: locale.results_for_page,
             },
             {
               name: "page",
               value: "",
               type: "text",
-              label: "Pagina",
+              label: locale.page,
             },
           ],
           display: {
@@ -427,11 +427,11 @@ export default {
                 tags_enroll:
                   item.tags.join() !== ""
                     ? "[" + item.tags.join(" , ") + "]"
-                    : "Nessun Tag",
+                    : locale.no_tag,
                 item_name_enroll:
                   item.items.map((e) => e.name).join() !== ""
                     ? "[" + item.items.map((e) => e.name).join(" , ") + "]"
-                    : "Nessun Item",
+                    : locale.no_item,
               })
             ),
 
@@ -478,7 +478,7 @@ export default {
               label: "Items",
               value: [
                 {
-                  dimension: "0 scalar / 1 array / 2 matrix || remove quotes ||",
+                  dimension: locale.dimensions_guide,
                   type: "",
                   name: "",
                   unit: "",
@@ -494,7 +494,7 @@ export default {
 
       customActions: [
         {
-          name: "Expand and Edit",
+          name: locale.expand_and_edit,
           url: "/features/:_id",
           dataPath: "items",
           actualMethod: "put",
@@ -528,7 +528,7 @@ export default {
           ],
         },
         {
-          name: "Clone and Edit",
+          name: locale.clone_and_edit,
           url: "/features/",
           dataPath: "items",
           actualMethod: "post",
@@ -536,7 +536,7 @@ export default {
           fields: [
             {
               name: "_id",
-              label: "Insert new ID",
+              label: locale.id_suggestion,
               type: "text",
             },
             {
@@ -570,7 +570,7 @@ export default {
     {
       name: "Devices",
       id: "devices",
-      description: "Visualizzazione e gestione dei Device.",
+      description: locale.device_page_description,
       itemName: "Device",
       methods: {
         getAll: {
@@ -587,7 +587,7 @@ export default {
             {
               name: "tags",
               type: "select",
-              label: "Filtra Tag",
+              label: locale.filter_tag,
               optionSource: {
                 url: "/tags",
                 dataPath: "docs",
@@ -600,13 +600,13 @@ export default {
               value: "",
               type: "select",
               options: ["5", "10", "50"],
-              label: "Risultati per pagina",
+              label: locale.results_for_page,
             },
             {
               name: "page",
               value: "",
               type: "text",
-              label: "Pagina",
+              label: locale.page,
             },
           ],
           display: {
@@ -656,15 +656,15 @@ export default {
                 tags_enroll:
                   item.tags.join() !== ""
                     ? "[" + item.tags.join(" , ") + "]"
-                    : "Nessun Tag",
+                    : locale.no_tag,
                 features_enroll:
                   item.features.join() !== ""
                     ? "[" + item.features.join(" , ") + "]"
-                    : "Nessuna Feature",
+                    : locale.no_feature,
                 scripts_enroll:
                   item.scripts.join() !== ""
                     ? "[" + item.scripts.join(" , ") + "]"
-                    : "Nessuno Script",
+                    : locale.no_script,
               })
             ),
 
@@ -788,7 +788,7 @@ export default {
       },
       customActions: [
         {
-          name: "Expand and Edit",
+          name: locale.expand_and_edit,
           url: "/devices/:_id",
           dataPath: "items",
           actualMethod: "put",
@@ -883,7 +883,7 @@ export default {
     {
       name: "Measurements",
       id: "measurements",
-      description: "Visualizzazione e gestione delle Measure.",
+      description: locale.measure_page_description,
       itemName: "Measurement",
       methods: {
         getAll: {
@@ -894,7 +894,7 @@ export default {
             {
               name: "thing",
               type: "select",
-              label: "Filtra Thing",
+              label: locale.filter_thing,
               optionSource: {
                 url: "/things",
                 dataPath: "docs",
@@ -905,7 +905,7 @@ export default {
             {
               name: "feature",
               type: "select",
-              label: "Filtra Feature",
+              label: locale.filter_feature,
               optionSource: {
                 url: "/features",
                 dataPath: "docs",
@@ -916,7 +916,7 @@ export default {
             {
               name: "device",
               type: "select",
-              label: "Filtra Device",
+              label: locale.filter_device,
               optionSource: {
                 url: "/devices",
                 dataPath: "docs",
@@ -927,7 +927,7 @@ export default {
             {
               name: "tags",
               type: "select",
-              label: "Filtra Tag",
+              label: locale.filter_device,
               optionSource: {
                 url: "/tags",
                 dataPath: "docs",
@@ -940,13 +940,13 @@ export default {
               value: "",
               type: "select",
               options: ["5", "10", "50"],
-              label: "Risultati per pagina",
+              label: locale.results_for_page,
             },
             {
               name: "page",
               value: "",
               type: "text",
-              label: "Pagina",
+              label: locale.page,
             },
           ],
           display: {
@@ -998,7 +998,7 @@ export default {
                 tags_enroll:
                   item.tags.join() !== ""
                     ? "[" + item.tags.join(" , ") + "]"
-                    : "Nessun Tag",
+                    : locale.no_tag,
                 sample_enroll:
                   "" + item.samples.map((e) => " { " + e.values.map((j) => " [ " + j + " ] ") + " } ") + "",
               })
@@ -1025,7 +1025,7 @@ export default {
               name: "feature",
               required: true,
               type: "select",
-              label: "Sel. Feature",
+              label: locale.select_feature,
               optionSource: {
                 url: "/features",
                 dataPath: "docs",
@@ -1037,7 +1037,7 @@ export default {
             {
               name: "thing",
               type: "select",
-              label: "Filtra Thing",
+              label: locale.select_thing,
               optionSource: {
                 url: "/things",
                 dataPath: "docs",
@@ -1048,7 +1048,7 @@ export default {
             {
               name: "device",
               type: "select",
-              label: "Filtra Device",
+              label: locale.select_device,
               optionSource: {
                 url: "/devices",
                 dataPath: "docs",
@@ -1061,12 +1061,12 @@ export default {
               value: "",
               type: "select",
               options: ["5", "10", "50"],
-              label: "Campioni",
+              label: locale.samples,
             },
             {
               name: "page",
               type: "text",
-              label: "Pagina",
+              label: locale.page,
               value: "1"
             },
           ],
@@ -1079,7 +1079,7 @@ export default {
 
       customActions: [
         {
-          name: "Expand",
+          name: locale.expand,
           url: "/measurements/:_id",
           dataPath: "items",
           actualMethod: "put",
@@ -1150,7 +1150,7 @@ export default {
     {
       name: "Tags",
       id: "tags",
-      description: "Visualizzazione e gestione dei Tag.",
+      description: locale.tag_page_description,
       itemName: "Tag",
       methods: {
         getAll: {
@@ -1169,13 +1169,13 @@ export default {
               value: "10",
               type: "select",
               options: ["5", "10", "50"],
-              label: "Risultati per pagina",
+              label: locale.results_for_page,
             },
             {
               name: "page",
               value: "",
               type: "text",
-              label: "Pagina",
+              label: locale.page,
             },
           ],
           display: {
@@ -1210,7 +1210,7 @@ export default {
                 tags_enroll:
                   item.tags.join() !== ""
                     ? "[" + item.tags.join(" , ") + "]"
-                    : "Nessun Tag",
+                    : locale.no_tag,
               })
             ),
 
@@ -1302,7 +1302,7 @@ export default {
     {
       name: "Fieldmasks",
       id: "fieldmasks",
-      description: "Visualizzazione e gestione delle Fieldmask.",
+      description: locale.fieldmask_page_description,
       itemName: "Fieldmask",
       methods: {
         getAll: {
@@ -1321,7 +1321,7 @@ export default {
               value: "",
               type: "select",
               options: ["5", "10", "50"],
-              label: "Risultati per pagina",
+              label: locale.results_for_page,
             }
           ],
           display: {
@@ -1376,31 +1376,31 @@ export default {
                 computation_enroll:
                   item.computation_fields.join() !== ""
                     ? "[" + item.computation_fields.join(" , ") + "]"
-                    : "Privilegi completi",
+                    : locale.full_privileges,
                 device_enroll:
                   item.device_fields.join() !== ""
                     ? "[" + item.device_fields.join(" , ") + "]"
-                    : "Privilegi completi",
+                    : locale.full_privileges,
                 feature_enroll:
                   item.feature_fields.join() !== ""
                     ? "[" + item.feature_fields.join(" , ") + "]"
-                    : "Privilegi completi",
+                    : locale.full_privileges,
                 measurement_enroll:
                   item.measurement_fields.join() !== ""
                     ? "[" + item.measurement_fields.join(" , ") + "]"
-                    : "Privilegi completi",
+                    : locale.full_privileges,
                 script_enroll:
                   item.script_fields.join() !== ""
                     ? "[" + item.script_fields.join(" , ") + "]"
-                    : "Privilegi completi",
+                    : locale.full_privileges,
                 tag_enroll:
                   item.tag_fields.join() !== ""
                     ? "[" + item.tag_fields.join(" , ") + "]"
-                    : "Privilegi completi",
+                    : locale.full_privileges,
                 thing_enroll:
                   item.thing_fields.join() !== ""
                     ? "[" + item.thing_fields.join(" , ") + "]"
-                    : "Privilegi completi",
+                    : locale.full_privileges,
               })
             ),
 
@@ -1533,7 +1533,7 @@ export default {
     {
           name: "Rights",
           id: "rights",
-          description: "Visualizzazione e gestione dei Rights.",
+          description: locale.right_page_description,
           itemName: "Right",
           methods: {
             getAll: {
@@ -1541,18 +1541,18 @@ export default {
               dataPath: "docs",
               url: "/rights/",
               queryParams: [
-                {
+                /*{
                   name: "_id",
                   value: "",
                   label: "ID",
                   type: "text",
-                },
+                },*/
                 {
                   name: "limit",
                   value: "",
                   type: "select",
                   options: ["5", "10", "50"],
-                  label: "Risultati per pagina",
+                  label: locale.results_for_page,
                 }
               ],
               display: {
@@ -1612,9 +1612,9 @@ export default {
                   Object.assign(item, {
                    
                     tag_enroll:
-                      item.tag_fields.join() !== ""
-                        ? "[" + item.tag_fields.join(" , ") + "]"
-                        : "Nessun Tag",
+                      item.tags.join() !== ""
+                        ? "[" + item.tags.join(" , ") + "]"
+                        :locale.no_tag,
                     user_id:  item.user._id,
                     user_status:  item.user.status,
                     user_username:  item.user.username,
@@ -1703,7 +1703,7 @@ export default {
   {
         name: "Issues",
         id: "issues",
-        description: "Visualizzazione e gestione degli Issues.",
+        description: locale.issue_page_description,
         itemName: "Issue",
         methods: {
           getAll: {
@@ -1715,7 +1715,7 @@ export default {
               {
                 name: "device",
                 type: "select",
-                label: "Filtra Device",
+                label: locale.filter_device,
                 optionSource: {
                   url: "/devices",
                   dataPath: "docs",
@@ -1728,7 +1728,7 @@ export default {
                 value: "",
                 type: "select",
                 options: ["5", "10", "50"],
-                label: "Risultati per pagina",
+                label: locale.results_for_page,
               }
             ],
             display: {
@@ -1838,6 +1838,18 @@ export default {
             url: "/issues/:_id",
             fields: [
               {
+                name: "_id",
+                type: "text",
+                label: "Id",
+                disabled: true,
+              },
+              {
+                name: "type",
+                type: "text",
+                label: "Type",
+                disabled: true,
+              },
+              {
                 name: "status",
                 type: "select",
                 label: "Status",
@@ -1847,7 +1859,24 @@ export default {
                   name : "IssueStatusTypes",
                 },
               },
-              
+              {
+                name: "message",
+                type: "text",
+                label: "Message",
+                disabled: true,
+              },
+              {
+                name: "date",
+                type: "text",
+                label: "Date",
+                disabled: true,
+              },
+              {
+                name: "owner",
+                type: "text",
+                label: "Owner",
+                disabled: true,
+              },
             ],
           },
           delete: {
@@ -1861,7 +1890,7 @@ export default {
   {
       name: "Constraints",
       id: "constraints",
-      description: "Visualizzazione e gestione dei Constraint.",
+      description: locale.constraint_page_description,
       itemName: "Constraint",
       methods: {
         getAll: {
@@ -1924,7 +1953,7 @@ export default {
                 tags_enroll:
                   item.tags.join() !== ""
                     ? "[" + item.tags.join(" , ") + "]"
-                    : "Nessun Tag",
+                    : locale.no_tag,
                
               })
             ),
@@ -2005,7 +2034,7 @@ export default {
   {
     name: "Scripts",
     id: "scripts",
-    description: "Visualizzazione e gestione degli Scripts.",
+    description: locale.script_page_description,
     itemName: "Scripts",
     methods: {
       getAll: {
@@ -2022,7 +2051,7 @@ export default {
           {
             name: "tags",
             type: "select",
-            label: "Filtra Tag",
+            label: locale.filter_tag,
             optionSource: {
               url: "/tags",
               dataPath: "docs",
@@ -2035,13 +2064,13 @@ export default {
             value: "",
             type: "select",
             options: ["5", "10", "50"],
-            label: "Risultati per pagina",
+            label: locale.results_for_page,
           },
           {
             name: "page",
             value: "",
             type: "text",
-            label: "Pagina",
+            label: locale.page,
           },
         ],
         display: {
@@ -2077,7 +2106,7 @@ export default {
               tags_enroll:
                 item.tags.join() !== ""
                   ? "[" + item.tags.join(" , ") + "]"
-                  : "Nessun Tag",
+                  : locale.no_tag,
             })
           ),
 
@@ -2161,3 +2190,5 @@ export default {
 
   ],
 };
+}
+

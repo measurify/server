@@ -38,6 +38,15 @@
     }
   }
 
+  &.blue {
+    background: #251996;
+    color: #fff;
+
+    &:hover {
+      background-color: #253ab3;
+    }
+  }
+
   &.red {
     background: #81070d;
     color: #fff;

@@ -19,7 +19,7 @@ import { fileHelpers } from "../../helpers/file.helpers";
 import { IAppContext } from "../app.context";
 import { withAppContext } from "../withContext/withContext.comp";
 
-import locale, { previous_page } from "../../common/locale";
+import locale from "../../common/locale";
 
 import "./graphHolder.scss";
 //import "../node_modules/react-vis/dist/style.css";
