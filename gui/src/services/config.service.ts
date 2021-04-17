@@ -1,7 +1,7 @@
 import HTTPService from './http.service';
 import { IConfig } from '../common/models/config.model';
 import Ajv from 'ajv';
-import locale from "../common/locale.js";
+import locale from "../common/locale";
 
 const httpService: HTTPService = new HTTPService();
 

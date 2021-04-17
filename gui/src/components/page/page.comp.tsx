@@ -43,7 +43,7 @@ import {
   isQueryPagination,
   isBodyPagination,
 } from "../../common/models/config.types.helper";
-import locale from "../../common/locale.js";
+import locale from "../../common/locale";
 
 import "react-toastify/dist/ReactToastify.css";
 import "./page.scss";
@@ -191,15 +191,15 @@ const PageComp = ({ context, loadedFields }: IProps) => {
   };
   const addItemLabel =
     customLabels?.buttons?.addItem ||
-    "+ " + locale.add + " " + activePage?.itemName;
-  const openGraphLabel = locale.graph + " " + activePage?.itemName;
+    "+ " + locale().add + " " + activePage?.itemName;
+  const openGraphLabel = locale().graph + " " + activePage?.itemName;
   const addItemFormTitle =
     customLabels?.formTitles?.addItem ||
-    locale.add + " " + activePage?.itemName;
+    locale().add + " " + activePage?.itemName;
   const editItemFormTitle =
     customLabels?.formTitles?.editItem ||
-    locale.update + " " + activePage?.itemName;
-  const graphTitle = locale.graph + " " + activePage?.itemName;
+    locale().update + " " + activePage?.itemName;
+  const graphTitle = locale().graph + " " + activePage?.itemName;
   const {
     initQueryParams,
     initialPagination,
@@ -570,7 +570,10 @@ const PageComp = ({ context, loadedFields }: IProps) => {
     }
 
     updatedParams.map((queryParam, idx) => {
-      if (queryParam.type === "select" && queryParam.value === locale.select) {
+      if (
+        queryParam.type === "select" &&
+        queryParam.value === locale().select
+      ) {
         // default value means nothing was selected and thus we explicitly
         // empty out the value in this case; otherwise the string '-- Select --'
         // is used as the value for the given queryParams
@@ -670,27 +673,28 @@ const PageComp = ({ context, loadedFields }: IProps) => {
         : {
             source: "body",
             type: paginationConfig.type,
-            next: result[paginationConfig.params.nextPath || locale.next],
+            next: result[paginationConfig.params.nextPath || locale().next],
             previous:
-              result[paginationConfig.params.prevPath || locale.previous],
+              result[paginationConfig.params.prevPath || locale().previous],
             hasNextPage: !!result[
-              paginationConfig.params.nextPath || locale.next
+              paginationConfig.params.nextPath || locale().next
             ],
             hasPreviousPage: !!result[
-              paginationConfig.params.prevPath || locale.previous
+              paginationConfig.params.prevPath || locale().previous
             ],
             limit: parseInt(paginationConfig.params?.limit?.value || "10"),
             total: result[paginationConfig.params.countPath || "count"],
           };
       if (result) {
-        newState.next = result[paginationConfig.params.nextPath || locale.next];
+        newState.next =
+          result[paginationConfig.params.nextPath || locale().next];
         newState.previous =
-          result[paginationConfig.params.prevPath || locale.previous];
+          result[paginationConfig.params.prevPath || locale().previous];
         newState.hasNextPage = !!result[
-          paginationConfig.params.nextPath || locale.next
+          paginationConfig.params.nextPath || locale().next
         ];
         newState.hasPreviousPage = !!result[
-          paginationConfig.params.prevPath || locale.previous
+          paginationConfig.params.prevPath || locale().previous
         ];
         newState.total = result[paginationConfig.params.countPath || "count"];
       }
@@ -734,7 +738,7 @@ const PageComp = ({ context, loadedFields }: IProps) => {
     }
 
     if (!filteredItems.length) {
-      return <div className="app-error">{locale.nothing_to_see}</div>;
+      return <div className="app-error">{locale().nothing_to_see}</div>;
     }
 
     const getNextPage = paginationConfig
@@ -885,7 +889,11 @@ const PageComp = ({ context, loadedFields }: IProps) => {
       const currentCountFrom =
         ((pagination?.page || 1) - 1) * (pagination?.limit || 10) + 1;
       const currentCountTo = currentCountFrom + items.length - 1;
-      let label: string = `${locale.showing_result} ${currentCountFrom}-${currentCountTo} ${locale.out_of} ${pagination?.total} ${locale.items}`;
+      let label: string = `${
+        locale().showing_result
+      } ${currentCountFrom}-${currentCountTo} ${locale().out_of} ${
+        pagination?.total
+      } ${locale().items}`;
 
       if (pagination?.type === "infinite-scroll") {
         label = `Showing ${pagination?.total} items`;

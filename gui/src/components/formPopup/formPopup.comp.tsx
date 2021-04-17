@@ -17,7 +17,7 @@ import { dataHelpers } from "../../helpers/data.helpers";
 import { fileHelpers } from "../../helpers/file.helpers";
 import { IAppContext } from "../app.context";
 import { withAppContext } from "../withContext/withContext.comp";
-import locale from "../../common/locale.js";
+import locale from "../../common/locale";
 
 import "./formPopup.scss";
 
@@ -375,7 +375,7 @@ export const FormPopup = withAppContext(
                 })}
                 <div className="buttons-wrapper center">
                   <Button type="submit" onClick={submitForm} color="green">
-                    {locale.submit}
+                    {locale().submit}
                   </Button>
                 </div>
               </form>

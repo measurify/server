@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 import { IAppContext } from "../app.context";
 import { withAppContext } from "../withContext/withContext.comp";
 import { Button } from "../button/button.comp";
-import locale from "../../common/locale.js";
+import locale from "../../common/locale";
 
 import "./navigation.scss";
 
@@ -45,7 +45,7 @@ const NavigationComp = ({ context: { config } }: IProps) => {
         </div>
         <div className="logout-wrapper">
           <Button color="red" onClick={() => logOut()}>
-            {locale.logout}
+            {locale().logout}
           </Button>
         </div>
       </div>

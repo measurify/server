@@ -6,7 +6,7 @@ import {
 } from "../../common/models/config.model";
 import { FormRow } from "../formRow/formRow.comp";
 import { Button } from "../button/button.comp";
-import locale from "../../common/locale.js";
+import locale from "../../common/locale";
 
 import "./queryParams.scss";
 
@@ -71,7 +71,7 @@ export const QueryParams = ({
 
   return (
     <section className="query-params-form">
-      <h5>{locale.search}</h5>
+      <h5>{locale().search}</h5>
       <form onSubmit={submit}>
         {queryParams.map((queryParam, idx) => {
           if (queryParam.name == "page") return "";
@@ -86,7 +86,7 @@ export const QueryParams = ({
           );
         })}
         <Button type="submit" onClick={submit}>
-          {locale.submit}
+          {locale().submit}
         </Button>
       </form>
     </section>

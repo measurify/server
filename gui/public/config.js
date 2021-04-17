@@ -11,7 +11,7 @@ export function configurator(locale){return  {
     {
       name: "Users",
       id: "users",
-      description: locale.user_page_description,
+      description: locale().user_page_description,
       itemName: "User",
 
       methods: {
@@ -32,7 +32,7 @@ export function configurator(locale){return  {
               value: "",
               type: "select",
               options: ["5", "10", "50"],
-              label: locale.results_for_page,
+              label: locale().results_for_page,
             },
           ],
 
@@ -191,7 +191,7 @@ export function configurator(locale){return  {
     {
       name: "Things",
       id: "things",
-      description: locale.thing_page_description,
+      description: locale().thing_page_description,
       itemName: "Thing",
 
       methods: {
@@ -210,7 +210,7 @@ export function configurator(locale){return  {
             {
               name: "tags",
               type: "select",
-              label: locale.filter_tag,
+              label: locale().filter_tag,
               optionSource: {
                 url: "/tags",
                 dataPath: "docs",
@@ -223,13 +223,13 @@ export function configurator(locale){return  {
               value: "",
               type: "select",
               options: ["5", "10", "50"],
-              label: locale.results_for_page,
+              label: locale().results_for_page,
             },
             {
               name: "page",
               value: "",
               type: "text",
-              label: locale.page,
+              label: locale().page,
             },
           ],
 
@@ -265,11 +265,11 @@ export function configurator(locale){return  {
                 tags_enroll:
                   item.tags.join() !== ""
                     ? "[" + item.tags.join(" , ") + "]"
-                    : locale.no_tag,
+                    : locale().no_tag,
                 relations_enroll:
                   item.relations.join() !== ""
                     ? "[" + item.relations.join() + "]"
-                    : locale.no_relation,
+                    : locale().no_relation,
               })
             ),
 
@@ -356,7 +356,7 @@ export function configurator(locale){return  {
     {
       name: "Features",
       id: "features",
-      description: locale.feature_page_description,
+      description: locale().feature_page_description,
       itemName: "Feature",
       methods: {
         getAll: {
@@ -373,7 +373,7 @@ export function configurator(locale){return  {
             {
               name: "tags",
               type: "select",
-              label: locale.filter_tag,
+              label: locale().filter_tag,
               optionSource: {
                 url: "/tags",
                 dataPath: "docs",
@@ -386,13 +386,13 @@ export function configurator(locale){return  {
               value: "",
               type: "select",
               options: ["5", "10", "50"],
-              label: locale.results_for_page,
+              label: locale().results_for_page,
             },
             {
               name: "page",
               value: "",
               type: "text",
-              label: locale.page,
+              label: locale().page,
             },
           ],
           display: {
@@ -427,11 +427,11 @@ export function configurator(locale){return  {
                 tags_enroll:
                   item.tags.join() !== ""
                     ? "[" + item.tags.join(" , ") + "]"
-                    : locale.no_tag,
+                    : locale().no_tag,
                 item_name_enroll:
                   item.items.map((e) => e.name).join() !== ""
                     ? "[" + item.items.map((e) => e.name).join(" , ") + "]"
-                    : locale.no_item,
+                    : locale().no_item,
               })
             ),
 
@@ -478,7 +478,7 @@ export function configurator(locale){return  {
               label: "Items",
               value: [
                 {
-                  dimension: locale.dimensions_guide,
+                  dimension: locale().dimensions_guide,
                   type: "",
                   name: "",
                   unit: "",
@@ -494,7 +494,7 @@ export function configurator(locale){return  {
 
       customActions: [
         {
-          name: locale.expand_and_edit,
+          name: locale().expand_and_edit,
           url: "/features/:_id",
           dataPath: "items",
           actualMethod: "put",
@@ -528,7 +528,7 @@ export function configurator(locale){return  {
           ],
         },
         {
-          name: locale.clone_and_edit,
+          name: locale().clone_and_edit,
           url: "/features/",
           dataPath: "items",
           actualMethod: "post",
@@ -536,7 +536,7 @@ export function configurator(locale){return  {
           fields: [
             {
               name: "_id",
-              label: locale.id_suggestion,
+              label: locale().id_suggestion,
               type: "text",
             },
             {
@@ -570,7 +570,7 @@ export function configurator(locale){return  {
     {
       name: "Devices",
       id: "devices",
-      description: locale.device_page_description,
+      description: locale().device_page_description,
       itemName: "Device",
       methods: {
         getAll: {
@@ -587,7 +587,7 @@ export function configurator(locale){return  {
             {
               name: "tags",
               type: "select",
-              label: locale.filter_tag,
+              label: locale().filter_tag,
               optionSource: {
                 url: "/tags",
                 dataPath: "docs",
@@ -600,13 +600,13 @@ export function configurator(locale){return  {
               value: "",
               type: "select",
               options: ["5", "10", "50"],
-              label: locale.results_for_page,
+              label: locale().results_for_page,
             },
             {
               name: "page",
               value: "",
               type: "text",
-              label: locale.page,
+              label: locale().page,
             },
           ],
           display: {
@@ -656,15 +656,15 @@ export function configurator(locale){return  {
                 tags_enroll:
                   item.tags.join() !== ""
                     ? "[" + item.tags.join(" , ") + "]"
-                    : locale.no_tag,
+                    : locale().no_tag,
                 features_enroll:
                   item.features.join() !== ""
                     ? "[" + item.features.join(" , ") + "]"
-                    : locale.no_feature,
+                    : locale().no_feature,
                 scripts_enroll:
                   item.scripts.join() !== ""
                     ? "[" + item.scripts.join(" , ") + "]"
-                    : locale.no_script,
+                    : locale().no_script,
               })
             ),
 
@@ -788,7 +788,7 @@ export function configurator(locale){return  {
       },
       customActions: [
         {
-          name: locale.expand_and_edit,
+          name: locale().expand_and_edit,
           url: "/devices/:_id",
           dataPath: "items",
           actualMethod: "put",
@@ -883,7 +883,7 @@ export function configurator(locale){return  {
     {
       name: "Measurements",
       id: "measurements",
-      description: locale.measure_page_description,
+      description: locale().measure_page_description,
       itemName: "Measurement",
       methods: {
         getAll: {
@@ -894,7 +894,7 @@ export function configurator(locale){return  {
             {
               name: "thing",
               type: "select",
-              label: locale.filter_thing,
+              label: locale().filter_thing,
               optionSource: {
                 url: "/things",
                 dataPath: "docs",
@@ -905,7 +905,7 @@ export function configurator(locale){return  {
             {
               name: "feature",
               type: "select",
-              label: locale.filter_feature,
+              label: locale().filter_feature,
               optionSource: {
                 url: "/features",
                 dataPath: "docs",
@@ -916,7 +916,7 @@ export function configurator(locale){return  {
             {
               name: "device",
               type: "select",
-              label: locale.filter_device,
+              label: locale().filter_device,
               optionSource: {
                 url: "/devices",
                 dataPath: "docs",
@@ -927,7 +927,7 @@ export function configurator(locale){return  {
             {
               name: "tags",
               type: "select",
-              label: locale.filter_device,
+              label: locale().filter_device,
               optionSource: {
                 url: "/tags",
                 dataPath: "docs",
@@ -940,13 +940,13 @@ export function configurator(locale){return  {
               value: "",
               type: "select",
               options: ["5", "10", "50"],
-              label: locale.results_for_page,
+              label: locale().results_for_page,
             },
             {
               name: "page",
               value: "",
               type: "text",
-              label: locale.page,
+              label: locale().page,
             },
           ],
           display: {
@@ -998,7 +998,7 @@ export function configurator(locale){return  {
                 tags_enroll:
                   item.tags.join() !== ""
                     ? "[" + item.tags.join(" , ") + "]"
-                    : locale.no_tag,
+                    : locale().no_tag,
                 sample_enroll:
                   "" + item.samples.map((e) => " { " + e.values.map((j) => " [ " + j + " ] ") + " } ") + "",
               })
@@ -1025,7 +1025,7 @@ export function configurator(locale){return  {
               name: "feature",
               required: true,
               type: "select",
-              label: locale.select_feature,
+              label: locale().select_feature,
               optionSource: {
                 url: "/features",
                 dataPath: "docs",
@@ -1037,7 +1037,7 @@ export function configurator(locale){return  {
             {
               name: "thing",
               type: "select",
-              label: locale.select_thing,
+              label: locale().select_thing,
               optionSource: {
                 url: "/things",
                 dataPath: "docs",
@@ -1048,7 +1048,7 @@ export function configurator(locale){return  {
             {
               name: "device",
               type: "select",
-              label: locale.select_device,
+              label: locale().select_device,
               optionSource: {
                 url: "/devices",
                 dataPath: "docs",
@@ -1061,12 +1061,12 @@ export function configurator(locale){return  {
               value: "",
               type: "select",
               options: ["5", "10", "50"],
-              label: locale.samples,
+              label: locale().samples,
             },
             {
               name: "page",
               type: "text",
-              label: locale.page,
+              label: locale().page,
               value: "1"
             },
           ],
@@ -1079,7 +1079,7 @@ export function configurator(locale){return  {
 
       customActions: [
         {
-          name: locale.expand,
+          name: locale().expand,
           url: "/measurements/:_id",
           dataPath: "items",
           actualMethod: "put",
@@ -1150,7 +1150,7 @@ export function configurator(locale){return  {
     {
       name: "Tags",
       id: "tags",
-      description: locale.tag_page_description,
+      description: locale().tag_page_description,
       itemName: "Tag",
       methods: {
         getAll: {
@@ -1169,13 +1169,13 @@ export function configurator(locale){return  {
               value: "10",
               type: "select",
               options: ["5", "10", "50"],
-              label: locale.results_for_page,
+              label: locale().results_for_page,
             },
             {
               name: "page",
               value: "",
               type: "text",
-              label: locale.page,
+              label: locale().page,
             },
           ],
           display: {
@@ -1210,7 +1210,7 @@ export function configurator(locale){return  {
                 tags_enroll:
                   item.tags.join() !== ""
                     ? "[" + item.tags.join(" , ") + "]"
-                    : locale.no_tag,
+                    : locale().no_tag,
               })
             ),
 
@@ -1302,7 +1302,7 @@ export function configurator(locale){return  {
     {
       name: "Fieldmasks",
       id: "fieldmasks",
-      description: locale.fieldmask_page_description,
+      description: locale().fieldmask_page_description,
       itemName: "Fieldmask",
       methods: {
         getAll: {
@@ -1321,7 +1321,7 @@ export function configurator(locale){return  {
               value: "",
               type: "select",
               options: ["5", "10", "50"],
-              label: locale.results_for_page,
+              label: locale().results_for_page,
             }
           ],
           display: {
@@ -1376,31 +1376,31 @@ export function configurator(locale){return  {
                 computation_enroll:
                   item.computation_fields.join() !== ""
                     ? "[" + item.computation_fields.join(" , ") + "]"
-                    : locale.full_privileges,
+                    : locale().full_privileges,
                 device_enroll:
                   item.device_fields.join() !== ""
                     ? "[" + item.device_fields.join(" , ") + "]"
-                    : locale.full_privileges,
+                    : locale().full_privileges,
                 feature_enroll:
                   item.feature_fields.join() !== ""
                     ? "[" + item.feature_fields.join(" , ") + "]"
-                    : locale.full_privileges,
+                    : locale().full_privileges,
                 measurement_enroll:
                   item.measurement_fields.join() !== ""
                     ? "[" + item.measurement_fields.join(" , ") + "]"
-                    : locale.full_privileges,
+                    : locale().full_privileges,
                 script_enroll:
                   item.script_fields.join() !== ""
                     ? "[" + item.script_fields.join(" , ") + "]"
-                    : locale.full_privileges,
+                    : locale().full_privileges,
                 tag_enroll:
                   item.tag_fields.join() !== ""
                     ? "[" + item.tag_fields.join(" , ") + "]"
-                    : locale.full_privileges,
+                    : locale().full_privileges,
                 thing_enroll:
                   item.thing_fields.join() !== ""
                     ? "[" + item.thing_fields.join(" , ") + "]"
-                    : locale.full_privileges,
+                    : locale().full_privileges,
               })
             ),
 
@@ -1533,7 +1533,7 @@ export function configurator(locale){return  {
     {
           name: "Rights",
           id: "rights",
-          description: locale.right_page_description,
+          description: locale().right_page_description,
           itemName: "Right",
           methods: {
             getAll: {
@@ -1552,7 +1552,7 @@ export function configurator(locale){return  {
                   value: "",
                   type: "select",
                   options: ["5", "10", "50"],
-                  label: locale.results_for_page,
+                  label: locale().results_for_page,
                 }
               ],
               display: {
@@ -1614,7 +1614,7 @@ export function configurator(locale){return  {
                     tag_enroll:
                       item.tags.join() !== ""
                         ? "[" + item.tags.join(" , ") + "]"
-                        :locale.no_tag,
+                        :locale().no_tag,
                     user_id:  item.user._id,
                     user_status:  item.user.status,
                     user_username:  item.user.username,
@@ -1703,7 +1703,7 @@ export function configurator(locale){return  {
   {
         name: "Issues",
         id: "issues",
-        description: locale.issue_page_description,
+        description: locale().issue_page_description,
         itemName: "Issue",
         methods: {
           getAll: {
@@ -1715,7 +1715,7 @@ export function configurator(locale){return  {
               {
                 name: "device",
                 type: "select",
-                label: locale.filter_device,
+                label: locale().filter_device,
                 optionSource: {
                   url: "/devices",
                   dataPath: "docs",
@@ -1728,7 +1728,7 @@ export function configurator(locale){return  {
                 value: "",
                 type: "select",
                 options: ["5", "10", "50"],
-                label: locale.results_for_page,
+                label: locale().results_for_page,
               }
             ],
             display: {
@@ -1890,7 +1890,7 @@ export function configurator(locale){return  {
   {
       name: "Constraints",
       id: "constraints",
-      description: locale.constraint_page_description,
+      description: locale().constraint_page_description,
       itemName: "Constraint",
       methods: {
         getAll: {
@@ -1953,7 +1953,7 @@ export function configurator(locale){return  {
                 tags_enroll:
                   item.tags.join() !== ""
                     ? "[" + item.tags.join(" , ") + "]"
-                    : locale.no_tag,
+                    : locale().no_tag,
                
               })
             ),
@@ -2034,7 +2034,7 @@ export function configurator(locale){return  {
   {
     name: "Scripts",
     id: "scripts",
-    description: locale.script_page_description,
+    description: locale().script_page_description,
     itemName: "Scripts",
     methods: {
       getAll: {
@@ -2051,7 +2051,7 @@ export function configurator(locale){return  {
           {
             name: "tags",
             type: "select",
-            label: locale.filter_tag,
+            label: locale().filter_tag,
             optionSource: {
               url: "/tags",
               dataPath: "docs",
@@ -2064,13 +2064,13 @@ export function configurator(locale){return  {
             value: "",
             type: "select",
             options: ["5", "10", "50"],
-            label: locale.results_for_page,
+            label: locale().results_for_page,
           },
           {
             name: "page",
             value: "",
             type: "text",
-            label: locale.page,
+            label: locale().page,
           },
         ],
         display: {
@@ -2106,7 +2106,7 @@ export function configurator(locale){return  {
               tags_enroll:
                 item.tags.join() !== ""
                   ? "[" + item.tags.join(" , ") + "]"
-                  : locale.no_tag,
+                  : locale().no_tag,
             })
           ),
 

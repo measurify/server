@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import { Button } from "../button/button.comp";
 import { ToastContainer, toast } from "react-toastify";
 import { withAppContext } from "../withContext/withContext.comp";
-import locale from "../../common/locale.js";
+import locale from "../../common/locale";
 import { IAppContext } from "../app.context";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -24,6 +24,7 @@ import {
 
 import "./authPage.scss";
 import { FormPopup } from "../formPopup/formPopup.comp";
+import { LanguageSelector } from "../languageSelector/languageSelector";
 
 interface IProps {
   context: IAppContext;
@@ -97,19 +98,18 @@ const AuthPageComp = ({ context }: IProps) => {
         headers: { "content-type": "application/json" },
       });
       if (!result) {
-        throw new Error(locale.login_error);
+        throw new Error(locale().login_error);
       }
       if (result.status === 401) {
-        throw new Error(locale.login_error);
+        throw new Error(locale().login_error);
       }
 
       if (result.user.type !== "admin") {
-        throw new Error(locale.login_unauthorised_user);
+        throw new Error(locale().login_unauthorised_user);
       }
 
       sessionStorage.setItem("diten-token", result.token);
       window.location.replace("/");
-      console.log("token impostato");
 
       //const { from } = location.state || { from: { pathname: "/" } };
       //replace(from);
@@ -158,35 +158,38 @@ const AuthPageComp = ({ context }: IProps) => {
 
   return (
     <div className="auth-page">
-      <h4>{locale.login}</h4>
+      <LanguageSelector />
+      <br />
+      <br />
+      <h4>{locale().login}</h4>
       <form className="form-content" onSubmit={submitForm}>
         <div className="form-row row">
-          <label>{locale.username}</label>
+          <label>{locale().username}</label>
           <input
             type="text"
-            placeholder={locale.username_suggestion}
+            placeholder={locale().username_suggestion}
             onChange={handleUserChange}
           />
         </div>
         <div className="form-row row">
-          <label>{locale.password}</label>
+          <label>{locale().password}</label>
           <input
             type="password"
-            placeholder={locale.password_suggestion}
+            placeholder={locale().password_suggestion}
             onChange={handlePwdChange}
           />
         </div>
         <div className="form-row row">
-          <label>{locale.tenant}</label>
+          <label>{locale().tenant}</label>
           <input
             type="text"
-            placeholder={locale.tenant_suggestion}
+            placeholder={locale().tenant_suggestion}
             onChange={handleTenantChange}
           />
         </div>
         <div className="buttons-wrapper center">
           <Button type="submit" onClick={submitForm} color="green">
-            {locale.submit}
+            {locale().submit}
           </Button>
         </div>
       </form>
@@ -196,14 +199,14 @@ const AuthPageComp = ({ context }: IProps) => {
       <br />
       <div className="form-content">
         <div className="form-row row">
-          <h5>{locale.add_tenant}</h5>
+          <h5>{locale().add_tenant}</h5>
           <div className="buttons-wrapper center"></div>
           <Button
-            title={locale.add_tenant}
+            title={locale().add_tenant}
             onClick={() =>
               setOpenedAddTenant({
                 type: "add",
-                title: locale.add_tenant,
+                title: locale().add_tenant,
                 config: postConfig,
                 submitCallback: addTenant,
               })

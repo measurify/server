@@ -101,7 +101,7 @@ export const GraphHolder = withAppContext(
         <div>
           <Button
             className="button-margin"
-            title={locale.previous_page}
+            title={locale().previous_page}
             onClick={() => prevCallback()}
             disabled={!prev}
           >
@@ -110,7 +110,7 @@ export const GraphHolder = withAppContext(
 
           <Button
             className="button-margin"
-            title={locale.next_page}
+            title={locale().next_page}
             onClick={() => nextCallback()}
             disabled={!next}
           >
@@ -119,7 +119,7 @@ export const GraphHolder = withAppContext(
 
           <Button
             className="button-margin"
-            title={locale.zoomIn}
+            title={locale().zoomIn}
             onClick={() => zoomInCallback()}
             disabled={!zoomIn}
           >
@@ -128,7 +128,7 @@ export const GraphHolder = withAppContext(
 
           <Button
             className="button-margin"
-            title={locale.zoomOut}
+            title={locale().zoomOut}
             onClick={() => zoomOutCallback()}
             disabled={!zoomOut}
           >
@@ -175,7 +175,7 @@ export const GraphHolder = withAppContext(
                     <div style={{ background: "grey" }}>
                       {"Start time: " + new Date(+hintData[index].x).toString()}
                       <br />
-                      {locale.value + ": " + hintData[index].y}
+                      {locale().value + ": " + hintData[index].y}
                     </div>
                   </Hint>
                 )}

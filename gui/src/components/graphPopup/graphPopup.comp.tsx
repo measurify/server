@@ -18,7 +18,7 @@ import { dataHelpers } from "../../helpers/data.helpers";
 import { fileHelpers } from "../../helpers/file.helpers";
 import { IAppContext } from "../app.context";
 import { withAppContext } from "../withContext/withContext.comp";
-import locale from "../../common/locale.js";
+import locale from "../../common/locale";
 import { GraphHolder } from "../graphHolder/graphHolder";
 
 import "./graphPopup.scss";
@@ -278,8 +278,6 @@ export const GraphPopup = withAppContext(
       setLoading(true);
       setDoneQuery(true);
 
-      console.log("Entered submitGraph");
-
       const {
         fetchedData,
         fetchedFeature,
@@ -299,12 +297,12 @@ export const GraphPopup = withAppContext(
       const finalData = buildData(fetchedData, fetchedFeature);
 
       if (finalData === null) {
-        setError(locale.wrong_feature_error);
+        setError(locale().wrong_feature_error);
         return;
       }
 
       if (finalData[0].dataStruct.length === 0) {
-        setError(locale.no_data_error);
+        setError(locale().no_data_error);
         setLoading(false);
         return;
       }
@@ -324,7 +322,7 @@ export const GraphPopup = withAppContext(
 
       setShowGraph(true);
 
-      setTitleState(locale.graph + " " + fetchedFeature[0]._id);
+      setTitleState(locale().graph + " " + fetchedFeature[0]._id);
 
       setLoading(false);
 
@@ -349,8 +347,6 @@ export const GraphPopup = withAppContext(
         limit,
       } = await fetchFeatureData();
 
-      console.log("Entered BuildMain");
-
       setLoading(true);
 
       setPageNum(pageNum);
@@ -359,12 +355,12 @@ export const GraphPopup = withAppContext(
       const finalData = buildData(fetchedData, fetchedFeature);
 
       if (finalData === null) {
-        setError(locale.wrong_feature_error);
+        setError(locale().wrong_feature_error);
         return;
       }
 
       if (finalData[0].dataStruct.length === 0) {
-        setError(locale.no_data_error);
+        setError(locale().no_data_error);
         setLoading(false);
         return;
       }
@@ -481,7 +477,7 @@ export const GraphPopup = withAppContext(
             <Loader />
           ) : !doneQuery ? (
             <section className="query-params-form">
-              <h5>{locale.graph}</h5>
+              <h5>{locale().graph}</h5>
               <form onSubmit={submitGraph}>
                 {formFields.map((queryParam, idx) => {
                   if (queryParam.name == "page") return "";
@@ -495,7 +491,7 @@ export const GraphPopup = withAppContext(
                   );
                 })}
                 <Button type="submit" onClick={submitGraph}>
-                  {locale.submit}
+                  {locale().submit}
                 </Button>
               </form>
             </section>

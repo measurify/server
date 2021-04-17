@@ -11,7 +11,7 @@ import { Button } from "../button/button.comp";
 import { withAppContext } from "../withContext/withContext.comp";
 import { IAppContext } from "../app.context";
 import { dataHelpers } from "../../helpers/data.helpers";
-import locale from "../../common/locale.js";
+import locale from "../../common/locale";
 
 import "./formRow.scss";
 import { stringify } from "query-string";
@@ -100,9 +100,9 @@ export const FormRow = withAppContext(
         } = optionSource;
 
         if (!url && !preLoad) {
-          throw new Error(
+          /* throw new Error(
             `URL option source (for field "${fieldName}") is empty.`
-          );
+          );*/
         }
 
         const result = await httpService.fetch({
@@ -264,7 +264,7 @@ export const FormRow = withAppContext(
 
             return (
               <select {...inputProps()}>
-                <option>{locale.select}</option>
+                <option>{locale().select}</option>
                 {loadedOption.options.map((option, idx) => {
                   const key = `option_${idx}_`;
                   return (
@@ -301,7 +301,7 @@ export const FormRow = withAppContext(
 
             return (
               <select {...inputProps()}>
-                <option>{locale.select}</option>
+                <option>{locale().select}</option>
                 {sortedOptions.map((option, idx) => {
                   const key = `option_${idx}_`;
                   if (typeof option !== "object") {
@@ -346,7 +346,7 @@ export const FormRow = withAppContext(
           return (
             <textarea
               {...inputProps(
-                customLabels?.placeholders?.text || locale.enter_text
+                customLabels?.placeholders?.text || locale().enter_text
               )}
             ></textarea>
           );
@@ -366,7 +366,7 @@ export const FormRow = withAppContext(
             <input
               type="color"
               {...inputProps(
-                customLabels?.placeholders?.color || locale.enter_color
+                customLabels?.placeholders?.color || locale().enter_color
               )}
             />
           );
@@ -375,7 +375,7 @@ export const FormRow = withAppContext(
             <input
               type="email"
               {...inputProps(
-                customLabels?.placeholders?.email || locale.enter_email
+                customLabels?.placeholders?.email || locale().enter_email
               )}
             />
           );
@@ -384,7 +384,7 @@ export const FormRow = withAppContext(
             <input
               type="password"
               {...inputProps(
-                customLabels?.placeholders?.password || locale.enter_password
+                customLabels?.placeholders?.password || locale().enter_password
               )}
             />
           );
@@ -412,7 +412,7 @@ export const FormRow = withAppContext(
             <input
               type="date"
               {...inputProps(
-                customLabels?.placeholders?.date || locale.enter_date
+                customLabels?.placeholders?.date || locale().enter_date
               )}
             />
           );
@@ -422,7 +422,7 @@ export const FormRow = withAppContext(
             <input
               type="text"
               {...inputProps(
-                customLabels?.placeholders?.text || locale.enter_text
+                customLabels?.placeholders?.text || locale().enter_text
               )}
             />
           );
