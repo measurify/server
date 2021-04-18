@@ -7,6 +7,7 @@ const localization_en = {
     next : "Next",
     previous : "Previous",
     select : "",
+    language: "Language",
     
 
     
@@ -68,7 +69,6 @@ const localization_en = {
     full_privileges : "Full privileges",
 
 
-    
 
     ///Azioni
     expand_and_edit: "Expand and Edit",

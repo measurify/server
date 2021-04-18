@@ -10,6 +10,7 @@ interface ILocalization {
     next :string;
     previous :string;
     select : string;
+    language: string;
     
     previous_page:string;
     next_page:string;
@@ -90,7 +91,7 @@ interface ILocalization {
 
 export default function locale(){
 
-    const tkn = sessionStorage.getItem("language-token");
+    const tkn = sessionStorage.getItem("diten-language");
     let localization : ILocalization;
     if(tkn ==="it")
     {

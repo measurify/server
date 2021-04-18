@@ -5,22 +5,17 @@ import "./languageSelector.scss";
 
 export const LanguageSelector = () => {
   function setSessionLanguage(language: string) {
-    sessionStorage.setItem("language-token", language);
+    sessionStorage.setItem("diten-language", language);
     window.location.reload();
   }
   return (
-    <div className="languageSelector">
-      <div>
-        <h4>Language</h4>
-      </div>
-      <div>
-        <Button title="Italiano" onClick={() => setSessionLanguage("it")}>
-          Italiano
-        </Button>
-        <Button title="English" onClick={() => setSessionLanguage("en")}>
-          English
-        </Button>
-      </div>
+    <div>
+      <Button title="It" onClick={() => setSessionLanguage("it")}>
+        Ita
+      </Button>
+      <Button title="En" onClick={() => setSessionLanguage("en")}>
+        Eng
+      </Button>
     </div>
   );
   //

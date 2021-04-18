@@ -100,7 +100,7 @@ function App() {
   async function preloadData() {
     const resultsData = await httpService.fetch({
       method: "get",
-      origUrl: httpService.baseUrl + "/v1/types",
+      origUrl: httpService.baseUrl + "v1/types",
       headers: { "content-type": "application/json" },
     });
 

@@ -40,7 +40,7 @@ interface IPopupProps {
 }
 
 const AuthPageComp = ({ context }: IProps) => {
-  const { location, replace } = useHistory();
+  //const { location, replace } = useHistory();
   const [user, setUser] = useState<string>("");
   const [pwd, setPwd] = useState<string>("");
   const [tenant, setTenant] = useState<string>("");
@@ -83,8 +83,6 @@ const AuthPageComp = ({ context }: IProps) => {
   async function submitForm(e: any) {
     e.preventDefault();
 
-    console.log("entrato nel submit form");
-
     try {
       const credentials = {
         username: `${user}`,
@@ -104,11 +102,22 @@ const AuthPageComp = ({ context }: IProps) => {
         throw new Error(locale().login_error);
       }
 
+      // comment to ENABLE LOGIN FOR DIFFERENT USERS THAN ADMIN
       if (result.user.type !== "admin") {
         throw new Error(locale().login_unauthorised_user);
       }
 
       sessionStorage.setItem("diten-token", result.token);
+
+      sessionStorage.setItem("diten-username", result.user.username);
+
+      const userData = await httpService.fetch({
+        method: "get",
+        origUrl: httpService.baseUrl + "/users/" + result.user._id,
+        headers: { "content-type": "application/json" },
+      });
+
+      sessionStorage.setItem("diten-fieldmask", userData.fieldmask);
       window.location.replace("/");
 
       //const { from } = location.state || { from: { pathname: "/" } };
@@ -158,7 +167,10 @@ const AuthPageComp = ({ context }: IProps) => {
 
   return (
     <div className="auth-page">
-      <LanguageSelector />
+      <div className="language-wrapper">
+        <h5>{locale().language}</h5>
+        <LanguageSelector />
+      </div>
       <br />
       <br />
       <h4>{locale().login}</h4>

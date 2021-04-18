@@ -7,6 +7,7 @@ const localization_it = {
     next : "Successivo",
     previous : "Precedente",
     select : "",
+    language: "Lingua",
     
     
     
