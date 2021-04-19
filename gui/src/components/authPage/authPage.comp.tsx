@@ -108,8 +108,9 @@ const AuthPageComp = ({ context }: IProps) => {
       }
 
       sessionStorage.setItem("diten-token", result.token);
-
       sessionStorage.setItem("diten-username", result.user.username);
+      sessionStorage.setItem("diten-user-role", result.user.type);
+      sessionStorage.setItem("diten-user-tenant", tenant);
 
       const userData = await httpService.fetch({
         method: "get",
@@ -117,7 +118,7 @@ const AuthPageComp = ({ context }: IProps) => {
         headers: { "content-type": "application/json" },
       });
 
-      sessionStorage.setItem("diten-fieldmask", userData.fieldmask);
+      sessionStorage.setItem("diten-user-fieldmask", userData.fieldmask);
       window.location.replace("/");
 
       //const { from } = location.state || { from: { pathname: "/" } };
@@ -168,7 +169,6 @@ const AuthPageComp = ({ context }: IProps) => {
   return (
     <div className="auth-page">
       <div className="language-wrapper">
-        <h5>{locale().language}</h5>
         <LanguageSelector />
       </div>
       <br />

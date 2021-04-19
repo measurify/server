@@ -8,17 +8,18 @@ import locale from "../../common/locale";
 
 import "./navigation.scss";
 
+import fontawesome from "@fortawesome/fontawesome";
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import { faTimes, faBars } from "@fortawesome/fontawesome-free-solid";
+
+fontawesome.library.add(faTimes, faBars);
+
 interface IProps {
   context: IAppContext;
 }
 
 const NavigationComp = ({ context: { config } }: IProps) => {
   const [isOpened, setIsOpened] = useState<boolean>(false);
-
-  function logOut() {
-    sessionStorage.clear();
-    document.location.replace("/");
-  }
 
   return (
     <nav className="app-nav">
@@ -42,11 +43,6 @@ const NavigationComp = ({ context: { config } }: IProps) => {
               {page.name}
             </NavLink>
           ))}
-        </div>
-        <div className="logout-wrapper">
-          <Button color="red" onClick={() => logOut()}>
-            {locale().logout}
-          </Button>
         </div>
       </div>
     </nav>

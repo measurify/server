@@ -24,6 +24,17 @@ import locale from "../../common/locale";
 import "./graphHolder.scss";
 //import "../node_modules/react-vis/dist/style.css";
 
+import fontawesome from "@fortawesome/fontawesome";
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import {
+  faBackward,
+  faForward,
+  faSearchPlus,
+  faSearchMinus,
+} from "@fortawesome/fontawesome-free-solid";
+
+fontawesome.library.add(faBackward, faForward, faSearchPlus, faSearchMinus);
+
 interface IGraphData {
   nameStruct: string;
   unitMeasure: string;

@@ -8,6 +8,9 @@ const localization_en = {
     previous : "Previous",
     select : "",
     language: "Language",
+    welcome: "Welcome back",
+    role: "Role",
+    session_expire_in: "Session will expire in ",
     
 
     
@@ -54,6 +57,7 @@ const localization_en = {
     ///Filtra e Seleziona
     filter_tag: "Filter Tags",
     filter_thing: "Filter Things",
+    filter_feature: "Filter Features",
     filter_device: "Filter Devices",
     select_feature: "Select Features",
     select_thing: "Select Things",

@@ -1,5 +1,5 @@
-@import '../common/styles/vars';
-@import '../common/styles/functions';
+@import "../common/styles/vars";
+@import "../common/styles/functions";
 
 .restool-app {
   display: flex;
@@ -13,7 +13,7 @@
 
   aside {
     width: $aside-width;
-    background: v(navBackground, #3C3E6F);
+    background: v(navBackground, #3c3e6f);
     color: v(navText, #fff);
     box-shadow: inset -2px 0px 3px rgba(0, 0, 0, 0.3);
     z-index: 10;
@@ -43,7 +43,40 @@
       }
     }
   }
-  
+
+  .right-bar {
+    width: 0.8 * $aside-width;
+    background: v(navBackground, #3c3e6f);
+    color: v(navText, #fff);
+    box-shadow: inset -2px 0px 3px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+
+    @media screen and (max-width: 800px) {
+      height: auto;
+      width: 100%;
+    }
+
+    h1 {
+      padding: 20px;
+      margin: 0;
+      font-size: 20px;
+      font-weight: 300;
+      margin: 0;
+      height: 63px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: default;
+
+      @media screen and (max-width: 800px) {
+        text-align: center;
+      }
+    }
+  }
+
   main {
     position: relative;
     flex: 1;

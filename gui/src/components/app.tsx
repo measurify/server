@@ -11,6 +11,7 @@ import { IConfig, IConfigPage } from "../common/models/config.model";
 import { Page } from "../components/page/page.comp";
 import { AuthPage } from "../components/authPage/authPage.comp";
 import { Navigation } from "../components/navigation/navigation.comp";
+import { RightBar } from "../components/rightbar/rightbar";
 import { AppContext } from "./app.context";
 import HttpService from "../services/http.service";
 import { CustomStyles } from "./customStyles/customStyles.comp";
@@ -229,6 +230,9 @@ function App() {
                 <Redirect path="/" to={`/${config?.pages?.[0]?.id || "1"}`} />
               </Switch>
             )}
+            <div className="right-bar">
+              <RightBar />
+            </div>
             <ToastContainer
               position={toast.POSITION.TOP_CENTER}
               autoClose={4000}

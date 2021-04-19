@@ -1,11 +1,11 @@
 @import "../../common/styles/functions";
-
-.app-nav {
+/*
+.rightbar {
   text-align: left;
   overflow: auto;
   max-height: calc(100vh - 63px);
 
-  .app-nav-opener {
+  .rightbar-opener {
     position: absolute;
     right: 10px;
     top: 50%;
@@ -26,7 +26,7 @@
     }
   }
 
-  .app-nav-wrapper {
+  .rightbar-wrapper {
     @media screen and (max-width: 800px) {
       display: none;
       width: 100%;
@@ -46,11 +46,18 @@
       display: flex;
     }
 
-    .app-nav-links {
+    .rightbar-elem {
       flex-direction: column;
       justify-content: center;
       align-items: center;
       align-self: flex-start;
+      text-decoration: none;
+      padding: 10px 20px;
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.3em;
+      cursor: pointer;
+      transition: 0.2s background-color ease 0s;
     }
 
     a {
@@ -83,5 +90,77 @@
         background: v(navItemActiveBackground, #57578f);
       }
     }
+
+    .logout-wrapper {
+      position: absolute;
+      bottom: 10px;
+      right: 20px;
+    }
   }
+}
+*/
+
+h1 {
+  padding: 20px;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 300;
+  margin: 0;
+  height: 63px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: default;
+
+  @media screen and (max-width: 800px) {
+    text-align: left;
+  }
+}
+
+h2 {
+  padding-left: 15px;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 300;
+  margin: 0;
+  height: 63px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: default;
+
+  @media screen and (max-width: 800px) {
+    text-align: left;
+  }
+}
+
+h3 {
+  padding-left: 15px;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 300;
+  margin: 0;
+  height: 63px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: default;
+
+  @media screen and (max-width: 800px) {
+    text-align: left;
+  }
+}
+
+.logout-wrapper {
+  position: absolute;
+  bottom: 10px;
+  right: 20px;
+}
+
+.rightbar {
+  padding-top: 25px;
 }

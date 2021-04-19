@@ -11,6 +11,9 @@ interface ILocalization {
     previous :string;
     select : string;
     language: string;
+    welcome: string;
+    role : string;
+    session_expire_in: string;
     
     previous_page:string;
     next_page:string;
@@ -56,6 +59,7 @@ interface ILocalization {
     ///Filter and Select
     filter_tag: string;
     filter_thing: string;
+    filter_feature: string;
     filter_device:string;
     select_feature: string;
     select_thing: string;

@@ -16,6 +16,12 @@ import locale from "../../common/locale";
 import "./formRow.scss";
 import { stringify } from "query-string";
 
+import fontawesome from "@fortawesome/fontawesome";
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/fontawesome-free-solid";
+
+fontawesome.library.add(faPlus);
+
 interface ILoadedFields {
   fieldName: string;
   values: Array<string>;
@@ -67,23 +73,15 @@ export const FormRow = withAppContext(
     ) {
       var optionsData = Array<string>(0).fill("");
 
-      console.log("loaded");
-      console.log(loadedFields);
       loadedFields.map((e) => {
         if (e.fieldName === optionSource.name) optionsData = e.values;
       });
-
-      console.log(optionsData);
 
       var optionDisplay = new Array<IOption>(optionsData.length);
       optionsData.map((opt: string, i: number) => {
         optionDisplay[i] = { display: opt, value: opt };
       });
 
-      console.log(optionDisplay);
-      //const temp = { [fieldName]: optionDisplay };
-
-      //setLoadedOptionSources(temp);
       return { fieldname: fieldName, options: optionDisplay };
     }
     async function loadOptionSourceFromRemote(
@@ -118,9 +116,9 @@ export const FormRow = withAppContext(
         );
 
         if (!extractedData || !extractedData.length) {
-          throw new Error(
+          /*throw new Error(
             `Option source data is empty (for field "${fieldName}")`
-          );
+          );*/
         }
 
         // Map option source to fields
@@ -143,7 +141,6 @@ export const FormRow = withAppContext(
           }
         );
 
-        console.log(optionSourceData);
         setOptionSources({
           ...optionSources,
           [fieldName]: optionSourceData,
@@ -260,7 +257,6 @@ export const FormRow = withAppContext(
 
           if (optionSource && optionSource.preLoad) {
             const loadedOption = insertPreloadedData(field.name, optionSource);
-            console.log(loadedOption);
 
             return (
               <select {...inputProps()}>
@@ -292,12 +288,6 @@ export const FormRow = withAppContext(
               finalOptions,
               typeof sortBy === "string" ? [sortBy] : sortBy || []
             );
-
-            console.log("final option");
-            console.log(finalOptions);
-
-            console.log("sorted option");
-            console.log(sortedOptions);
 
             return (
               <select {...inputProps()}>
