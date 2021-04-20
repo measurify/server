@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const broker = require('../commons/broker');
+const broker = require('../commons/broker.js');
 const tenancy = require('../commons/tenancy.js');
 const factory = require('../commons/factory.js');
 const bcrypt = require('bcryptjs');

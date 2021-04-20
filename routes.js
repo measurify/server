@@ -20,11 +20,11 @@ router.use('/' + process.env.VERSION + '/tenants', passport.authenticate('api-to
 const logRoute = require('./routes/logRoute');
 router.use('/' + process.env.VERSION + '/log', passport.authenticate('jwt-token', {session: false}), logRoute);
 
-// errors
+// docs
 const errorRoute = require('./routes/docsRoute');
 router.use('/' + process.env.VERSION + '/docs', errorRoute);
 
-// docs
+// errors
 const docsRoute = require('./routes/errorRoute');
 router.use('/' + process.env.VERSION + '/errors', docsRoute);
 
