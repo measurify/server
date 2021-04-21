@@ -4,22 +4,6 @@ mongoose.Promise = global.Promise;
 const ItemTypes = require('../types/itemTypes.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
-/**
- * @swagger
- * definitions:
- *      dimension:
- *          type: object
- *          required:
- *              - name
- *              - unit
- *          properties:
- *              name:
- *                  type: string
- *                  description: the name of the dimension
- *              unit:
- *                  type: string
- *                  description: the unit of the dimension
- */
 const itemSchema = new mongoose.Schema({ 
     name: { type: String, required: "Please, supply a name" },
     unit: { type: String, required: "Please, supply a unit" },
@@ -27,38 +11,6 @@ const itemSchema = new mongoose.Schema({
     type: { type: String, enum: ItemTypes, default: ItemTypes.number }, },
     { _id: false }  
 );
-
-/**
- * @swagger
- * definitions:
- *      feature:
- *          type: object
- *          required:
- *              - _id
- *              - owner
- *          properties:
- *              _id: 
- *                  type: string
- *              dimensions: 
- *                  type: array
- *                  items:
- *                      $ref: '#/paths/definitions/dimension'
- *              owner:
- *                  description: the user how creates the feature
- *                  type: 
- *                      $ref: '#/paths/definitions/tag' 
- *              description:
- *                  description: 
- *                  type: string
- *              order:
- *                  description: 
- *                  type: number
- *              tags: 
- *                  description: list of labels related to the device
- *                  type: array
- *                  items:
- *                      $ref: '#/paths/definitions/tag'
- */
 
 const featureSchema = new mongoose.Schema({ 
     _id: { type: String, required: "Please, supply an _id" },

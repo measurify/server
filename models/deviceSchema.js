@@ -4,33 +4,6 @@ mongoose.Promise = global.Promise;
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 const MeasurementBufferPolicyTypes = require('../types/measurementBufferPolicyTypes.js'); 
  
-/**
- * @swagger
- * definitions:
- *      device:
- *          type: object
- *          required:
- *              - _id
- *              - features
- *              - owner
- *          properties:
- *              _id: 
- *                  type: string
- *              features: 
- *                  description: list of features sensed by the device
- *                  type: array
- *                  items:
- *                      $ref: '#/paths/definitions/feature'
- *              owner:
- *                  description: the user how creates the device
- *                  type: 
- *                      $ref: '#/paths/definitions/tag'
- *              tags: 
- *                  description: list of labels related to the device
- *                  type: array
- *                  items:
- *                      $ref: '#/paths/definitions/tag'
- */
 const deviceSchema = new mongoose.Schema({ 
     _id: { type: String, required: "Please, supply an _id" },
     owner: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true },

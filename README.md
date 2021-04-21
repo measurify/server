@@ -13,6 +13,11 @@ Clone code and run the container
     git clone https://github.com/measurify/server.git
     docker-compose up 
 
+## Documentation
+
+It is possible to get information about routes and data model from the following routes:
+    {{url}}/docs.html
+
 ## Installation
 
 The Measurify Cloud API Server is developed using [Node JS](https://nodejs.org/en/) and [MongoDB](https://www.mongodb.com/). The following steps show how to deploy a complete enviroment on a Ubuntu 16.04 server, however it can be adapted also for MacOS or Windows operating systems.

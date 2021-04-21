@@ -69,12 +69,43 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/",
+							"raw": "{{url}}/v1/docs",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								""
+								"v1",
+								"docs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "API docs HTML",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"demo\", jsonData);",
+									"tests[\"demo = \" + jsonData] = true;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/docs.html",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"docs.html"
 							]
 						}
 					},
@@ -82,6 +113,37 @@
 				},
 				{
 					"name": "API error codes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"demo\", jsonData);",
+									"tests[\"demo = \" + jsonData] = true;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/v1/errors",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"errors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "API documentation",
 					"event": [
 						{
 							"listen": "test",
@@ -137,6 +199,37 @@
 							"path": [
 								"v1",
 								"errors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "API models",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"demo\", jsonData);",
+									"tests[\"demo = \" + jsonData] = true;"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/v1/models",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"models"
 							]
 						}
 					},
@@ -913,7 +1006,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"user-username-test-2\",\n\t\"password\" : \"user-password-test-2\",\n\t\"type\" : \"analyst\"\n}"
+							"raw": "{\n\t\"username\" : \"user-username-test-2\",\n\t\"password\" : \"password\",\n\t\"type\" : \"analyst\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/users",
@@ -945,7 +1038,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n\t{\n\t\t\"username\" : \"user-username-test-1\",\n\t\t\"password\" : \"user-password-test-1\",\n\t\t\"type\" : \"analyst\"\n\t},\n\t{\n\t\t\"username\" : \"user-username-test-2\",\n\t\t\"password\" : \"user-password-test-2\",\n\t\t\"type\" : \"provider\"\n\t},\n\t{\n\t\t\"username\" : \"user-username-test-3\",\n\t\t\"password\" : \"user-password-test-3\",\n\t\t\"type\" : \"provider\"\n\t},\n\t{\n\t\t\"username\" : \"user-username-test-4\",\n\t\t\"password\" : \"user-password-test-4\",\n\t\t\"type\" : \"provider\"\n\t}\n]"
+							"raw": "[\n\t{\n\t\t\"username\" : \"user-username-test-1\",\n\t\t\"password\" : \"password\",\n\t\t\"type\" : \"analyst\"\n\t},\n\t{\n\t\t\"username\" : \"user-username-test-2\",\n\t\t\"password\" : \"password\",\n\t\t\"type\" : \"provider\"\n\t},\n\t{\n\t\t\"username\" : \"user-username-test-3\",\n\t\t\"password\" : \"password\",\n\t\t\"type\" : \"provider\"\n\t},\n\t{\n\t\t\"username\" : \"user-username-test-4\",\n\t\t\"password\" : \"password\",\n\t\t\"type\" : \"provider\"\n\t}\n]"
 						},
 						"url": {
 							"raw": "{{url}}/v1/users",
@@ -987,7 +1080,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"user-usernatme-test-2\",\n\t\"password\" : \"user-password-test-2\"\n}"
+							"raw": "{\n\t\"username\" : \"user-username-test-2\",\n\t\"password\" : \"password\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/login",
@@ -1082,7 +1175,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"user-usernatme-test-2\",\n\t\"password\" : \"new password\"\n}"
+							"raw": "{\n\t\"username\" : \"user-username-test-2\",\n\t\"password\" : \"new password\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/login",
@@ -1177,7 +1270,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"user-usernatme-test-2\",\n\t\"password\" : \"new password 2\"\n}"
+							"raw": "{\n\t\"username\" : \"user-username-test-2\",\n\t\"password\" : \"new password 2\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/login",
@@ -2523,6 +2616,42 @@
 					"response": []
 				},
 				{
+					"name": "GET an issue",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/issues/{{issue}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"issues",
+								"{{issue}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "PUT an issue",
 					"event": [
 						{
@@ -2607,118 +2736,6 @@
 								"v1",
 								"issues",
 								"{{issue}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET the list of issue types",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"type": "text",
-								"value": "{{token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{url}}/v1/issues/types",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"issues",
-								"types"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET the list of issue status",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"type": "text",
-								"value": "{{token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{url}}/v1/issues/status",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"issues",
-								"status"
 							]
 						}
 					},

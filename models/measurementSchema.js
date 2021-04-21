@@ -5,91 +5,12 @@ mongoose.Promise = global.Promise;
 const inspector = require('../commons/inspector.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
-/**
-* @swagger
-* definitions:
-*      value:
-*          type: object
-*          required:
-*              - value
-*              - date
-*          properties:
-*              value:
-*                  description: vector of values
-*                  type: array
-*                  items: 
-*                      type: number or array    
-*              delta:
-*                  description: delta time of that value (relative to the measurement start date)
-*                  type: number
-*/
 const sampleSchema = new mongoose.Schema({
     values: { type: [Object], default: [] },
     delta: { type: Number } },
     { _id: false }
 );
 
-
-/**
- * @swagger
- * definitions:
- *      measurement:
- *          type: object
- *          required:
- *              - thing
- *              - device
- *              - feature
- *              - values
- *          properties:
- *              location:
- *                  description: the geografical location where the measurament was taken (expressed usgin GeoJSON standard) 
- *                  type: mongoose.SchemaTypes.GeoJSON
- *              startDate:
- *                  description: start time for the measurement activities   
- *                  type: date
- *              endDate:
- *                  description: end time for the measurement activities (if the measurement is instantaneous can be equal to start date)  
- *                  type: date
- *              thing: 
- *                  description: reference to the thing subject of the measurement
- *                  type: string 
- *              device: 
- *                  description: reference to the device used to take the measurement
- *                  type: string
- *              feature: 
- *                  description: reference to the high-order feature of the measurement
- *                  type: string
- *              values: 
- *                  description: list of values related to the measurement
- *                  type: array
- *                  items:
- *                      $ref: '#/paths/definitions/value'
- *              tags: 
- *                  description: list of labels related to the measurement
- *                  type: array
- *                  items:
- *                      $ref: '#/paths/definitions/tag' 
- *      measurements:
- *          type: object
- *          properties:
- *              docs: 
- *                  description: array of measurements
- *                  type: array
- *                  items:
- *                      $ref: '#/paths/definitions/measurement' 
- *              total:
- *                  description: total number of measurements that match a query 
- *                  type: number
- *              limit: 
- *                  description: page size
- *                  type: number
- *              page: 
- *                  description: page number (1 to n)
- *                  type: number 
- *              pages: 
- *                  description: total number of pages
- *                  type: number
- */
 const measurementSchema = new mongoose.Schema({
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     location: { type: mongoose.SchemaTypes.GeoJSON, required: false, index: "2dsphere" },
@@ -101,7 +22,7 @@ const measurementSchema = new mongoose.Schema({
     script: { type: String, ref: 'Script', index: true },
     samples: [sampleSchema],
     visibility: {type: String, enum: VisibilityTypes, default: VisibilityTypes.private },
-    tags: [{ type: String, ref: 'Tag' }],
+    tags: { type: [String], ref: 'Tag' },
     timestamp: { type: Date, default: Date.now },
     lastmod: { type: Date, default: Date.now, select: false }
 });

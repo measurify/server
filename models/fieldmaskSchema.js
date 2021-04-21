@@ -2,23 +2,15 @@ const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
 
-/**
- * @swagger
- * definitions:
- *      constraint:
- *          type: object
- *          properties:
- *       
- */
 const fieldmaskSchema = new mongoose.Schema({ 
     _id: { type: String, required: "Please, supply an _id" },
-    computation_fields: [{ type: String }],
-    device_fields: [{ type: String }],
-    feature_fields: [{ type: String }],
-    measurement_fields: [{ type: String }],
-    script_fields: [{ type: String }],
-    tag_fields: [{ type: String }],
-    thing_fields: [{ type: String }],
+    computation_fields: { type: [String] },
+    device_fields:{ type: [String] },
+    feature_fields: { type: [String] },
+    measurement_fields: { type: [String] },
+    script_fields: { type: [String] },
+    tag_fields: { type: [String] },
+    thing_fields: { type: [String] },
     owner: { type: String, required: true },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
