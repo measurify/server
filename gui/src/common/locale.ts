@@ -84,6 +84,7 @@ interface ILocalization {
     search:string;
     login : string;
     logout : string;
+    scroll_to_top: string;
 
     ///Errors
     wrong_feature_error : string;

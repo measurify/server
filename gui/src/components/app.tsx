@@ -19,6 +19,7 @@ import { CustomStyles } from "./customStyles/customStyles.comp";
 import "./app.scss";
 import "react-toastify/dist/ReactToastify.css";
 import { remoteConfig } from "firebase-admin";
+import locale from "../common/locale";
 
 interface ILoadedFields {
   fieldName: string;
@@ -214,7 +215,7 @@ function App() {
           {config.customStyles && <CustomStyles styles={config.customStyles} />}
           <Router>
             <aside>
-              <h1 title={appName} onClick={() => scrollToTop()}>
+              <h1 title={locale().scroll_to_top} onClick={() => scrollToTop()}>
                 {appName}
               </h1>
               {<Navigation />}

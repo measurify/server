@@ -959,6 +959,11 @@ export function configurator(locale){return  {
               label: "Id",
             },
             {
+              name: "startDate",
+              type: "text",
+              label: "Start Date",
+            },
+            {
               name: "feature",
               type: "text",
               label: "Feature",

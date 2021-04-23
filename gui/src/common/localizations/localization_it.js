@@ -94,6 +94,7 @@ const localization_it = {
     search: 'Cerca',
     login : "Accedi",
     logout : "Esci",
+    scroll_to_top: "Torna a inizio pagina",
 
     ///Errori
     wrong_feature_error : "Questa versione del software non può costruire un grafico delle feature selezionate. Possono essere mostrati i grafici solamente di feature aventi almeno una componente scalare e numerica",

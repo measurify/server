@@ -72,13 +72,12 @@ const RightBarComp = ({ context: { config } }: IProps) => {
   }
 
   function CalcEnding() {
-    console.log("CalcEnding");
     let t0;
     if (loginTime === undefined) {
       const retryLoginTime = sessionStorage.getItem("diten-login-time");
       if (retryLoginTime !== null) {
         t0 = parseInt(retryLoginTime);
-        console.log(new Date(t0));
+
         setLoginTime(parseInt(retryLoginTime));
       } else {
         t0 = Date.now();
@@ -88,14 +87,13 @@ const RightBarComp = ({ context: { config } }: IProps) => {
     }
     const duration = DurationToMilliSeconds();
     const endTime = t0 + duration;
-    console.log(new Date(endTime));
+
     let remainingSec = (endTime - Date.now()) / 1000;
     remainingSec = remainingSec > 0 ? remainingSec : 0;
 
     const mins = Math.floor(remainingSec / 60);
     const secs = Math.floor(remainingSec % 60);
     setDisplayTime(mins + " : " + ("0" + secs).slice(-2));
-    console.log(mins + " : " + ("0" + secs).slice(-2));
   }
 
   function DurationToMilliSeconds() {

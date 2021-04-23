@@ -54,7 +54,7 @@ const localization_en = {
 
     results_for_page: "Results each page",
 
-    ///Filtra e Seleziona
+    ///Filter and select
     filter_tag: "Filter Tags",
     filter_thing: "Filter Things",
     filter_feature: "Filter Features",
@@ -63,7 +63,7 @@ const localization_en = {
     select_thing: "Select Things",
     select_device: "Select Devices",
 
-    ///Termini legati alle risorse
+    ///Words related to resources
     no_tag: "No Tags",
     no_feature: "No Features",
     no_script: "No Scripts",
@@ -74,7 +74,7 @@ const localization_en = {
 
 
 
-    ///Azioni
+    ///Actions
     expand_and_edit: "Expand and Edit",
     clone_and_edit: "Clone and Edit",
     expand: "Expand",
@@ -84,8 +84,9 @@ const localization_en = {
     search: 'Search',
     login : "Login",
     logout : "Logout",
+    scroll_to_top: "Scroll to top",
 
-    ///Errori
+    ///Errors
     wrong_feature_error : "This software cannot build plot with the selected feature. Only features with scalar and numeric components can be plotted",
     no_data_error : "Not enough data to build a plot",
     login_error: 'Wrong login!',
