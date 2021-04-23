@@ -108,9 +108,18 @@ const AuthPageComp = ({ context }: IProps) => {
       }
 
       sessionStorage.setItem("diten-token", result.token);
+      sessionStorage.setItem(
+        "diten-token-expiration-time",
+        result.token_expiration_time
+      );
       sessionStorage.setItem("diten-username", result.user.username);
       sessionStorage.setItem("diten-user-role", result.user.type);
       sessionStorage.setItem("diten-user-tenant", tenant);
+      sessionStorage.setItem("diten-user-fieldmask", result.user.fieldmask);
+      sessionStorage.setItem(
+        "diten-login-time",
+        new Date().getTime().toString()
+      );
 
       const userData = await httpService.fetch({
         method: "get",

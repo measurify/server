@@ -34,6 +34,9 @@ const RightBarComp = ({ context: { config } }: IProps) => {
   const [username, setUsername] = useState<string>();
   const [role, setRole] = useState<string>();
   const [tenant, setTenant] = useState<string>();
+  const [loginTime, setLoginTime] = useState<number>();
+  const [tknExpTime, setTknExpTime] = useState<string>();
+  const [displayTime, setDisplayTime] = useState<string>("00:00");
 
   function logOut() {
     sessionStorage.clear();
@@ -41,7 +44,6 @@ const RightBarComp = ({ context: { config } }: IProps) => {
   }
 
   function renderIcon() {
-    console.log(role);
     if (role === "admin") {
       return (
         <i className="fa fa-user-tie" aria-hidden="true" title="Admin"></i>
@@ -68,16 +70,80 @@ const RightBarComp = ({ context: { config } }: IProps) => {
       );
     }
   }
+
+  function CalcEnding() {
+    console.log("CalcEnding");
+    let t0;
+    if (loginTime === undefined) {
+      const retryLoginTime = sessionStorage.getItem("diten-login-time");
+      if (retryLoginTime !== null) {
+        t0 = parseInt(retryLoginTime);
+        console.log(new Date(t0));
+        setLoginTime(parseInt(retryLoginTime));
+      } else {
+        t0 = Date.now();
+      }
+    } else {
+      t0 = loginTime;
+    }
+    const duration = DurationToMilliSeconds();
+    const endTime = t0 + duration;
+    console.log(new Date(endTime));
+    let remainingSec = (endTime - Date.now()) / 1000;
+    remainingSec = remainingSec > 0 ? remainingSec : 0;
+
+    const mins = Math.floor(remainingSec / 60);
+    const secs = Math.floor(remainingSec % 60);
+    setDisplayTime(mins + " : " + ("0" + secs).slice(-2));
+    console.log(mins + " : " + ("0" + secs).slice(-2));
+  }
+
+  function DurationToMilliSeconds() {
+    let exp;
+    if (tknExpTime === undefined) {
+      const retryTokenExpiration = sessionStorage.getItem(
+        "diten-token-expiration-time"
+      );
+      if (retryTokenExpiration !== null) {
+        exp = retryTokenExpiration;
+        setTknExpTime(retryTokenExpiration);
+      } else {
+        exp = "5m";
+      }
+    } else {
+      exp = tknExpTime;
+    }
+    if (exp.endsWith("h")) {
+      return parseInt(exp.slice(0, -1)) * 60 * 60 * 1000;
+    } else if (exp.endsWith("m")) {
+      return parseInt(exp.slice(0, -1)) * 60 * 1000;
+    } else if (exp.endsWith("s")) {
+      return parseInt(exp.slice(0, -1)) * 1000;
+    }
+    //default case, right now the same as seconds
+    else {
+      return parseInt(exp.slice(0, -1)) * 1000;
+    }
+  }
+
   useEffect(() => {
     const username = sessionStorage.getItem("diten-username");
     const role = sessionStorage.getItem("diten-user-role");
     const tenant = sessionStorage.getItem("diten-user-tenant");
+    const loginTime = sessionStorage.getItem("diten-login-time");
+    const tokenExpiration = sessionStorage.getItem(
+      "diten-token-expiration-time"
+    );
     setUsername(username !== null ? username : "");
     setRole(role !== null ? role : "");
     setTenant(tenant !== null && tenant !== "" ? tenant : "-");
+    setTknExpTime(tokenExpiration !== null ? tokenExpiration : "300m");
+    setLoginTime(loginTime !== null ? parseInt(loginTime) : Date.now());
 
-    console.log(tenant);
-  });
+    setTimeout(() => {
+      CalcEnding();
+    }, 1000);
+  }, [displayTime]);
   return (
     <div className="rightbar">
       <h2>
@@ -92,7 +158,7 @@ const RightBarComp = ({ context: { config } }: IProps) => {
         <b>{tenant}</b>
         <br />
         {locale().session_expire_in}
-        XX:XX
+        {displayTime}
       </h3>
       <hr />
       <h2>

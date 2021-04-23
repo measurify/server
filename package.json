@@ -72,6 +72,7 @@
     "slug": "^0.9.4",
     "socket.io-client": "^2.3.0",
     "summary-statistics": "^1.0.0",
+    "underscore": "^1.13.1",
     "ws": "^7.3.0"
   },
   "devDependencies": {

@@ -203,7 +203,7 @@ export const FormPopup = withAppContext(
       const containFiles: boolean = fileHelpers.isMultipartForm(formFields);
       let validationError = null;
 
-      var queryParams: IQueryParam[] = [];
+      let queryParams: IQueryParam[] = [];
 
       formFields.forEach((field) => {
         if (field.type === "file") {
@@ -256,9 +256,9 @@ export const FormPopup = withAppContext(
           field.type === "array" &&
           field.arrayType === "text"
         ) {
-          var temp = "{";
+          let temp = "{";
 
-          var rmVal = deleteValues.filter((e) => e.fieldName === field.name);
+          let rmVal = deleteValues.filter((e) => e.fieldName === field.name);
           rmVal = rmVal.filter((e) => e.value !== "");
 
           console.log(rmVal);
@@ -332,7 +332,7 @@ export const FormPopup = withAppContext(
     }
 
     function saveRemovedValues(fieldName: string, value: string) {
-      var delVal = [...deleteValues];
+      let delVal = [...deleteValues];
       delVal.push({ fieldName: fieldName, value: value });
 
       setDeleteValues(delVal);

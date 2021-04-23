@@ -71,13 +71,13 @@ export const FormRow = withAppContext(
       fieldName: string,
       optionSource: IConfigOptionSource
     ) {
-      var optionsData = Array<string>(0).fill("");
+      let optionsData = Array<string>(0).fill("");
 
       loadedFields.map((e) => {
         if (e.fieldName === optionSource.name) optionsData = e.values;
       });
 
-      var optionDisplay = new Array<IOption>(optionsData.length);
+      let optionDisplay = new Array<IOption>(optionsData.length);
       optionsData.map((opt: string, i: number) => {
         optionDisplay[i] = { display: opt, value: opt };
       });

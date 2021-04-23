@@ -107,7 +107,7 @@ export const GraphPopup = withAppContext(
         headers: { "content-type": "application/json" },
       });
 
-      var fF = fetchedFeature;
+      let fF = fetchedFeature;
       if (fetchFeatureData === true) {
         let queryFeature = "";
 
@@ -161,9 +161,9 @@ export const GraphPopup = withAppContext(
     }
 
     function buildData(fetchedData: any, fetchedFeature: any) {
-      var goodFeatures = new Array();
-      var dataFeatName = new Array<string>();
-      var dataFeatUnit = new Array<string>();
+      let goodFeatures = new Array();
+      let dataFeatName = new Array<string>();
+      let dataFeatUnit = new Array<string>();
 
       fetchedFeature.map((ft: any) =>
         ft.items.map((comp: any, index: number) => {
@@ -180,9 +180,9 @@ export const GraphPopup = withAppContext(
         return null;
       }
 
-      var dataStruct = new Array(goodFeatures.length);
+      let dataStruct = new Array(goodFeatures.length);
 
-      for (var i = 0; i < dataStruct.length; i++) {
+      for (let i = 0; i < dataStruct.length; i++) {
         dataStruct[i] = new Array();
       }
 
@@ -198,8 +198,8 @@ export const GraphPopup = withAppContext(
         )
       );
 
-      var finalData = Array<IGraphData>();
-      for (i = 0; i < dataFeatName.length; i++) {
+      let finalData = Array<IGraphData>();
+      for (let i = 0; i < dataFeatName.length; i++) {
         finalData[i] = {
           nameStruct: dataFeatName[i],
           dataStruct: dataStruct[i].reverse(),
@@ -214,7 +214,7 @@ export const GraphPopup = withAppContext(
       formFields: IConfigInputField[],
       fetchedFeature: any
     ) {
-      var tempField = formFields;
+      let tempField = formFields;
       tempField.filter((obj) => {
         return (
           obj.name === "page" && (obj.value = 1 + parseInt(obj.value) + "")
@@ -246,7 +246,7 @@ export const GraphPopup = withAppContext(
       formFields: IConfigInputField[],
       fetchedFeature: any
     ) {
-      var tempField = formFields;
+      let tempField = formFields;
       tempField.filter((obj) => {
         return (
           obj.name === "page" && (obj.value = parseInt(obj.value) - 1 + "")
@@ -326,8 +326,8 @@ export const GraphPopup = withAppContext(
 
       setLoading(false);
 
-      var pPage = null;
-      var nPage = null;
+      let pPage = null;
+      let nPage = null;
       if (prev === true) {
         pPage = await buildPrev(formFields, fetchedFeature);
       }
@@ -383,8 +383,8 @@ export const GraphPopup = withAppContext(
 
       setLoading(false);
 
-      var pPage = null;
-      var nPage = null;
+      let pPage = null;
+      let nPage = null;
       if (prev === true) {
         pPage = await buildPrev(formFields, fetchedFeature);
       }
@@ -431,7 +431,7 @@ export const GraphPopup = withAppContext(
       setLoading(true);
       console.log("Entered Increase Sample");
 
-      var tempField = formFields;
+      let tempField = formFields;
 
       tempField.filter((obj) => {
         return obj.name === "limit" && (obj.value = 2 + limit + "");
@@ -446,7 +446,7 @@ export const GraphPopup = withAppContext(
       setLoading(true);
       console.log("Entered Decrease Sample");
 
-      var tempField = formFields;
+      let tempField = formFields;
 
       tempField.filter((obj) => {
         return obj.name === "limit" && (obj.value = limit - 2 + "");
