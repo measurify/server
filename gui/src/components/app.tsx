@@ -4,12 +4,14 @@ import {
   Route,
   Switch,
   Redirect,
+  NavLink,
 } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import ConfigService from "../services/config.service";
 import { IConfig, IConfigPage } from "../common/models/config.model";
 import { Page } from "../components/page/page.comp";
 import { AuthPage } from "../components/authPage/authPage.comp";
+import { HomePage } from "../components/homePage/homePage";
 import { Navigation } from "../components/navigation/navigation.comp";
 import { RightBar } from "../components/rightbar/rightbar";
 import { AppContext } from "./app.context";
@@ -71,8 +73,6 @@ function App() {
 
       // Setting global config for httpService
 
-      console.log("setting global");
-
       httpService.baseUrl = remoteConfig.baseUrl || "";
       httpService.loginUrl = remoteConfig.loginUrl || "";
       httpService.errorMessageDataPath =
@@ -90,7 +90,6 @@ function App() {
         return await loadConfig(remoteConfig.remoteUrl);
       }
 
-      console.log("set config");
       setConfig(remoteConfig);
     } catch (e) {
       console.error("Could not load config file", e);
@@ -181,7 +180,7 @@ function App() {
           }}
         >
           <Router>
-            <Route exact path="/" component={AuthPage} />
+            <Route path="/" component={AuthPage} />
           </Router>
         </AppContext.Provider>
       </div>
@@ -215,20 +214,21 @@ function App() {
           {config.customStyles && <CustomStyles styles={config.customStyles} />}
           <Router>
             <aside>
-              <h1 title={locale().scroll_to_top} onClick={() => scrollToTop()}>
+              <NavLink to="/home" className="nav-wrap">
                 {appName}
-              </h1>
+              </NavLink>
               {<Navigation />}
             </aside>
             {config && (
               <Switch>
-                <Route exact path="/login" component={AuthPage} />
+                <Route exact path="/home" component={() => <HomePage />} />
                 <Route
                   exact
                   path="/:page"
                   component={() => <Page loadedFields={loadedFields} />}
                 />
-                <Redirect path="/" to={`/${config?.pages?.[0]?.id || "1"}`} />
+
+                <Redirect path="/" to="/home" />
               </Switch>
             )}
             <div className="right-bar">

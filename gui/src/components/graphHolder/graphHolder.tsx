@@ -178,7 +178,6 @@ export const GraphHolder = withAppContext(
                       x: d.x.toString(),
                       y: d.y.toString(),
                     });
-                    console.log(d);
                   }} //
                 />
                 {hoverData[index] && (

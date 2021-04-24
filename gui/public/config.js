@@ -1,7 +1,7 @@
 export function configurator(locale){return  {
   name: "Measurify GUI",
-  //baseUrl: "https://students.atmosphere.tools/v1",
-  baseUrl: "https://localhost/v1",
+  baseUrl: "https://students.atmosphere.tools/v1",
+  //baseUrl: "https://localhost/v1",
   loginUrl: "/login",
   unauthorizedRedirectUrl: "/#/",
 
@@ -14,6 +14,7 @@ export function configurator(locale){return  {
       description: locale().user_page_description,
       itemName: "User",
 
+      accessedBy: ["admin"],
       methods: {
         getAll: {
           dataPath: "docs",
@@ -194,6 +195,8 @@ export function configurator(locale){return  {
       description: locale().thing_page_description,
       itemName: "Thing",
 
+      accessedBy: ["admin", "analyst"],
+
       methods: {
         getAll: {
           dataPath: "docs",
@@ -358,6 +361,8 @@ export function configurator(locale){return  {
       id: "features",
       description: locale().feature_page_description,
       itemName: "Feature",
+      accessedBy: ["admin", "analyst"],
+
       methods: {
         getAll: {
           label: "Get All",
@@ -572,6 +577,8 @@ export function configurator(locale){return  {
       id: "devices",
       description: locale().device_page_description,
       itemName: "Device",
+      accessedBy: ["admin", "analyst"],
+
       methods: {
         getAll: {
           label: "Get All",
@@ -885,6 +892,8 @@ export function configurator(locale){return  {
       id: "measurements",
       description: locale().measure_page_description,
       itemName: "Measurement",
+      accessedBy: ["admin", "analyst"],
+
       methods: {
         getAll: {
           label: "Get All",
@@ -1157,6 +1166,8 @@ export function configurator(locale){return  {
       id: "tags",
       description: locale().tag_page_description,
       itemName: "Tag",
+      accessedBy: ["admin", "analyst"],
+
       methods: {
         getAll: {
           label: "Get All",
@@ -1309,6 +1320,8 @@ export function configurator(locale){return  {
       id: "fieldmasks",
       description: locale().fieldmask_page_description,
       itemName: "Fieldmask",
+      accessedBy: ["admin"],
+
       methods: {
         getAll: {
           label: "Get All",
@@ -1540,6 +1553,8 @@ export function configurator(locale){return  {
           id: "rights",
           description: locale().right_page_description,
           itemName: "Right",
+          accessedBy: ["admin", "analyst"],
+
           methods: {
             getAll: {
               label: "Get All",
@@ -1710,6 +1725,8 @@ export function configurator(locale){return  {
         id: "issues",
         description: locale().issue_page_description,
         itemName: "Issue",
+        accessedBy: ["admin"],
+
         methods: {
           getAll: {
             label: "Get All",
@@ -1897,6 +1914,8 @@ export function configurator(locale){return  {
       id: "constraints",
       description: locale().constraint_page_description,
       itemName: "Constraint",
+      accessedBy: ["admin"],
+
       methods: {
         getAll: {
           label: "Get All",
@@ -2041,6 +2060,8 @@ export function configurator(locale){return  {
     id: "scripts",
     description: locale().script_page_description,
     itemName: "Scripts",
+    accessedBy: ["admin", "analyst"],
+
     methods: {
       getAll: {
         label: "Get All",

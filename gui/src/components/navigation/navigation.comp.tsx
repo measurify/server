@@ -33,16 +33,26 @@ const NavigationComp = ({ context: { config } }: IProps) => {
 
       <div className={`app-nav-wrapper ${isOpened ? "opened" : ""}`}>
         <div className="app-nav-links">
-          {(config?.pages || []).map((page, idx) => (
-            <NavLink
-              to={`/${page.id || idx + 1}`}
-              activeClassName="active"
-              key={`page_${idx}`}
-              onClick={() => setIsOpened(false)}
-            >
-              {page.name}
-            </NavLink>
-          ))}
+          {(config?.pages || []).map((page, idx) => {
+            if (page.accessedBy === undefined) {
+              return;
+            }
+            if (
+              page.accessedBy.includes(
+                sessionStorage.getItem("diten-user-role") || ""
+              )
+            )
+              return (
+                <NavLink
+                  to={`/${page.id || idx + 1}`}
+                  activeClassName="active"
+                  key={`page_${idx}`}
+                  onClick={() => setIsOpened(false)}
+                >
+                  {page.name}
+                </NavLink>
+              );
+          })}
         </div>
       </div>
     </nav>

@@ -244,7 +244,6 @@ export const FormPopup = withAppContext(
 
         if (field.disabled === true) {
           delete finalObject[field.name];
-          console.log(finalObject);
         }
 
         if (field.type === "boolean") {
@@ -260,8 +259,6 @@ export const FormPopup = withAppContext(
 
           let rmVal = deleteValues.filter((e) => e.fieldName === field.name);
           rmVal = rmVal.filter((e) => e.value !== "");
-
-          console.log(rmVal);
 
           if (field.value.length !== 0) {
             temp += ` "add": ["` + field.value.join('" , "') + `"]`;

@@ -13,7 +13,7 @@
 
   aside {
     width: $aside-width;
-    background: v(navBackground, #3c3e6f);
+    background: v(navBackground, #0d4477);
     color: v(navText, #fff);
     box-shadow: inset -2px 0px 3px rgba(0, 0, 0, 0.3);
     z-index: 10;
@@ -26,6 +26,27 @@
       width: 100%;
     }
 
+    .nav-wrap {
+      display: block;
+      color: v(navText, #fff);
+      text-decoration: none;
+      padding-bottom: 15px;
+      padding-top: 15px;
+      padding-right: 40px;
+      font-size: 20px;
+      font-weight: 300;
+      text-align: center;
+      //height: 100px;
+      //width: 100%;
+      //overflow: hidden;
+      //text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: default;
+
+      &:hover {
+        background: v(navItemHoverBackground, #347dc2);
+      }
+    }
     h1 {
       padding: 20px;
       margin: 0;
@@ -46,7 +67,7 @@
 
   .right-bar {
     width: 0.8 * $aside-width;
-    background: v(navBackground, #3c3e6f);
+    background: v(navBackground, #0d4477);
     color: v(navText, #fff);
     box-shadow: inset -2px 0px 3px rgba(0, 0, 0, 0.3);
     z-index: 10;

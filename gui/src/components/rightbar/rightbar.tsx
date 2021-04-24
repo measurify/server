@@ -89,7 +89,12 @@ const RightBarComp = ({ context: { config } }: IProps) => {
     const endTime = t0 + duration;
 
     let remainingSec = (endTime - Date.now()) / 1000;
-    remainingSec = remainingSec > 0 ? remainingSec : 0;
+    //remainingSec = remainingSec > 0 ? remainingSec : 0;
+    if (remainingSec <= 0) {
+      sessionStorage.clear();
+      setDisplayTime(locale().session_expired);
+      return;
+    }
 
     const mins = Math.floor(remainingSec / 60);
     const secs = Math.floor(remainingSec % 60);
@@ -155,8 +160,9 @@ const RightBarComp = ({ context: { config } }: IProps) => {
         {locale().tenant + " "}
         <b>{tenant}</b>
         <br />
-        {locale().session_expire_in}
-        {displayTime}
+        {displayTime !== locale().session_expired
+          ? locale().session_expire_in + displayTime
+          : displayTime}
       </h3>
       <hr />
       <h2>

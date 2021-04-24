@@ -10,12 +10,13 @@
 .app-page-header {
   position: relative;
   padding: 30px;
-  background: rgba(255,255,255,0.4);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  //background: rgba(255,255,255,0.4);
+  background-color: #f1f9fc;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
 
-  @media screen and (max-width: 800px) { 
+  @media screen and (max-width: 800px) {
     padding: 15px;
     flex-direction: column;
     text-align: center;
@@ -25,7 +26,7 @@
     font-size: 18px;
     padding: 12px 30px;
 
-    @media screen and (max-width: 800px) { 
+    @media screen and (max-width: 800px) {
       margin-top: 15px;
       font-size: 14px;
       padding: 7px 15px;
@@ -49,7 +50,7 @@
       font-size: 14px;
       line-height: 1.5em;
 
-      @media screen and (max-width: 800px) { 
+      @media screen and (max-width: 800px) {
         margin-top: 5px;
       }
     }
@@ -59,13 +60,15 @@
 .app-page-content {
   position: relative;
   padding: 30px;
+  background: #d5e1e6;
 
   .pagination-state {
     margin: 20px 0;
   }
 
-  @media screen and (max-width: 800px) { 
-    .app-loader, .app-error {
+  @media screen and (max-width: 800px) {
+    .app-loader,
+    .app-error {
       position: relative;
     }
 
@@ -79,7 +82,8 @@
   }
 }
 
-.app-error, .app-loader {
+.app-error,
+.app-loader {
   position: absolute;
   left: 50%;
   top: 50%;

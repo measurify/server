@@ -103,10 +103,10 @@ const AuthPageComp = ({ context }: IProps) => {
       }
 
       // comment to ENABLE LOGIN FOR DIFFERENT USERS THAN ADMIN
-      if (result.user.type !== "admin") {
+      /* if (result.user.type !== "admin") {
         throw new Error(locale().login_unauthorised_user);
       }
-
+*/
       sessionStorage.setItem("diten-token", result.token);
       sessionStorage.setItem(
         "diten-token-expiration-time",
@@ -121,13 +121,13 @@ const AuthPageComp = ({ context }: IProps) => {
         new Date().getTime().toString()
       );
 
-      const userData = await httpService.fetch({
+      /* const userData = await httpService.fetch({
         method: "get",
         origUrl: httpService.baseUrl + "/users/" + result.user._id,
         headers: { "content-type": "application/json" },
       });
+      */
 
-      sessionStorage.setItem("diten-user-fieldmask", userData.fieldmask);
       window.location.replace("/");
 
       //const { from } = location.state || { from: { pathname: "/" } };
@@ -161,8 +161,6 @@ const AuthPageComp = ({ context }: IProps) => {
       throw new Error("Post method is not defined.");
     }
 
-    console.log(body);
-
     const tokenHead = body["token"];
 
     delete body["token"];
@@ -177,65 +175,76 @@ const AuthPageComp = ({ context }: IProps) => {
 
   return (
     <div className="auth-page">
+      <div className="title-wrapper">
+        <div className="title-section">Measurify</div>
+        <br />
+        <div className="subtitle-section">From the edge to cloud and back</div>
+      </div>
       <div className="language-wrapper">
         <LanguageSelector />
       </div>
       <br />
       <br />
-      <h4>{locale().login}</h4>
-      <form className="form-content" onSubmit={submitForm}>
-        <div className="form-row row">
-          <label>{locale().username}</label>
-          <input
-            type="text"
-            placeholder={locale().username_suggestion}
-            onChange={handleUserChange}
-          />
-        </div>
-        <div className="form-row row">
-          <label>{locale().password}</label>
-          <input
-            type="password"
-            placeholder={locale().password_suggestion}
-            onChange={handlePwdChange}
-          />
-        </div>
-        <div className="form-row row">
-          <label>{locale().tenant}</label>
-          <input
-            type="text"
-            placeholder={locale().tenant_suggestion}
-            onChange={handleTenantChange}
-          />
-        </div>
-        <div className="buttons-wrapper center">
-          <Button type="submit" onClick={submitForm} color="green">
-            {locale().submit}
-          </Button>
-        </div>
-      </form>
+      <div className="login-section">
+        <h4>{locale().login}</h4>
+        <form className="form-content" onSubmit={submitForm}>
+          <div className="form-row row">
+            <label>{locale().username}</label>
+            <input
+              type="text"
+              placeholder={locale().username_suggestion}
+              onChange={handleUserChange}
+            />
+          </div>
+          <div className="form-row row">
+            <label>{locale().password}</label>
+            <input
+              type="password"
+              placeholder={locale().password_suggestion}
+              onChange={handlePwdChange}
+            />
+          </div>
+          <div className="form-row row">
+            <label>{locale().tenant}</label>
+            <input
+              type="text"
+              placeholder={locale().tenant_suggestion}
+              onChange={handleTenantChange}
+            />
+          </div>
+          <div className="buttons-wrapper center">
+            <Button type="submit" onClick={submitForm} color="green">
+              {locale().submit}
+            </Button>
+          </div>
+        </form>
 
-      <br />
-      <br />
-      <br />
-      <div className="form-content">
-        <div className="form-row row">
-          <h5>{locale().add_tenant}</h5>
-          <div className="buttons-wrapper center"></div>
-          <Button
-            title={locale().add_tenant}
-            onClick={() =>
-              setOpenedAddTenant({
-                type: "add",
-                title: locale().add_tenant,
-                config: postConfig,
-                submitCallback: addTenant,
-              })
-            }
-            color="green"
-          >
-            <i className="fa fa-plus-circle" aria-hidden="true"></i>
-          </Button>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+
+        <div className="form-content">
+          <div className="form-row row">
+            <h4>{locale().add_tenant}</h4>
+            <div className="buttons-wrapper center"></div>
+            <Button
+              title={locale().add_tenant}
+              onClick={() =>
+                setOpenedAddTenant({
+                  type: "add",
+                  title: locale().add_tenant,
+                  config: postConfig,
+                  submitCallback: addTenant,
+                })
+              }
+              color="green"
+            >
+              <i className="fa fa-plus-circle" aria-hidden="true"></i>
+            </Button>
+          </div>
         </div>
       </div>
       {openedAddTenant && (

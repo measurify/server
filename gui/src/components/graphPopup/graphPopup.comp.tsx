@@ -398,8 +398,6 @@ export const GraphPopup = withAppContext(
     async function prevShifting() {
       setLoading(true);
 
-      console.log("Entered PrevShifting");
-
       setNextGraphData(graphData);
       setGraphData(prevGraphData);
 
@@ -415,7 +413,6 @@ export const GraphPopup = withAppContext(
 
     async function nextShifting() {
       setLoading(true);
-      console.log("Entered NextShifting");
 
       setPrevGraphData(graphData);
       setGraphData(nextGraphData);
@@ -429,7 +426,6 @@ export const GraphPopup = withAppContext(
 
     async function increaseSamples() {
       setLoading(true);
-      console.log("Entered Increase Sample");
 
       let tempField = formFields;
 
@@ -444,7 +440,6 @@ export const GraphPopup = withAppContext(
 
     async function decreaseSamples() {
       setLoading(true);
-      console.log("Entered Decrease Sample");
 
       let tempField = formFields;
 

@@ -120,6 +120,14 @@
           "type": "string",
           "description": "A unique identifier for the page. RESTool will use it to navigate between pages."
         },
+        "accessedBy": {
+          "type": "array",
+          "description": "This field specify which user can access this page.",
+          "items": {
+            "type": "string",
+            "enum": ["admin","analyst","provider","supplier"]
+          }
+        },
         "itemName": {
           "type": "string",
           "description": "The name of the entity visualized in this page."
@@ -148,7 +156,8 @@
       "required": [
         "name",
         "id",
-        "itemName"
+        "itemName",
+        "accessedBy"
       ]
     },
     "requestHeaders": {

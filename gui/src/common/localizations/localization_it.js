@@ -14,7 +14,12 @@ const localization_it = {
     
     
     
-    
+    graph : "Grafico",
+    samples: "Campioni",
+    zoomIn : "Ingrandisci",
+    zoomOut : "Riduci",
+    value : "Valore",
+    page: "Pagina", 
     previous_page: 'Pagina precedente',
     next_page: 'Prossima pagina',
     showing_result: "Risultati",
@@ -37,15 +42,16 @@ const localization_it = {
 
 
     
+    //Homepage
+    welcome_hp: "Benvenuto nel pannello di controllo di Measurify!",
+    left_bar_descr_hp :"Nella barra a sinistra sono presenti i collegamenti alle pagine per le quali possiedi l'autorizzazione.",
+    right_bar_descr_hp :"Nella barra a destra sono presenti le informazioni relative al tuo account e alla scadenza della sessione corrente.",
+    session_expire_info_hp: `Al termine della sessione non sarai espulso automaticamente e potrai continuare a visualizzare la pagina attiva. Ogni azione successiva porterà alla disconnessione.`,
+    github_page_hp :"Pagina Github di Measurify",
+    github_issue_page_hp: "Segnala eventuali bug o problemi",
     
     
-    
-    graph : "Grafico",
-    samples: "Campioni",
-    zoomIn : "Ingrandisci",
-    zoomOut : "Riduci",
-    value : "Valore",
-    page: "Pagina",
+
 
     /// Descrizione Pagine
     user_page_description : "Visualizzazione e gestione degli User",
@@ -100,7 +106,7 @@ const localization_it = {
     wrong_feature_error : "Questa versione del software non può costruire un grafico delle feature selezionate. Possono essere mostrati i grafici solamente di feature aventi almeno una componente scalare e numerica",
     no_data_error : "Non sono presenti dati per poter elaborare un grafico",
     login_error: 'Login errata!',
-    login_unauthorised_user : "Al momento solamente gli utenti con i privilegi di amministratore possono accedere",
+    unauthorised_user : "Non sei abilitato a utilizzare questa pagina",
     session_expired : "Sessione scaduta",
 };
 

@@ -15,6 +15,12 @@ interface ILocalization {
     role : string;
     session_expire_in: string;
     
+    graph : string;
+    samples: string;
+    zoomIn : string;
+    zoomOut : string;
+    value : string;
+    page:string;
     previous_page:string;
     next_page:string;
     showing_result:string;
@@ -34,12 +40,7 @@ interface ILocalization {
     id_suggestion: string;
     dimensions_guide: string;
 
-    graph : string;
-    samples: string;
-    zoomIn : string;
-    zoomOut : string;
-    value : string;
-    page:string;
+
 
     /// Page descriptions
     user_page_description : string;
@@ -55,6 +56,13 @@ interface ILocalization {
     script_page_description:string;
 
     results_for_page: string;
+
+    welcome_hp: string;
+    left_bar_descr_hp :string;
+    right_bar_descr_hp :string;
+    session_expire_info_hp: string;
+    github_page_hp :string;
+    github_issue_page_hp: string;
 
     ///Filter and Select
     filter_tag: string;
@@ -90,7 +98,7 @@ interface ILocalization {
     wrong_feature_error : string;
     no_data_error : string;
     login_error: string;
-    login_unauthorised_user :string;
+    unauthorised_user :string;
     session_expired : string;    
 }
 
@@ -98,6 +106,8 @@ export default function locale(){
 
     const tkn = sessionStorage.getItem("diten-language");
     let localization : ILocalization;
+
+    //check token first
     if(tkn ==="it")
     {
         return localization_it as ILocalization;
@@ -108,6 +118,18 @@ export default function locale(){
         return localization_en as ILocalization
     }
 
-    //default language: english
+    //then check language from browser
+    if(navigator.language.substring(0, 2) === "it")
+    {
+        return localization_it as ILocalization;
+    }
+
+    if(navigator.language.substring(0, 2) ==="en")
+    {
+        return localization_en as ILocalization
+    }
+
+
+    //if the token found or language is not valid -> default language: english
     return localization_en as ILocalization;
 };

@@ -9,7 +9,7 @@ class ConfigService extends HTTPService {
 
   public async getRemoteConfig(url: string) {
     if (url.endsWith('.js')) {
-      console.log("fetch config.js");
+      
       return (await import(/* webpackIgnore: true */url)).configurator(locale);
     }
     return await httpService.fetch({

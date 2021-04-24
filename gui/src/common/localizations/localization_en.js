@@ -13,7 +13,12 @@ const localization_en = {
     session_expire_in: "Session will expire in ",
     
 
-    
+    graph : "Plot",
+    samples: "Samples",
+    zoomIn : "Zoom In",
+    zoomOut : "Zoom Out",
+    value : "Value",
+    page: "Page",
     previous_page: 'Previous Page',
     next_page: 'Next Page',
     showing_result: "Results",
@@ -32,13 +37,14 @@ const localization_en = {
     id_suggestion: "Insert an ID",
     dimensions_guide: "0 scalar / 1 array / 2 matrix",
 
+    //Homepage
+    welcome_hp: "Welcome to Measurify dashboard!",
+    left_bar_descr_hp :"The left bar contains all the links for the pages you are allowed to navigate to",
+    right_bar_descr_hp :"The right bar contains the information about your account and the expiration of the current session.",
+    session_expire_info_hp: "When this session will expire you will not be logged-out instantly, you will still be able to watch the active page. Each action on this or another page will force your log-out.",
+    github_page_hp :"Measurify Github page",
+    github_issue_page_hp: "Report bugs or issues",
 
-    graph : "Plot",
-    samples: "Samples",
-    zoomIn : "Zoom In",
-    zoomOut : "Zoom Out",
-    value : "Value",
-    page: "Page",
 
     user_page_description : "Visualization and Management of Users",
     thing_page_description: "Visualization and Management of Things",
@@ -90,7 +96,7 @@ const localization_en = {
     wrong_feature_error : "This software cannot build plot with the selected feature. Only features with scalar and numeric components can be plotted",
     no_data_error : "Not enough data to build a plot",
     login_error: 'Wrong login!',
-    login_unauthorised_user : "This software version allows only admin users to login",
+    unauthorised_user : "You are not allowed to use this page",
     session_expired : "Session expired",
 };
 

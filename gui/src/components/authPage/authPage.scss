@@ -1,12 +1,65 @@
 .auth-page {
-  justify-content: center;
-  align-items: center;
+  //justify-content: center;
+  //align-items: center;
+  background-color: #ecfaff;
+  background-image: url("../../assets/img/background-login.png");
+  background-repeat: no-repeat;
+  background-size: contain;
   flex: 1;
   display: flex;
   flex-direction: column;
   max-width: 100%;
   overflow: auto;
   min-height: 100vh;
+
+  .title-wrapper {
+    position: absolute;
+    margin: 30px;
+    background-color: rgba(255, 255, 255, 0.5);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    top: 5%;
+    left: 2%;
+    //align-self: center;
+  }
+  .title-section {
+    //align-self: center;
+    font-size: 84px;
+    font-style: normal;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+    font-stretch: semi-expanded;
+    color: rgb(59, 59, 59);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 10px;
+    //text-transform: uppercase;
+  }
+  .subtitle-section {
+    //align-self: center;
+    font-size: 38px;
+    font-style: italic;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+    font-stretch: ultra-condensed;
+    color: rgb(59, 59, 59);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 10px;
+    //text-transform: uppercase;
+  }
+  .login-section {
+    background-color: rgba(255, 255, 255, 0.5);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+
+    position: absolute;
+    padding-left: 10px;
+    top: 20%;
+    right: 2%;
+    align-items: center;
+    min-width: 30%;
+  }
   .form-content {
     width: 90%;
     max-width: 540px;
@@ -189,8 +242,23 @@
     }
   }
   .language-wrapper {
+    background-color: rgba(255, 255, 255, 0.5);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
     position: absolute;
-    top: 20px;
-    left: 20px;
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+    top: 2%;
+    right: 5%;
+    font-size: 12px;
+    color: rgb(0, 0, 0);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
   }
 }

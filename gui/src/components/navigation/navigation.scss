@@ -35,7 +35,7 @@
       left: 0;
       top: 0;
       overflow: auto;
-      background: #3c3e6f;
+      background: #0d4477;
       justify-content: center;
       align-items: center;
       text-align: center;
@@ -76,11 +76,11 @@
       }
 
       &:hover {
-        background: v(navItemHoverBackground, #424479);
+        background: v(navItemHoverBackground, #347dc2);
       }
 
       &.active {
-        background: v(navItemActiveBackground, #57578f);
+        background: v(navItemActiveBackground, #5d98cf);
       }
     }
   }
