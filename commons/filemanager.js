@@ -1,5 +1,5 @@
 const fs = require('fs');
-require('dotenv').config({ path: 'variables.env' });
+require('dotenv').config({ path: './init/variables.env' });
 
 function writeOrAppendData(data, filename, ws) {
     if (!fs.existsSync(filename)) {

@@ -9,7 +9,8 @@ const run = async function() {
   console.log('Node version: ' + process.versions.node);
 
   // Import environmental variables
-  require('dotenv').config({ path: 'variables.env' });
+  require('dotenv').config({ path: './init/variables.env' });
+
   
   // Init database
   const database = require('./database.js');

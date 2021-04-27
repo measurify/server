@@ -1,5 +1,5 @@
 // Import environmental variables from variables.test.env file
-require('dotenv').config({ path: 'variables.env' });
+require('dotenv').config({ path: './init/variables.env' });
 
 // This line allow to test with the self signed certificate
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
