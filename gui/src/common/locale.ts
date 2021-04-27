@@ -57,12 +57,17 @@ interface ILocalization {
 
     results_for_page: string;
 
+    //homepage
     welcome_hp: string;
     left_bar_descr_hp :string;
     right_bar_descr_hp :string;
     session_expire_info_hp: string;
     github_page_hp :string;
     github_issue_page_hp: string;
+
+    //404
+    oh_no: string;
+    broken_link: string;
 
     ///Filter and Select
     filter_tag: string;

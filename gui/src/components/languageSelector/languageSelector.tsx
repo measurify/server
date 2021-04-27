@@ -13,10 +13,18 @@ export const LanguageSelector = () => {
     <div>
       {locale().language}
       <div>
-        <Button title="It" onClick={() => setSessionLanguage("it")}>
+        <Button
+          outlined="outlined"
+          title="It"
+          onClick={() => setSessionLanguage("it")}
+        >
           Ita
         </Button>
-        <Button title="En" onClick={() => setSessionLanguage("en")}>
+        <Button
+          outlined="outlined"
+          title="En"
+          onClick={() => setSessionLanguage("en")}
+        >
           Eng
         </Button>
       </div>

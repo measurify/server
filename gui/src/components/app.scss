@@ -13,7 +13,7 @@
 
   aside {
     width: $aside-width;
-    background: v(navBackground, #0d4477);
+    background: v(navBackground, #123651);
     color: v(navText, #fff);
     box-shadow: inset -2px 0px 3px rgba(0, 0, 0, 0.3);
     z-index: 10;
@@ -67,7 +67,7 @@
 
   .right-bar {
     width: 0.8 * $aside-width;
-    background: v(navBackground, #0d4477);
+    background: v(navBackground, #123651);
     color: v(navText, #fff);
     box-shadow: inset -2px 0px 3px rgba(0, 0, 0, 0.3);
     z-index: 10;

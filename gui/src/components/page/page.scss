@@ -15,6 +15,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
+  color: #123651;
 
   @media screen and (max-width: 800px) {
     padding: 15px;
@@ -42,6 +43,7 @@
       font-size: 24px;
       margin: 0;
       line-height: 1.5em;
+      color: #123651;
     }
 
     h4 {
@@ -49,6 +51,7 @@
       font-weight: 300;
       font-size: 14px;
       line-height: 1.5em;
+      color: #123651;
 
       @media screen and (max-width: 800px) {
         margin-top: 5px;
@@ -60,7 +63,7 @@
 .app-page-content {
   position: relative;
   padding: 30px;
-  background: #d5e1e6;
+  background: #f1f9fc; // #d5e1e6;
 
   .pagination-state {
     margin: 20px 0;

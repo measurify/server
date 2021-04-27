@@ -17,6 +17,43 @@
   font-weight: 300;
   font-size: 14px;
 
+  &.outlined {
+    border: 2px solid black;
+    background-color: #e6e6e6;
+    color: black;
+    padding: 8px 12px;
+    font-weight: 300;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+
+    &.green {
+      border-color: #1cb841;
+      color: #1cb841;
+
+      &:hover {
+        border-color: #2dc450;
+      }
+    }
+
+    &.blue {
+      border-color: #251996;
+      color: #251996;
+
+      &:hover {
+        border-color: #253ab3;
+      }
+    }
+
+    &.red {
+      border-color: #81070d;
+      color: #81070d;
+
+      &:hover {
+        border-color: #d11827;
+      }
+    }
+  }
   &:focus {
     outline: none;
   }
@@ -29,30 +66,32 @@
     color: #cccccccc;
   }
 
-  &.green {
-    background: #1cb841;
-    color: #fff;
+  &.unlined {
+    &.green {
+      background: #1cb841;
+      color: #fff;
 
-    &:hover {
-      background-color: #2dc450;
+      &:hover {
+        background-color: #2dc450;
+      }
     }
-  }
 
-  &.blue {
-    background: #251996;
-    color: #fff;
+    &.blue {
+      background: #251996;
+      color: #fff;
 
-    &:hover {
-      background-color: #253ab3;
+      &:hover {
+        background-color: #253ab3;
+      }
     }
-  }
 
-  &.red {
-    background: #81070d;
-    color: #fff;
+    &.red {
+      background: #81070d;
+      color: #fff;
 
-    &:hover {
-      background-color: #d11827;
+      &:hover {
+        background-color: #d11827;
+      }
     }
   }
 }

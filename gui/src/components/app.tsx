@@ -12,6 +12,7 @@ import { IConfig, IConfigPage } from "../common/models/config.model";
 import { Page } from "../components/page/page.comp";
 import { AuthPage } from "../components/authPage/authPage.comp";
 import { HomePage } from "../components/homePage/homePage";
+import { NotFoundPage } from "../components/notFoundPage/notFoundPage";
 import { Navigation } from "../components/navigation/navigation.comp";
 import { RightBar } from "../components/rightbar/rightbar";
 import { AppContext } from "./app.context";
@@ -22,6 +23,7 @@ import "./app.scss";
 import "react-toastify/dist/ReactToastify.css";
 import { remoteConfig } from "firebase-admin";
 import locale from "../common/locale";
+import { UnauthorizedPage } from "./unauthorizedPage/unauthorizedPage";
 
 interface ILoadedFields {
   fieldName: string;
@@ -224,11 +226,18 @@ function App() {
                 <Route exact path="/home" component={() => <HomePage />} />
                 <Route
                   exact
+                  path="/unauthorized"
+                  component={UnauthorizedPage}
+                />
+                <Route exact path="/404" component={NotFoundPage} />
+                <Route
+                  exact
                   path="/:page"
                   component={() => <Page loadedFields={loadedFields} />}
                 />
 
                 <Redirect path="/" to="/home" />
+                <Route path="*" component={NotFoundPage} />
               </Switch>
             )}
             <div className="right-bar">

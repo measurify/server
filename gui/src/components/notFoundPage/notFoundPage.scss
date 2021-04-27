@@ -1,4 +1,4 @@
-.home-page {
+.notFound-page {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -7,11 +7,11 @@
   min-height: 100vh;
   max-height: 100vh;
 
-  background-color: #f1f9fc;
-  //background-image: url("../../assets/img/background-login.png");
+  background-color: #d5e1e6;
+  background-image: url("../../assets/img/404.png");
   background-repeat: no-repeat;
-  //background-position: right;
-  background-size: contain;
+  background-position: right top;
+  background-size: 80%;
 
   .info-box {
     position: absolute;
@@ -20,7 +20,7 @@
     padding-bottom: 1%;
     max-height: 95vh;
     padding-left: 2%;
-    background-color: rgba(18, 54, 81, 0.75);
+    background-color: rgba(18, 54, 81, 0.5);
     -webkit-backdrop-filter: blur(2px);
     backdrop-filter: blur(2px);
     width: 35%;
@@ -36,9 +36,9 @@
       text-decoration: none;
       padding: 10px 20px;
       margin: 0;
-      font-size: 18px;
-      font-weight: lighter;
-      line-height: 1.3em;
+      font-size: 20px;
+      font-weight: normal;
+      line-height: 1.4em;
 
       transition: 0.2s background-color ease 0s;
       //hyphens: auto;

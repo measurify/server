@@ -4,6 +4,7 @@ import * as QueryString from "query-string";
 import { toast, ToastContainer } from "react-toastify";
 import { orderBy } from "natural-orderby";
 import { find, remove } from "lodash";
+import { useLocation } from "react-router-dom";
 
 import { IAppContext } from "../app.context";
 import {
@@ -955,108 +956,116 @@ const PageComp = ({ context, loadedFields }: IProps) => {
 
   useEffect(() => {
     if (
+      config?.pages
+        .map((e) => e.id)
+        .includes(location.pathname.substring(1)) === false
+    ) {
+      document.location.replace("#/404");
+    }
+    if (
       activePage?.accessedBy.includes(
         sessionStorage.getItem("diten-user-role") || ""
-      )
+      ) === false
     ) {
-      const {
-        initQueryParams,
-        initialPagination,
-      } = buildInitQueryParamsAndPaginationState(
-        getAllConfig?.queryParams || [],
-        paginationConfig
-      );
-
-      setItems([]);
-      setQueryParams(extractQueryParams(initQueryParams));
-      setPagination(initialPagination);
+      document.location.replace("#/unauthorized");
     }
+
+    const {
+      initQueryParams,
+      initialPagination,
+    } = buildInitQueryParamsAndPaginationState(
+      getAllConfig?.queryParams || [],
+      paginationConfig
+    );
+
+    setItems([]);
+    setQueryParams(extractQueryParams(initQueryParams));
+    setPagination(initialPagination);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activePage]);
 
   useEffect(() => {
     // Load data when query params
     if (
+      config?.pages
+        .map((e) => e.id)
+        .includes(location.pathname.substring(1)) === false
+    ) {
+      document.location.replace("#/404");
+    }
+
+    if (
       activePage?.accessedBy.includes(
         sessionStorage.getItem("diten-user-role") || ""
-      )
+      ) === false
     ) {
-      getAllRequest();
+      document.location.replace("#/unauthorized");
     }
+    getAllRequest();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryParams]);
 
-  if (
-    activePage?.accessedBy.includes(
-      sessionStorage.getItem("diten-user-role") || ""
-    )
-  ) {
-    return (
-      <div className="app-page">
-        <header className="app-page-header">
-          <hgroup>
-            <h2>{activePage?.name}</h2>
-            {activePage?.description && <h4>{activePage?.description}</h4>}
-          </hgroup>
-          {graphConfig && (
-            <Button
-              className="add-item"
-              color="blue"
-              onClick={() => openGraphPopup(graphConfig)}
-            >
-              {openGraphLabel}
-            </Button>
-          )}
-          {postConfig && (
-            <Button
-              className="add-item"
-              color="green"
-              onClick={() =>
-                setOpenedPopup({
-                  type: "add",
-                  title: addItemFormTitle,
-                  config: postConfig,
-                  submitCallback: addItem,
-                })
-              }
-            >
-              {addItemLabel}
-            </Button>
-          )}
-        </header>
-        <main className="app-page-content">{renderPageContent()}</main>
-        {openedPopup && (
-          <FormPopup
-            title={openedPopup.title}
-            closeCallback={closeFormPopup}
-            submitCallback={openedPopup.submitCallback}
-            type={openedPopup.type}
-            fields={openedPopup.config?.fields || []}
-            loadedFields={loadedFields}
-            rawData={openedPopup.rawData}
-            getSingleConfig={openedPopup.getSingleConfig}
-            methodConfig={openedPopup.config}
-          />
+  return (
+    <div className="app-page">
+      <header className="app-page-header">
+        <hgroup>
+          <h2>{activePage?.name}</h2>
+          {activePage?.description && <h4>{activePage?.description}</h4>}
+        </hgroup>
+        {graphConfig && (
+          <Button
+            className="add-item"
+            color="blue"
+            onClick={() => openGraphPopup(graphConfig)}
+          >
+            {openGraphLabel}
+          </Button>
         )}
-        {openedGraph && (
-          <GraphPopup
-            title={openedGraph.title}
-            closeCallback={closeGraph}
-            fields={openedGraph.config?.fields || []}
-            graphConfig={openedGraph.config}
-          />
+        {postConfig && (
+          <Button
+            className="add-item"
+            color="green"
+            onClick={() =>
+              setOpenedPopup({
+                type: "add",
+                title: addItemFormTitle,
+                config: postConfig,
+                submitCallback: addItem,
+              })
+            }
+          >
+            {addItemLabel}
+          </Button>
         )}
-        <ToastContainer />
-      </div>
-    );
-  } else {
-    return (
-      <div className="app-page">
-        <h1>{locale().unauthorised_user}</h1>
-      </div>
-    );
-  }
+      </header>
+      <hr />
+      <main className="app-page-content">{renderPageContent()}</main>
+      {openedPopup && (
+        <FormPopup
+          title={openedPopup.title}
+          closeCallback={closeFormPopup}
+          submitCallback={openedPopup.submitCallback}
+          type={openedPopup.type}
+          fields={openedPopup.config?.fields || []}
+          loadedFields={loadedFields}
+          rawData={openedPopup.rawData}
+          getSingleConfig={openedPopup.getSingleConfig}
+          methodConfig={openedPopup.config}
+        />
+      )}
+      {openedGraph && (
+        <GraphPopup
+          title={openedGraph.title}
+          closeCallback={closeGraph}
+          fields={openedGraph.config?.fields || []}
+          graphConfig={openedGraph.config}
+        />
+      )}
+      <ToastContainer />
+    </div>
+  );
 };
 
 export const Page = withAppContext(PageComp);

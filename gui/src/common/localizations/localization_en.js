@@ -45,6 +45,12 @@ const localization_en = {
     github_page_hp :"Measurify Github page",
     github_issue_page_hp: "Report bugs or issues",
 
+    //404
+    oh_no:"Oh No!",
+    broken_link: "It looks like you used a broken link. If you arrived at this page using the interface features report the bug: a carefully selected team of college students will try to fix it.",
+
+
+
 
     user_page_description : "Visualization and Management of Users",
     thing_page_description: "Visualization and Management of Things",

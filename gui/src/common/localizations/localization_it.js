@@ -48,7 +48,14 @@ const localization_it = {
     right_bar_descr_hp :"Nella barra a destra sono presenti le informazioni relative al tuo account e alla scadenza della sessione corrente.",
     session_expire_info_hp: `Al termine della sessione non sarai espulso automaticamente e potrai continuare a visualizzare la pagina attiva. Ogni azione successiva porterà alla disconnessione.`,
     github_page_hp :"Pagina Github di Measurify",
-    github_issue_page_hp: "Segnala eventuali bug o problemi",
+    github_issue_page_hp: "Segnala bug o problemi",
+
+    //404
+    oh_no:"Oh No!",
+    broken_link: "Sembra che tu abbia utilizzato un collegamento non funzionante. Se sei arrivato a questa pagina utilizzando le funzioni dell'interfaccia segnala il bug: un team accuratamente selezionato di studenti universitari proverà a risolvere il problema.",
+
+
+
     
     
 

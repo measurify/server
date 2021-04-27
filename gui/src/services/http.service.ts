@@ -138,11 +138,14 @@ class HttpService {
       
       sessionStorage.clear();
 
-      
-
       const redirectUrl: string = this.unauthorizedRedirectUrl.replace(':returnUrl', encodeURIComponent(document.location.href));
       document.location.replace(redirectUrl);
+      
       return;
+    }
+    if(res.status === 404)
+    {
+      document.location.replace("#/404");
     }
 
     throw new Error(await this.getErrorMessage(res));

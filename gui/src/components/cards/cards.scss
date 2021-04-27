@@ -1,4 +1,4 @@
-@import '../../common/styles/functions';
+@import "../../common/styles/functions";
 
 .cards-wrapper {
   $image-height: 200px;
@@ -14,7 +14,7 @@
 
   .card {
     background: #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     font-weight: 300;
     margin: 0 20px 20px 0;
     // min-width: 340px;
@@ -23,7 +23,6 @@
     @media screen and (max-width: 800px) {
       width: 100%;
     }
-
   }
 
   .card-row {

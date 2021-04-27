@@ -26,6 +26,12 @@
       background: rgba(255, 255, 255, 0.2);
     }
   }
+  .logout-wrapper {
+    position: relative;
+    bottom: 5%;
+    left: 5%;
+    width: fit-content;
+  }
 
   .rightbar-wrapper {
     @media screen and (max-width: 800px) {
@@ -36,7 +42,7 @@
       left: 0;
       top: 0;
       overflow: auto;
-      background: #0d4477;
+      background: #123651;
       justify-content: center;
       align-items: center;
       text-align: center;
@@ -146,11 +152,5 @@
     @media screen and (max-width: 800px) {
       text-align: left;
     }
-  }
-
-  .logout-wrapper {
-    position: absolute;
-    bottom: 10px;
-    right: 20px;
   }
 }

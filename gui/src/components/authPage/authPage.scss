@@ -2,9 +2,9 @@
   //justify-content: center;
   //align-items: center;
   background-color: #ecfaff;
-  background-image: url("../../assets/img/background-login.png");
+  //background-image: url("../../assets/img/background-login.png");
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: 70% 100%;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -12,6 +12,9 @@
   overflow: auto;
   min-height: 100vh;
 
+  h4 {
+    color: #123651;
+  }
   .title-wrapper {
     position: absolute;
     margin: 30px;
@@ -20,6 +23,7 @@
     backdrop-filter: blur(2px);
     top: 5%;
     left: 2%;
+
     //align-self: center;
   }
   .title-section {
@@ -27,21 +31,21 @@
     font-size: 84px;
     font-style: normal;
     font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-    font-stretch: semi-expanded;
-    color: rgb(59, 59, 59);
+    font-stretch: ultra-expanded;
+    color: #123651;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding-right: 10px;
-    //text-transform: uppercase;
+    text-transform: uppercase;
   }
   .subtitle-section {
     //align-self: center;
     font-size: 38px;
-    font-style: italic;
+    //font-style: italic;
     font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
     font-stretch: ultra-condensed;
-    color: rgb(59, 59, 59);
+    color: #123651;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -53,6 +57,7 @@
     -webkit-backdrop-filter: blur(2px);
     backdrop-filter: blur(2px);
 
+    //box-shadow: 0 2px 4px rgb(0 0 0 / 10%), 0 8px 16px rgb(0 0 0 / 10%);
     position: absolute;
     padding-left: 10px;
     top: 20%;
@@ -94,7 +99,7 @@
 
       > label {
         font-size: 12px;
-        color: #666;
+        color: #123651;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -253,7 +258,7 @@
     top: 2%;
     right: 5%;
     font-size: 12px;
-    color: rgb(0, 0, 0);
+    color: #123651;
     display: flex;
     justify-content: space-between;
     align-items: center;

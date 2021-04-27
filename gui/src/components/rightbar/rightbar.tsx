@@ -164,17 +164,22 @@ const RightBarComp = ({ context: { config } }: IProps) => {
           ? locale().session_expire_in + displayTime
           : displayTime}
       </h3>
+
+      <br />
+      <div className="logout-wrapper">
+        <Button outlined="outlined" color="red" onClick={() => logOut()}>
+          {locale().logout}
+        </Button>
+      </div>
+
+      <br />
       <hr />
+
       <h2>
         <LanguageSelector />
       </h2>
       <br />
       <hr />
-      <div className="logout-wrapper">
-        <Button color="red" onClick={() => logOut()}>
-          {locale().logout}
-        </Button>
-      </div>
     </div>
   );
 };
