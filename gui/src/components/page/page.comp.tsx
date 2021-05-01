@@ -1040,8 +1040,11 @@ const PageComp = ({ context, loadedFields }: IProps) => {
           </Button>
         )}
       </header>
-      <hr />
-      <main className="app-page-content">{renderPageContent()}</main>
+
+      <main className="app-page-content">
+        <hr />
+        {renderPageContent()}
+      </main>
       {openedPopup && (
         <FormPopup
           title={openedPopup.title}

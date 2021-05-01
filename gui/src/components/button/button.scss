@@ -33,15 +33,27 @@
 
       &:hover {
         border-color: #2dc450;
+        color: #2dc450;
+        background: #fff;
       }
     }
-
+    &.darkBlue {
+      border-color: #123651;
+      color: #123651;
+      &:hover {
+        border-color: #347dc2;
+        color: #347dc2;
+        background: #fff;
+      }
+    }
     &.blue {
       border-color: #251996;
       color: #251996;
 
       &:hover {
         border-color: #253ab3;
+        color: #253ab3;
+        background: #fff;
       }
     }
 
@@ -51,6 +63,8 @@
 
       &:hover {
         border-color: #d11827;
+        color: #d11827;
+        background: #fff;
       }
     }
   }
@@ -76,6 +90,13 @@
       }
     }
 
+    &.darkBlue {
+      background: #123651;
+      color: #fff;
+      &:hover {
+        background: #347dc2;
+      }
+    }
     &.blue {
       background: #251996;
       color: #fff;

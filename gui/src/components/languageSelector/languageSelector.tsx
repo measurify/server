@@ -15,6 +15,7 @@ export const LanguageSelector = () => {
       <div>
         <Button
           outlined="outlined"
+          color="darkBlue"
           title="It"
           onClick={() => setSessionLanguage("it")}
         >
@@ -22,6 +23,7 @@ export const LanguageSelector = () => {
         </Button>
         <Button
           outlined="outlined"
+          color="darkBlue"
           title="En"
           onClick={() => setSessionLanguage("en")}
         >

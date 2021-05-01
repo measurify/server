@@ -9,7 +9,7 @@ interface IProps {
   className?: string;
   onClick?: (e: any) => void;
   outlined?: "outlined" | "unlined";
-  color?: "gray" | "blue" | "green" | "red";
+  color?: "gray" | "darkBlue" | "blue" | "green" | "red";
   disabled?: boolean;
 }
 
