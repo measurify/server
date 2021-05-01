@@ -3,7 +3,7 @@ import { useParams, useHistory } from "react-router-dom";
 import * as QueryString from "query-string";
 import { toast, ToastContainer } from "react-toastify";
 import { orderBy } from "natural-orderby";
-import { find, remove } from "lodash";
+import { find, get, remove } from 'lodash';
 import { useLocation } from "react-router-dom";
 
 import { IAppContext } from "../app.context";
@@ -98,7 +98,7 @@ const buildInitQueryParamsAndPaginationState = (
         sortBy: paginationConfig.params?.sortBy?.value,
       };
 
-      if (!find(initQueryParams, { name: "page" })) {
+      if (!find(initQueryParams, { name: get(paginationConfig, 'params.page.name', 'page') })) {
         initQueryParams.push({
           name: paginationConfig?.params?.page?.name,
           label: paginationConfig?.params?.page?.label || "Page",
@@ -106,10 +106,7 @@ const buildInitQueryParamsAndPaginationState = (
         });
       }
 
-      if (
-        paginationConfig?.params?.limit &&
-        !find(initQueryParams, { name: "limit" })
-      ) {
+      if (paginationConfig?.params?.limit && !find(initQueryParams, { name: get(paginationConfig, 'params.limit.name', 'limit') })) {
         initQueryParams.push({
           name: paginationConfig.params.limit.name,
           label: paginationConfig.params.limit.label || "Limit",
@@ -117,10 +114,7 @@ const buildInitQueryParamsAndPaginationState = (
         });
       }
 
-      if (
-        paginationConfig?.params?.descending &&
-        !find(initQueryParams, { name: "descending" })
-      ) {
+      if (paginationConfig?.params?.descending && !find(initQueryParams, { name: get(paginationConfig, 'params.descending.name', 'descending') })) {
         initQueryParams.push({
           name: paginationConfig.params.descending.name,
           label: paginationConfig.params.descending.label || "Descending",
@@ -128,10 +122,7 @@ const buildInitQueryParamsAndPaginationState = (
         });
       }
 
-      if (
-        paginationConfig?.params?.sortBy &&
-        !find(initQueryParams, { name: "sortBy" })
-      ) {
+      if (paginationConfig?.params?.sortBy && !find(initQueryParams, { name: get(paginationConfig, 'params.sortBy.name', 'sortBy') })) {
         initQueryParams.push({
           name: paginationConfig.params.sortBy.name,
           label: "Sort by",
@@ -149,10 +140,7 @@ const buildInitQueryParamsAndPaginationState = (
         limit: parseInt(paginationConfig.params?.limit?.value || "10"),
       };
 
-      if (
-        paginationConfig?.params?.limit &&
-        !find(initQueryParams, { name: "limit" })
-      ) {
+       if (paginationConfig?.params?.limit && !find(initQueryParams, { name: get(paginationConfig, 'params.limit.name', 'limit') })) {
         initQueryParams.push({
           name: paginationConfig.params.limit.name,
           label: paginationConfig.params.limit.label || "Limit",
@@ -414,13 +402,17 @@ const PageComp = ({ context, loadedFields }: IProps) => {
         if (isQueryPaginationState(pagination)) {
           if (pagination?.page !== 1) {
             setLoading(false);
+          } else {
+            setLoading(true);
           }
         } else if (isBodyPaginationState(pagination)) {
           if (pagination.previous) {
             setLoading(false);
+          } else {
+            setLoading(true);
           }
         } else {
-          throw new Error("unrecognized pagination source");
+          throw new Error('unrecognized pagination source');
         }
       }
     } else {
