@@ -97,7 +97,7 @@ class HttpService {
   private buildRequest(params: IFetchParams): { url: string, params: any } {
     const reqUrl: string = this.urlIsAbsolute(params.origUrl) ? params.origUrl : this.baseUrl + params.origUrl;
     const finalUrl: string = this.buildUrl(reqUrl, params.queryParams,params.exactMatch, params.rawData);
-    const authorization = sessionStorage.getItem('diten-token') ? { Authorization: sessionStorage.getItem('diten-token'), } : {};
+    const authorization = localStorage.getItem('diten-token') ? { Authorization: localStorage.getItem('diten-token'), } : {};
     const requestParams = {
       method: params.method ? params.method.toUpperCase() : 'GET',
       headers: Object.assign(authorization, this.requestHeaders, params.headers || {}),
@@ -136,7 +136,7 @@ class HttpService {
     if (res.status === 401 && this.unauthorizedRedirectUrl) {
       //test
       
-      sessionStorage.clear();
+      localStorage.clear();
 
       const redirectUrl: string = this.unauthorizedRedirectUrl.replace(':returnUrl', encodeURIComponent(document.location.href));
       document.location.replace(redirectUrl);

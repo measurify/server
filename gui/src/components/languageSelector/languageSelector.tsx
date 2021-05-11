@@ -6,7 +6,7 @@ import "./languageSelector.scss";
 
 export const LanguageSelector = () => {
   function setSessionLanguage(language: string) {
-    sessionStorage.setItem("diten-language", language);
+    localStorage.setItem("diten-language", language);
     window.location.reload();
   }
   return (

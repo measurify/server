@@ -39,7 +39,7 @@ const RightBarComp = ({ context: { config } }: IProps) => {
   const [displayTime, setDisplayTime] = useState<string>("00:00");
 
   function logOut() {
-    sessionStorage.clear();
+    localStorage.clear();
     document.location.replace("/");
   }
 
@@ -74,7 +74,7 @@ const RightBarComp = ({ context: { config } }: IProps) => {
   function CalcEnding() {
     let t0;
     if (loginTime === undefined) {
-      const retryLoginTime = sessionStorage.getItem("diten-login-time");
+      const retryLoginTime = localStorage.getItem("diten-login-time");
       if (retryLoginTime !== null) {
         t0 = parseInt(retryLoginTime);
 
@@ -91,7 +91,7 @@ const RightBarComp = ({ context: { config } }: IProps) => {
     let remainingSec = (endTime - Date.now()) / 1000;
     //remainingSec = remainingSec > 0 ? remainingSec : 0;
     if (remainingSec <= 0) {
-      sessionStorage.clear();
+      localStorage.clear();
       setDisplayTime(locale().session_expired);
       return;
     }
@@ -104,7 +104,7 @@ const RightBarComp = ({ context: { config } }: IProps) => {
   function DurationToMilliSeconds() {
     let exp;
     if (tknExpTime === undefined) {
-      const retryTokenExpiration = sessionStorage.getItem(
+      const retryTokenExpiration = localStorage.getItem(
         "diten-token-expiration-time"
       );
       if (retryTokenExpiration !== null) {
@@ -130,13 +130,11 @@ const RightBarComp = ({ context: { config } }: IProps) => {
   }
 
   useEffect(() => {
-    const username = sessionStorage.getItem("diten-username");
-    const role = sessionStorage.getItem("diten-user-role");
-    const tenant = sessionStorage.getItem("diten-user-tenant");
-    const loginTime = sessionStorage.getItem("diten-login-time");
-    const tokenExpiration = sessionStorage.getItem(
-      "diten-token-expiration-time"
-    );
+    const username = localStorage.getItem("diten-username");
+    const role = localStorage.getItem("diten-user-role");
+    const tenant = localStorage.getItem("diten-user-tenant");
+    const loginTime = localStorage.getItem("diten-login-time");
+    const tokenExpiration = localStorage.getItem("diten-token-expiration-time");
     setUsername(username !== null ? username : "");
     setRole(role !== null ? role : "");
     setTenant(tenant !== null && tenant !== "" ? tenant : "-");

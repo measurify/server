@@ -39,7 +39,7 @@ const NavigationComp = ({ context: { config } }: IProps) => {
             }
             if (
               page.accessedBy.includes(
-                sessionStorage.getItem("diten-user-role") || ""
+                localStorage.getItem("diten-user-role") || ""
               )
             )
               return (

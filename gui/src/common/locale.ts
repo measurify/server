@@ -109,7 +109,7 @@ interface ILocalization {
 
 export default function locale(){
 
-    const tkn = sessionStorage.getItem("diten-language");
+    const tkn = localStorage.getItem("diten-language");
     let localization : ILocalization;
 
     //check token first

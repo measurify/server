@@ -166,7 +166,7 @@ function App() {
     }
   }, [config]);
 
-  const tkn = sessionStorage.getItem("diten-token");
+  const tkn = localStorage.getItem("diten-token");
 
   if (tkn === null)
     return (

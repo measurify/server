@@ -107,19 +107,16 @@ const AuthPageComp = ({ context }: IProps) => {
         throw new Error(locale().login_unauthorised_user);
       }
 */
-      sessionStorage.setItem("diten-token", result.token);
-      sessionStorage.setItem(
+      localStorage.setItem("diten-token", result.token);
+      localStorage.setItem(
         "diten-token-expiration-time",
         result.token_expiration_time
       );
-      sessionStorage.setItem("diten-username", result.user.username);
-      sessionStorage.setItem("diten-user-role", result.user.type);
-      sessionStorage.setItem("diten-user-tenant", tenant);
-      sessionStorage.setItem("diten-user-fieldmask", result.user.fieldmask);
-      sessionStorage.setItem(
-        "diten-login-time",
-        new Date().getTime().toString()
-      );
+      localStorage.setItem("diten-username", result.user.username);
+      localStorage.setItem("diten-user-role", result.user.type);
+      localStorage.setItem("diten-user-tenant", tenant);
+      localStorage.setItem("diten-user-fieldmask", result.user.fieldmask);
+      localStorage.setItem("diten-login-time", new Date().getTime().toString());
 
       /* const userData = await httpService.fetch({
         method: "get",
