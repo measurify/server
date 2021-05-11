@@ -1072,10 +1072,8 @@ export function configurator(locale){return  {
             },
             {
               name: "limit",
-              value: "",
-              type: "select",
-              options: ["5", "10", "50"],
-              label: locale().samples,
+              value: "100",
+              type: "hidden"
             },
             {
               name: "page",
@@ -1087,7 +1085,7 @@ export function configurator(locale){return  {
         },
 
         delete: {
-          url: "/features/:_id",
+          url: "/measurements/:_id",
         },
       },
 

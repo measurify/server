@@ -97,6 +97,12 @@ export const GraphPopup = withAppContext(
       }
     }
 
+    /*
+
+    This function will get the selected feature (graph building form) and fetch it from the features page
+
+
+    */
     async function fetchFeatureData(fetchFeatureData: boolean = false) {
       //get the data for the selected feature
       const resultsData = await httpService.fetch({
@@ -109,13 +115,14 @@ export const GraphPopup = withAppContext(
 
       let fF = fetchedFeature;
       if (fetchFeatureData === true) {
+        /*
         let queryFeature = "";
 
         //get the name of the selected feature
         formFields.map((f) =>
           f.name === "feature" ? (queryFeature = f.value) : {}
         );
-
+*/
         //fetch the feature
         const resultsFeature = await httpService.fetch({
           method: "get",
@@ -286,6 +293,9 @@ export const GraphPopup = withAppContext(
         totalDocs,
         limit,
       } = await fetchFeatureData(true);
+
+      console.log(fetchedData);
+      console.log(totalDocs);
 
       setFetchedData(fetchedData);
       setFetchedFeature(fetchedFeature);

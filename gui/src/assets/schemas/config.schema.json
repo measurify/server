@@ -399,6 +399,7 @@
         "disabled": {
           "type": "boolean"
         },
+        
         "label": {
           "type": "string",
           "description": "A label that describes the field. This will act as a label in RESTool's forms."
