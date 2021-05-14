@@ -8,7 +8,6 @@ const bcrypt = require('bcryptjs');
 exports.get = async (req, res) => { 
     const Fieldmask = mongoose.dbs[req.tenant.database].model('Fieldmask');
     const select = await checker.whatCanSee(req, res, Fieldmask)
-    const result = await checker.isAdminitrator(req, res); if (result != true) return result;
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Fieldmask); 
 };
 
@@ -22,7 +21,6 @@ exports.getone = async (req, res) => {
     const Fieldmask = mongoose.dbs[req.tenant.database].model('Fieldmask');
     const select = await checker.whatCanSee(req, res, Fieldmask)
     let result = await checker.isAvailable(req, res, Fieldmask); if (result != true) return result;
-    result = await checker.isAdminitrator(req, res); if (result != true) return result;
     return await controller.getResource(req, res, null, Fieldmask, select);
 };
 

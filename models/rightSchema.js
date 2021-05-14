@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
-const RightTypes  = require('../types/rightTypes.js');
+const RightTypes = require('../types/rightTypes.js');
+const ConstraintTypes = require('../types/constraintTypes.js');
 
 const rightSchema = new mongoose.Schema({ 
     _id: { type: String, required: "Please, supply an _id" },
-    type: { type: String, required: "Please, supply the resource type" },
+    type: { type: String, enum: RightTypes, required: "Please, supply the resource type" },
     resource: { type: String, required: "Please, supply a resource" },
     user: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: "Please, supply the user", autopopulate: true },
     owner: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true },

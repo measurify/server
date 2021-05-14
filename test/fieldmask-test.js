@@ -17,7 +17,7 @@ const before = require('./before-test.js');
 // Test the /GET route
 describe('/GET fieldmask', () => {
     it('it should GET all the fieldmasks as admin', async () => {      
-const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask1 = await factory.createFieldmask("fieldmaask-test-1", [], [], [], ['samples'], [], [], [], admin);
         const fieldmask2 = await factory.createFieldmask("fieldmaask-test-2", [], [], [], ['samples'], [], [], [], admin);
         const fieldmask3 = await factory.createFieldmask("fieldmaask-test-3", [], [], [], ['samples'], [], [], [], admin);
@@ -27,16 +27,16 @@ const admin = await factory.createUser("test-username-1", "test-password-1", Use
         res.body.docs.length.should.be.eql(3);
     });
 
-    it('it should not GET fieldmasks as non admin', async () => {      
-const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+    it('it should GET fieldmasks as non admin', async () => {      
+        const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const fieldmask1 = await factory.createFieldmask("fieldmaask-test-1", [], [], [], ['samples'], [], [], [], admin);
         const fieldmask2 = await factory.createFieldmask("fieldmaask-test-2", [], [], [], ['samples'], [], [], [], admin);
         const fieldmask3 = await factory.createFieldmask("fieldmaask-test-3", [], [], [], ['samples'], [], [], [], admin);
         const res = await chai.request(server).keepOpen().get('/v1/fieldmasks').set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.admin_restricted_access.status);
-        res.body.should.be.a('object');
-        res.body.message.should.contain(errors.admin_restricted_access.message);
+        res.should.have.status(200);
+        res.body.docs.should.be.a('array');
+        res.body.docs.length.should.be.eql(3);
     });
 
     it('it should GET a specific fieldmask as admin', async () => {      
@@ -48,14 +48,14 @@ const admin = await factory.createUser("test-username-1", "test-password-1", Use
         res.body._id.should.eql(fieldmask._id.toString());
     });
 
-    it('it should not GET a specific fieldmask as non admin', async () => {      
+    it('it should GET a specific fieldmask as non admin', async () => {      
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const fieldmask = await factory.createFieldmask("fieldmaask-test-1", [], [], [], ['samples'], [], [], [], admin);
         const res = await chai.request(server).keepOpen().get('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.admin_restricted_access.status);
+        res.should.have.status(200);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.admin_restricted_access.message);
+        res.body._id.should.eql(fieldmask._id.toString());
     });
 
     it('it should not GET a fake fieldmask', async () => {      

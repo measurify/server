@@ -125,7 +125,7 @@ describe('/POST constraint', () => {  it('it should not POST a constraint withou
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.post_request_error.message);
-        res.body.details.should.contain('Unrecognized resource type');
+        res.body.details.should.contain('is not a valid enum value');
     });
 
     it('it should not POST a constraint with a fake type2', async () => {      
@@ -138,7 +138,7 @@ describe('/POST constraint', () => {  it('it should not POST a constraint withou
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.post_request_error.message);
-        res.body.details.should.contain('Unrecognized resource type');
+        res.body.details.should.contain('is not a valid enum value');
     });
 
     it('it should not POST a constraint with a fake relatioship', async () => {      
