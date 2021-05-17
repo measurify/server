@@ -34,7 +34,7 @@ exports.post = async (req, res) => {
 
 exports.put = async (req, res) => { 
     const Constraint = mongoose.dbs[req.tenant.database].model('Constraint');
-    const fields = ['tags'];
+    const fields = ['visibility', 'relationship', 'tags'];
     let result = await checker.isAvailable(req, res, Constraint); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.canModify(req, res); if (result != true) return result;

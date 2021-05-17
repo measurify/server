@@ -3,11 +3,12 @@ const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
 const RelationshipTypes = require('../types/relationshipTypes.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
+const ConstraintTypes = require('../types/constraintTypes.js');
  
 const constraintSchema = new mongoose.Schema({ 
     owner: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true },
-    type1: { type: String, required: "Please, supply type1" },
-    type2: { type: String, required: "Please, supply type2"  },
+    type1: { type: String, enum: ConstraintTypes, required: "Please, supply type1" },
+    type2: { type: String, enum: ConstraintTypes, required: "Please, supply type2" },
     element1: { type: String, required: "Please, supply element1"  },
     element2: { type: String, required: "Please, supply element2"  },
     relationship: { type: String, required: "Please, supply a relationship"  },
