@@ -48,6 +48,8 @@ interface IHintData {
 
 interface IProps {
   dataMat: IGraphData[];
+  head: number;
+  tail: number;
   prev: boolean;
   prevCallback: () => void;
   next: boolean;
@@ -61,6 +63,8 @@ interface IProps {
 export const GraphHolder = withAppContext(
   ({
     dataMat,
+    head,
+    tail,
     prev,
     prevCallback,
     next,
@@ -71,7 +75,6 @@ export const GraphHolder = withAppContext(
     zoomOutCallback,
   }: IProps) => {
     useEffect(() => {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
       setHintData(Array(dataMat.length).fill({ date: "", y: "" }));
       setHoverData(Array(dataMat.length).fill(false));
     }, []);
@@ -93,15 +96,14 @@ export const GraphHolder = withAppContext(
     }
 
     function setHintDataWithIndex(index: number, value: IHintData) {
-      // 1. Make a shallow copy of the items
       let items = [...hintData];
-      // 2. Make a shallow copy of the item you want to mutate
+
       let item = items[index];
-      // 3. Replace the property you're intested in
+
       item = value;
-      // 4. Put it back into our array. N.B. we *are* mutating the array here, but that's why we made a copy first
+
       items[index] = item;
-      // 5. Set the state to our new copy
+
       setHintData(items);
     }
 
@@ -155,14 +157,13 @@ export const GraphHolder = withAppContext(
               <XYPlot
                 width={1600}
                 height={600}
-                xType="ordinal"
                 onMouseLeave={() => setHoverDataWithIndex(index, false)}
               >
                 <VerticalGridLines />
                 <HorizontalGridLines />
                 <XAxis
                   title="t"
-                  tickTotal={7}
+                  tickTotal={10}
                   //tickLabelAngle={-90}
                   tickFormat={function tickFormat(d) {
                     const date = new Date(+d);
@@ -171,7 +172,8 @@ export const GraphHolder = withAppContext(
                 />
                 <YAxis title={data.unitMeasure} />
                 <LineMarkSeries
-                  data={data.dataStruct}
+                  animation="stiff"
+                  data={[...data.dataStruct].slice(head, tail).reverse()}
                   onValueMouseOver={(d) => {
                     setHoverDataWithIndex(index, true);
                     setHintDataWithIndex(index, {
@@ -201,4 +203,3 @@ export const GraphHolder = withAppContext(
     );
   }
 );
-//style={{ fill: "none" }}

@@ -195,7 +195,7 @@ const PageComp = ({ context, loadedFields }: IProps) => {
   const getSingleConfig: IConfigGetSingleMethod | undefined =
     pageMethods?.getSingle;
   const postConfig: IConfigPostMethod | undefined = pageMethods?.post;
-  const graphConfig: IConfigGraphMethod | undefined = pageMethods?.graph;
+  const graphConfig: IConfigGraphMethod | undefined = pageMethods?.plot;
   const putConfig: IConfigPutMethod | undefined = pageMethods?.put;
   const deleteConfig: IConfigDeleteMethod | undefined = pageMethods?.delete;
   const customLabels: ICustomLabels | undefined = {
@@ -205,30 +205,26 @@ const PageComp = ({ context, loadedFields }: IProps) => {
   const addItemLabel =
     customLabels?.buttons?.addItem ||
     "+ " + locale().add + " " + activePage?.itemName;
-  const openGraphLabel = locale().graph + " " + activePage?.itemName;
+  const openGraphLabel = locale().plot + " " + activePage?.itemName;
   const addItemFormTitle =
     customLabels?.formTitles?.addItem ||
     locale().add + " " + activePage?.itemName;
   const editItemFormTitle =
     customLabels?.formTitles?.editItem ||
     locale().update + " " + activePage?.itemName;
-  const graphTitle = locale().graph + " " + activePage?.itemName;
-  const {
-    initQueryParams,
-    initialPagination,
-  } = buildInitQueryParamsAndPaginationState(
-    getAllConfig?.queryParams || [],
-    paginationConfig
-  );
+  const graphTitle = locale().plot + " " + activePage?.itemName;
+  const { initQueryParams, initialPagination } =
+    buildInitQueryParamsAndPaginationState(
+      getAllConfig?.queryParams || [],
+      paginationConfig
+    );
   const [loading, setLoading] = useState<boolean>(false);
   const [openedPopup, setOpenedPopup] = useState<null | IPopupProps>(null);
   const [openedGraph, setOpenedGraph] = useState<null | IGraphProps>(null);
-  const [queryParams, setQueryParams] = useState<IConfigInputField[]>(
-    initQueryParams
-  );
-  const [pagination, setPagination] = useState<IPaginationState | undefined>(
-    initialPagination
-  );
+  const [queryParams, setQueryParams] =
+    useState<IConfigInputField[]>(initQueryParams);
+  const [pagination, setPagination] =
+    useState<IPaginationState | undefined>(initialPagination);
   const [items, setItems] = useState<any[]>([]);
   const [filter, setFilter] = useState<string>("");
 
@@ -690,12 +686,10 @@ const PageComp = ({ context, loadedFields }: IProps) => {
             next: result[paginationConfig.params.nextPath || locale().next],
             previous:
               result[paginationConfig.params.prevPath || locale().previous],
-            hasNextPage: !!result[
-              paginationConfig.params.nextPath || locale().next
-            ],
-            hasPreviousPage: !!result[
-              paginationConfig.params.prevPath || locale().previous
-            ],
+            hasNextPage:
+              !!result[paginationConfig.params.nextPath || locale().next],
+            hasPreviousPage:
+              !!result[paginationConfig.params.prevPath || locale().previous],
             limit: parseInt(paginationConfig.params?.limit?.value || "10"),
             total: result[paginationConfig.params.countPath || "count"],
           };
@@ -704,12 +698,10 @@ const PageComp = ({ context, loadedFields }: IProps) => {
           result[paginationConfig.params.nextPath || locale().next];
         newState.previous =
           result[paginationConfig.params.prevPath || locale().previous];
-        newState.hasNextPage = !!result[
-          paginationConfig.params.nextPath || locale().next
-        ];
-        newState.hasPreviousPage = !!result[
-          paginationConfig.params.prevPath || locale().previous
-        ];
+        newState.hasNextPage =
+          !!result[paginationConfig.params.nextPath || locale().next];
+        newState.hasPreviousPage =
+          !!result[paginationConfig.params.prevPath || locale().previous];
         newState.total = result[paginationConfig.params.countPath || "count"];
       }
       newState.limit =
@@ -986,13 +978,11 @@ const PageComp = ({ context, loadedFields }: IProps) => {
       document.location.replace("#/unauthorized");
     }
 
-    const {
-      initQueryParams,
-      initialPagination,
-    } = buildInitQueryParamsAndPaginationState(
-      getAllConfig?.queryParams || [],
-      paginationConfig
-    );
+    const { initQueryParams, initialPagination } =
+      buildInitQueryParamsAndPaginationState(
+        getAllConfig?.queryParams || [],
+        paginationConfig
+      );
 
     setItems([]);
     setQueryParams(extractQueryParams(initQueryParams));

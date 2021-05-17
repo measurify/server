@@ -91,7 +91,7 @@ export interface IConfigMethods {
   post: IConfigPostMethod
   put: IConfigPutMethod
   delete: IConfigDeleteMethod
-  graph : IConfigGraphMethod
+  plot : IConfigGraphMethod
 }
 
 export type TConfigMethod = 'get' | 'post' | 'put' | 'delete' | 'patch';

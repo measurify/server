@@ -13,7 +13,7 @@ const localization_en = {
     session_expire_in: "Session will expire in ",
     
 
-    graph : "Plot",
+    plot : "Plot",
     samples: "Samples",
     zoomIn : "Zoom In",
     zoomOut : "Zoom Out",

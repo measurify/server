@@ -14,7 +14,7 @@ const localization_it = {
     
     
     
-    graph : "Grafico",
+    plot : "Grafico",
     samples: "Campioni",
     zoomIn : "Ingrandisci",
     zoomOut : "Riduci",

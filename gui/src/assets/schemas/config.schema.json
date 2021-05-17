@@ -181,7 +181,7 @@
         "post": {
           "$ref": "#/definitions/post"
         },
-        "graph": {
+        "plot": {
           "$ref": "#/definitions/post"
         },
         "put": {
@@ -310,7 +310,7 @@
       ],
       "description": "The post method will be used to create new items in your API resource."
     },
-    "graph": {
+    "plot": {
       "allOf": [
         {
           "$ref": "#/definitions/method"
@@ -333,7 +333,7 @@
           ]
         }
       ],
-      "description": "This method will be used to create graph with the resource within the page."
+      "description": "This method will be used to create plot with the resource within the page."
     },
     "put": {
       "allOf": [

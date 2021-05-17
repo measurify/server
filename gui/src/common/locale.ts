@@ -15,7 +15,7 @@ interface ILocalization {
     role : string;
     session_expire_in: string;
     
-    graph : string;
+    plot : string;
     samples: string;
     zoomIn : string;
     zoomOut : string;
