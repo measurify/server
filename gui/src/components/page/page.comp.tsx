@@ -3,7 +3,7 @@ import { useParams, useHistory } from "react-router-dom";
 import * as QueryString from "query-string";
 import { toast, ToastContainer } from "react-toastify";
 import { orderBy } from "natural-orderby";
-import { find, get, remove } from "lodash";
+import { find, get, indexOf, remove } from "lodash";
 import { useLocation } from "react-router-dom";
 
 import { IAppContext } from "../app.context";
@@ -584,9 +584,6 @@ const PageComp = ({ context, loadedFields }: IProps) => {
         queryParam.type === "select" &&
         queryParam.value === locale().select
       ) {
-        // default value means nothing was selected and thus we explicitly
-        // empty out the value in this case; otherwise the string '-- Select --'
-        // is used as the value for the given queryParams
         queryParam.value = "";
       }
     });
@@ -721,7 +718,33 @@ const PageComp = ({ context, loadedFields }: IProps) => {
       return <Loader />;
     }
 
-    const fields = getAllConfig?.fields || getAllConfig?.display?.fields || [];
+    let fields = getAllConfig?.fields || getAllConfig?.display?.fields || [];
+
+    const fieldmaskData = localStorage.getItem("diten-fieldmask-data");
+    const fieldmaskIdentifier = activePage?.fieldmaskIdentifier;
+
+    for (let i = 0; i < fields.length; i++) {
+      if (
+        fieldmaskIdentifier !== undefined &&
+        fieldmaskData !== "null" &&
+        fieldmaskData !== null
+      ) {
+        if (
+          JSON.parse(fieldmaskData)[fieldmaskIdentifier].length !== 0 &&
+          !(
+            JSON.parse(fieldmaskData)[fieldmaskIdentifier].includes(
+              fields[i].name
+            ) ||
+            JSON.parse(fieldmaskData)[fieldmaskIdentifier].includes(
+              fields[i].originalName
+            )
+          )
+        ) {
+          fields = fields.splice(i, 1);
+        }
+      }
+    }
+
     const fieldsToFilter = fields
       .filter((field) => field.filterable)
       .map((field) => field.name);
@@ -934,10 +957,38 @@ const PageComp = ({ context, loadedFields }: IProps) => {
   }
 
   function renderPageContent() {
-    const fields = getAllConfig?.fields || getAllConfig?.display?.fields || [];
+    let fields = getAllConfig?.fields || getAllConfig?.display?.fields || [];
+
+    const fieldmaskData = localStorage.getItem("diten-fieldmask-data");
+    const fieldmaskIdentifier = activePage?.fieldmaskIdentifier;
+
+    for (let i = 0; i < fields.length; i++) {
+      if (
+        fieldmaskIdentifier !== undefined &&
+        fieldmaskData !== "null" &&
+        fieldmaskData !== null
+      ) {
+        if (
+          JSON.parse(fieldmaskData)[fieldmaskIdentifier].length !== 0 &&
+          !(
+            JSON.parse(fieldmaskData)[fieldmaskIdentifier].includes(
+              fields[i].name
+            ) ||
+            JSON.parse(fieldmaskData)[fieldmaskIdentifier].includes(
+              fields[i].originalName
+            )
+          )
+        ) {
+          fields = fields.splice(i, 1);
+        }
+      }
+    }
+
     const fieldsToFilter = fields
       .filter((field) => field.filterable)
       .map((field) => field.name);
+
+    //
 
     return (
       <React.Fragment>

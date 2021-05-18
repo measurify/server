@@ -77,6 +77,7 @@ export interface IConfigPage {
   name: string
   id: string
   accessedBy: string[]
+  fieldmaskIdentifier?: string
   itemName : string
   description: string
   requestHeaders: any
@@ -141,6 +142,7 @@ export type TConfigDisplayField = 'text' | 'url' | 'image' | 'colorbox' | 'boole
 
 export interface IConfigDisplayField {
   name: string
+  originalName?: string
   type: TConfigDisplayField
   label: string
   dataPath: string

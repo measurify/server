@@ -45,9 +45,8 @@ const AuthPageComp = ({ context }: IProps) => {
   const [pwd, setPwd] = useState<string>("");
   const [tenant, setTenant] = useState<string>("");
   const { setError, httpService } = context;
-  const [openedAddTenant, setOpenedAddTenant] = useState<null | IPopupProps>(
-    null
-  );
+  const [openedAddTenant, setOpenedAddTenant] =
+    useState<null | IPopupProps>(null);
   const postConfig: IConfigPostMethod | undefined = {
     url: "/tenants/",
     actualMethod: "post",
@@ -115,15 +114,23 @@ const AuthPageComp = ({ context }: IProps) => {
       localStorage.setItem("diten-username", result.user.username);
       localStorage.setItem("diten-user-role", result.user.type);
       localStorage.setItem("diten-user-tenant", tenant);
-      localStorage.setItem("diten-user-fieldmask", result.user.fieldmask);
+      //localStorage.setItem("diten-user-fieldmask", result.user.fieldmask);
       localStorage.setItem("diten-login-time", new Date().getTime().toString());
 
-      /* const userData = await httpService.fetch({
-        method: "get",
-        origUrl: httpService.baseUrl + "/users/" + result.user._id,
-        headers: { "content-type": "application/json" },
-      });
-      */
+      if (result.user.fieldmask !== null) {
+        const fieldmaskData = await httpService.fetch({
+          method: "get",
+          origUrl: httpService.baseUrl + "/fieldmasks/" + result.user.fieldmask,
+          headers: { "content-type": "application/json" },
+        });
+        console.log(fieldmaskData);
+        localStorage.setItem(
+          "diten-fieldmask-data",
+          JSON.stringify(fieldmaskData)
+        );
+      } else {
+        localStorage.setItem("diten-fieldmask-data", "null");
+      }
 
       window.location.replace("/");
 
