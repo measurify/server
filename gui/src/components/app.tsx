@@ -107,7 +107,7 @@ function App() {
       headers: { "content-type": "application/json" },
     });
 
-    var tempLD = Array<ILoadedFields>(12).fill({
+    var tempLD = Array<ILoadedFields>(Object.keys(resultsData).length).fill({
       fieldName: "",
       values: [],
     });

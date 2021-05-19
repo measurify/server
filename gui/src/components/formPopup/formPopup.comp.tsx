@@ -242,6 +242,9 @@ export const FormPopup = withAppContext(
           }
         }
 
+        if (field.type === "select" && field.value === "") {
+          delete finalObject[field.name];
+        }
         if (field.disabled === true) {
           delete finalObject[field.name];
         }
@@ -261,7 +264,10 @@ export const FormPopup = withAppContext(
           rmVal = rmVal.filter((e) => e.value !== "");
 
           if (field.value.length !== 0) {
-            temp += ` "add": ["` + field.value.join('" , "') + `"]`;
+            temp +=
+              ` "add": ["` +
+              field.value.map((e: any) => e !== "").join('" , "') +
+              `"]`;
           }
           if (field.value.length !== 0 && rmVal.length !== 0) {
             temp += ",";
