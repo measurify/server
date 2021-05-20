@@ -20,6 +20,7 @@ import {
   ICustomLabels,
   IConfigPagination,
   IConfigGraphMethod,
+  IConfigDisplayField,
 } from "../../common/models/config.model";
 import {
   IPaginationState,
@@ -273,7 +274,7 @@ const PageComp = ({ context, loadedFields }: IProps) => {
   }
 
   async function openEditPopup(rawData: any) {
-    const params: IPopupProps = {
+    let params: IPopupProps = {
       rawData,
       type: "update",
       title: editItemFormTitle,
@@ -284,11 +285,13 @@ const PageComp = ({ context, loadedFields }: IProps) => {
       },
     };
 
+    params.config.fields = removeUselessFields([...params.config.fields]);
+
     setOpenedPopup(params);
   }
 
   function openCustomActionPopup(rawData: any, action: IConfigCustomAction) {
-    const params: IPopupProps = {
+    let params: IPopupProps = {
       rawData,
       type: "action",
       title: action.name || "Custom Action",
@@ -297,6 +300,9 @@ const PageComp = ({ context, loadedFields }: IProps) => {
         return await performAction(body, rawData, action, containFiles);
       },
     };
+
+    params.config.fields = removeUselessFields([...params.config.fields]);
+
     setOpenedPopup(params);
   }
 
@@ -357,7 +363,7 @@ const PageComp = ({ context, loadedFields }: IProps) => {
   }
 
   async function fetchPageData(params: {
-    actualMethod: "get" | "put" | "post" | "patch" | "delete";
+    actualMethod: "get" | "put" | "post" | "patch" | "delete" | "view";
     url: string;
     requestHeaders?: any;
     dataPath: string;
@@ -720,30 +726,7 @@ const PageComp = ({ context, loadedFields }: IProps) => {
 
     let fields = getAllConfig?.fields || getAllConfig?.display?.fields || [];
 
-    const fieldmaskData = localStorage.getItem("diten-fieldmask-data");
-    const fieldmaskIdentifier = activePage?.fieldmaskIdentifier;
-
-    for (let i = 0; i < fields.length; i++) {
-      if (
-        fieldmaskIdentifier !== undefined &&
-        fieldmaskData !== "null" &&
-        fieldmaskData !== null
-      ) {
-        if (
-          JSON.parse(fieldmaskData)[fieldmaskIdentifier].length !== 0 &&
-          !(
-            JSON.parse(fieldmaskData)[fieldmaskIdentifier].includes(
-              fields[i].name
-            ) ||
-            JSON.parse(fieldmaskData)[fieldmaskIdentifier].includes(
-              fields[i].originalName
-            )
-          )
-        ) {
-          fields = fields.splice(i, 1);
-        }
-      }
-    }
+    fields = removeUselessFields(fields);
 
     const fieldsToFilter = fields
       .filter((field) => field.filterable)
@@ -959,30 +942,7 @@ const PageComp = ({ context, loadedFields }: IProps) => {
   function renderPageContent() {
     let fields = getAllConfig?.fields || getAllConfig?.display?.fields || [];
 
-    const fieldmaskData = localStorage.getItem("diten-fieldmask-data");
-    const fieldmaskIdentifier = activePage?.fieldmaskIdentifier;
-
-    for (let i = 0; i < fields.length; i++) {
-      if (
-        fieldmaskIdentifier !== undefined &&
-        fieldmaskData !== "null" &&
-        fieldmaskData !== null
-      ) {
-        if (
-          JSON.parse(fieldmaskData)[fieldmaskIdentifier].length !== 0 &&
-          !(
-            JSON.parse(fieldmaskData)[fieldmaskIdentifier].includes(
-              fields[i].name
-            ) ||
-            JSON.parse(fieldmaskData)[fieldmaskIdentifier].includes(
-              fields[i].originalName
-            )
-          )
-        ) {
-          fields = fields.splice(i, 1);
-        }
-      }
-    }
+    fields = removeUselessFields(fields);
 
     const fieldsToFilter = fields
       .filter((field) => field.filterable)
@@ -1004,6 +964,36 @@ const PageComp = ({ context, loadedFields }: IProps) => {
     );
   }
 
+  function removeUselessFields(fields: any) {
+    let f = [...fields];
+    const len = f.length;
+    const fieldmaskData = localStorage.getItem("diten-fieldmask-data");
+    const fieldmaskIdentifier = activePage?.fieldmaskIdentifier;
+
+    for (let i = len - 1; i >= 0; i--) {
+      if (
+        fieldmaskIdentifier !== undefined &&
+        fieldmaskData !== "null" &&
+        fieldmaskData !== null
+      ) {
+        if (
+          JSON.parse(fieldmaskData)[fieldmaskIdentifier].length !== 0 &&
+          !(
+            JSON.parse(fieldmaskData)[fieldmaskIdentifier].includes(
+              f[i].name
+            ) ||
+            JSON.parse(fieldmaskData)[fieldmaskIdentifier].includes(
+              f[i].originalName
+            )
+          )
+        ) {
+          f.splice(i, 1);
+        }
+      }
+    }
+
+    return f;
+  }
   useEffect(() => {
     const nextActivePage: IConfigPage | null =
       context?.config?.pages?.filter(

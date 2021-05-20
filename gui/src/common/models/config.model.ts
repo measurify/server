@@ -95,7 +95,7 @@ export interface IConfigMethods {
   plot : IConfigGraphMethod
 }
 
-export type TConfigMethod = 'get' | 'post' | 'put' | 'delete' | 'patch';
+export type TConfigMethod = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'view';
 
 export interface IConfigMethod {
   url: string

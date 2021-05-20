@@ -1120,7 +1120,7 @@ export function configurator(locale) {
             name: locale().expand,
             url: "/measurements/:_id",
             dataPath: "items",
-            actualMethod: "put",
+            actualMethod: "view",
             icon: "search",
             fields: [
               {

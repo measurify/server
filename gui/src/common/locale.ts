@@ -94,6 +94,7 @@ interface ILocalization {
     add : string;
     update : string;
     submit:string;
+    close:string;
     search:string;
     login : string;
     logout : string;

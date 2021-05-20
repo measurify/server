@@ -213,7 +213,8 @@
             "put",
             "post",
             "delete",
-            "patch"
+            "patch",
+            "view"
           ]
         },
         "requestHeaders": {

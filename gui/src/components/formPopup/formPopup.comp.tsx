@@ -89,8 +89,9 @@ export const FormPopup = withAppContext(
             responseType,
             dataTransform,
           } = getSingleConfig;
+
           const result = await httpService.fetch({
-            method: actualMethod || "get",
+            method: actualMethod === "view" ? "get" : actualMethod || "get",
             origUrl: url,
             queryParams,
             headers: Object.assign({}, pageHeaders, requestHeaders || {}),
@@ -376,11 +377,19 @@ export const FormPopup = withAppContext(
                     </div>
                   );
                 })}
-                <div className="buttons-wrapper center">
-                  <Button type="submit" onClick={submitForm} color="green">
-                    {locale().submit}
-                  </Button>
-                </div>
+                {methodConfig.actualMethod === "view" ? (
+                  <div className="buttons-wrapper center">
+                    <Button onClick={closeCallback} color="green">
+                      {locale().close}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="buttons-wrapper center">
+                    <Button type="submit" onClick={submitForm} color="green">
+                      {locale().submit}
+                    </Button>
+                  </div>
+                )}
               </form>
             )}
           </section>
