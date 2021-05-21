@@ -50,6 +50,14 @@ exports.getResourceListSize = async function(req, res, model, restriction) {
     catch (err) { return errors.manage(res, errors.get_request_error, err); }
 }
 
+exports.streamResource = async function(req, data, model) {
+    try { 
+        if(req.user._id) data.owner = req.user._id;
+        return await persistence.post(data, model, req.tenant);
+    }
+    catch (err) { return err; }
+}
+
 exports.postResource = async function(req, res, model) {
     try { 
         if(req.user._id) req.body.owner = req.user._id;

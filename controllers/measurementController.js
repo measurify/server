@@ -81,6 +81,16 @@ exports.getstream = async (ws, req) => {
     filemanager.upload(ws, req.resource._id, 'webm');
 };
 
+exports.poststream = async (ws, req) => {
+    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
+    let result = await checker.canCreate(req, ws); if (result != true) return result;
+    result = await checker.hasRightsToCreate(req, ws, ['thing','device', 'feature', 'tags']); if (result != true) return result;
+    ws.on('message', async function incoming(data) { 
+        const res = await controller.streamResource(req, JSON.parse(data), Measurement);
+        ws.send(JSON.stringify(res)); 
+    });
+};
+
 exports.getfile = async (req, res) => {
     const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
     let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;

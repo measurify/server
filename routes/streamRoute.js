@@ -24,6 +24,6 @@ exports.init = function(server) {
         if(req.params.thing) { req.params.id = req.params.thing; await thingController.getstream(ws, req); }
         else if(req.params.device) { req.params.id = req.params.device; await deviceController.getstream(ws, req); }
         else if(req.params.measurement) { req.params.id = req.params.measurement; await measurementController.getstream(ws, req); }
-        else { close(ws, 'Websocket disconnected due to invalid entity'); }
+        else { await measurementController.poststream(ws, req);  }
     });
 }
