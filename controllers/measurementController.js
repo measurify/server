@@ -86,7 +86,7 @@ exports.poststream = async (ws, req) => {
     let result = await checker.canCreate(req, ws); if (result != true) return result;
     result = await checker.hasRightsToCreate(req, ws, ['thing','device', 'feature', 'tags']); if (result != true) return result;
     ws.on('message', async function incoming(data) { 
-        const res = await controller.streamResource(req, JSON.parse(data), Measurement);
+        const res = await controller.streamResource(req, data, Measurement);
         ws.send(JSON.stringify(res)); 
     });
 };

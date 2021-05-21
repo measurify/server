@@ -83,7 +83,6 @@ const postList = async function(body, model, tenant) {
 };
 
 exports.post = async function(body, model, tenant) {
-    console.log("2")
     if (body.constructor == Array) return await postList(body, model, tenant);
     return await postOne(body, model, tenant);
 }

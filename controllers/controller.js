@@ -52,6 +52,7 @@ exports.getResourceListSize = async function(req, res, model, restriction) {
 
 exports.streamResource = async function(req, data, model) {
     try { 
+        data = JSON.parse(data);
         if(req.user._id) data.owner = req.user._id;
         return await persistence.post(data, model, req.tenant);
     }
