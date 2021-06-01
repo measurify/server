@@ -23,7 +23,7 @@ exports.dropContents = async function(tenant){
         const Tenant = mongoose.dbs['catalog'].model('Tenant');  
         if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
         for (let collection in mongoose.dbs[tenant.database].collections) { await mongoose.dbs[tenant.database].collections[collection].deleteMany(); };  
-        tenancy.init(tenant);   
+        await tenancy.init(tenant);   
     }
     catch (error) { console.log('Error in dropping databae ' + tenant + '('+ error + ')')} 
 }

@@ -56,7 +56,8 @@ exports.post = async (req, res) => {
 
 exports.delete = async (req, res) => {
     if (!Authorization.isAdministrator(req.user)) return errors.manage(res, errors.admin_restricted_access); 
-    await factory.dropContents(req.tenan);
+    await factory.dropContents(req.tenant);
+    /*
     const User = mongoose.dbs[req.tenant.database].model('User');
     const Tag = mongoose.dbs[req.tenant.database].model('Tag');
     const Feature = mongoose.dbs[req.tenant.database].model('Feature');
@@ -76,4 +77,6 @@ exports.delete = async (req, res) => {
     const scripts = await Script.find({});
     const rights = await Right.find({});
     res.status(200).json({users: users, tags: tags, features:features, devices:devices, things:things, measurements:measurements, constraints:constraints, script:scripts, rights:rights });
+    */
+    res.status(200).json({ok: true});
 };
