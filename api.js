@@ -11,13 +11,16 @@ const run = async function() {
   // Import environmental variables
   require('dotenv').config({ path: './init/variables.env' });
 
-  
   // Init database
   const database = require('./database.js');
   await database.init('prod');
   
   // Authentication
   require('./security/authentication.js');
+
+  // Init cache
+  const cache = require('./commons/cache.js');
+  await cache.init();
 
   // Start the micro-service
   const server = require('./server.js');

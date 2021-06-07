@@ -690,6 +690,7 @@ describe('/POST measurement', () => {
         res.body.details.should.contain('Tag not existent');
     });
 
+    /*
     it('it should POST in a idempotent way', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-6", user);
@@ -725,7 +726,7 @@ describe('/POST measurement', () => {
         res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('The measurement already exists');
     });
-
+*/
     it('it should POST a list of measurements', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-7", user);
