@@ -7,6 +7,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const database = require('../database.js');
 const mongoose = require('mongoose');
 const factory = require('../commons/factory.js');
+const cache = require('../commons/cache.js');
 
 exports.Fieldmask = null;
 exports.User = null;
@@ -28,7 +29,11 @@ exports.Tenant = null;
 exports.tenant = null;
 
 before(async () => { 
+    // Init Database
     await database.init('test');
+  
+    // Init cache
+    await cache.init();
 
     this.Fieldmask = mongoose.dbs[process.env.DEFAULT_TENANT_DATABASE].model('Fieldmask');
     this.User = mongoose.dbs[process.env.DEFAULT_TENANT_DATABASE].model('User');
@@ -48,4 +53,7 @@ before(async () => {
     this.Tenant = mongoose.dbs['catalog'].model('Tenant');
 });
 
-beforeEach(async () => { await factory.dropContents(); });
+beforeEach(async () => { 
+    await cache.flush();
+    await factory.dropContents(); 
+});

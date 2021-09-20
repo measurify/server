@@ -4,6 +4,7 @@ const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
 const inspector = require('../commons/inspector.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
+const cache = require('../commons/cache.js');
 
 const sampleSchema = new mongoose.Schema({
     values: { type: [Object], default: [] },
@@ -35,12 +36,15 @@ measurementSchema.index({ feature: 1, timestamp: -1});
 measurementSchema.plugin(paginate);
 measurementSchema.plugin(require('mongoose-autopopulate'));
 
+/*
 // validate feature
 measurementSchema.path('feature').validate({
     validator: async function (value) {
+        if(cache.get(value)) return true;
         const Feature = this.constructor.model('Feature');
         const feature = await Feature.findById(value);
         if (!feature) throw new Error('Feature not existent (' + value + ')');
+        cache.set(value, feature);
         return true;
     }
 });
@@ -48,9 +52,11 @@ measurementSchema.path('feature').validate({
 // validate script
 measurementSchema.path('script').validate({
     validator: async function (value) {
+        if(cache.get(value)) return true;
         const Script = this.constructor.model('Script');
         const script = await Script.findById(value);
         if (!script) throw new Error('Script not existent (' + value + ')');
+        cache.set(value, script);
         return true;
     }
 });
@@ -58,9 +64,11 @@ measurementSchema.path('script').validate({
 // validate thing
 measurementSchema.path('thing').validate({
     validator: async function (value) {
+        if(cache.get(value)) return true;
         const Thing = this.constructor.model('Thing');
         const thing = await Thing.findById(value);
         if (!thing) throw new Error('Thing not existent (' + value + ')');
+        cache.set(value, thing);
         return true;
     }
 });
@@ -68,21 +76,25 @@ measurementSchema.path('thing').validate({
 // validate device
 measurementSchema.path('device').validate({
     validator: async function (value) {
-        const Feature = this.constructor.model('Feature');
+        if(cache.get(value)) return true;
         const Device = this.constructor.model('Device');
         const device = await Device.findById(value);
         if (!device) throw new Error('Device not existent (' + value + ')');
+        cache.set(value, device);
         return true;
     }
 });
 
 // validate tags
 measurementSchema.path('tags').validate({
-    validator: async function (values) { 
+    validator: async function (values) {
         const Tag = this.constructor.model('Tag');
         for (let value of values) {
-            const tag = await Tag.findById(value);
-            if (!tag) throw new Error('Tag not existent (' + value + ')');
+            if(!cache.get(value)){ 
+                const tag = await Tag.findById(value);
+                if (!tag) throw new Error('Tag not existent (' + value + ')');
+                cache.set(value, tag);
+            }
         };
         return true;
     }
@@ -91,13 +103,15 @@ measurementSchema.path('tags').validate({
 // validate owner
 measurementSchema.path('owner').validate({
     validator: async function (value) {
+        if(cache.get(value.toString())) return true;        
         const User = this.constructor.model('User');
         let user = await User.findById(value);
         if (!user) throw new Error('User not existent (' + value + ')');
+        cache.set(value.toString(), user);
         return true;
     }
 });
- 
+
 // check samples
 measurementSchema.pre('save', async function () {
     if(!inspector.hasSamples(this)) throw new Error('No samples specified for this measurement');
@@ -109,23 +123,34 @@ measurementSchema.pre('save', async function () {
 
 // check consistency between samples and feature
 measurementSchema.pre('save', async function () {
-    const Feature = this.constructor.model('Feature');
-    const feature = (await Feature.findById(this.feature));
+    let feature = cache.get(this.feature);
+    if(!feature) {
+        const Feature = this.constructor.model('Feature');
+        feature = (await Feature.findById(this.feature));
+        cache.set(this.feature, feature);
+    }
     let result = inspector.areCoherent(this, feature);
     if(result != true) throw new Error(result);
 });
 
 // check consistency between device and feature
 measurementSchema.pre('save', async function () {
-    const Feature = this.constructor.model('Feature');
-    const Device = this.constructor.model('Device');
-    const feature = await Feature.findById(this.feature);
-    const device = await Device.findById(this.device);
+    let feature = cache.get(this.feature);
+    if(!feature) {
+        const Feature = this.constructor.model('Feature');
+        feature = await Feature.findById(this.feature);
+    }
+    let device = cache.get(this.device);
+    if(!device) {
+        const Device = this.constructor.model('Device');
+        device = await Device.findById(this.device);
+    }
     if(!device.features.includes(feature._id)) throw new Error("No match between device features and measurement feature (" + feature._id + ")");
 });
 
 // check if already have a similar measurement (idempotent)
 // same start/end date, thing, device and feature
+
 measurementSchema.pre('save', async function() {
     const res = await this.constructor.findOne( { feature: this.feature,
                                                   startDate: this.startDate,
@@ -135,6 +160,7 @@ measurementSchema.pre('save', async function() {
                                                   device: this.device });
     if(res) throw new Error('The measurement already exists');                       
 });
+*/
 
 measurementSchema.methods.toCSV = function toCSV() {
     if(!process.env.CSV_DELIMITER ) process.env.CSV_DELIMITER = ','; 

@@ -690,6 +690,7 @@ describe('/POST measurement', () => {
         res.body.details.should.contain('Tag not existent');
     });
 
+    /*
     it('it should POST in a idempotent way', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-6", user);
@@ -725,7 +726,7 @@ describe('/POST measurement', () => {
         res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('The measurement already exists');
     });
-
+*/
     it('it should POST a list of measurements', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-7", user);
@@ -892,3 +893,60 @@ describe('/DELETE measurement', () => {
         measurements_after.length.should.be.eql(1);
     });
 });
+
+/*
+// Test the stream route
+describe('/STREAM measurement', () => {
+    it('it should stream a list of measurements', async () => {
+        const WebSocket = require('ws');
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature-7", user);
+        const device = await factory.createDevice("test-device-7", user, [feature]);
+        const thing = await factory.createThing("test-thing-7", user);
+        const measurements = [
+            {
+                startDate: new Date().toISOString,
+                endDate: new Date().toISOString,
+                position: {
+                    type: "Point",
+                    coordinates: [12.123456, 13.1345678]
+                },
+                thing: thing._id,
+                device: device._id,
+                feature: feature._id,
+                samples: [
+                    { values: [10.4], delta: 200 },
+                    { values: [10.5], delta: 220 }
+                ]
+            },
+            {
+                startDate: new Date().toISOString,
+                endDate: new Date().toISOString,
+                position: {
+                    type: "Point",
+                    coordinates: [12.123456, 13.1345678]
+                },
+                thing: thing._id,
+                device: device._id,
+                feature: feature._id,
+                samples: [
+                    { values: [10.4], delta: 200 },
+                    { values: [10.5], delta: 220 }
+                ]
+            }
+        ];
+        const token = await factory.getUserToken(user);
+        const url = "wss://localhost:443/v1/streams?&token=" + token;
+        const client = await new WebSocket(url);
+        client.on('message', function (message) {
+            message.should.be.a('object');
+            message.measurements[0].thing.should.be.eql("test-thing-7");
+            message.measurements[1].thing.should.be.eql("test-thing-7");
+            client.close();
+        });
+        client.on('error', function error(message) { assert.fail(message) });
+        client.on('open',  function open() { client.send("ciao"); });
+        await new Promise(done => { client.on('close', done) });
+    }); 
+});
+*/

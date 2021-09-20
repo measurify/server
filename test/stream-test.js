@@ -152,28 +152,6 @@ describe('Thing stream', () => {
         client.on('error', function (message) { assert.fail(message) });
         client.on('open', async function (message) { await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
         await new Promise(done => { client.on('close', done) });
-    });
-
-    it('it should not GET measurements of a fake entity', async () => {
-        const WebSocket = require('ws');
-        const provider = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const analyst = await factory.createUser("test-username-2", "test-password-2", UserRoles.analyst);
-        const feature = await factory.createFeature("test-feature", provider);
-        const device = await factory.createDevice("test-device-1", provider, [feature]);
-        const thing = await factory.createThing("test-thing-1", provider);
-        const measurement_request = { owner: provider, feature: feature._id, device: device._id, thing: thing._id, samples: factory.createSamples(1) };
-        const provider_token = await factory.getUserToken(provider);
-        const analyst_token = await factory.getUserToken(analyst);
-        const url = "wss://localhost:443/v1/streams?fake=" + thing._id + "&token=" + analyst_token;
-        const client = await new WebSocket(url);
-        client.on('message', function (message) {
-            message.should.be.a('string');
-            message.should.contains('Websocket disconnected due to invalid entity');
-            client.close();
-        });
-        client.on('error', function (message) { assert.fail(message) });
-        client.on('open', async function (message) { await chai.request(server).keepOpen().post('/v1/measurements').set("Authorization", provider_token).send(measurement_request); });
-        await new Promise(done => { client.on('close', done) });
     }); 
 
     it('it should not GET measurements of a thing wothout rights', async () => {
