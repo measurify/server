@@ -32,6 +32,7 @@ import {
   faSearchPlus,
   faSearchMinus,
 } from "@fortawesome/fontawesome-free-solid";
+import { reduce } from "lodash";
 
 fontawesome.library.add(faBackward, faForward, faSearchPlus, faSearchMinus);
 
@@ -183,12 +184,26 @@ export const GraphHolder = withAppContext(
                   }} //
                 />
                 {hoverData[index] && (
-                  <Hint value={hintData[index]}>
-                    <div style={{ background: "grey" }}>
-                      {"Start time: " + new Date(+hintData[index].x).toString()}
-                      <br />
-                      {locale().value + ": " + hintData[index].y}
-                    </div>
+                  <Hint
+                    value={hintData[index]}
+                    style={{
+                      fontSize: 18,
+                      background: "#0B132B",
+                      border: 10,
+                      borderColor: "red",
+                      /*text: {
+                        display: "none",
+                      },
+                      value: {
+                        color: "red",
+                      },*/
+                    }}
+                  >
+                    {"Start time: " + new Date(+hintData[index].x).toString()}
+                    <br />
+                    {locale().value +
+                      ": " +
+                      parseFloat(hintData[index].y).toFixed(2)}
                   </Hint>
                 )}
               </XYPlot>
