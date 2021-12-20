@@ -16,6 +16,49 @@ exports.get = async function(id, field, model, select) {
     catch(err) { return null; }
 };
 
+exports.getDataset = async function(filter,  sort, select, page, limit, model) {
+    if (!page) page = '1';
+    if (!limit) limit = '10';
+    if (!filter) filter = '{}';
+    if (!sort) sort = '{ "timestamp": "desc" }';
+    if (!select) select = {};
+    //filter = prepareFilterDataset(id,filter); moved to controller.js
+    
+    console.error("filter è: ");
+    console.error(filter);
+    const list = await model.aggregate(
+        [
+            {$match:filter},
+            {$skip:(parseInt(page)-1)*parseInt(limit)},
+            {$limit:parseInt(limit)},
+            {$unwind:"$samples"},
+            {$group:{_id:"$feature","visibility":{$push:"$visibility"},"tags":{$push:"$tags"},"id":{$push:"$_id"},"startDate":{$push:"$startDate"},
+            "endDate":{$push:"$endDate"},"thing":{$push:"$thing"},"device":{$push:"$device"},"samples":{$push:"$samples.values"}}}            
+        ]
+    ) 
+    //list.push({"page":page,"limit":limit}); //per la pagination
+    console.error("list è: ");
+    console.error(list);
+    
+    //const list2 = await res.paginate(filter, options);
+    //console.error("list modificato è: ");
+    //console.error(list2);
+    return list;
+    
+    
+    
+    //try {
+    //    let item = null;
+    //    if (!select) select = {};
+    //    if(field) item = await model.findOne({ [field]: id }).select(select);
+    //    if(!item) item = await model.findById(id).select(select);
+    //    if(!item) return null;
+    //    return item;
+    //}
+    //catch(err) { return null; }
+}
+
+
 exports.getPipe = function(req, res, filter, sort, select, restriction, model) {
     if (!filter) filter = '{}';
     if (!sort) sort = '{ "timestamp": "desc" }';

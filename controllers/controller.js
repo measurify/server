@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 const persistence = require('../commons/persistence.js');
 const errors = require('../commons/errors.js');
+const { isArray, forEach, isObject } = require('underscore');
 
 exports.getResource = async function(req, res, field, model, select) {
     try {
@@ -14,6 +15,69 @@ exports.getResource = async function(req, res, field, model, select) {
         else return errors.manage(res, errors.get_request_error, err); 
     }
 };
+
+exports.getResourceDataset = async function(req, res, sort, select, model) {
+    try {
+        const query = req.query;
+        if (!query.sort) query.sort = sort;
+        if (!query.filter) query.filter = '{}';//Create here filter + id
+        filterDataset = prepareFilterDataset(req.params.id,query.filter);
+        if(req.headers.accept == 'text/csv') {
+            restriction={};//da aggiornare
+            filterDataset=JSON.stringify(filterDataset);//need to be a string not an object
+            let list = await persistence.getList(filterDataset, query.sort, select, query.page, query.limit, restriction, model);
+        
+            res.header('Content-Type', 'text/csv');
+            let csvresultlibrary = '';
+
+            //list.docs.forEach((doc) => result += doc.toCSV());
+            //return res.status(200).json(result); 
+            csvresultlibrary=jsonToCSV(list);            
+            console.error("csvresultlibrary vale: ");
+            console.error(csvresultlibrary);
+
+            //tocsvresult=arrayToCSV(list);
+            
+            return res.status(200).json(csvresultlibrary);           
+        }
+        else if(req.headers.accept == 'text/csv+'){
+            restriction={};//da aggiornare            
+            filterDataset=JSON.stringify(filterDataset);//need to be a string not an object
+            const Feature = mongoose.dbs[req.tenant.database].model('Feature');
+            const item = await persistence.get(req.params.id, null, Feature, select);
+            //console.error("item vale: ");
+            //console.error(item);
+            let columnsName=[];
+            item.items.forEach(elem=>columnsName.push(elem.name));
+            //console.error("columnsname vale: ");
+            //console.error(columnsName);
+
+            let list = await persistence.getList(filterDataset, query.sort, select, query.page, query.limit, restriction, model);
+        
+            res.header('Content-Type', 'text/csv');
+            let tocsvresult = '';
+
+            //list.docs.forEach((doc) => result += doc.toCSV());
+            //return res.status(200).json(result); 
+            //csvresultlibrary=jsonToCSV(list);            
+            
+
+            tocsvresult=jsonToCSVPlus(list,columnsName);
+            console.error("tocsvresult vale: ");
+            console.error(tocsvresult);
+            
+            return res.status(200).json(tocsvresult);           
+        }//else no accept headers parameters or else
+        let list = await persistence.getDataset(filterDataset, query.sort, select, query.page, query.limit, model);
+        //if(!item) return errors.manage(res, errors.resource_not_found, req.params.id)
+        return res.status(200).json(list);
+    } 
+    catch (err) { 
+        if(err.name == 'CastError') return errors.manage(res, errors.resource_not_found);
+        else return errors.manage(res, errors.get_request_error, err); 
+    }
+};
+
 
 exports.getResourcePipe = function(req, res, sort, select, model, restriction) {
     try {
@@ -29,16 +93,93 @@ exports.getResourceList = async function(req, res, sort, select, model, restrict
         const query = req.query;
         if (!query.sort) query.sort = sort;
         let list = await persistence.getList(query.filter, query.sort, select, query.page, query.limit, restriction, model);
+        console.error(list);
         if(req.headers.accept == 'text/csv') {
             res.header('Content-Type', 'text/csv');
-            let result = '';
+            //let result = '';
 
-            list.docs.forEach((doc) => result += doc.toCSV());
-            return res.status(200).json(result);
+            //list.docs.forEach((doc) => result += doc.toCSV());
+            //return res.status(200).json(result); 
+            csvresultlibrary=jsonToCSV(list);            
+            console.error("csvresultlibrary vale: ");
+            console.error(csvresultlibrary);
+
+            //tocsvresult=arrayToCSV(list);
+            
+            return res.status(200).json(csvresultlibrary);           
         }
         else return res.status(200).json(list);
     }
     catch (err) { return errors.manage(res, errors.get_request_error, err); }
+}
+
+const jsonToCSVPlus=function(jsonData,columnsname) {
+    jsonData=JSON.stringify(jsonData);
+    const json =
+      typeof jsonData !== "object" ? JSON.parse(jsonData) : jsonData;
+      columnsname=columnsname.map(x=>`"${x}"`).join(",");
+      //console.error(columnsname);
+    //console.error("array.docs è: ");
+    //console.error(json.docs);
+    //console.error("keys ");
+    //console.error(Object.keys(json.docs[0]));
+    //console.error("value è: ");
+    let str =
+      `${Object.keys(json.docs[0])
+        .map((value) => {
+            if(value=="samples"){
+                return columnsname;
+
+            }
+            else return`"${value}"`})
+        .join(",")}` + "\r\n";
+        json.docs.forEach(doc=>
+    str +=
+        `${Object.values(doc)
+          .map((value) => {
+                if(isArray(value) )
+                {
+                    //console.error("cicciotag");
+                    //console.error(value);
+                    if(value.length==0){
+                        return `"[]"`;
+                    }
+                    return value.map((x)=>
+                        {   //console.error("cicciotag");
+                            //console.error(x);
+                            if (isObject(x)){
+                                //console.error("ciccio");
+                                //console.error(x.values);
+                                return x.values.map(x=>`"${x}"`).join(",");
+                            }
+                            else return x;
+                        }
+                    )
+
+                } 
+                else return `"${value}"`}).join(",")}` + "\r\n");
+    //console.error("str è: ");
+    //console.error(str);
+    return str;   
+}
+
+const jsonToCSV=function(jsonData) {
+    jsonData=JSON.stringify(jsonData);
+    const json =
+        typeof jsonData !== "object" ? JSON.parse(jsonData) : jsonData;
+    //console.error("json.docs è: ");
+    //console.error(json.docs);
+    const { Parser, transforms: { unwind,flatten } } = require('json2csv');
+
+    const fields = ["visibility","tags","_id","startDate","endDate","thing","feature","device",'samples.values'];
+    //const transforms = [unwind({ paths: ['samples','samples.values'] }),flatten({ objects: true, arrays:true })];//questo nel caso avessimo piu seamples lo apre  paths: ['samples','samples.values'] per separare ogni riga ma non va bene
+    //const transforms = [unwind({ paths: ['samples'] }),flatten({objects:false,arrays:false,separator:"_"})];
+    const transforms = [unwind({ paths: ['samples'] })];
+
+    const json2csvParser = new Parser({fields, transforms});
+    const csv = json2csvParser.parse(json.docs);
+    return csv;
+      
 }
 
 exports.getResourceListSize = async function(req, res, model, restriction) {
@@ -109,3 +250,17 @@ exports.updateResource = async function(req, res, fields, model) {
     }
     catch (err) { return errors.manage(res, errors.put_request_error, err); }
 };
+
+const prepareFilterDataset = function(id, filter) {
+    if(filter.charAt( 0 ) == '[') filter = '{ "$or":' + filter + '}'; //serve per casi particolari. non nel mio per ora
+    let object = JSON.parse(filter);
+    if(object.hasOwnProperty('feature')){
+        object['feature']=id;//si potrebbe anche mandare bad request
+    }
+    else { //not found feature inside filter
+        if(object.$and) object.$and.push({"feature":id});
+       else object = { $and: [ object,{ "feature":id}] };
+    }
+    return object;
+}
+
