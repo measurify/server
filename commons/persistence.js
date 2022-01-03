@@ -21,11 +21,7 @@ exports.getDataset = async function(filter,  sort, select, page, limit, model) {
     if (!limit) limit = '10';
     if (!filter) filter = '{}';
     if (!sort) sort = '{ "timestamp": "desc" }';
-    if (!select) select = {};
-    //filter = prepareFilterDataset(id,filter); moved to controller.js
-    
-    console.error("filter è: ");
-    console.error(filter);
+    if (!select) select = {};       
     const list = await model.aggregate(
         [
             {$match:filter},
@@ -36,36 +32,24 @@ exports.getDataset = async function(filter,  sort, select, page, limit, model) {
             "endDate":{$push:"$endDate"},"thing":{$push:"$thing"},"device":{$push:"$device"},"samples":{$push:"$samples.values"}}}            
         ]
     ) 
-    //list.push({"page":page,"limit":limit}); //per la pagination
+    //list.push({"page":page,"limit":limit}); //for the pagination
     console.error("list è: ");
     console.error(list);
-    
-    //const list2 = await res.paginate(filter, options);
-    //console.error("list modificato è: ");
-    //console.error(list2);
     return list;
-    
-    
-    
-    //try {
-    //    let item = null;
-    //    if (!select) select = {};
-    //    if(field) item = await model.findOne({ [field]: id }).select(select);
-    //    if(!item) item = await model.findById(id).select(select);
-    //    if(!item) return null;
-    //    return item;
-    //}
-    //catch(err) { return null; }
 }
-
 
 exports.getPipe = function(req, res, filter, sort, select, restriction, model) {
     if (!filter) filter = '{}';
     if (!sort) sort = '{ "timestamp": "desc" }';
     if (!select) select = {};
     filter = prepareFilter(filter, restriction);
-    if(req.headers.accept == 'text/csv') model.find(filter).cursor({ transform: doc => doc.toCSV() }).pipe(res.type('text/csv'));
+    if(req.headers.accept == 'text/csv') {
+        //const agg =model.find(filter).cursor({ transform: doc => doc.toCSV() });
+        const agg= model.aggregate([{ $match:{ thing: "shop" }}]).cursor();
+        agg.pipe(res.type('text/csv'));
+    }
     else model.find(filter).cursor({transform: JSON.stringify}).pipe(res.type('json'));
+    //model.aggregate().match({filter}).pipe();    
 }
 
 exports.getSize = async function(filter, restriction, model) {

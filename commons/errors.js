@@ -31,6 +31,7 @@ exports.missing_password                     = { status: 401, value: 28, message
 exports.reset_invalid                        = { status: 403, value: 29, message: 'The reset password request is not valid' };
 exports.unknown_value                        = { status: 404, value: 30, message: 'Status value' };
 exports.incorrect_info                       = { status: 401, value: 31, message: 'Please, the body information is missing valid fields'}; 
+exports.different_feature                    = { status: 400, value: 32, message: 'Different features in request and filter, please choose only one feature'}; 
 
 exports.manage = function(res, error, more) {
     if( typeof more === 'object' && more !== null) more = more.toString();

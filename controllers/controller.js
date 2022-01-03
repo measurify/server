@@ -22,46 +22,33 @@ exports.getResourceDataset = async function(req, res, sort, select, model) {
         if (!query.sort) query.sort = sort;
         if (!query.filter) query.filter = '{}';//Create here filter + id
         filterDataset = prepareFilterDataset(req.params.id,query.filter);
+        if(!filterDataset)return errors.manage(res, errors.different_feature);
         if(req.headers.accept == 'text/csv') {
-            restriction={};//da aggiornare
+            restriction={};
             filterDataset=JSON.stringify(filterDataset);//need to be a string not an object
             let list = await persistence.getList(filterDataset, query.sort, select, query.page, query.limit, restriction, model);
         
             res.header('Content-Type', 'text/csv');
             let csvresultlibrary = '';
-
-            //list.docs.forEach((doc) => result += doc.toCSV());
-            //return res.status(200).json(result); 
+            
             csvresultlibrary=jsonToCSV(list);            
             console.error("csvresultlibrary vale: ");
             console.error(csvresultlibrary);
-
-            //tocsvresult=arrayToCSV(list);
-            
+                        
             return res.status(200).json(csvresultlibrary);           
         }
         else if(req.headers.accept == 'text/csv+'){
-            restriction={};//da aggiornare            
+            restriction={};            
             filterDataset=JSON.stringify(filterDataset);//need to be a string not an object
             const Feature = mongoose.dbs[req.tenant.database].model('Feature');
-            const item = await persistence.get(req.params.id, null, Feature, select);
-            //console.error("item vale: ");
-            //console.error(item);
-            let columnsName=[];
-            item.items.forEach(elem=>columnsName.push(elem.name));
-            //console.error("columnsname vale: ");
-            //console.error(columnsName);
-
+            const item = await persistence.get(req.params.id, null, Feature, select);            
             let list = await persistence.getList(filterDataset, query.sort, select, query.page, query.limit, restriction, model);
         
             res.header('Content-Type', 'text/csv');
+                       
+            let columnsName=[];
+            item.items.forEach(elem=>columnsName.push(elem.name));
             let tocsvresult = '';
-
-            //list.docs.forEach((doc) => result += doc.toCSV());
-            //return res.status(200).json(result); 
-            //csvresultlibrary=jsonToCSV(list);            
-            
-
             tocsvresult=jsonToCSVPlus(list,columnsName);
             console.error("tocsvresult vale: ");
             console.error(tocsvresult);
@@ -69,7 +56,6 @@ exports.getResourceDataset = async function(req, res, sort, select, model) {
             return res.status(200).json(tocsvresult);           
         }//else no accept headers parameters or else
         let list = await persistence.getDataset(filterDataset, query.sort, select, query.page, query.limit, model);
-        //if(!item) return errors.manage(res, errors.resource_not_found, req.params.id)
         return res.status(200).json(list);
     } 
     catch (err) { 
@@ -96,15 +82,9 @@ exports.getResourceList = async function(req, res, sort, select, model, restrict
         console.error(list);
         if(req.headers.accept == 'text/csv') {
             res.header('Content-Type', 'text/csv');
-            //let result = '';
-
-            //list.docs.forEach((doc) => result += doc.toCSV());
-            //return res.status(200).json(result); 
             csvresultlibrary=jsonToCSV(list);            
             console.error("csvresultlibrary vale: ");
             console.error(csvresultlibrary);
-
-            //tocsvresult=arrayToCSV(list);
             
             return res.status(200).json(csvresultlibrary);           
         }
@@ -115,51 +95,46 @@ exports.getResourceList = async function(req, res, sort, select, model, restrict
 
 const jsonToCSVPlus=function(jsonData,columnsname) {
     jsonData=JSON.stringify(jsonData);
+    //console.log(jsonData);
     const json =
       typeof jsonData !== "object" ? JSON.parse(jsonData) : jsonData;
       columnsname=columnsname.map(x=>`"${x}"`).join(",");
-      //console.error(columnsname);
-    //console.error("array.docs è: ");
-    //console.error(json.docs);
-    //console.error("keys ");
-    //console.error(Object.keys(json.docs[0]));
-    //console.error("value è: ");
+    
     let str =
-      `${Object.keys(json.docs[0])
+      `${Object.keys(json.docs[0])//parte per mettere l'intestazione del csv con i nomi delle colonne
         .map((value) => {
             if(value=="samples"){
                 return columnsname;
-
             }
             else return`"${value}"`})
-        .join(",")}` + "\r\n";
-        json.docs.forEach(doc=>
-    str +=
-        `${Object.values(doc)
+        .join(",")}` + ",\"deltatime\""+"\r\n";
+    currentRow="\r\n";//stringa virtuale usata per i samples con piu value.
+        json.docs.forEach(doc=>{//compilazione campi riga per riga
+    str +=//entriamo per un doc ossia un singolo samples del json
+        `${Object.values(doc)//questo divide ogni singolo campo del samples, cicla per visility,tags ecc
           .map((value) => {
-                if(isArray(value) )
-                {
-                    //console.error("cicciotag");
-                    //console.error(value);
-                    if(value.length==0){
+                if(isArray(value) )//nel caso in cui sia tags o samples entra qui
+                {                   
+                    if(value.length==0){//se il tags o samples non contiene valori metto un array vuoto
+                        currentRow+=`"[]"`+",";
                         return `"[]"`;
                     }
-                    return value.map((x)=>
-                        {   //console.error("cicciotag");
-                            //console.error(x);
-                            if (isObject(x)){
-                                //console.error("ciccio");
-                                //console.error(x.values);
-                                return x.values.map(x=>`"${x}"`).join(",");
+                    if(isObject(value[0])){                        
+                        return value.map((x)=>
+                            {    
+                                delta=0;//inizializzazione e nel caso nullo
+                                if(x.delta!=null)delta=x.delta;  //lo aggiungo come colonna                            
+                                // se nei samples è un insieme di oggetti contenenti values entra qui dentro
+                                return x.values.map(x=>`"${x}"`).join(",")+",\""+delta+"\"";//mappa i valori di values separandoli con una virgola. 
                             }
-                            else return x;
-                        }
-                    )
-
+                        ).join(currentRow);}
+                    else{ 
+                        currentRow+="["+value+"]"+",";
+                        return "["+value+"]";}//se è il tags ritorna il valore e basta
                 } 
-                else return `"${value}"`}).join(",")}` + "\r\n");
-    //console.error("str è: ");
-    //console.error(str);
+                else {currentRow+=`"${value}"`+",";
+                    return `"${value}"`}}).join(",")}` + "\r\n";
+                    currentRow="\r\n";});//se non è un array aggiunge semplicemente il valore alla stringa
     return str;   
 }
 
@@ -167,8 +142,6 @@ const jsonToCSV=function(jsonData) {
     jsonData=JSON.stringify(jsonData);
     const json =
         typeof jsonData !== "object" ? JSON.parse(jsonData) : jsonData;
-    //console.error("json.docs è: ");
-    //console.error(json.docs);
     const { Parser, transforms: { unwind,flatten } } = require('json2csv');
 
     const fields = ["visibility","tags","_id","startDate","endDate","thing","feature","device",'samples.values'];
@@ -178,8 +151,7 @@ const jsonToCSV=function(jsonData) {
 
     const json2csvParser = new Parser({fields, transforms});
     const csv = json2csvParser.parse(json.docs);
-    return csv;
-      
+    return csv;      
 }
 
 exports.getResourceListSize = async function(req, res, model, restriction) {
@@ -252,10 +224,12 @@ exports.updateResource = async function(req, res, fields, model) {
 };
 
 const prepareFilterDataset = function(id, filter) {
-    if(filter.charAt( 0 ) == '[') filter = '{ "$or":' + filter + '}'; //serve per casi particolari. non nel mio per ora
+    if(filter.charAt( 0 ) == '[') filter = '{ "$or":' + filter + '}'; //for or request 
     let object = JSON.parse(filter);
     if(object.hasOwnProperty('feature')){
-        object['feature']=id;//si potrebbe anche mandare bad request
+        if(object['feature']!=id){//bad request
+            return null;
+        };
     }
     else { //not found feature inside filter
         if(object.$and) object.$and.push({"feature":id});
@@ -263,4 +237,3 @@ const prepareFilterDataset = function(id, filter) {
     }
     return object;
 }
-
