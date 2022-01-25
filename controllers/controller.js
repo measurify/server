@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const persistence = require('../commons/persistence.js');
 const errors = require('../commons/errors.js');
 const { isArray, forEach, isObject } = require('underscore');
+const bodyParser=require('body-parser');
+const express=require('express');
 
 exports.getResource = async function(req, res, field, model, select) {
     try {
@@ -94,21 +96,25 @@ exports.getResourceList = async function(req, res, sort, select, model, restrict
 }
 
 const jsonToCSVPlus=function(jsonData,columnsname) {
+    if(!process.env.CSV_DELIMITER ) process.env.CSV_DELIMITER = ','; 
+    if(!process.env.CSV_VECTOR_START ) process.env.CSV_VECTOR_START = ''; 
+    if(!process.env.CSV_VECTOR_END ) process.env.CSV_VECTOR_END = '';  
+    if(!process.env.CSV_VECTOR_DELIMITER ) process.env.CSV_VECTOR_DELIMITER =';' 
     jsonData=JSON.stringify(jsonData);
     //console.log(jsonData);
     const json =
       typeof jsonData !== "object" ? JSON.parse(jsonData) : jsonData;
       columnsname=columnsname.map(x=>`"${x}"`).join(",");
     
-    let str =
+    let str =process.env.CSV_VECTOR_START+
       `${Object.keys(json.docs[0])//parte per mettere l'intestazione del csv con i nomi delle colonne
         .map((value) => {
             if(value=="samples"){
                 return columnsname;
             }
             else return`"${value}"`})
-        .join(",")}` + ",\"deltatime\""+"\r\n";
-    currentRow="\r\n";//stringa virtuale usata per i samples con piu value.
+        .join(process.env.CSV_DELIMITER)}` + process.env.CSV_DELIMITER+"\"deltatime\""+"\n";
+    currentRow="\n";//stringa virtuale usata per i samples con piu value.
         json.docs.forEach(doc=>{//compilazione campi riga per riga
     str +=//entriamo per un doc ossia un singolo samples del json
         `${Object.values(doc)//questo divide ogni singolo campo del samples, cicla per visility,tags ecc
@@ -116,7 +122,7 @@ const jsonToCSVPlus=function(jsonData,columnsname) {
                 if(isArray(value) )//nel caso in cui sia tags o samples entra qui
                 {                   
                     if(value.length==0){//se il tags o samples non contiene valori metto un array vuoto
-                        currentRow+=`"[]"`+",";
+                        currentRow+=`"[]"`+process.env.CSV_DELIMITER;
                         return `"[]"`;
                     }
                     if(isObject(value[0])){                        
@@ -125,31 +131,32 @@ const jsonToCSVPlus=function(jsonData,columnsname) {
                                 delta=0;//inizializzazione e nel caso nullo
                                 if(x.delta!=null)delta=x.delta;  //lo aggiungo come colonna                            
                                 // se nei samples è un insieme di oggetti contenenti values entra qui dentro
-                                return x.values.map(x=>`"${x}"`).join(",")+",\""+delta+"\"";//mappa i valori di values separandoli con una virgola. 
+                                return x.values.map(x=>`"${x}"`).join(process.env.CSV_DELIMITER)+process.env.CSV_DELIMITER+"\""+delta+"\"";//mappa i valori di values separandoli con una virgola. 
                             }
                         ).join(currentRow);}
                     else{ 
-                        currentRow+="["+value+"]"+",";
+                        currentRow+="["+value+"]"+process.env.CSV_DELIMITER;
                         return "["+value+"]";}//se è il tags ritorna il valore e basta
                 } 
-                else {currentRow+=`"${value}"`+",";
-                    return `"${value}"`}}).join(",")}` + "\r\n";
-                    currentRow="\r\n";});//se non è un array aggiunge semplicemente il valore alla stringa
+                else {currentRow+=`"${value}"`+process.env.CSV_DELIMITER;
+                    return `"${value}"`}}).join(process.env.CSV_DELIMITER)}` + "\n";
+                    currentRow="\n";});//se non è un array aggiunge semplicemente il valore alla stringa
+    str+=process.env.CSV_VECTOR_END;
     return str;   
 }
 
 const jsonToCSV=function(jsonData) {
+    if(!process.env.CSV_DELIMITER ) process.env.CSV_DELIMITER = ','; 
     jsonData=JSON.stringify(jsonData);
     const json =
         typeof jsonData !== "object" ? JSON.parse(jsonData) : jsonData;
-    const { Parser, transforms: { unwind,flatten } } = require('json2csv');
+    const { Parser, transforms: { unwind } } = require('json2csv');
 
-    const fields = ["visibility","tags","_id","startDate","endDate","thing","feature","device",'samples.values'];
-    //const transforms = [unwind({ paths: ['samples','samples.values'] }),flatten({ objects: true, arrays:true })];//questo nel caso avessimo piu seamples lo apre  paths: ['samples','samples.values'] per separare ogni riga ma non va bene
-    //const transforms = [unwind({ paths: ['samples'] }),flatten({objects:false,arrays:false,separator:"_"})];
+    const fields = ["visibility","tags","_id","startDate","endDate","thing","feature","device",{label: 'values',value: 'samples.values'},{label: 'deltatime',value: 'samples.delta', default: 0}];
+    
     const transforms = [unwind({ paths: ['samples'] })];
 
-    const json2csvParser = new Parser({fields, transforms});
+    const json2csvParser = new Parser({fields, transforms,delimiter:process.env.CSV_DELIMITER});
     const csv = json2csvParser.parse(json.docs);
     return csv;      
 }
@@ -193,6 +200,44 @@ exports.postResource = async function(req, res, model) {
     }
     catch (err) { return errors.manage(res, errors.post_request_error, err); }
 }
+
+exports.postResourceDataset = async function(req, res, model,descriptionData) {
+
+    //const app = express();
+    //app.use(bodyParser.json());
+    //app.use(bodyParser.urlencoded({extended: true}));
+    //console.log(app.use(express.json()));
+    //console.log(req);
+    //console.log("ciccio");
+    //console.log(req.body);
+    //console.log(req.body.file);
+    
+    //a=req.body;
+    //b=req.body.file;
+    //console.log(JSON.stringify(a));
+    //console.log(JSON.stringify(b));
+    return errors.manage(res, errors.post_request_error, descriptionData);
+    //try { 
+    //    if(req.user._id) req.body.owner = req.user._id;
+    //    if(!req.query.verbose) req.query.verbose = 'true';
+    //    const results = await persistence.post(req.body, model, req.tenant);
+    //    req.result = results;   
+    //    if (req.body.constructor != Array) return res.status(200).json(results);
+    //    else {
+    //        if (req.query.verbose == 'true') {
+    //            if (results.errors.length === 0) { return res.status(200).json(results); }
+    //            else { return res.status(202).json(results); }
+     //       }
+    //        else {
+    //            const items = model.modelName.toLowerCase() + 's';
+     //           if (results.errors.length === 0) { return res.status(200).json({ saved: results[items].length, errors: results.errors.length }); }
+     //           else { return res.status(202).json({ saved: results[items].length, errors: results.errors.length, Indexes: results.errors }); }
+     //       }
+     //   }
+  //  }
+  //  catch (err) { return errors.manage(res, errors.post_request_error, err); }
+}
+
 
 exports.deleteResource = async function(req, res, model) {  
     try {

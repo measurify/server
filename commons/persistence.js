@@ -43,13 +43,8 @@ exports.getPipe = function(req, res, filter, sort, select, restriction, model) {
     if (!sort) sort = '{ "timestamp": "desc" }';
     if (!select) select = {};
     filter = prepareFilter(filter, restriction);
-    if(req.headers.accept == 'text/csv') {
-        //const agg =model.find(filter).cursor({ transform: doc => doc.toCSV() });
-        const agg= model.aggregate([{ $match:{ thing: "shop" }}]).cursor();
-        agg.pipe(res.type('text/csv'));
-    }
+    if(req.headers.accept == 'text/csv') model.find(filter).cursor({ transform: doc => doc.toCSV() }).pipe(res.type('text/csv'));
     else model.find(filter).cursor({transform: JSON.stringify}).pipe(res.type('json'));
-    //model.aggregate().match({filter}).pipe();    
 }
 
 exports.getSize = async function(filter, restriction, model) {

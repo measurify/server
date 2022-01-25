@@ -68,6 +68,10 @@ router.use('/' + process.env.VERSION + '/subscriptions', passport.authenticate('
 const thingsRoute = require('./routes/thingRoute');
 router.use('/' + process.env.VERSION + '/things', passport.authenticate('jwt-token', {session: false}), thingsRoute);
 
+// dataupload
+const datauploadsRoute = require('./routes/datauploadRoute');
+router.use('/' + process.env.VERSION + '/datauploads', passport.authenticate('jwt-token', {session: false}), datauploadsRoute);
+
 // feature
 const featuresRoute = require('./routes/featureRoute');
 router.use('/' + process.env.VERSION + '/features', passport.authenticate('jwt-token', {session: false}), featuresRoute);
