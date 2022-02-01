@@ -8,10 +8,10 @@ services:
       - "8084:8084"
       - "443:443"
     depends_on:
-      - mongo
+      - database
     volumes:
         - ./resources:/resources   
-  mongo:
+  database:
     image: mongo
     volumes:
         - ./data:/data/db
