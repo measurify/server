@@ -36,6 +36,13 @@ exports.description_not_json                 = { status: 400, value: 33, message
 exports.feature_different                    = { status: 400, value: 34, message: 'Incorrect number of elements in the feature'}; 
 exports.already_exist_dataupload             = { status: 400, value: 35, message: 'already exist a dataupload with the same id, can\'t save two datafile with the same name'}; 
 exports.feature_not_found                    = { status: 400, value: 36, message: 'feature not found'}; 
+exports.fieldName_error                      = { status: 400, value: 37, message: 'the keys of the files can be only \"file\" for the csv and \"description\"'}; 
+exports.max_one_csv_file                     = { status: 400, value: 38, message: 'max one file with the key \"file\"'}; 
+exports.max_one_description_file             = { status: 400, value: 39, message: 'max one description file with the key \"description\"'}; 
+exports.error_description_format             = { status: 400, value: 40, message: 'error in the format of description file, please control that each row has \"c\" + number'}; 
+exports.error_description_keys               = { status: 400, value: 41, message: 'error in the format of description file, please control that keys are thing, device, items, tags, startdate, enddate'}; 
+exports.empty_file                           = { status: 400, value: 42, message: 'file binary data cannot be null'}; 
+
 
 
 exports.manage = function(res, error, more) {

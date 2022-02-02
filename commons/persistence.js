@@ -164,6 +164,7 @@ exports.update = async function(body, fields, resource, model, tenant) {
 
 exports.deletemore = async function(filter, restriction, model) {  
     if (!filter) filter = '{}'; 
+    console.log(filter);
     filter = prepareFilter(filter, restriction);
     const result = await model.deleteMany(filter);
     return result.n;

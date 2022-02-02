@@ -192,6 +192,24 @@ exports.createThing = async function(name, owner, tags, metadata, relations, vis
     return thing._doc;
 };
 
+exports.createDataupload = async function(name, owner, timestamp, size, results, lastmod, tenant) {
+    const Tenant = mongoose.dbs['catalog'].model('Tenant');
+    if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
+    const Dataupload = mongoose.dbs[tenant.database].model('Dataupload');
+    const req = { 
+        _id: name,
+        owner: owner,
+        timestamp: timestamp,
+        size: size,
+        results: results,
+        lastmod: lastmod 
+    }
+    const dataupload = new Dataupload(req);
+    await dataupload.save();
+    return dataupload._doc;
+};
+
+
 exports.createScript = async function(name, owner, code, tags, visibility, tenant) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);

@@ -6,18 +6,12 @@ const inspector = require('../commons/inspector.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 const cache = require('../commons/cache.js');
 
-const resultsSchema = new mongoose.Schema({
-    description: { type: String,default:"" },
-    timestamp: { type: Date, default: Date.now }},
-    { _id: false }
-);
-
 const datauploadSchema = new mongoose.Schema({
     _id: { type: String, required: "Please, supply an _id" },//corrisponde a file name
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
     timestamp: { type: Date, default: Date.now },
     size: {type: Number, default: 0 },
-    results: [resultsSchema],
+    results: { type: String, default: ""},
     lastmod: {type: Date, default: Date.now, select: false }//per la put
 });
 
