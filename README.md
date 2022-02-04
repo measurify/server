@@ -11,8 +11,9 @@ In order to support the IoT developer community, Measeurify Cloud API Server is 
 Clone code and run the container
 
     git clone https://github.com/measurify/server.git measurify
+
     cd measurify
-    docker-compose up 
+    sudo docker-compose up -d
 
 to see logs:
 
