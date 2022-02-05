@@ -29,7 +29,7 @@ to update the server:
 
 to get info:
 
-    sudo docker exec -it measurify pm2 show measurify 
+    sudo docker exec -it measurify pm2 show measurify
 
 ## Documentation
 
@@ -56,7 +56,7 @@ There is a configuration file **\init\variable.env** which can be edited in orde
     API_TOKEN=ifhidhfudshuf8
     JWT_SECRET=fdshudshfidsuh
     JWT_EXPIRATIONTIME=30m
-    DATABASE=mongodb://localhost:27017/measurify-catalog
+    DATABASE=mongodb://127.0.0.1:27017/measurify-catalog
     FIREBASE_URL=https://measurify.firebaseio.com
     DEMO=true
     LOG=true
@@ -67,10 +67,10 @@ There is a configuration file **\init\variable.env** which can be edited in orde
     CSV_VECTOR_END=
     DEFAULT_TENANT=meaasurify-default-tenant
     DEFAULT_TENANT_DATABASE=meaasurify-default
-    DEFAULT_TENANT_ADMIN_USERNAME=admin 
-    DEFAULT_TENANT_ADMIN_TEMPORARY_PASSWORD=admin 
+    DEFAULT_TENANT_ADMIN_USERNAME=admin
+    DEFAULT_TENANT_ADMIN_TEMPORARY_PASSWORD=admin
     DEFAULT_TENANT_PASSWORDHASH=true
-    CACHE_TIME=1000 
+    CACHE_TIME=1000
 
 In particular, the connection string with the database and administrator credential (at startup the server will create a admin user with these credential), the expiration time of tokens, the log level, the secret word for the HTTPS certificate file, the secret word for the JWT token.
 
