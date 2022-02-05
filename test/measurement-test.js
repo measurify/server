@@ -1321,8 +1321,42 @@ describe("/POST measurement", () => {
         device: device._id,
         feature: feature._id,
         samples: [
-          { values: [10.4], delta: 200 },
+          { values: [11.4], delta: 200 },
           { values: [10.5], delta: 220 },
+        ],
+      },
+    ];
+    const measurements2 = [
+      {
+        owner: user,
+        startDate: new Date().toISOString,
+        endDate: new Date().toISOString,
+        position: {
+          type: "Point",
+          coordinates: [12.123456, 13.1345678],
+        },
+        thing: thing._id,
+        device: device._id,
+        feature: feature._id,
+        samples: [
+          { values: [13.4], delta: 200 },
+          { values: [13.5], delta: 220 },
+        ],
+      },
+      {
+        owner: user,
+        startDate: new Date().toISOString,
+        endDate: new Date().toISOString,
+        position: {
+          type: "Point",
+          coordinates: [12.123456, 13.1345678],
+        },
+        thing: thing._id,
+        device: device._id,
+        feature: feature._id,
+        samples: [
+          { values: [14.4], delta: 200 },
+          { values: [14.5], delta: 220 },
         ],
       },
     ];
@@ -1340,7 +1374,7 @@ describe("/POST measurement", () => {
       .keepOpen()
       .post("/v1/measurements")
       .set("Authorization", await factory.getUserToken(user))
-      .send(measurements);
+      .send(measurements2);
     res.should.have.status(200);
     res.body.should.be.a("object");
     res.body.measurements[0].thing.should.be.eql("test-thing-7");

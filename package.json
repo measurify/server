@@ -40,6 +40,7 @@
     "compression": "^1.7.4",
     "compute-variance": "^3.0.0",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dev-env": "^1.0.4",
     "dotenv": "^5.0.1",
     "express": "^4.17.1",

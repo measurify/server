@@ -2,7 +2,7 @@ export function configurator(locale) {
   return {
     name: "Measurify GUI",
     //baseUrl: "https://students.atmosphere.tools/v1",
-    baseUrl: "https://127.0.0.1/v1",
+    baseUrl: "https://localhost/v1",
     loginUrl: "/login",
     unauthorizedRedirectUrl: "/#/",
 

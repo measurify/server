@@ -3,6 +3,12 @@ const controller = require("./controller");
 const checker = require("./checker");
 const filemanager = require("../commons/filemanager");
 
+const crypto = require("crypto");
+
+function sha(content) {
+  return crypto.createHash("sha256").update(content).digest("hex");
+}
+
 exports.get = async (req, res) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   const select = await checker.whatCanSee(req, res, Measurement);
@@ -61,7 +67,7 @@ exports.getone = async (req, res) => {
 };
 
 exports.post = async (req, res) => {
-  /*if (Array.isArray(req.body)) {
+  if (Array.isArray(req.body)) {
     req.body.map((r) => {
       if (r._id == undefined) {
         r._id = sha(JSON.stringify(r));
@@ -69,8 +75,7 @@ exports.post = async (req, res) => {
     });
   } else if (req.body._id == undefined) {
     req.body._id = sha(JSON.stringify(req.body));
-  }*/
-
+  }
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   let result = await checker.canCreate(req, res);
   if (result != true) return result;

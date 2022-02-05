@@ -15,7 +15,7 @@ const sampleSchema = new mongoose.Schema(
 );
 
 const measurementSchema = new mongoose.Schema({
-  //_id: { type: String, required: "Please, supply an _id" },
+  _id: { type: String, required: "Please, supply an _id" },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   location: {
     type: mongoose.SchemaTypes.GeoJSON,
