@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const crypto = require("crypto");
 const broker = require('./broker.js');
 const tenancy = require('./tenancy.js');
 const factory = require('./factory.js');
@@ -9,6 +10,10 @@ const datasetController = require('../controllers/datasetController.js');
 const errors = require('./errors.js');
 const checker = require('../controllers/checker');
 const persistence = require('./persistence.js');
+
+function sha(content) {
+  return crypto.createHash("sha256").update(content).digest("hex");
+}
 
 
 //extract data when receive a form-data post
@@ -221,6 +226,8 @@ const createRequestObject = async function (startdate, enddate, thing, feature, 
     "tags": tags,
     "owner": owner
   }; 
+  const id = sha(JSON.stringify(results));
+  results._id = id;
   return results;
 }
 

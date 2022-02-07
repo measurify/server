@@ -45,8 +45,9 @@ const AuthPageComp = ({ context }: IProps) => {
   const [pwd, setPwd] = useState<string>("");
   const [tenant, setTenant] = useState<string>("");
   const { setError, httpService } = context;
-  const [openedAddTenant, setOpenedAddTenant] =
-    useState<null | IPopupProps>(null);
+  const [openedAddTenant, setOpenedAddTenant] = useState<null | IPopupProps>(
+    null
+  );
   const postConfig: IConfigPostMethod | undefined = {
     url: "/tenants/",
     actualMethod: "post",
@@ -123,7 +124,6 @@ const AuthPageComp = ({ context }: IProps) => {
           origUrl: httpService.baseUrl + "/fieldmasks/" + result.user.fieldmask,
           headers: { "content-type": "application/json" },
         });
-        console.log(fieldmaskData);
         localStorage.setItem(
           "diten-fieldmask-data",
           JSON.stringify(fieldmaskData)

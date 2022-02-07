@@ -114,13 +114,3 @@ exports.getoneDataupload = async (req, res) => {
     result = await checker.hasRights(req, res, Dataupload); if (result != true) return result;
     return await controller.getResource(req, res, null, Dataupload, select);
 };
-
-exports.putDataupload = async (req, res) => {
-    const Dataupload = mongoose.dbs[req.tenant.database].model('Dataupload');
-    const fields = ['results'];
-    let result = await checker.isAvailable(req, res, Dataupload); if (result != true) return result;
-    result = await checker.isFilled(req, res, fields); if (result != true) return result;
-    result = await checker.canModify(req, res); if (result != true) return result;
-    result = await checker.hasRights(req, res, Dataupload); if (result != true) return result;
-    return await controller.updateResource(req, res, fields, Dataupload);
-};

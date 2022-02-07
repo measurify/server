@@ -256,9 +256,6 @@ export const GraphPopup = withAppContext(
         limit,
       } = await fetchFeatureData(true);
 
-      //console.log(fetchedData);
-      //console.log(totalDocs);
-
       //setFetchedData(fetchedData);
       setFetchedFeature(fetchedFeature);
       setPageNum(pageNum);
@@ -281,9 +278,7 @@ export const GraphPopup = withAppContext(
       // inserire parte con i cursori qua
 
       setGraphData(finalData);
-      //console.log(finalData);
       const updatedDocSize = loadedDocSize + finalData[0].dataStruct.length;
-      //console.log(updatedDocSize);
       setLoadedDocSize(updatedDocSize);
 
       setShowGraph(true);
@@ -309,14 +304,6 @@ export const GraphPopup = withAppContext(
       let newTail: number = tail;
       const diff = tail - head;
       const zoomFactor = 1;
-
-      //log
-      /*
-      console.log("Head");
-      console.log(newHead);
-      console.log("Tail");
-      console.log(newTail);
-      */
 
       //move head and tail
       switch (act) {
@@ -348,22 +335,12 @@ export const GraphPopup = withAppContext(
         newTail = totalDocs;
       }
 
-      //log
-      /*
-      console.log("new Head");
-      console.log(newHead);
-      console.log("new Tail");
-      console.log(newTail);
-      */
       //load data before required
       if (
         (newTail + diff > loadedDocSize ||
           newTail + zoomFactor > loadedDocSize) &&
         loadedDocSize < totalDocs
       ) {
-        //load data
-        //console.log("load more data");
-
         const { fetchedData, pageNum } = await fetchFeatureData(false, 1);
 
         setPageNum(pageNum);
@@ -375,8 +352,6 @@ export const GraphPopup = withAppContext(
           return;
         }
 
-        //console.log(graphData);
-        //console.log(newData);
         let finalData: IGraphData[];
         if (graphData !== undefined) {
           finalData = [...graphData];
@@ -387,11 +362,9 @@ export const GraphPopup = withAppContext(
               newData[i].dataStruct
             );
           }
-          //console.log(finalData);
 
           setGraphData(finalData);
           const updatedDocSize = finalData[0].dataStruct.length;
-          //console.log(updatedDocSize);
           setLoadedDocSize(updatedDocSize);
         }
       }
