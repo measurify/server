@@ -1,0 +1,8 @@
+{
+"thing":"c2",
+"device":"c4",
+"items":["c6"],
+"tags":["c3"],
+"startdate":"c1",
+"enddate":"c5"
+}

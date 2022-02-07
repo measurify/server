@@ -9,8 +9,7 @@ const { result } = require('underscore');
 const { file } = require('../types/itemTypes');
 const VisibilityTypes = require('../types/visibilityTypes.js');
 const { catchErrors } = require('../commons/errorHandlers.js');
-const datauploadController = require('../controllers/datauploadController.js');
-const datasetCreator = require('../commons/datasetCreator.js');
+const datasetCreator = require('../commons/dataset.js');
 
 exports.get = async (req, res) => {
     const Feature = mongoose.dbs[req.tenant.database].model('Feature');
@@ -69,12 +68,11 @@ exports.post = async (req, res, next, fileData, descriptionData, filename) => {
 
     //principal loop for each line
     report = await datasetCreator.principalLoop(req, res, lines, elementsNumber, feature, report, descriptionDataCleaned, filename, force);
-    console.log(report);
+    //console.log(report);
 
 
     result = await datasetCreator.updateDataupload(req, res, report, resourceDataupload);
-    if (result != true) {
-        console.log("errore" + result);
+    if (result != true) {        
         return result;
     };
 
@@ -84,4 +82,45 @@ exports.post = async (req, res, next, fileData, descriptionData, filename) => {
     else {
         return res.status(202).json(report);
     }
+};
+
+exports.delete = async (req, res) => {
+    const Dataupload = mongoose.dbs[req.tenant.database].model('Dataupload');
+    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
+    let result = await checker.isAvailable(req, res, Dataupload); if (result != true) return result;
+    result = await checker.isOwned(req, res); if (result != true) return result;
+    result = await checker.canDelete(req, res); if (result != true) return result;
+    result = await checker.hasRights(req, res, Dataupload); if (result != true) return result;
+
+    
+    result = await checker.canDeleteList(req, res); if (result != true) return result;
+    const restriction_1 = await checker.whatCanDelete(req, res);
+    const restriction_2 = await checker.whichRights(req, res, Measurement);
+    const restrictions = { ...restriction_1, ...restriction_2 };
+    filter = { "tags": req.params.id };
+    filter=JSON.stringify(filter);
+    try {
+        await persistence.deletemore(filter, restrictions, Measurement);
+    }
+    catch (err) { return errors.manage(res, errors.delete_request_error, err); }
+    return await controller.deleteResource(req, res, Dataupload);
+};
+
+exports.getoneDataupload = async (req, res) => {
+    const Dataupload = mongoose.dbs[req.tenant.database].model('Dataupload');
+    const select = await checker.whatCanSee(req, res, Dataupload);
+    let result = await checker.isAvailable(req, res, Dataupload); if (result != true) return result;
+    result = await checker.canRead(req, res); if (result != true) return result;
+    result = await checker.hasRights(req, res, Dataupload); if (result != true) return result;
+    return await controller.getResource(req, res, null, Dataupload, select);
+};
+
+exports.putDataupload = async (req, res) => {
+    const Dataupload = mongoose.dbs[req.tenant.database].model('Dataupload');
+    const fields = ['results'];
+    let result = await checker.isAvailable(req, res, Dataupload); if (result != true) return result;
+    result = await checker.isFilled(req, res, fields); if (result != true) return result;
+    result = await checker.canModify(req, res); if (result != true) return result;
+    result = await checker.hasRights(req, res, Dataupload); if (result != true) return result;
+    return await controller.updateResource(req, res, fields, Dataupload);
 };

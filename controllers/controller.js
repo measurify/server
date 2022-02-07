@@ -37,9 +37,7 @@ exports.getResourceDataset = async function (req, res, sort, select, model) {
             res.header('Content-Type', 'text/csv');
             let csvresultlibrary = '';
 
-            csvresultlibrary = jsonToCSV(list);
-            console.error("csvresultlibrary vale: ");
-            console.error(csvresultlibrary);
+            csvresultlibrary = jsonToCSV(list);           
 
             return res.status(200).json(csvresultlibrary);
         }
@@ -55,9 +53,7 @@ exports.getResourceDataset = async function (req, res, sort, select, model) {
             let columnsName = [];
             item.items.forEach(elem => columnsName.push(elem.name));
             let tocsvresult = '';
-            tocsvresult = jsonToCSVPlus(list, columnsName);
-            console.error("tocsvresult vale: ");
-            console.error(tocsvresult);
+            tocsvresult = jsonToCSVPlus(list, columnsName);           
 
             return res.status(200).json(tocsvresult);
         }//else no accept headers parameters or else
@@ -85,12 +81,9 @@ exports.getResourceList = async function (req, res, sort, select, model, restric
         const query = req.query;
         if (!query.sort) query.sort = sort;
         let list = await persistence.getList(query.filter, query.sort, select, query.page, query.limit, restriction, model);
-        console.error(list);
         if (req.headers.accept == 'text/csv') {
             res.header('Content-Type', 'text/csv');
-            csvresultlibrary = jsonToCSV(list);
-            console.error("csvresultlibrary vale: ");
-            console.error(csvresultlibrary);
+            csvresultlibrary = jsonToCSV(list);           
 
             return res.status(200).json(csvresultlibrary);
         }

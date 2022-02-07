@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
-const broker = require('../commons/broker.js');
-const tenancy = require('../commons/tenancy.js');
-const factory = require('../commons/factory.js');
+const broker = require('./broker.js');
+const tenancy = require('./tenancy.js');
+const factory = require('./factory.js');
 const bcrypt = require('bcryptjs');
-const { catchErrors } = require('../commons/errorHandlers.js');
+const { catchErrors } = require('./errorHandlers.js');
 const busboy = require('connect-busboy');
 const datasetController = require('../controllers/datasetController.js');
-const errors = require('../commons/errors.js');
+const errors = require('./errors.js');
 const checker = require('../controllers/checker');
-const persistence = require('../commons/persistence.js');
+const persistence = require('./persistence.js');
 
 
 //extract data when receive a form-data post
@@ -43,12 +43,6 @@ exports.dataExtractor = async function (req, res, next) {
   });
   req.busboy.on('finish', () => {
     if (!fileData) { return errors.manage(res, errors.empty_file); }
-    console.log("fileData vale:");
-    console.log(fileData);
-    console.log("descriptionData vale:");
-    console.log(descriptionData);
-    console.log("namefile vale:");
-    console.log(namefile);
 
     catchErrors(datasetController.post(req, res, next, fileData, descriptionData, namefile));
   });
@@ -72,24 +66,20 @@ exports.datauploadCheckAndCreate = async function (req, res, descriptionData, fi
   const Feature = mongoose.dbs[req.tenant.database].model('Feature');
   let feature = await Feature.findById(req.params.id);//utile per le parti successive
   if (!feature) {//error feature not found 
-    console.log("feature doesn't exist");
     return [errors.manage(res, errors.feature_not_found, req.params.id), null];
-  }
-  console.log(feature);
+  }  
 
   //check if feature has the same number of items 
   itemsNumber = descriptionData.items.length;
   const item = await persistence.get(req.params.id, null, Feature, null);
   if (itemsNumber != item.items.length) {
-    console.log("errore elementi nella feature in numero diverso");
     return [errors.manage(res, errors.feature_different, itemsNumber + " != " + item.items.length), null];
   }
 
   //check if exist dataupload with the same id (the id is the filename)
   const Dataupload = mongoose.dbs[req.tenant.database].model('Dataupload');
   result = await this.checkerIfExist(Dataupload, filename);
-  if (result) {
-    console.log("already exist a dataupload with the same id, can't save two datafile with the same name");
+  if (result) {    
     return [errors.manage(res, errors.already_exist_dataupload, filename), null];
   }
 
@@ -98,7 +88,6 @@ exports.datauploadCheckAndCreate = async function (req, res, descriptionData, fi
 
   try {
     let resourceDataupload = await persistence.post(req.body, Dataupload, req.tenant);
-    console.log(resourceDataupload);
     return [true, resourceDataupload];
   }
   catch (err) { return [errors.manage(res, errors.post_request_error, err), null]; }
@@ -124,13 +113,11 @@ exports.createTag = async function (req, res, filename) {
 
   //check if it already exists
   const tagDataupload = filename;
-  console.log(tagDataupload);
   let result = await this.checkerIfExist(Tag, tagDataupload);
   if (!result) {
     try {
       bodyTag = await this.createTagRequest(tagDataupload);
       const results = await persistence.post(bodyTag, Tag, req.tenant);
-      console.log(results);
     }
     catch (err) { return errors.manage(res, errors.post_request_error, err); }
   }
@@ -140,8 +127,7 @@ exports.createTag = async function (req, res, filename) {
 exports.createTagRequest = async function (tagName) {
   var results = {
     "_id": tagName
-  };
-  console.log(results);
+  };  
   return results;
 }
 
@@ -151,7 +137,6 @@ exports.tagLoop = async function (descriptionDataCleaned, Tag) {
     id = line[descriptionDataCleaned.tags[j]].replaceAll(/['"]+/g, '');
     resultTag = await this.checkerIfExist(Tag, id);
     if (!resultTag) {
-      console.log("errore il tag " + id + " non esiste");
       errMessage = "tag " + id + " not found in database";
       return [null, errMessage];
     }
@@ -185,9 +170,7 @@ exports.cleanObj = async function (res, descriptionData) {//cleaned c and -1 for
   //first try to convert descriptionData to json
   try {//descriptionData must be json readable
     descriptionData = JSON.parse(descriptionData);
-    console.log("si lo è");
-  } catch (error) {
-    console.log("non lo è");
+  } catch (error) {    
     return [null, errors.manage(res, errors.description_not_json)];
   }
 
@@ -217,8 +200,7 @@ exports.cleanObj = async function (res, descriptionData) {//cleaned c and -1 for
   return [data, true];
 }
 
-const checkDescriptionKeys = async function (res, descriptionData) {
-  console.log(descriptionData);
+const checkDescriptionKeys = async function (res, descriptionData) { 
   if (descriptionData.hasOwnProperty('thing') && descriptionData.hasOwnProperty('device')
     && descriptionData.hasOwnProperty('items') && descriptionData.hasOwnProperty('tags')
     && descriptionData.hasOwnProperty('startdate') && descriptionData.hasOwnProperty('enddate')) {
@@ -238,8 +220,7 @@ const createRequestObject = async function (startdate, enddate, thing, feature, 
     "samples": samples,
     "tags": tags,
     "owner": owner
-  };
-  console.log(results);
+  }; 
   return results;
 }
 
@@ -248,21 +229,22 @@ exports.sampleLoop = async function (descriptionDataCleaned, line, feature) {
   for (let k in descriptionDataCleaned.items) {
     id = line[descriptionDataCleaned.items[k]].replaceAll(/['"]+/g, '');
     if (feature.items[k].type == "number") {
-      if (isNaN(id)) {//not a number
-        console.log("errore aspettato numero alla posizione " + k);
+      if (isNaN(id)) {//not a number       
         errMessage = "expected number in samples at position " + k;
         return [null, errMessage];
       }
+      else{
+        samples.push(Number(id));
+        continue;
+      }
     }
     else if (feature.items[k].type == "string") {
-      if (typeof myVar != 'string') {
-        console.log("errore aspettata stringa alla posizione " + k);
+      if (typeof myVar != 'string') {       
         errMessage = "expected string in samples at position " + k;
         return [null, errMessage];
       }
     }
-    else {
-      console.log("errore nella definizione dei parametri nella feature");
+    else {    
       errMessage = "error in the definition of the feature on the database, value.type is not a number or string";
       return [null, errMessage];
     }
@@ -288,8 +270,7 @@ exports.tagLoop = async function (descriptionDataCleaned, Tag, force, req) {
           return [null, errMessage];
         }
       }
-      else {
-        console.log("errore il tag " + id + " non esiste");
+      else {        
         errMessage = "tag " + id + " not found in database";
         return [null, errMessage];
       }
@@ -309,8 +290,7 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
     if (lines[i] == "") continue;
     line = lines[i].split(",");
     if (line.length != elementsNumber) {
-      console.log("errore non ci sono abbastanza campi nella riga");
-      errMessage = "not enough fields in the row"
+            errMessage = "not enough fields in the row"
       report.errors.push('Index: ' + i + ' (' + errMessage + ')');
       continue;
     }
@@ -330,8 +310,7 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
           continue;
         }
       }
-      else {
-        console.log("errore la thing " + thing + " non esiste");
+      else {        
         errMessage = "thing " + thing + " not found in database"
         report.errors.push('Index: ' + i + ' (' + errMessage + ')');
         continue;
@@ -365,8 +344,7 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
           continue;
         }
       }
-      else {
-        console.log("errore il device " + device + " non esiste");
+      else {        
         errMessage = "device " + device + " not found in database"
         report.errors.push('Index: ' + i + ' (' + errMessage + ')');
         continue;
@@ -375,9 +353,7 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
 
     //check if startdate is a date
     let result = Date.parse(line[descriptionDataCleaned.startdate].replaceAll(/['"]+/g, ''));//need to remove ""
-    console.log(result);
-    if (Number.isNaN(result)) {
-      console.log("la startdate " + result + " non è in formato date");
+    if (Number.isNaN(result)) {      
       errMessage = "startdate is not in Date format"
       report.errors.push('Index: ' + i + ' (' + errMessage + ')');
       continue;
@@ -392,8 +368,7 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
     }
     else {
       enddate = line[descriptionDataCleaned.enddate].replaceAll(/['"]+/g, '');
-      if (Number.isNaN(result)) {
-        console.log("la enddate " + result + " non è in formato date");
+      if (Number.isNaN(result)) {       
         errMessage = "enddate is not in Date format"
         report.errors.push('Index: ' + i + ' (' + errMessage + ')');
         continue;
@@ -418,20 +393,8 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
       report.errors.push('Index: ' + i + ' (' + error + ')');
       continue;
     }
-
-    //console.log(samples);
+    
     samples = this.createSamples(samples, 0);
-
-    //se arriva fin qui allora va tutto bene e posso salvarla
-    console.log(req.user._id);
-    console.log(feature._id);
-    console.log(device);
-    console.log(thing);
-    console.log(tags);
-    console.log(samples);
-    console.log(startdate);
-    console.log(enddate);
-    console.log(req.tenant);
 
     //create measurement
     //this.createMeasurement(req.user,feature._id,device,thing,tags,samples,startdate,enddate,null,VisibilityTypes.private,req.tenant);
@@ -450,8 +413,7 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
 
 exports.saveModelData = async function (req, body, Model) {
   try {
-    const results = await persistence.post(body, Model, req.tenant);
-    console.log(results);
+    const results = await persistence.post(body, Model, req.tenant);    
   }
   catch (err) {
     return err;

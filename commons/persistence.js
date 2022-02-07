@@ -32,9 +32,7 @@ exports.getDataset = async function(filter,  sort, select, page, limit, model) {
             "endDate":{$push:"$endDate"},"thing":{$push:"$thing"},"device":{$push:"$device"},"samples":{$push:"$samples.values"}}}            
         ]
     ) 
-    //list.push({"page":page,"limit":limit}); //for the pagination
-    console.error("list è: ");
-    console.error(list);
+    //list.push({"page":page,"limit":limit}); //for the pagination    
     return list;
 }
 
@@ -164,7 +162,6 @@ exports.update = async function(body, fields, resource, model, tenant) {
 
 exports.deletemore = async function(filter, restriction, model) {  
     if (!filter) filter = '{}'; 
-    console.log(filter);
     filter = prepareFilter(filter, restriction);
     const result = await model.deleteMany(filter);
     return result.n;

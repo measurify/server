@@ -36,7 +36,7 @@ measurementSchema.index({ feature: 1, timestamp: -1});
 measurementSchema.plugin(paginate);
 measurementSchema.plugin(require('mongoose-autopopulate'));
 
-/*
+
 // validate feature
 measurementSchema.path('feature').validate({
     validator: async function (value) {
@@ -160,7 +160,6 @@ measurementSchema.pre('save', async function() {
                                                   device: this.device });
     if(res) throw new Error('The measurement already exists');                       
 });
-*/
 
 measurementSchema.methods.toCSV = function toCSV() {
     if(!process.env.CSV_DELIMITER ) process.env.CSV_DELIMITER = ','; 
