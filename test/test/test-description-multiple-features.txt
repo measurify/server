@@ -7,5 +7,5 @@
 "tags":[3],
 "startdate":1,
 "enddate":5,
-"feature":"test-feature"
+"feature":7
 }

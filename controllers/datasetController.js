@@ -12,25 +12,10 @@ const { catchErrors } = require('../commons/errorHandlers.js');
 const datasetCreator = require('../commons/dataset.js');
 
 exports.get = async (req, res) => {
-    const Feature = mongoose.dbs[req.tenant.database].model('Feature');
-    const select = await checker.whatCanSee(req, res, Feature)
-    let result = await checker.isAvailable(req, res, Feature); if (result != true) return result;
-    result = await checker.canRead(req, res); if (result != true) return result;
-    result = await checker.hasRights(req, res, Feature); if (result != true) return result;
-    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
+    const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
+    const select = await checker.whatCanSee(req, res, Measurement);    
     return await controller.getResourceDataset(req, res, '{ "timestamp": "desc" }', select, Measurement);
 };
-
-exports.getFile = async (req, res) => {
-    const Feature = mongoose.dbs[req.tenant.database].model('Feature');
-    const select = await checker.whatCanSee(req, res, Feature)
-    let result = await checker.isAvailable(req, res, Feature); if (result != true) return result;
-    result = await checker.canRead(req, res); if (result != true) return result;
-    result = await checker.hasRights(req, res, Feature); if (result != true) return result;
-    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
-    return await controller.getResourceDataset(req, res, '{ "timestamp": "desc" }', select, Measurement);
-};
-
 
 exports.post = async (req, res, next, fileData, descriptionData, filename) => {
     const Feature = mongoose.dbs[req.tenant.database].model('Feature');
@@ -42,16 +27,17 @@ exports.post = async (req, res, next, fileData, descriptionData, filename) => {
     if (result != true) return result;
 
     let resourceDataupload
-    [result,resourceDataupload] = await datasetCreator.datauploadCheckAndCreate(req, res, descriptionDataCleaned, filename, fileData);
+    [result, resourceDataupload] = await datasetCreator.datauploadCheckAndCreate(req, res, descriptionDataCleaned, filename, fileData);
     if (result != true) return result;
 
     result = await datasetCreator.createTag(req, res, filename);
     if (result != true) return result;
 
-    //create report
+    //create report    
     let report = { completed: [], errors: [] };
-    let feature = await Feature.findById(req.params.id);
 
+    let feature=null;    
+    
     //csv unrolling and control
     //control number of element in the description    
     const elementsNumber = await datasetCreator.elementsCount(descriptionDataCleaned);
@@ -60,19 +46,17 @@ exports.post = async (req, res, next, fileData, descriptionData, filename) => {
     var lines = fileDataModified.split("\n");
 
     //check for force save object on database by default value if it is true or undefined
-    let force=false;
-    if(req.query.force=='true'){force=true;}
-
+    let force = false;    
+    if (req.query.force == 'true') { force = true; }
     //set the owner
     if (req.user._id) req.body.owner = req.user._id;
-
     //principal loop for each line
     report = await datasetCreator.principalLoop(req, res, lines, elementsNumber, feature, report, descriptionDataCleaned, filename, force);
     //console.log(report);
 
 
     result = await datasetCreator.updateDataupload(req, res, report, resourceDataupload);
-    if (result != true) {        
+    if (result != true) {
         return result;
     };
 
@@ -92,13 +76,13 @@ exports.delete = async (req, res) => {
     result = await checker.canDelete(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Dataupload); if (result != true) return result;
 
-    
+
     result = await checker.canDeleteList(req, res); if (result != true) return result;
     const restriction_1 = await checker.whatCanDelete(req, res);
     const restriction_2 = await checker.whichRights(req, res, Measurement);
     const restrictions = { ...restriction_1, ...restriction_2 };
     filter = { "tags": req.params.id };
-    filter=JSON.stringify(filter);
+    filter = JSON.stringify(filter);
     try {
         await persistence.deletemore(filter, restrictions, Measurement);
     }

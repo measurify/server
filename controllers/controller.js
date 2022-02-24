@@ -24,11 +24,46 @@ exports.getResourceDataset = async function (req, res, sort, select, model) {
         if (!query.sort) query.sort = sort;
         if (!query.filter) query.filter = '{}';//Create here filter + id
         let idFile = null;
-        if (req.params.id2 !== undefined) {
-            idFile = req.params.id2;
+        if (req.params.id !== undefined) {
+            idFile = req.params.id;
         }
-        filterDataset = prepareFilterDataset(req.params.id, idFile, query.filter);
-        if (!filterDataset) return errors.manage(res, errors.different_feature);
+
+        filterDataset = prepareFilterDataset(idFile, query.filter);
+
+        if (query.page == undefined & query.limit == undefined) {
+            query.page = 1;
+            query.limit = await model.countDocuments(filterDataset);
+        }
+        if (req.headers.accept == 'text/csv+') {//only with feature specified
+            fil = JSON.stringify(filterDataset);//need to be a string not an object            
+            if (fil.includes('{"feature":')) {
+                restriction = {};
+                let featureId = null;
+                if (filterDataset.hasOwnProperty('feature')) {
+                    featureId = filterDataset.feature;
+                }
+                else if (filterDataset.hasOwnProperty('$and')) {
+                    featureId = filterDataset.$and[0].feature;
+                }
+                if (featureId != null) {
+                    filterDataset = JSON.stringify(filterDataset);//need to be a string not an object
+                    const Feature = mongoose.dbs[req.tenant.database].model('Feature');
+
+                    const item = await persistence.get(featureId, null, Feature, select);
+                    let list = await persistence.getList(filterDataset, query.sort, select, query.page, query.limit, restriction, model);
+
+                    res.header('Content-Type', 'text/csv');
+
+                    let columnsName = [];
+                    item.items.forEach(elem => columnsName.push(elem.name));
+                    let tocsvresult = '';
+                    tocsvresult = jsonToCSVPlus(list, columnsName);
+                    return res.status(200).send(tocsvresult);
+                }
+                else { req.headers.accept = 'text/csv' }
+            }
+            else { req.headers.accept = 'text/csv' }
+        }
         if (req.headers.accept == 'text/csv') {
             restriction = {};
             filterDataset = JSON.stringify(filterDataset);//need to be a string not an object
@@ -36,27 +71,10 @@ exports.getResourceDataset = async function (req, res, sort, select, model) {
 
             res.header('Content-Type', 'text/csv');
             let csvresultlibrary = '';
-
-            csvresultlibrary = jsonToCSV(list);           
-
-            return res.status(200).json(csvresultlibrary);
+            csvresultlibrary = jsonToCSV(list);
+            return res.status(200).send(csvresultlibrary);
         }
-        else if (req.headers.accept == 'text/csv+') {
-            restriction = {};
-            filterDataset = JSON.stringify(filterDataset);//need to be a string not an object
-            const Feature = mongoose.dbs[req.tenant.database].model('Feature');
-            const item = await persistence.get(req.params.id, null, Feature, select);
-            let list = await persistence.getList(filterDataset, query.sort, select, query.page, query.limit, restriction, model);
-
-            res.header('Content-Type', 'text/csv');
-
-            let columnsName = [];
-            item.items.forEach(elem => columnsName.push(elem.name));
-            let tocsvresult = '';
-            tocsvresult = jsonToCSVPlus(list, columnsName);           
-
-            return res.status(200).json(tocsvresult);
-        }//else no accept headers parameters or else
+        //else no accept headers parameters or else
         let list = await persistence.getDataset(filterDataset, query.sort, select, query.page, query.limit, model);
         return res.status(200).json(list);
     }
@@ -83,7 +101,7 @@ exports.getResourceList = async function (req, res, sort, select, model, restric
         let list = await persistence.getList(query.filter, query.sort, select, query.page, query.limit, restriction, model);
         if (req.headers.accept == 'text/csv') {
             res.header('Content-Type', 'text/csv');
-            csvresultlibrary = jsonToCSV(list);           
+            csvresultlibrary = jsonToCSV(list);
 
             return res.status(200).json(csvresultlibrary);
         }
@@ -233,18 +251,9 @@ exports.updateResource = async function (req, res, fields, model) {
     catch (err) { return errors.manage(res, errors.put_request_error, err); }
 };
 
-const prepareFilterDataset = function (id, idFile, filter) {
+const prepareFilterDataset = function (idFile, filter) {
     if (filter.charAt(0) == '[') filter = '{ "$or":' + filter + '}'; //for or request 
     let object = JSON.parse(filter);
-    if (object.hasOwnProperty('feature')) {
-        if (object['feature'] != id) {//bad request
-            return null;
-        };
-    }
-    else { //not found feature inside filter
-        if (object.$and) object.$and.push({ "feature": id });
-        else object = { $and: [object, { "feature": id }] };
-    }
     if (idFile) {//not null
         if (object.$and) object.$and.push({ "tags": idFile });
         else object = { $and: [object, { "tags": idFile }] };

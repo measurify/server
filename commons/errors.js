@@ -31,17 +31,15 @@ exports.missing_password                     = { status: 401, value: 28, message
 exports.reset_invalid                        = { status: 403, value: 29, message: 'The reset password request is not valid' };
 exports.unknown_value                        = { status: 404, value: 30, message: 'Status value' };
 exports.incorrect_info                       = { status: 401, value: 31, message: 'Please, the body information is missing valid fields'}; 
-exports.different_feature                    = { status: 400, value: 32, message: 'Different features in request and filter, please choose only one feature'}; 
-exports.description_not_json                 = { status: 400, value: 33, message: 'DescriptionData is not in JSON format'}; 
-exports.feature_different                    = { status: 400, value: 34, message: 'Incorrect number of elements in the feature'}; 
-exports.already_exist_dataupload             = { status: 400, value: 35, message: 'already exist a dataupload with the same id, can\'t save two datafile with the same name'}; 
-exports.feature_not_found                    = { status: 400, value: 36, message: 'feature not found'}; 
-exports.fieldName_error                      = { status: 400, value: 37, message: 'the keys of the files can be only \"file\" for the csv and \"description\"'}; 
-exports.max_one_csv_file                     = { status: 400, value: 38, message: 'max one file with the key \"file\"'}; 
-exports.max_one_description_file             = { status: 400, value: 39, message: 'max one description file with the key \"description\"'}; 
-exports.error_description_format             = { status: 400, value: 40, message: 'error in the format of description file, please control that each row has \"c\" + number'}; 
-exports.error_description_keys               = { status: 400, value: 41, message: 'error in the format of description file, please control that keys are thing, device, items, tags, startdate, enddate'}; 
-exports.empty_file                           = { status: 400, value: 42, message: 'file binary data cannot be null'}; 
+exports.description_not_json                 = { status: 400, value: 32, message: 'DescriptionData is not in JSON format'}; 
+exports.feature_different                    = { status: 400, value: 33, message: 'Incorrect number of elements in the feature'}; 
+exports.already_exist_dataupload             = { status: 400, value: 34, message: 'already exist a dataupload with the same id, can\'t save two datafile with the same name'}; 
+exports.feature_not_found                    = { status: 400, value: 35, message: 'feature not found'}; 
+exports.fieldName_error                      = { status: 400, value: 36, message: 'the keys of the files can be only \"file\" for the csv and \"description\"'}; 
+exports.max_one_description_file             = { status: 400, value: 37, message: 'max one description file with the key \"description\"'}; 
+exports.error_description_format             = { status: 400, value: 38, message: 'error in the format of description file, please control that each row has \"c\" + number'}; 
+exports.error_description_keys               = { status: 400, value: 39, message: 'error in the format of description file, please control that keys are thing, device, items, tags, startdate, enddate,feature'}; 
+exports.empty_file                           = { status: 400, value: 40, message: 'file binary data cannot be null'}; 
 
 
 
