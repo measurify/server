@@ -457,14 +457,26 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
     //check if startdate is a date
     let result = null;
     if (descriptionDataCleaned.commonElements.hasOwnProperty("startdate")) {//startdate fixed
-      result = Date.parse(descriptionDataCleaned.commonElements["startdate"].replaceAll(/['"]+/g, ''));
-      startdate = descriptionDataCleaned.commonElements["startdate"].replaceAll(/['"]+/g, '');
+      if(isNaN(descriptionDataCleaned.commonElements["startdate"].replaceAll(/['"]+/g, ''))){
+        result = Date.parse(descriptionDataCleaned.commonElements["startdate"].replaceAll(/['"]+/g, ''));
+        startdate = descriptionDataCleaned.commonElements["startdate"].replaceAll(/['"]+/g, '');
+      }
+      else{//is a number
+        result=descriptionDataCleaned.commonElements["startdate"].replaceAll(/['"]+/g, '');
+        startdate=descriptionDataCleaned.commonElements["startdate"].replaceAll(/['"]+/g, '');
+      }
     }
     else {
-      result = Date.parse(line[descriptionDataCleaned.startdate].replaceAll(/['"]+/g, ''));//need to remove ""
-      startdate = line[descriptionDataCleaned.startdate].replaceAll(/['"]+/g, '');
+      if(isNaN(line[descriptionDataCleaned.startdate].replaceAll(/['"]+/g, ''))){
+        result = Date.parse(line[descriptionDataCleaned.startdate].replaceAll(/['"]+/g, ''));//need to remove ""
+        startdate = line[descriptionDataCleaned.startdate].replaceAll(/['"]+/g, '');
+      }
+      else{//is a number
+        result=line[descriptionDataCleaned.startdate].replaceAll(/['"]+/g, '')
+        startdate=line[descriptionDataCleaned.startdate].replaceAll(/['"]+/g, '')
+      }
     }
-    if (Number.isNaN(result)) {
+    if (isNaN(result)) {
       errMessage = "startdate is not in Date format"
       report.errors.push('Index: ' + i + ' (' + errMessage + ')');
       continue;
@@ -474,19 +486,31 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
     //check if enddate exist and is a date
     let enddate = "";
     if (descriptionDataCleaned.commonElements.hasOwnProperty("enddate")) {//enddate fixed
-      result = Date.parse(descriptionDataCleaned.commonElements["enddate"].replaceAll(/['"]+/g, ''));
-      enddate = descriptionDataCleaned.commonElements["enddate"].replaceAll(/['"]+/g, '');
+      if(isNaN(descriptionDataCleaned.commonElements["enddate"].replaceAll(/['"]+/g, ''))){
+        result = Date.parse(descriptionDataCleaned.commonElements["enddate"].replaceAll(/['"]+/g, ''));
+        enddate = descriptionDataCleaned.commonElements["enddate"].replaceAll(/['"]+/g, '');
+      }
+      else{//is a number
+        result=descriptionDataCleaned.commonElements["enddate"].replaceAll(/['"]+/g, '');
+        enddate=descriptionDataCleaned.commonElements["enddate"].replaceAll(/['"]+/g, '');
+      }
     }
     else {
       if (descriptionDataCleaned.enddate == descriptionDataCleaned.startdate || line[descriptionDataCleaned.enddate] == "") {
         enddate = startdate;
       }
       else {
-        result = Date.parse(line[descriptionDataCleaned.enddate].replaceAll(/['"]+/g, ''));//need to remove ""
-        enddate = line[descriptionDataCleaned.enddate].replaceAll(/['"]+/g, '');
+        if(isNaN(line[descriptionDataCleaned.enddate].replaceAll(/['"]+/g, ''))){
+          result = Date.parse(line[descriptionDataCleaned.enddate].replaceAll(/['"]+/g, ''));//need to remove ""
+          enddate = line[descriptionDataCleaned.enddate].replaceAll(/['"]+/g, '');
+        }
+        else{//is a number
+          result=line[descriptionDataCleaned.enddate].replaceAll(/['"]+/g, '')
+          enddate=line[descriptionDataCleaned.enddate].replaceAll(/['"]+/g, '')
+        }
       }
     }
-    if (Number.isNaN(result)) {
+    if (isNaN(result)) {
       errMessage = "enddate is not in Date format"
       report.errors.push('Index: ' + i + ' (' + errMessage + ')');
       continue;

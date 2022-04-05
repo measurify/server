@@ -184,12 +184,13 @@ measurementSchema.pre("save", async function () {
 
 measurementSchema.pre("save", async function () {
   const res = await this.constructor.findOne({
-    feature: this.feature,
-    startDate: this.startDate,
-    endDate: this.endDate,
-    thing: this.thing,
-    script: this.script,
-    device: this.device,
+    //feature: this.feature,
+    //startDate: this.startDate,
+    //endDate: this.endDate,
+    //thing: this.thing,
+    //script: this.script,
+    //device: this.device,
+    _id:this._id
   });
   if (res) throw new Error("The measurement already exists");
 });
