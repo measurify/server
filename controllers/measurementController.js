@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const controller = require("./controller");
 const checker = require("./checker");
 const filemanager = require("../commons/filemanager");
+const dataset = require('../commons/dataset.js');
 
 const crypto = require("crypto");
 
@@ -167,3 +168,39 @@ exports.getfile = async (req, res) => {
   if (result != true) return result;
   await filemanager.download(req, res, req.resource._id, "webm");
 };
+
+exports.postFile = async (req, res, next, fileData, descriptionData, filename) => {
+  const Feature = mongoose.dbs[req.tenant.database].model('Feature');
+  const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
+  //prepare an object semplified for next steps
+  let result;
+  [descriptionDataCleaned, result] = await dataset.cleanObj(res, descriptionData);
+  if (result != true) return result;
+  //create report    
+  let report = { completed: [], errors: [] };
+
+  let feature=null;
+  //csv unrolling and control
+  //control number of element in the description    
+  const elementsNumber = await dataset.elementsCount(descriptionDataCleaned);
+
+  fileDataModified = fileData.replace(/(\r)/gm, "");
+  var lines = fileDataModified.split("\n");
+
+  //check for force save object on database by default value if it is true or undefined
+  let force = false;    
+  if (req.query.force == 'true') { force = true; }
+  //set the owner
+  if (req.user._id) req.body.owner = req.user._id;
+  //principal loop for each line
+  report = await dataset.principalLoop(req, res, lines, elementsNumber, feature, report, descriptionDataCleaned, filename, force, false);
+  //console.log(report);
+
+  if (report.errors.length === 0) {
+      return res.status(200).json(report);
+  }
+  else {
+      return res.status(202).json(report);
+  }
+};
+

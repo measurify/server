@@ -7,6 +7,7 @@ const bcrypt = require('bcryptjs');
 const { catchErrors } = require('./errorHandlers.js');
 const busboy = require('connect-busboy');
 const datasetController = require('../controllers/datasetController.js');
+const measurementController = require('../controllers/measurementController.js');
 const errors = require('./errors.js');
 const checker = require('../controllers/checker');
 const persistence = require('./persistence.js');
@@ -18,7 +19,7 @@ function sha(content) {
 
 
 //extract data when receive a form-data post
-exports.dataExtractor = async function (req, res, next) {
+exports.dataExtractor = async function (req, res, next,saveDataset) {
   if (!req.busboy) throw new Error('file binary data cannot be null');
   let fileData = null;
   let descriptionData = null;
@@ -58,8 +59,8 @@ exports.dataExtractor = async function (req, res, next) {
   });
   req.busboy.on('finish', () => {
     if (!fileData) { return errors.manage(res, errors.empty_file); }
-
-    catchErrors(datasetController.post(req, res, next, fileData, descriptionData, namefile));
+    if(saveDataset==true){catchErrors(datasetController.post(req, res, next, fileData, descriptionData, namefile));}
+    else{catchErrors(measurementController.postFile(req, res, next, fileData, descriptionData, namefile));}
   });
 }
 
@@ -318,7 +319,7 @@ exports.tagLoop = async function (descriptionDataCleaned, Tag, force, req) {
   return [tags, null];
 }
 
-exports.principalLoop = async function (req, res, lines, elementsNumber, feature, report, descriptionDataCleaned, filename, force) {
+exports.principalLoop = async function (req, res, lines, elementsNumber, feature, report, descriptionDataCleaned, filename, force, addDatasetTag) {
   const Device = mongoose.dbs[req.tenant.database].model('Device');
   const Thing = mongoose.dbs[req.tenant.database].model('Thing');
   const Tag = mongoose.dbs[req.tenant.database].model('Tag');
@@ -527,7 +528,7 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
     }
 
     //Add datauploadtag
-    tags.push(filename);
+    if(addDatasetTag==true){ tags.push(filename);}
 
     //Add Samples
     var samples = [];

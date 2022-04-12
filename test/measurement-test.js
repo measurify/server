@@ -1592,3 +1592,200 @@ describe('/STREAM measurement', () => {
     }); 
 });
 */
+
+// Test the /POST file csv route
+describe('/POST file CSV route', () => {
+  it('it should POST measurements from correct one row CSV', async () => {
+      const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+      const tag1 = await factory.createTag("test-tag-1", user);
+      const tag2 = await factory.createTag("test-tag-2", user);
+      const feature = await factory.createFeature("test-feature", user);
+      const device1 = await factory.createDevice("test-device-1", user, [feature]);
+      const device2 = await factory.createDevice("test-device-2", user, [feature]);
+      const thing1 = await factory.createThing("test-thing-1", user);
+      const testFile = './test/test/test-file1.txt';
+      const testDescription = './test/test/test-description.txt';
+      
+      const res = await chai.request(server).keepOpen().post('/v1/measurements/file').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+      res.should.have.status(200);
+
+      res.body.should.be.a('object');
+      res.body.should.have.property('completed');
+      res.body.should.have.property('errors');
+      res.body.completed.length.should.be.eql(1);
+      res.body.errors.length.should.be.eql(0);        
+  });
+
+  it('it should POST measurements from CSV some row correct and some not', async () => {
+      const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+      const tag1 = await factory.createTag("test-tag-1", user);
+      const tag2 = await factory.createTag("test-tag-2", user);
+      const feature = await factory.createFeature("test-feature", user);
+      const device1 = await factory.createDevice("test-device-1", user, [feature]);
+      const device2 = await factory.createDevice("test-device-2", user, [feature]);
+      const thing1 = await factory.createThing("test-thing-1", user);
+      const testFile = './test/test/test-file2.txt';
+      const testDescription = './test/test/test-description.txt';
+      
+      const res = await chai.request(server).keepOpen().post('/v1/measurements/file').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+      res.should.have.status(202);
+      res.body.should.be.a('object');
+      res.body.should.have.property('completed');
+      res.body.should.have.property('errors');
+      res.body.completed.length.should.be.eql(2);
+      res.body.errors.length.should.be.eql(7);
+      res.body.completed[0].should.be.eql('0');
+      res.body.completed[1].should.be.eql('7');
+      res.body.errors[0].should.be.eql('Index: 1 (thing fake-thing not found in database)');
+      res.body.errors[1].should.be.eql('Index: 2 (device fake-device not found in database)');
+      res.body.errors[2].should.be.eql('Index: 3 (not enough fields in the row)');
+      res.body.errors[3].should.be.eql('Index: 4 (startdate is not in Date format)');
+      res.body.errors[4].should.be.eql('Index: 5 (tag fake-tag not found in database)'); 
+      res.body.errors[5].should.be.eql('Index: 6 (enddate is not in Date format)');
+      res.body.errors[6].should.be.eql('Index: 8 (expected number in samples at position 0)');       
+  });
+
+  it('it should POST measurements from CSV with force = true and the object not found in database will be created', async () => {
+      const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+      const tag1 = await factory.createTag("test-tag-1", user);
+      const tag2 = await factory.createTag("test-tag-2", user);
+      const feature = await factory.createFeature("test-feature", user);
+      const device1 = await factory.createDevice("test-device-1", user, [feature]);
+      const device2 = await factory.createDevice("test-device-2", user, [feature]);
+      const thing1 = await factory.createThing("test-thing-1", user);
+      const testFile = './test/test/test-file2.txt';
+      const testDescription = './test/test/test-description.txt';
+      
+      const res = await chai.request(server).keepOpen().post('/v1/measurements/file?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+      res.should.have.status(202);
+      res.body.should.be.a('object');
+      res.body.should.have.property('completed');
+      res.body.should.have.property('errors');
+      res.body.completed.length.should.be.eql(5);
+      res.body.errors.length.should.be.eql(4);
+      res.body.completed[0].should.be.eql('0');
+      res.body.completed[1].should.be.eql('1');
+      res.body.completed[2].should.be.eql('2');
+      res.body.completed[3].should.be.eql('5');
+      res.body.completed[4].should.be.eql('7');
+      res.body.errors[0].should.be.eql('Index: 3 (not enough fields in the row)');
+      res.body.errors[1].should.be.eql('Index: 4 (startdate is not in Date format)');        
+      res.body.errors[2].should.be.eql('Index: 6 (enddate is not in Date format)');
+      res.body.errors[3].should.be.eql('Index: 8 (expected number in samples at position 0)');       
+  });
+  
+  it('it should not POST measurements with a wrong description file', async () => {
+      const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+      const tag1 = await factory.createTag("test-tag-1", user);
+      const tag2 = await factory.createTag("test-tag-2", user);
+      const feature = await factory.createFeature("test-feature", user);
+      const device1 = await factory.createDevice("test-device-1", user, [feature]);
+      const device2 = await factory.createDevice("test-device-2", user, [feature]);
+      const thing1 = await factory.createThing("test-thing-1", user);
+      const testFile = './test/test/test-file2.txt';
+      const testDescription = './test/test/test-fake-description.txt';
+      
+      const res = await chai.request(server).keepOpen().post('/v1/measurements/file?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+      res.should.have.status(errors.description_not_json.status);
+      res.body.should.be.a('object');
+      res.body.message.should.be.a('string');        
+      res.body.message.should.contain(errors.description_not_json.message);       
+  });
+
+  //with multiple features
+  it('it should POST measurements from correct one row CSV with multiple features', async () => {
+      const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+      const tag1 = await factory.createTag("test-tag-1", user);
+      const tag2 = await factory.createTag("test-tag-2", user);
+      const feature = await factory.createFeature("test-feature", user);
+      const device1 = await factory.createDevice("test-device-1", user, [feature]);
+      const device2 = await factory.createDevice("test-device-2", user, [feature]);
+      const thing1 = await factory.createThing("test-thing-1", user);
+      const testFile = './test/test/test-file1-multiple-features.txt';
+      const testDescription = './test/test/test-description-multiple-features.txt';
+      
+      const res = await chai.request(server).keepOpen().post('/v1/measurements/file').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+      res.should.have.status(200);
+      res.body.should.be.a('object');
+      res.body.should.have.property('completed');
+      res.body.should.have.property('errors');
+      res.body.completed.length.should.be.eql(1);
+      res.body.errors.length.should.be.eql(0);        
+  });
+
+  it('it should POST measurements from CSV with multiple features some row correct and some not', async () => {
+      const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+      const tag1 = await factory.createTag("test-tag-1", user);
+      const tag2 = await factory.createTag("test-tag-2", user);
+      const feature = await factory.createFeature("test-feature", user);
+      const device1 = await factory.createDevice("test-device-1", user, [feature]);
+      const device2 = await factory.createDevice("test-device-2", user, [feature]);
+      const thing1 = await factory.createThing("test-thing-1", user);
+      const testFile = './test/test/test-file2-multiple-features.txt';
+      const testDescription = './test/test/test-description-multiple-features.txt';
+      
+      const res = await chai.request(server).keepOpen().post('/v1/measurements/file').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+      res.should.have.status(202);
+      res.body.should.be.a('object');
+      res.body.should.have.property('completed');
+      res.body.should.have.property('errors');
+      res.body.completed.length.should.be.eql(1);
+      res.body.errors.length.should.be.eql(8);
+      res.body.completed[0].should.be.eql('0');
+      res.body.errors[0].should.be.eql('Index: 1 (thing fake-thing not found in database)');
+      res.body.errors[1].should.be.eql('Index: 2 (device fake-device not found in database)');
+      res.body.errors[2].should.be.eql('Index: 3 (not enough fields in the row)');
+      res.body.errors[3].should.be.eql('Index: 4 (startdate is not in Date format)');
+      res.body.errors[4].should.be.eql('Index: 5 (tag fake-tag not found in database)'); 
+      res.body.errors[5].should.be.eql('Index: 6 (enddate is not in Date format)');
+      res.body.errors[6].should.be.eql('Index: 7 (feature bad-feature not found in database)');
+      res.body.errors[7].should.be.eql('Index: 8 (expected number in samples at position 0)');       
+  });
+
+  it('it should POST measurements from CSV with multiple features with force = true and the object not found in database will be created', async () => {
+      const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+      const tag1 = await factory.createTag("test-tag-1", user);
+      const tag2 = await factory.createTag("test-tag-2", user);
+      const feature = await factory.createFeature("test-feature", user);
+      const device1 = await factory.createDevice("test-device-1", user, [feature]);
+      const device2 = await factory.createDevice("test-device-2", user, [feature]);
+      const thing1 = await factory.createThing("test-thing-1", user);
+      const testFile = './test/test/test-file2-multiple-features.txt';
+      const testDescription = './test/test/test-description-multiple-features.txt';
+      
+      const res = await chai.request(server).keepOpen().post('/v1/measurements/file?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+      res.should.have.status(202);
+      res.body.should.be.a('object');
+      res.body.should.have.property('completed');
+      res.body.should.have.property('errors');
+      res.body.completed.length.should.be.eql(4);
+      res.body.errors.length.should.be.eql(5);
+      res.body.completed[0].should.be.eql('0');
+      res.body.completed[1].should.be.eql('1');
+      res.body.completed[2].should.be.eql('2');
+      res.body.completed[3].should.be.eql('5');
+      res.body.errors[0].should.be.eql('Index: 3 (not enough fields in the row)');
+      res.body.errors[1].should.be.eql('Index: 4 (startdate is not in Date format)');        
+      res.body.errors[2].should.be.eql('Index: 6 (enddate is not in Date format)');
+      res.body.errors[3].should.be.eql('Index: 7 (feature bad-feature not found in database)');
+      res.body.errors[4].should.be.eql('Index: 8 (expected number in samples at position 0)');       
+  });
+  
+  it('it should not POST measurements with a wrong description file with multiple features', async () => {
+      const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+      const tag1 = await factory.createTag("test-tag-1", user);
+      const tag2 = await factory.createTag("test-tag-2", user);
+      const feature = await factory.createFeature("test-feature", user);
+      const device1 = await factory.createDevice("test-device-1", user, [feature]);
+      const device2 = await factory.createDevice("test-device-2", user, [feature]);
+      const thing1 = await factory.createThing("test-thing-1", user);
+      const testFile = './test/test/test-file2-multiple-features.txt';
+      const testDescription = './test/test/test-fake-description.txt';
+      
+      const res = await chai.request(server).keepOpen().post('/v1/measurements/file?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+      res.should.have.status(errors.description_not_json.status);
+      res.body.should.be.a('object');
+      res.body.message.should.be.a('string');        
+      res.body.message.should.contain(errors.description_not_json.message);       
+  });
+});

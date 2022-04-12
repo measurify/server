@@ -339,7 +339,6 @@ describe('/POST dataset', () => {
         
         const res = await chai.request(server).keepOpen().post('/v1/dataset').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(202);
-        console.log(res.body);
         res.body.should.be.a('object');
         res.body.should.have.property('completed');
         res.body.should.have.property('errors');

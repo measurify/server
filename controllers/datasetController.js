@@ -9,7 +9,7 @@ const { result } = require('underscore');
 const { file } = require('../types/itemTypes');
 const VisibilityTypes = require('../types/visibilityTypes.js');
 const { catchErrors } = require('../commons/errorHandlers.js');
-const datasetCreator = require('../commons/dataset.js');
+const dataset = require('../commons/dataset.js');
 
 exports.get = async (req, res) => {
     const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
@@ -23,14 +23,14 @@ exports.post = async (req, res, next, fileData, descriptionData, filename) => {
 
     //prepare an object semplified for next steps
     let result;
-    [descriptionDataCleaned, result] = await datasetCreator.cleanObj(res, descriptionData);
+    [descriptionDataCleaned, result] = await dataset.cleanObj(res, descriptionData);
     if (result != true) return result;
 
     let resourceDataupload
-    [result, resourceDataupload] = await datasetCreator.datauploadCheckAndCreate(req, res, descriptionDataCleaned, filename, fileData);
+    [result, resourceDataupload] = await dataset.datauploadCheckAndCreate(req, res, descriptionDataCleaned, filename, fileData);
     if (result != true) return result;
 
-    result = await datasetCreator.createTag(req, res, filename);
+    result = await dataset.createTag(req, res, filename);
     if (result != true) return result;
 
     //create report    
@@ -40,7 +40,7 @@ exports.post = async (req, res, next, fileData, descriptionData, filename) => {
     
     //csv unrolling and control
     //control number of element in the description    
-    const elementsNumber = await datasetCreator.elementsCount(descriptionDataCleaned);
+    const elementsNumber = await dataset.elementsCount(descriptionDataCleaned);
 
     fileDataModified = fileData.replace(/(\r)/gm, "");
     var lines = fileDataModified.split("\n");
@@ -51,11 +51,11 @@ exports.post = async (req, res, next, fileData, descriptionData, filename) => {
     //set the owner
     if (req.user._id) req.body.owner = req.user._id;
     //principal loop for each line
-    report = await datasetCreator.principalLoop(req, res, lines, elementsNumber, feature, report, descriptionDataCleaned, filename, force);
+    report = await dataset.principalLoop(req, res, lines, elementsNumber, feature, report, descriptionDataCleaned, filename, force, true);
     //console.log(report);
 
 
-    result = await datasetCreator.updateDataupload(req, res, report, resourceDataupload);
+    result = await dataset.updateDataupload(req, res, report, resourceDataupload);
     if (result != true) {
         return result;
     };
