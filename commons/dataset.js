@@ -19,7 +19,7 @@ function sha(content) {
 
 
 //extract data when receive a form-data post
-exports.dataExtractor = async function (req, res, next,saveDataset) {
+exports.dataExtractor = async function (req, res, next, saveDataset) {
   if (!req.busboy) throw new Error('file binary data cannot be null');
   let fileData = null;
   let descriptionData = null;
@@ -59,8 +59,8 @@ exports.dataExtractor = async function (req, res, next,saveDataset) {
   });
   req.busboy.on('finish', () => {
     if (!fileData) { return errors.manage(res, errors.empty_file); }
-    if(saveDataset==true){catchErrors(datasetController.post(req, res, next, fileData, descriptionData, namefile));}
-    else{catchErrors(measurementController.postFile(req, res, next, fileData, descriptionData, namefile));}
+    if (saveDataset == true) { catchErrors(datasetController.post(req, res, next, fileData, descriptionData, namefile)); }
+    else { catchErrors(measurementController.postFile(req, res, next, fileData, descriptionData, namefile)); }
   });
 }
 
@@ -166,7 +166,7 @@ exports.elementsCount = async function (descriptionData) {
       }
       else {
         if (key == "enddate") {
-          if (!isNaN(descriptionData.enddate)&&descriptionData.enddate == descriptionData.startdate){}
+          if (!isNaN(descriptionData.enddate) && descriptionData.enddate == descriptionData.startdate) { }
           else { elementsNumber++; }
         }
         else {
@@ -268,13 +268,29 @@ exports.sampleLoop = async function (descriptionDataCleaned, line, feature) {
   for (let k in descriptionDataCleaned.items[feature._id]) {
     id = line[descriptionDataCleaned.items[feature._id][k]].replaceAll(/['"]+/g, '');
     if (feature.items[k].type == "number") {
-      if (isNaN(id)) {//not a number       
-        errMessage = "expected number in samples at position " + k;
-        return [null, errMessage];
+      if (
+        id == "NaN" ||
+        id == "nan" ||
+        id == "Nan" ||
+        id == "NAN" ||
+        id == "Inf" ||
+        id == "-Inf" ||
+        id == "inf" ||
+        id == "-inf"
+      ) {
+        id=null;
+        samples.push(id);
+        continue;
       }
       else {
-        samples.push(Number(id));
-        continue;
+        if (isNaN(id)) {//not a number       
+          errMessage = "expected number in samples at position " + k;
+          return [null, errMessage];
+        }
+        else {
+          samples.push(Number(id));
+          continue;
+        }
       }
     }
     else if (feature.items[k].type == "string") {
@@ -328,7 +344,7 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
   for (let i in lines) {
     if (lines[i] == "") continue;
     line = lines[i].split(",");
-    if (line.length != elementsNumber) {      
+    if (line.length != elementsNumber) {
       errMessage = "not enough fields in the row"
       report.errors.push('Index: ' + i + ' (' + errMessage + ')');
       continue;
@@ -458,23 +474,23 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
     //check if startdate is a date
     let result = null;
     if (descriptionDataCleaned.commonElements.hasOwnProperty("startdate")) {//startdate fixed
-      if(isNaN(descriptionDataCleaned.commonElements["startdate"].replaceAll(/['"]+/g, ''))){
+      if (isNaN(descriptionDataCleaned.commonElements["startdate"].replaceAll(/['"]+/g, ''))) {
         result = Date.parse(descriptionDataCleaned.commonElements["startdate"].replaceAll(/['"]+/g, ''));
         startdate = descriptionDataCleaned.commonElements["startdate"].replaceAll(/['"]+/g, '');
       }
-      else{//is a number
-        result=descriptionDataCleaned.commonElements["startdate"].replaceAll(/['"]+/g, '');
-        startdate=descriptionDataCleaned.commonElements["startdate"].replaceAll(/['"]+/g, '');
+      else {//is a number
+        result = descriptionDataCleaned.commonElements["startdate"].replaceAll(/['"]+/g, '');
+        startdate = descriptionDataCleaned.commonElements["startdate"].replaceAll(/['"]+/g, '');
       }
     }
     else {
-      if(isNaN(line[descriptionDataCleaned.startdate].replaceAll(/['"]+/g, ''))){
+      if (isNaN(line[descriptionDataCleaned.startdate].replaceAll(/['"]+/g, ''))) {
         result = Date.parse(line[descriptionDataCleaned.startdate].replaceAll(/['"]+/g, ''));//need to remove ""
         startdate = line[descriptionDataCleaned.startdate].replaceAll(/['"]+/g, '');
       }
-      else{//is a number
-        result=line[descriptionDataCleaned.startdate].replaceAll(/['"]+/g, '')
-        startdate=line[descriptionDataCleaned.startdate].replaceAll(/['"]+/g, '')
+      else {//is a number
+        result = line[descriptionDataCleaned.startdate].replaceAll(/['"]+/g, '')
+        startdate = line[descriptionDataCleaned.startdate].replaceAll(/['"]+/g, '')
       }
     }
     if (isNaN(result)) {
@@ -487,13 +503,13 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
     //check if enddate exist and is a date
     let enddate = "";
     if (descriptionDataCleaned.commonElements.hasOwnProperty("enddate")) {//enddate fixed
-      if(isNaN(descriptionDataCleaned.commonElements["enddate"].replaceAll(/['"]+/g, ''))){
+      if (isNaN(descriptionDataCleaned.commonElements["enddate"].replaceAll(/['"]+/g, ''))) {
         result = Date.parse(descriptionDataCleaned.commonElements["enddate"].replaceAll(/['"]+/g, ''));
         enddate = descriptionDataCleaned.commonElements["enddate"].replaceAll(/['"]+/g, '');
       }
-      else{//is a number
-        result=descriptionDataCleaned.commonElements["enddate"].replaceAll(/['"]+/g, '');
-        enddate=descriptionDataCleaned.commonElements["enddate"].replaceAll(/['"]+/g, '');
+      else {//is a number
+        result = descriptionDataCleaned.commonElements["enddate"].replaceAll(/['"]+/g, '');
+        enddate = descriptionDataCleaned.commonElements["enddate"].replaceAll(/['"]+/g, '');
       }
     }
     else {
@@ -501,13 +517,13 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
         enddate = startdate;
       }
       else {
-        if(isNaN(line[descriptionDataCleaned.enddate].replaceAll(/['"]+/g, ''))){
+        if (isNaN(line[descriptionDataCleaned.enddate].replaceAll(/['"]+/g, ''))) {
           result = Date.parse(line[descriptionDataCleaned.enddate].replaceAll(/['"]+/g, ''));//need to remove ""
           enddate = line[descriptionDataCleaned.enddate].replaceAll(/['"]+/g, '');
         }
-        else{//is a number
-          result=line[descriptionDataCleaned.enddate].replaceAll(/['"]+/g, '')
-          enddate=line[descriptionDataCleaned.enddate].replaceAll(/['"]+/g, '')
+        else {//is a number
+          result = line[descriptionDataCleaned.enddate].replaceAll(/['"]+/g, '')
+          enddate = line[descriptionDataCleaned.enddate].replaceAll(/['"]+/g, '')
         }
       }
     }
@@ -528,7 +544,7 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
     }
 
     //Add datauploadtag
-    if(addDatasetTag==true){ tags.push(filename);}
+    if (addDatasetTag == true) { tags.push(filename); }
 
     //Add Samples
     var samples = [];
