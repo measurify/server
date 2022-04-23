@@ -335,7 +335,7 @@ exports.tagLoop = async function (descriptionDataCleaned, Tag, force, req) {
   return [tags, null];
 }
 
-exports.principalLoop = async function (req, res, lines, elementsNumber, feature, report, descriptionDataCleaned, filename, force, addDatasetTag) {
+exports.principalLoop = async function (req, res, lines, elementsNumber, feature, report, descriptionDataCleaned, filename, force, header, addDatasetTag) {
   const Device = mongoose.dbs[req.tenant.database].model('Device');
   const Thing = mongoose.dbs[req.tenant.database].model('Thing');
   const Tag = mongoose.dbs[req.tenant.database].model('Tag');
@@ -343,6 +343,7 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
   //algorithm for check every line of the csv and save the value inside a measurement
   for (let i in lines) {
     if (lines[i] == "") continue;
+    if(i==0&header==true) continue;
     line = lines[i].split(",");
     if (line.length != elementsNumber) {
       errMessage = "not enough fields in the row"

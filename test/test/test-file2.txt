@@ -1,3 +1,4 @@
+"startdata","thing","tag","device","enddata","value"
 "2022-02-01T17:54:33.180Z","test-thing-1","test-tag-1","test-device-1","2022-02-01T17:54:33.180Z",10
 "2022-01-01T17:54:33.180Z","fake-thing","test-tag-1","test-device-1","2022-01-01T17:54:33.180Z",20
 "2022-03-01T17:54:33.180Z","test-thing-1","test-tag-1","fake-device","2022-03-01T17:54:33.180Z",30

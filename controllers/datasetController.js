@@ -45,13 +45,18 @@ exports.post = async (req, res, next, fileData, descriptionData, filename) => {
     fileDataModified = fileData.replace(/(\r)/gm, "");
     var lines = fileDataModified.split("\n");
 
-    //check for force save object on database by default value if it is true or undefined
+    //check for force save object on database by default value if it is false or undefined
     let force = false;    
     if (req.query.force == 'true') { force = true; }
+
+    //check if the first line of the csv is the header of the file, default is true because csv needs header
+    let header = true;
+    if (req.query.header == 'false') { header = false; }
+
     //set the owner
     if (req.user._id) req.body.owner = req.user._id;
     //principal loop for each line
-    report = await dataset.principalLoop(req, res, lines, elementsNumber, feature, report, descriptionDataCleaned, filename, force, true);
+    report = await dataset.principalLoop(req, res, lines, elementsNumber, feature, report, descriptionDataCleaned, filename, force, header ,true);
     //console.log(report);
 
 
