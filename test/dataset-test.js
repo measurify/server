@@ -251,7 +251,7 @@ describe('/POST dataset', () => {
         res.body.completed[1].should.be.eql('8');
         res.body.errors[0].should.be.eql('Index: 2 (thing fake-thing not found in database)');
         res.body.errors[1].should.be.eql('Index: 3 (device fake-device not found in database)');
-        res.body.errors[2].should.be.eql('Index: 4 (not enough fields in the row)');
+        res.body.errors[2].should.be.eql('Index: 4 (not enough fields in the row 6 but in line 5)');
         res.body.errors[3].should.be.eql('Index: 5 (startdate is not in Date format)');
         res.body.errors[4].should.be.eql('Index: 6 (tag fake-tag not found in database)'); 
         res.body.errors[5].should.be.eql('Index: 7 (enddate is not in Date format)');
@@ -281,7 +281,7 @@ describe('/POST dataset', () => {
         res.body.completed[2].should.be.eql('3');
         res.body.completed[3].should.be.eql('6');
         res.body.completed[4].should.be.eql('8');
-        res.body.errors[0].should.be.eql('Index: 4 (not enough fields in the row)');
+        res.body.errors[0].should.be.eql('Index: 4 (not enough fields in the row 6 but in line 5)');
         res.body.errors[1].should.be.eql('Index: 5 (startdate is not in Date format)');        
         res.body.errors[2].should.be.eql('Index: 7 (enddate is not in Date format)');
         res.body.errors[3].should.be.eql('Index: 9 (expected number in samples at position 0)');       
@@ -347,7 +347,7 @@ describe('/POST dataset', () => {
         res.body.completed[0].should.be.eql('1');
         res.body.errors[0].should.be.eql('Index: 2 (thing fake-thing not found in database)');
         res.body.errors[1].should.be.eql('Index: 3 (device fake-device not found in database)');
-        res.body.errors[2].should.be.eql('Index: 4 (not enough fields in the row)');
+        res.body.errors[2].should.be.eql('Index: 4 (not enough fields in the row 7 but in line 6)');
         res.body.errors[3].should.be.eql('Index: 5 (startdate is not in Date format)');
         res.body.errors[4].should.be.eql('Index: 6 (tag fake-tag not found in database)'); 
         res.body.errors[5].should.be.eql('Index: 7 (enddate is not in Date format)');
@@ -377,7 +377,7 @@ describe('/POST dataset', () => {
         res.body.completed[1].should.be.eql('2');
         res.body.completed[2].should.be.eql('3');
         res.body.completed[3].should.be.eql('6');
-        res.body.errors[0].should.be.eql('Index: 4 (not enough fields in the row)');
+        res.body.errors[0].should.be.eql('Index: 4 (not enough fields in the row 7 but in line 6)');
         res.body.errors[1].should.be.eql('Index: 5 (startdate is not in Date format)');        
         res.body.errors[2].should.be.eql('Index: 7 (enddate is not in Date format)');
         res.body.errors[3].should.be.eql('Index: 8 (feature bad-feature not found in database)');
@@ -406,7 +406,7 @@ describe('/POST dataset', () => {
         res.body.completed[1].should.be.eql('1');
         res.body.completed[2].should.be.eql('2');
         res.body.completed[3].should.be.eql('5');
-        res.body.errors[0].should.be.eql('Index: 3 (not enough fields in the row)');
+        res.body.errors[0].should.be.eql('Index: 3 (not enough fields in the row 7 but in line 6)');
         res.body.errors[1].should.be.eql('Index: 4 (startdate is not in Date format)');        
         res.body.errors[2].should.be.eql('Index: 6 (enddate is not in Date format)');
         res.body.errors[3].should.be.eql('Index: 7 (feature bad-feature not found in database)');
