@@ -150,7 +150,7 @@ measurementSchema.pre("save", async function () {
 // check consistency between samples and feature
 measurementSchema.pre("save", async function () {
   let feature = cache.get(this.feature);
-  if (!feature) {
+  if (!feature||!feature.items) {//Problem
     const Feature = this.constructor.model("Feature");
     feature = await Feature.findById(this.feature);
     cache.set(this.feature, feature);

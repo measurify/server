@@ -219,7 +219,7 @@ exports.cleanObj = async function (res, descriptionData) {//cleaned c and -1 for
         else {
           if (key == "commonElements") { }
           else {
-            if (isNaN(descriptionData[key])) {// if is not a number it's a string that is in common with all measurements
+            if (typeof descriptionData[key]=='string') {// if is not a number it's a string that is in common with all measurements              
               data.commonElements[key] = descriptionData[key];
             }
             else {//is a number
@@ -346,7 +346,7 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
     if(i==0&header==true) continue;
     line = lines[i].split(",");
     if (line.length != elementsNumber) {
-      errMessage = "not enough fields in the row"
+      errMessage = "not enough fields in the row "+ elementsNumber+" but in line "+ line.length;
       report.errors.push('Index: ' + i + ' (' + errMessage + ')');
       continue;
     }
