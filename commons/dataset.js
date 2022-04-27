@@ -346,7 +346,7 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
     if(i==0&header==true) continue;
     line = lines[i].split(",");
     if (line.length != elementsNumber) {
-      errMessage = "not enough fields in the row "+ elementsNumber+" but in line "+ line.length;
+      errMessage = "Mismatch number of elements: Expected "+ elementsNumber+", got "+ line.length;
       report.errors.push('Index: ' + i + ' (' + errMessage + ')');
       continue;
     }
@@ -592,4 +592,134 @@ exports.updateDataupload = async function (req, res, report, resource) {
     return true;
   }
   catch (err) { return errors.manage(res, errors.put_request_error, err); }
+}
+
+exports.checkCommonElements = async function (req, res, descriptionDataCleaned,force) {
+  
+  //check if feature exists and has the same number of items 
+  if (descriptionDataCleaned.commonElements.hasOwnProperty("feature")) {//feature fixed
+    const Feature = mongoose.dbs[req.tenant.database].model('Feature');
+    featureName = descriptionDataCleaned.commonElements["feature"];
+   
+    featureInfo = await Feature.findById(featureName);
+    if (!featureInfo) {//error feature not found 
+      return errors.manage(res, errors.feature_not_found_description, featureName+ " not found");
+    }
+
+    //check if feature is also in description in items
+    if (!descriptionDataCleaned.items.hasOwnProperty(featureName)) {
+      return errors.manage(res, errors.feature_not_in_items_description, featureName);
+    }
+
+    //check if feature has the same number of items 
+    itemsNumber = descriptionDataCleaned.items[featureName].length;
+    if (itemsNumber != featureInfo.items.length) {     
+      return errors.manage(res, errors.mismatch_feature_items_description, featureName+ " has "+featureInfo.items.length+" elements on database, while in the description has " + itemsNumber + " elements");
+    }
+  }
+
+  //check if exist thing with the same id 
+  if (descriptionDataCleaned.commonElements.hasOwnProperty("thing")) {//thing fixed
+    const Thing = mongoose.dbs[req.tenant.database].model('Thing');
+    thing = descriptionDataCleaned.commonElements["thing"];  
+  
+    let resultThing = await this.checkerIfExist(Thing, thing);
+    if (!resultThing) {
+      if (force) {//save thing on database by default value
+        let body = {
+          '_id': thing,
+          'owner': req.body.owner
+        };
+        let result = await this.saveModelData(req, body, Thing);
+        if (result != true) {//error in the post of the value
+          return errors.manage(res, errors.post_force_element,result);
+        }
+      }
+      else {//force false
+          return errors.manage(res, errors.thing_not_found_description,thing);
+      }
+    }
+  }
+
+  //check if exist device with the same id 
+  if (descriptionDataCleaned.commonElements.hasOwnProperty("device")) {//device fixed
+    const Device = mongoose.dbs[req.tenant.database].model('Device');
+    device = descriptionDataCleaned.commonElements["device"];
+  
+  
+    let resultDevice = await this.checkerIfExist(Device, device);
+    if (!resultDevice) {
+      if (force) {//save device on database by default value
+        if(!featureInfo){//no feature id
+          body = {//default value
+            '_id': device,
+            'owner': req.body.owner,
+            "period": "5s",
+            "cycle": "10m",
+            "retryTime": "10s",
+            "scriptListMaxSize": 5,
+            "measurementBufferSize": 20,
+            "issueBufferSize": 20,
+            "sendBufferSize": 20,
+            "scriptStatementMaxSize": 5,
+            "statementBufferSize": 10,
+            "measurementBufferPolicy": "decimation"
+          };
+        }
+        else{//with feature id
+          body = {//default value
+            '_id': device,
+            'owner': req.body.owner,
+            "features": [featureInfo._id],
+            "period": "5s",
+            "cycle": "10m",
+            "retryTime": "10s",
+            "scriptListMaxSize": 5,
+            "measurementBufferSize": 20,
+            "issueBufferSize": 20,
+            "sendBufferSize": 20,
+            "scriptStatementMaxSize": 5,
+            "statementBufferSize": 10,
+            "measurementBufferPolicy": "decimation"
+          };
+        }
+
+        result = await this.saveModelData(req, body, Device);
+        if (result != true) {//error in the post of the value
+          return errors.manage(res, errors.post_force_element,result);
+        }
+      }
+      else {//force false
+        return errors.manage(res, errors.device_not_found_description,device);
+      }
+    }
+  
+    else {//device exist and with force=true the device must have feature.id in features
+      let deviceInfo = await Device.findById(device);
+      if(descriptionDataCleaned.commonElements.hasOwnProperty("feature")){        
+        if (!deviceInfo["features"].includes(featureInfo.id)) {
+          if(force){
+            try {
+              let fields = ['features', 'scripts', 'tags', 'visibility', 'period', 'cycle', 'retryTime', 'scriptListMaxSize', 'measurementBufferSize', 'issueBufferSize', 'sendBufferSize', 'scriptStatementMaxSize', 'statementBufferSize', 'measurementBufferPolicy'];
+              body = {
+                "features": {
+                  "add": [feature.id]
+                }
+              }
+              await persistence.update(body, fields, deviceInfo, Device, req.tenant);
+              deviceInfo = await Device.findById(device);
+              cache.set(device, deviceInfo);
+            }
+            catch (err) {
+              return errors.manage(res, errors.post_force_element,err);
+            }
+          }
+          else{//force = false
+            return errors.manage(res, errors.device_not_found_description,device+" doesn't have "+feature.id+ " as feature");
+          }
+        }
+      }
+    }
+  }  
+  return true;
 }

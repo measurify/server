@@ -26,6 +26,17 @@ exports.post = async (req, res, next, fileData, descriptionData, filename) => {
     [descriptionDataCleaned, result] = await dataset.cleanObj(res, descriptionData);
     if (result != true) return result;
 
+    //check for force save object on database by default value if it is false or undefined
+    let force = false;    
+    if (req.query.force == 'true') { force = true; }
+
+    //check if the first line of the csv is the header of the file, default is true because csv needs header
+    let header = true;
+    if (req.query.header == 'false') { header = false; }
+
+    result = await dataset.checkCommonElements(req, res, descriptionDataCleaned,force);
+    if (result != true) return result;
+
     let resourceDataupload
     [result, resourceDataupload] = await dataset.datauploadCheckAndCreate(req, res, descriptionDataCleaned, filename, fileData);
     if (result != true) return result;
@@ -43,15 +54,7 @@ exports.post = async (req, res, next, fileData, descriptionData, filename) => {
     const elementsNumber = await dataset.elementsCount(descriptionDataCleaned);
 
     fileDataModified = fileData.replace(/(\r)/gm, "");
-    var lines = fileDataModified.split("\n");
-
-    //check for force save object on database by default value if it is false or undefined
-    let force = false;    
-    if (req.query.force == 'true') { force = true; }
-
-    //check if the first line of the csv is the header of the file, default is true because csv needs header
-    let header = true;
-    if (req.query.header == 'false') { header = false; }
+    var lines = fileDataModified.split("\n");    
 
     //set the owner
     if (req.user._id) req.body.owner = req.user._id;

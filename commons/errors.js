@@ -40,6 +40,12 @@ exports.max_one_description_file             = { status: 400, value: 37, message
 exports.error_description_format             = { status: 400, value: 38, message: 'error in the format of description file, please control that each row has \"c\" + number'}; 
 exports.error_description_keys               = { status: 400, value: 39, message: 'error in the format of description file, please control that keys are thing, device, items, tags, startdate, enddate,feature'}; 
 exports.empty_file                           = { status: 400, value: 40, message: 'file binary data cannot be null'}; 
+exports.feature_not_found_description        = { status: 400, value: 41, message: 'feature in the description file not found on database'}; 
+exports.feature_not_in_items_description     = { status: 400, value: 42, message: 'feature is not a items key in description file'}; 
+exports.mismatch_feature_items_description   = { status: 400, value: 43, message: 'mismatch between number of feature elements in database and description items'}; 
+exports.post_force_element                   = { status: 400, value: 44, message: 'error in forced loading with default values'}; 
+exports.thing_not_found_description          = { status: 400, value: 45, message: 'thing in the description file not found on database'}; 
+exports.device_not_found_description         = { status: 400, value: 46, message: 'device in the description file not found on database'}; 
 
 
 
