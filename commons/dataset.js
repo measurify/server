@@ -219,7 +219,7 @@ exports.cleanObj = async function (res, descriptionData) {//cleaned c and -1 for
         else {
           if (key == "commonElements") { }
           else {
-            if (typeof descriptionData[key]=='string') {// if is not a number it's a string that is in common with all measurements              
+            if (typeof descriptionData[key] == 'string') {// if is not a number it's a string that is in common with all measurements              
               data.commonElements[key] = descriptionData[key];
             }
             else {//is a number
@@ -278,7 +278,7 @@ exports.sampleLoop = async function (descriptionDataCleaned, line, feature) {
         id == "inf" ||
         id == "-inf"
       ) {
-        id=null;
+        id = null;
         samples.push(id);
         continue;
       }
@@ -340,13 +340,14 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
   const Thing = mongoose.dbs[req.tenant.database].model('Thing');
   const Tag = mongoose.dbs[req.tenant.database].model('Tag');
   const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
+  //TEST OTTIMIZZAZIONE let allMeasurementBody=[];
   //algorithm for check every line of the csv and save the value inside a measurement
   for (let i in lines) {
     if (lines[i] == "") continue;
-    if(i==0&header==true) continue;
+    if (i == 0 & header == true) continue;
     line = lines[i].split(",");
     if (line.length != elementsNumber) {
-      errMessage = "Mismatch number of elements: Expected "+ elementsNumber+", got "+ line.length;
+      errMessage = "Mismatch number of elements: Expected " + elementsNumber + ", got " + line.length;
       report.errors.push('Index: ' + i + ' (' + errMessage + ')');
       continue;
     }
@@ -356,31 +357,33 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
 
     const Feature = mongoose.dbs[req.tenant.database].model('Feature');
 
-    if (descriptionDataCleaned.commonElements.hasOwnProperty("feature")) {//feature fixed
+    if (descriptionDataCleaned.commonElements.hasOwnProperty("feature")) {//feature in file description checked in checkCommonElements
       featureName = descriptionDataCleaned.commonElements["feature"];
+      featureInfo = await Feature.findById(featureName);
     }
     else {
       featureName = line[descriptionDataCleaned.feature].replaceAll(/['"]+/g, '');
-    }
-    let featureInfo = await Feature.findById(featureName);
-    if (!featureInfo) {//error feature not found 
-      errMessage = "feature " + featureName + " not found in database"
-      report.errors.push('Index: ' + i + ' (' + errMessage + ')');
-      continue;
-    }
-    //check if feature is also in description in items
-    if (!descriptionDataCleaned.items.hasOwnProperty(featureName)) {
-      errMessage = "the feature " + featureName + " is not as key in description items"
-      report.errors.push('Index: ' + i + ' (' + errMessage + ')');
-      continue;
-    }
 
-    //check if feature has the same number of items 
-    itemsNumber = descriptionDataCleaned.items[featureName].length;
-    if (itemsNumber != featureInfo.items.length) {
-      errMessage = "the feature " + featureName + " has " + featureInfo.items.length + " items, while the line has " + itemsNumber + " items"
-      report.errors.push('Index: ' + i + ' (' + errMessage + ')');
-      continue;
+      featureInfo = await Feature.findById(featureName);
+      if (!featureInfo) {//error feature not found 
+        errMessage = "feature " + featureName + " not found in database"
+        report.errors.push('Index: ' + i + ' (' + errMessage + ')');
+        continue;
+      }
+      //check if feature is also in description in items
+      if (!descriptionDataCleaned.items.hasOwnProperty(featureName)) {
+        errMessage = "the feature " + featureName + " is not as key in description items"
+        report.errors.push('Index: ' + i + ' (' + errMessage + ')');
+        continue;
+      }
+
+      //check if feature has the same number of items 
+      itemsNumber = descriptionDataCleaned.items[featureName].length;
+      if (itemsNumber != featureInfo.items.length) {
+        errMessage = "the feature " + featureName + " has " + featureInfo.items.length + " items, while the line has " + itemsNumber + " items"
+        report.errors.push('Index: ' + i + ' (' + errMessage + ')');
+        continue;
+      }
     }
     feature = featureInfo;
 
@@ -390,24 +393,25 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
     }
     else {
       thing = line[descriptionDataCleaned.thing].replaceAll(/['"]+/g, '');
-    }
-    let resultThing = await this.checkerIfExist(Thing, thing);
-    if (!resultThing) {
-      if (force) {//save thing on database by default value
-        let body = {
-          '_id': thing,
-          'owner': req.body.owner
-        };
-        let result = await this.saveModelData(req, body, Thing);
-        if (result != true) {//error in the post of the value
-          report.errors.push('Index: ' + i + ' (thing: ' + result + ')');
+
+      let resultThing = await this.checkerIfExist(Thing, thing);
+      if (!resultThing) {
+        if (force) {//save thing on database by default value
+          let body = {
+            '_id': thing,
+            'owner': req.body.owner
+          };
+          let result = await this.saveModelData(req, body, Thing);
+          if (result != true) {//error in the post of the value
+            report.errors.push('Index: ' + i + ' (thing: ' + result + ')');
+            continue;
+          }
+        }
+        else {
+          errMessage = "thing " + thing + " not found in database"
+          report.errors.push('Index: ' + i + ' (' + errMessage + ')');
           continue;
         }
-      }
-      else {
-        errMessage = "thing " + thing + " not found in database"
-        report.errors.push('Index: ' + i + ' (' + errMessage + ')');
-        continue;
       }
     }
 
@@ -417,41 +421,44 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
     }
     else {
       device = line[descriptionDataCleaned.device].replaceAll(/['"]+/g, '');
-    }
-    resultDevice = await this.checkerIfExist(Device, device);
-    if (!resultDevice) {
-      if (force) {//save device on database by default value
-        body = {//default value
-          '_id': device,
-          'owner': req.body.owner,
-          "features": [feature._id],
-          "period": "5s",
-          "cycle": "10m",
-          "retryTime": "10s",
-          "scriptListMaxSize": 5,
-          "measurementBufferSize": 20,
-          "issueBufferSize": 20,
-          "sendBufferSize": 20,
-          "scriptStatementMaxSize": 5,
-          "statementBufferSize": 10,
-          "measurementBufferPolicy": "decimation"
-        };
 
-        let result = await this.saveModelData(req, body, Device);
-        if (result != true) {//error in the post of the value
-          report.errors.push('Index: ' + i + ' (device: ' + result + ')');
+      resultDevice = await this.checkerIfExist(Device, device);
+      if (!resultDevice) {
+        if (force) {//save device on database by default value
+          body = {//default value
+            '_id': device,
+            'owner': req.body.owner,
+            "features": [feature._id],
+            "period": "5s",
+            "cycle": "10m",
+            "retryTime": "10s",
+            "scriptListMaxSize": 5,
+            "measurementBufferSize": 20,
+            "issueBufferSize": 20,
+            "sendBufferSize": 20,
+            "scriptStatementMaxSize": 5,
+            "statementBufferSize": 10,
+            "measurementBufferPolicy": "decimation"
+          };
+
+          let result = await this.saveModelData(req, body, Device);
+          if (result != true) {//error in the post of the value
+            report.errors.push('Index: ' + i + ' (device: ' + result + ')');
+            continue;
+          }
+        }
+        else {
+          errMessage = "device " + device + " not found in database"
+          report.errors.push('Index: ' + i + ' (' + errMessage + ')');
           continue;
         }
       }
-      else {
-        errMessage = "device " + device + " not found in database"
-        report.errors.push('Index: ' + i + ' (' + errMessage + ')');
-        continue;
-      }
     }
-    else {//device exist and with force=true the device must have feature.id in features
-      let deviceInfo = await Device.findById(device);
-      if (!deviceInfo["features"].includes(feature.id)) {
+
+    //device exist and with force=true the device must have feature.id in features
+    let deviceInfo = await Device.findById(device);
+    if (!deviceInfo["features"].includes(feature.id)) {
+      if (force) {
         try {
           let fields = ['features', 'scripts', 'tags', 'visibility', 'period', 'cycle', 'retryTime', 'scriptListMaxSize', 'measurementBufferSize', 'issueBufferSize', 'sendBufferSize', 'scriptStatementMaxSize', 'statementBufferSize', 'measurementBufferPolicy'];
           body = {
@@ -470,7 +477,13 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
 
         }
       }
+      else {
+        errMessage = "device " + device + " doesn't have feature " + feature.id + ", please add it or choose force = true"
+        report.errors.push('Index: ' + i + ' (' + errMessage + ')');
+        continue;
+      }
     }
+
 
     //check if startdate is a date
     let result = null;
@@ -560,6 +573,9 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
     //create measurement
     body = await createRequestObject(startdate, enddate, thing, feature._id, device, samples, tags, req.user._id);
 
+    
+    //TEST OTTIMIZZAZIONE allMeasurementBody.push(body);
+    
     result = await this.saveModelData(req, body, Measurement);
     if (result != true) {//error in the post of the value
       report.errors.push('Index: ' + i + ' (' + result + ')');
@@ -568,6 +584,14 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
       report.completed.push(i);
     }
   }
+  /*TEST OTTIMIZZAZIONE
+  result = await this.saveModelData(req, allMeasurementBody, Measurement);
+  if (result != true) {//error in the post of the value
+    report.errors.push('Index: ' + 0 + ' (' + result + ')');
+  }
+  else {
+    report.completed.push(0);
+  }*/
   return report;
 }
 
@@ -594,16 +618,16 @@ exports.updateDataupload = async function (req, res, report, resource) {
   catch (err) { return errors.manage(res, errors.put_request_error, err); }
 }
 
-exports.checkCommonElements = async function (req, res, descriptionDataCleaned,force) {
-  
+exports.checkCommonElements = async function (req, res, descriptionDataCleaned, force) {
+
   //check if feature exists and has the same number of items 
   if (descriptionDataCleaned.commonElements.hasOwnProperty("feature")) {//feature fixed
     const Feature = mongoose.dbs[req.tenant.database].model('Feature');
     featureName = descriptionDataCleaned.commonElements["feature"];
-   
+
     featureInfo = await Feature.findById(featureName);
     if (!featureInfo) {//error feature not found 
-      return errors.manage(res, errors.feature_not_found_description, featureName+ " not found");
+      return errors.manage(res, errors.feature_not_found_description, featureName + " not found");
     }
 
     //check if feature is also in description in items
@@ -613,16 +637,16 @@ exports.checkCommonElements = async function (req, res, descriptionDataCleaned,f
 
     //check if feature has the same number of items 
     itemsNumber = descriptionDataCleaned.items[featureName].length;
-    if (itemsNumber != featureInfo.items.length) {     
-      return errors.manage(res, errors.mismatch_feature_items_description, featureName+ " has "+featureInfo.items.length+" elements on database, while in the description has " + itemsNumber + " elements");
+    if (itemsNumber != featureInfo.items.length) {
+      return errors.manage(res, errors.mismatch_feature_items_description, featureName + " has " + featureInfo.items.length + " elements on database, while in the description has " + itemsNumber + " elements");
     }
   }
 
   //check if exist thing with the same id 
   if (descriptionDataCleaned.commonElements.hasOwnProperty("thing")) {//thing fixed
     const Thing = mongoose.dbs[req.tenant.database].model('Thing');
-    thing = descriptionDataCleaned.commonElements["thing"];  
-  
+    thing = descriptionDataCleaned.commonElements["thing"];
+
     let resultThing = await this.checkerIfExist(Thing, thing);
     if (!resultThing) {
       if (force) {//save thing on database by default value
@@ -632,11 +656,11 @@ exports.checkCommonElements = async function (req, res, descriptionDataCleaned,f
         };
         let result = await this.saveModelData(req, body, Thing);
         if (result != true) {//error in the post of the value
-          return errors.manage(res, errors.post_force_element,result);
+          return errors.manage(res, errors.post_force_element, result);
         }
       }
       else {//force false
-          return errors.manage(res, errors.thing_not_found_description,thing);
+        return errors.manage(res, errors.thing_not_found_description, thing);
       }
     }
   }
@@ -645,12 +669,12 @@ exports.checkCommonElements = async function (req, res, descriptionDataCleaned,f
   if (descriptionDataCleaned.commonElements.hasOwnProperty("device")) {//device fixed
     const Device = mongoose.dbs[req.tenant.database].model('Device');
     device = descriptionDataCleaned.commonElements["device"];
-  
-  
+
+
     let resultDevice = await this.checkerIfExist(Device, device);
     if (!resultDevice) {
       if (force) {//save device on database by default value
-        if(!featureInfo){//no feature id
+        if (!featureInfo) {//no feature id
           body = {//default value
             '_id': device,
             'owner': req.body.owner,
@@ -666,7 +690,7 @@ exports.checkCommonElements = async function (req, res, descriptionDataCleaned,f
             "measurementBufferPolicy": "decimation"
           };
         }
-        else{//with feature id
+        else {//with feature id
           body = {//default value
             '_id': device,
             'owner': req.body.owner,
@@ -686,19 +710,19 @@ exports.checkCommonElements = async function (req, res, descriptionDataCleaned,f
 
         result = await this.saveModelData(req, body, Device);
         if (result != true) {//error in the post of the value
-          return errors.manage(res, errors.post_force_element,result);
+          return errors.manage(res, errors.post_force_element, result);
         }
       }
       else {//force false
-        return errors.manage(res, errors.device_not_found_description,device);
+        return errors.manage(res, errors.device_not_found_description, device);
       }
     }
-  
+
     else {//device exist and with force=true the device must have feature.id in features
       let deviceInfo = await Device.findById(device);
-      if(descriptionDataCleaned.commonElements.hasOwnProperty("feature")){        
+      if (descriptionDataCleaned.commonElements.hasOwnProperty("feature")) {
         if (!deviceInfo["features"].includes(featureInfo.id)) {
-          if(force){
+          if (force) {
             try {
               let fields = ['features', 'scripts', 'tags', 'visibility', 'period', 'cycle', 'retryTime', 'scriptListMaxSize', 'measurementBufferSize', 'issueBufferSize', 'sendBufferSize', 'scriptStatementMaxSize', 'statementBufferSize', 'measurementBufferPolicy'];
               body = {
@@ -711,15 +735,15 @@ exports.checkCommonElements = async function (req, res, descriptionDataCleaned,f
               cache.set(device, deviceInfo);
             }
             catch (err) {
-              return errors.manage(res, errors.post_force_element,err);
+              return errors.manage(res, errors.post_force_element, err);
             }
           }
-          else{//force = false
-            return errors.manage(res, errors.device_not_found_description,device+" doesn't have "+feature.id+ " as feature");
+          else {//force = false
+            return errors.manage(res, errors.device_not_found_description, device + " doesn't have " + feature.id + " as feature");
           }
         }
       }
     }
-  }  
+  }
   return true;
 }
