@@ -468,7 +468,7 @@ exports.principalLoop = async function (req, res, lines, elementsNumber, feature
           }
           await persistence.update(body, fields, deviceInfo, Device, req.tenant);
           deviceInfo = await Device.findById(device);
-          cache.set(device, deviceInfo);
+          cache.set(device+"_device", deviceInfo);
         }
         catch (err) {
           errMessage = "error in adding match between device " + device + " and feature " + feature.id + ", " + err
@@ -732,7 +732,7 @@ exports.checkCommonElements = async function (req, res, descriptionDataCleaned, 
               }
               await persistence.update(body, fields, deviceInfo, Device, req.tenant);
               deviceInfo = await Device.findById(device);
-              cache.set(device, deviceInfo);
+              cache.set(device+"_device", deviceInfo);
             }
             catch (err) {
               return errors.manage(res, errors.post_force_element, err);

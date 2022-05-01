@@ -25,11 +25,11 @@ datauploadSchema.plugin(require('mongoose-autopopulate'));
 // validate owner
 datauploadSchema.path('owner').validate({
     validator: async function (value) {
-        if(cache.get(value.toString())) return true;        
+        if(cache.get(value.toString()+"_user")) return true;        
         const User = this.constructor.model('User');
         let user = await User.findById(value);
         if (!user) throw new Error('User not existent (' + value + ')');
-        cache.set(value.toString(), user);
+        cache.set(value.toString()+"_user", user);
         return true;
     }
 });
@@ -38,11 +38,11 @@ datauploadSchema.path('owner').validate({
 // validate feature
 measurementSchema.path('feature').validate({
     validator: async function (value) {
-        if(cache.get(value)) return true;
+        if(cache.get(value+"_feature")) return true;
         const Feature = this.constructor.model('Feature');
         const feature = await Feature.findById(value);
         if (!feature) throw new Error('Feature not existent (' + value + ')');
-        cache.set(value, feature);
+        cache.set(value+"_feature", feature);
         return true;
     }
 });
@@ -50,11 +50,11 @@ measurementSchema.path('feature').validate({
 // validate script
 measurementSchema.path('script').validate({
     validator: async function (value) {
-        if(cache.get(value)) return true;
+        if(cache.get(value+"_script")) return true;
         const Script = this.constructor.model('Script');
         const script = await Script.findById(value);
         if (!script) throw new Error('Script not existent (' + value + ')');
-        cache.set(value, script);
+        cache.set(value+"_script", script);
         return true;
     }
 });
@@ -62,11 +62,11 @@ measurementSchema.path('script').validate({
 // validate thing
 measurementSchema.path('thing').validate({
     validator: async function (value) {
-        if(cache.get(value)) return true;
+        if(cache.get(value+"_thing")) return true;
         const Thing = this.constructor.model('Thing');
         const thing = await Thing.findById(value);
         if (!thing) throw new Error('Thing not existent (' + value + ')');
-        cache.set(value, thing);
+        cache.set(value+"_thing", thing);
         return true;
     }
 });
@@ -74,11 +74,11 @@ measurementSchema.path('thing').validate({
 // validate device
 measurementSchema.path('device').validate({
     validator: async function (value) {
-        if(cache.get(value)) return true;
+        if(cache.get(value+"_device")) return true;
         const Device = this.constructor.model('Device');
         const device = await Device.findById(value);
         if (!device) throw new Error('Device not existent (' + value + ')');
-        cache.set(value, device);
+        cache.set(value+"_device", device);
         return true;
     }
 });
@@ -88,10 +88,10 @@ measurementSchema.path('tags').validate({
     validator: async function (values) {
         const Tag = this.constructor.model('Tag');
         for (let value of values) {
-            if(!cache.get(value)){ 
+            if(!cache.get(value+"_tag")){ 
                 const tag = await Tag.findById(value);
                 if (!tag) throw new Error('Tag not existent (' + value + ')');
-                cache.set(value, tag);
+                cache.set(value+"_tag", tag);
             }
         };
         return true;
@@ -111,11 +111,11 @@ measurementSchema.pre('save', async function () {
 
 // check consistency between samples and feature
 measurementSchema.pre('save', async function () {
-    let feature = cache.get(this.feature);
+    let feature = cache.get(this.feature+"_feature");
     if(!feature) {
         const Feature = this.constructor.model('Feature');
         feature = (await Feature.findById(this.feature));
-        cache.set(this.feature, feature);
+        cache.set(this.feature+"_feature", feature);
     }
     let result = inspector.areCoherent(this, feature);
     if(result != true) throw new Error(result);
@@ -123,12 +123,12 @@ measurementSchema.pre('save', async function () {
 
 // check consistency between device and feature
 measurementSchema.pre('save', async function () {
-    let feature = cache.get(this.feature);
+    let feature = cache.get(this.feature+"_feature");
     if(!feature) {
         const Feature = this.constructor.model('Feature');
         feature = await Feature.findById(this.feature);
     }
-    let device = cache.get(this.device);
+    let device = cache.get(this.device+"_device");
     if(!device) {
         const Device = this.constructor.model('Device');
         device = await Device.findById(this.device);
