@@ -386,6 +386,8 @@ exports.sampleLoop = async function (descriptionDataCleaned, line, feature) {
     } else {
       if (feature.items[k].type == "number") {
         if (
+          str_val == " " ||
+          str_val == "" ||
           str_val == "NaN" ||
           str_val == "nan" ||
           str_val == "Nan" ||
@@ -426,8 +428,9 @@ exports.sampleLoop = async function (descriptionDataCleaned, line, feature) {
 
 exports.tagLoop = async function (descriptionDataCleaned, Tag, force, req) {
   let tags = [];
-  for (let j in descriptionDataCleaned.tags) {
+  for (let j in descriptionDataCleaned.tags) {    
     id = line[descriptionDataCleaned.tags[j]].replaceAll(/['"]+/g, "");
+    if(id==""){continue;}
     resultTag = await this.checkerIfExist(Tag, id);
     if (!resultTag) {
       if (force) {
