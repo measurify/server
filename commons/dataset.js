@@ -19,7 +19,7 @@ function sha(content) {
 
 //extract data when receive a form-data post
 exports.dataExtractor = async function (req, res, next, saveDataset) {
-  if (!req.busboy) throw new Error("file binary data cannot be null");
+  if (!req.busboy) { return errors.manage(res, errors.empty_file, "not found any data"); }
   let fileData = null;
   let descriptionData = null;
   let namefile = null;
@@ -31,11 +31,7 @@ exports.dataExtractor = async function (req, res, next, saveDataset) {
       //if there is some error the lambda function is stopped
       if (fieldName != "file" && fieldName != "description") {
         errorOccurred = true;
-        return errors.manage(
-          res,
-          errors.fieldName_error,
-          fieldName + " is not file or description"
-        );
+        return errors.manage(res, errors.fieldName_error, fieldName + " is not file or description");
       }
       file.on("data", (data) => {
         if (!errorOccurred) {
@@ -64,30 +60,39 @@ exports.dataExtractor = async function (req, res, next, saveDataset) {
   });
   req.busboy.on("finish", () => {
     if (!fileData) {
-      return errors.manage(res, errors.empty_file);
+      return errors.manage(res, errors.empty_file, "file data not found");
     }
-    if (saveDataset == true) {
-      catchErrors(
-        datasetController.post(
-          req,
-          res,
-          next,
-          fileData,
-          descriptionData,
-          namefile
-        )
+    if (!descriptionData) {
+      return errors.manage(
+        res,
+        errors.empty_file,
+        "description data not found"
       );
-    } else {
-      catchErrors(
-        measurementController.postFile(
-          req,
-          res,
-          next,
-          fileData,
-          descriptionData,
-          namefile
-        )
-      );
+    }
+    if (!errorOccurred) {
+      if (saveDataset == true) {
+        catchErrors(
+          datasetController.post(
+            req,
+            res,
+            next,
+            fileData,
+            descriptionData,
+            namefile
+          )
+        );
+      } else {
+        catchErrors(
+          measurementController.postFile(
+            req,
+            res,
+            next,
+            fileData,
+            descriptionData,
+            namefile
+          )
+        );
+      }
     }
   });
 };
@@ -912,11 +917,11 @@ exports.checkCommonElements = async function (
         res,
         errors.mismatch_feature_items_description,
         featureName +
-          " has " +
-          featureInfo.items.length +
-          " elements on database, while in the description has " +
-          itemsNumber +
-          " elements"
+        " has " +
+        featureInfo.items.length +
+        " elements on database, while in the description has " +
+        itemsNumber +
+        " elements"
       );
     }
   }
