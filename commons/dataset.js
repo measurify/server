@@ -423,14 +423,18 @@ exports.sampleLoop = async function (descriptionDataCleaned, line, feature) {
       samples.push(str_val);
     }
   }
+  if (samples.every(element => element === null)) {
+    errMessage ="All items of the feature are null";
+    return [null, errMessage];
+  }
   return [samples, null];
 };
 
 exports.tagLoop = async function (descriptionDataCleaned, Tag, force, req) {
   let tags = [];
-  for (let j in descriptionDataCleaned.tags) {    
+  for (let j in descriptionDataCleaned.tags) {
     id = line[descriptionDataCleaned.tags[j]].replaceAll(/['"]+/g, "");
-    if(id==""){continue;}
+    if (id == "") { continue; }
     resultTag = await this.checkerIfExist(Tag, id);
     if (!resultTag) {
       if (force) {
