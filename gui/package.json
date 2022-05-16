@@ -16,7 +16,7 @@
     "fs": "0.0.1-security",
     "https": "^1.0.0",
     "jsonschema": "^1.4.0",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "natural-orderby": "^2.0.3",
     "node-csv": "^0.1.2",
     "path": "^0.12.7",
