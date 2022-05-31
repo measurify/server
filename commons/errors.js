@@ -46,6 +46,8 @@ exports.mismatch_feature_items_description   = { status: 400, value: 43, message
 exports.post_force_element                   = { status: 400, value: 44, message: 'error in forced loading with default values'}; 
 exports.thing_not_found_description          = { status: 400, value: 45, message: 'thing in the description file not found on database'}; 
 exports.device_not_found_description         = { status: 400, value: 46, message: 'device in the description file not found on database'}; 
+exports.max_one_file                         = { status: 400, value: 47, message: 'max one file'}; 
+exports.wrong_header                         = { status: 400, value: 48, message: 'wrong header'}; 
 
 
 
