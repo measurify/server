@@ -45,9 +45,10 @@ exports.dataExtractor = async function (req, res, next, modelName) {
 
             let [body, err] = readFile(req, fileData, modelName);
             if (!body) { return errors.manage(res, errors.wrong_header, err) }
-            req.body=body;
+            //console.log(body);
+            req.body = body;
             //const Model = mongoose.dbs[req.tenant.database].model(modelName);
-            return featureController.post(req,res);            
+            return featureController.post(req, res);
         }
     }
     );
@@ -60,6 +61,7 @@ const readFile = function (req, fileData, modelName) {
     data = data.filter(function (el) {
         return el != "";
     });
+    console.log(data);
     let header = data[0].split(",");
     data.shift();
     const headerExpected = [
@@ -79,13 +81,19 @@ const readFile = function (req, fileData, modelName) {
     if (!result) {
         return [null, "expected this header: " + headerExpected + " , instead of " + header];
     }
-    let bodyResults = createRequestObject(req, header, data);
 
+    let bodyResults =null;
+    if (req.headers.accept == 'text/csvCustom'){
+        bodyResults = createRequestObjectCustom(req.user._id, header, data);
+    }
+    else{
+        //bodyResults = createRequestObject(req.user._id, header, data);
+    }
     return [bodyResults, null];
 
 }
 
-const createRequestObject = function (req, header, data) {
+const createRequestObject = function (owner, header, data) {
     let results = [];
     let result = null;
     let item = [];
@@ -112,7 +120,7 @@ const createRequestObject = function (req, header, data) {
             "_id": arr[header.indexOf("_id")],
             "tags": tagsArr,
             "visibility": arr[header.indexOf("visibility")],
-            "owner": req.user._id,
+            "owner": owner,
             "items": item
         };
         results.push(result);
@@ -129,3 +137,51 @@ const cleanFunction = function (name, arr, header) {
     });
     return array;
 }
+
+const createRequestObjectCustom = function (owner, header, data) {//items over more lines, each feature separate by ## in _id column
+    let results = [];
+    let result = null;
+
+
+    let arr = null;
+    let id = null;
+    let visibility = null;
+    let items = [];
+    let tags = [];
+
+    for (let element of data) {
+        arr = element.split(",");
+        if (arr[header.indexOf("_id")] == "##") { //save and reset
+            result = {
+                "_id": id,
+                "tags": tags,
+                "visibility": visibility,
+                "owner": owner,
+                "items": items
+            };
+            results.push(result);
+            result = null;
+            id = null;
+            visibility = null;
+            items = [];
+            tags = [];
+            continue;
+        }
+        if (id == null) {//first row
+            id = arr[header.indexOf("_id")];
+            visibility = arr[header.indexOf("visibility")];
+        }
+        if (arr[header.indexOf("items.name")] != "" &&arr[header.indexOf("items.name")] != null) {
+            items.push({
+                "name": arr[header.indexOf("items.name")],
+                "unit": arr[header.indexOf("items.unit")],
+                "type": arr[header.indexOf("items.type")],
+                "dimension": arr[header.indexOf("items.dimension")]
+            })
+        }
+        if (arr[header.indexOf("tags")] != ""&&arr[header.indexOf("tags")] != null) {
+            tags.push(arr[header.indexOf("tags")]);
+        }
+    }
+    return results;
+};
