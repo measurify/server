@@ -61,11 +61,10 @@ const readFile = function (req, fileData, modelName) {
     data = data.filter(function (el) {
         return el != "";
     });
-    console.log(data);
+    //console.log(data);
     let header = data[0].split(",");
     data.shift();
-    const headerExpected = [
-        'tags',
+    const headerExpected = [//tags optional
         'visibility',
         '_id',
         'items.name',
@@ -75,19 +74,19 @@ const readFile = function (req, fileData, modelName) {
     ]
     let result = Array.isArray(headerExpected) &&
         Array.isArray(header) &&
-        headerExpected.length === header.length &&
+        headerExpected.length <= header.length &&
         headerExpected.every(ai => header.includes(ai));
 
     if (!result) {
         return [null, "expected this header: " + headerExpected + " , instead of " + header];
     }
 
-    let bodyResults =null;
-    if (req.headers.accept == 'text/csvCustom'){
+    let bodyResults = null;
+    if (req.headers.accept == 'text/csvCustom') {
         bodyResults = createRequestObjectCustom(req.user._id, header, data);
     }
-    else{
-        //bodyResults = createRequestObject(req.user._id, header, data);
+    else {
+        bodyResults = createRequestObject(req.user._id, header, data);
     }
     return [bodyResults, null];
 
@@ -96,24 +95,29 @@ const readFile = function (req, fileData, modelName) {
 const createRequestObject = function (owner, header, data) {
     let results = [];
     let result = null;
-    let item = [];
+    let items = [];
     let arr = null;
+    let tagsArr = [];
     for (let element of data) {
         arr = element.split(",");
-        if (!arr[header.indexOf("_id")]) { continue; }
-        let tagsArr = cleanFunction("tags", arr, header);
+        if (!arr[header.indexOf("_id")]) { continue; }//no id continue
+        if (header.indexOf("tags") != -1) { tagsArr = cleanFunction("tags", arr, header); }//tags optional
         let nameArr = cleanFunction("items.name", arr, header);
         let unitArr = cleanFunction("items.unit", arr, header);
         let typeArr = cleanFunction("items.type", arr, header);
         let dimensionArr = cleanFunction("items.dimension", arr, header);
 
         for (let itemElement in nameArr) {
-            item.push({
-                "name": nameArr[itemElement],
-                "unit": unitArr[itemElement],
-                "type": typeArr[itemElement],
-                "dimension": dimensionArr[itemElement]
-            })
+            let item = {};
+            item["name"] = nameArr[itemElement];
+            item["unit"] = unitArr[itemElement];
+            if (typeArr[itemElement] != null && typeArr[itemElement] != "") {//if null or "" use default value
+                item["type"] = typeArr[itemElement];
+            }
+            if (dimensionArr[itemElement] != null && dimensionArr[itemElement] != "") {//if null or "" use default value
+                item["dimension"] = dimensionArr[itemElement];
+            }            
+            items.push(item);
         }
 
         result = {
@@ -121,11 +125,11 @@ const createRequestObject = function (owner, header, data) {
             "tags": tagsArr,
             "visibility": arr[header.indexOf("visibility")],
             "owner": owner,
-            "items": item
+            "items": items
         };
         results.push(result);
         result = null;
-        item = []
+        items = []
     }
     return results;
 };
@@ -171,17 +175,33 @@ const createRequestObjectCustom = function (owner, header, data) {//items over m
             id = arr[header.indexOf("_id")];
             visibility = arr[header.indexOf("visibility")];
         }
-        if (arr[header.indexOf("items.name")] != "" &&arr[header.indexOf("items.name")] != null) {
-            items.push({
-                "name": arr[header.indexOf("items.name")],
-                "unit": arr[header.indexOf("items.unit")],
-                "type": arr[header.indexOf("items.type")],
-                "dimension": arr[header.indexOf("items.dimension")]
-            })
+        if (arr[header.indexOf("items.name")] != "" && arr[header.indexOf("items.name")] != null) {
+            let item = {}
+            item["name"] = arr[header.indexOf("items.name")];
+            item["unit"] = arr[header.indexOf("items.unit")];
+            if (arr[header.indexOf("items.type")] != null && arr[header.indexOf("items.type")] != "") {//optional
+                item["type"] = arr[header.indexOf("items.type")];
+            }
+            if (arr[header.indexOf("items.dimension")] != null && arr[header.indexOf("items.dimension")] != "") {//optional
+                item["dimension"] = arr[header.indexOf("items.dimension")];
+            }
+            items.push(item);
         }
-        if (arr[header.indexOf("tags")] != ""&&arr[header.indexOf("tags")] != null) {
-            tags.push(arr[header.indexOf("tags")]);
+        if (header.indexOf("tags") != -1) {
+            if (arr[header.indexOf("tags")] != "" && arr[header.indexOf("tags")] != null) {
+                tags.push(arr[header.indexOf("tags")]);
+            }
         }
+    }
+    if (id != null) {//save
+        result = {
+            "_id": id,
+            "tags": tags,
+            "visibility": visibility,
+            "owner": owner,
+            "items": items
+        };
+        results.push(result);
     }
     return results;
 };

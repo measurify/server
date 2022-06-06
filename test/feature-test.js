@@ -136,6 +136,73 @@ describe('/POST feature', () => {
     });
 });
 
+// Test the /POST file route
+describe('/POST feature from file', () => {
+    it('it should POST a feature from file csv compact way', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag1 = await factory.createTag("tag1", user);
+        const tag2 = await factory.createTag("tag2", user);
+        const testFile = './test/test/feature_test.csv';
+        
+        
+        const res = await chai.request(server).keepOpen().post('/v1/features/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('features');
+        res.body.features.length.should.be.eql(2);
+        res.body.errors.length.should.be.eql(0);        
+        res.body.features[0].should.have.property('items');
+        res.body.features[0].should.have.property('tags');
+        res.body.features[0].should.have.property('visibility');
+        res.body.features[0].should.have.property('_id');
+        res.body.features[1].should.have.property('items');
+        res.body.features[1].should.have.property('tags');
+        res.body.features[1].should.have.property('visibility');
+        res.body.features[1].should.have.property('_id');
+        res.body.features[0]._id.should.be.eql("feature_test_1");
+        res.body.features[1]._id.should.be.eql("feature_test_2");
+        res.body.features[1].tags.length.should.be.eql(2);
+        res.body.features[0].tags.length.should.be.eql(0);
+        res.body.features[0].items.length.should.be.eql(1);        
+        res.body.features[1].items.length.should.be.eql(2);
+        res.body.features[1].items[0].type.should.be.eql("number");        
+        res.body.features[1].items[0].dimension.should.be.eql(0);
+    });
+
+    it('it should POST a feature from file csv extended way', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag1 = await factory.createTag("tag1", user);
+        const tag2 = await factory.createTag("tag2", user);
+        const tag3 = await factory.createTag("tag3", user);
+        const testFile = './test/test/MultiFeatureTags.csv';
+        
+        
+        const res = await chai.request(server).keepOpen().post('/v1/features/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user)).set("Accept","text/csvCustom");
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('features');
+        res.body.features.length.should.be.eql(2);
+        res.body.errors.length.should.be.eql(0);        
+        res.body.features[0].should.have.property('items');
+        res.body.features[0].should.have.property('tags');
+        res.body.features[0].should.have.property('visibility');
+        res.body.features[0].should.have.property('_id');
+        res.body.features[1].should.have.property('items');
+        res.body.features[1].should.have.property('tags');
+        res.body.features[1].should.have.property('visibility');
+        res.body.features[1].should.have.property('_id');
+        res.body.features[0]._id.should.be.eql("myFeat1");
+        res.body.features[1]._id.should.be.eql("myFeat2");
+        res.body.features[0].tags.length.should.be.eql(3);
+        res.body.features[1].tags.length.should.be.eql(1);
+        res.body.features[0].items.length.should.be.eql(2);        
+        res.body.features[1].items.length.should.be.eql(6);
+        res.body.features[0].items[1].type.should.be.eql("number");        
+        res.body.features[0].items[1].dimension.should.be.eql(0);
+    });
+});
+
+
 // Test the /DELETE route
 describe('/DELETE feature', () => {
     it('it should DELETE a feature', async () => {      
