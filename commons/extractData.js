@@ -116,7 +116,7 @@ const createRequestObject = function (owner, header, data) {
             }
             if (dimensionArr[itemElement] != null && dimensionArr[itemElement] != "") {//if null or "" use default value
                 item["dimension"] = dimensionArr[itemElement];
-            }            
+            }
             items.push(item);
         }
 
@@ -155,15 +155,17 @@ const createRequestObjectCustom = function (owner, header, data) {//items over m
 
     for (let element of data) {
         arr = element.split(",");
-        if (arr[header.indexOf("_id")] == "##") { //save and reset
-            result = {
-                "_id": id,
-                "tags": tags,
-                "visibility": visibility,
-                "owner": owner,
-                "items": items
-            };
-            results.push(result);
+        if (arr[header.indexOf("_id")] === "##") { //save and reset
+            if (id != null && id != "##") {
+                result = {
+                    "_id": id,
+                    "tags": tags,
+                    "visibility": visibility,
+                    "owner": owner,
+                    "items": items
+                };
+                results.push(result);
+            }
             result = null;
             id = null;
             visibility = null;
@@ -171,29 +173,31 @@ const createRequestObjectCustom = function (owner, header, data) {//items over m
             tags = [];
             continue;
         }
-        if (id == null) {//first row
-            id = arr[header.indexOf("_id")];
-            visibility = arr[header.indexOf("visibility")];
-        }
-        if (arr[header.indexOf("items.name")] != "" && arr[header.indexOf("items.name")] != null) {
-            let item = {}
-            item["name"] = arr[header.indexOf("items.name")];
-            item["unit"] = arr[header.indexOf("items.unit")];
-            if (arr[header.indexOf("items.type")] != null && arr[header.indexOf("items.type")] != "") {//optional
-                item["type"] = arr[header.indexOf("items.type")];
+        else {
+            if (id == null) {//first row            
+                id = arr[header.indexOf("_id")];
+                visibility = arr[header.indexOf("visibility")];
             }
-            if (arr[header.indexOf("items.dimension")] != null && arr[header.indexOf("items.dimension")] != "") {//optional
-                item["dimension"] = arr[header.indexOf("items.dimension")];
+            if (arr[header.indexOf("items.name")] != "" && arr[header.indexOf("items.name")] != null) {
+                let item = {}
+                item["name"] = arr[header.indexOf("items.name")];
+                item["unit"] = arr[header.indexOf("items.unit")];
+                if (arr[header.indexOf("items.type")] != null && arr[header.indexOf("items.type")] != "") {//optional
+                    item["type"] = arr[header.indexOf("items.type")];
+                }
+                if (arr[header.indexOf("items.dimension")] != null && arr[header.indexOf("items.dimension")] != "") {//optional
+                    item["dimension"] = arr[header.indexOf("items.dimension")];
+                }
+                items.push(item);
             }
-            items.push(item);
-        }
-        if (header.indexOf("tags") != -1) {
-            if (arr[header.indexOf("tags")] != "" && arr[header.indexOf("tags")] != null) {
-                tags.push(arr[header.indexOf("tags")]);
+            if (header.indexOf("tags") != -1) {
+                if (arr[header.indexOf("tags")] != "" && arr[header.indexOf("tags")] != null) {
+                    tags.push(arr[header.indexOf("tags")]);
+                }
             }
         }
     }
-    if (id != null) {//save
+    if (id != null && id != "##") {//save
         result = {
             "_id": id,
             "tags": tags,
