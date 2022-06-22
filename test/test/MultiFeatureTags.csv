@@ -1,12 +1,10 @@
 _id,visibility,items.name,items.type,items.unit,items.dimension,tags
-myFeat1,public,item1,number,m/s,1,tag1
-,,item2,,m/s,,tag2
+myFeat1,public,[item1;item2;item3;item4],[number;number;;number],[m/s;m;m/s;s],[1;1;0;],tag1
+,,item5,,m/s,,tag2
 ,,,,,,tag3
-##,,,,,,
 myFeat2,private,itemA,number,m/s,0,tag1
 ,,itemB,number,m/s,0,
 ,,itemC,number,m/s,0,
 ,,itemD,number,m/s,0,
 ,,itemE,number,m/s,0,
 ,,itemF,number,m/s,0,
-##,,,,,,

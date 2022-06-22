@@ -169,7 +169,7 @@ describe('/POST feature from file', () => {
         res.body.features[1].items[0].dimension.should.be.eql(0);
     });
 
-    it('it should POST a feature from file csv extended way', async () => {
+    it('it should POST a feature from another file csv ', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag1 = await factory.createTag("tag1", user);
         const tag2 = await factory.createTag("tag2", user);
@@ -177,7 +177,7 @@ describe('/POST feature from file', () => {
         const testFile = './test/test/MultiFeatureTags.csv';
         
         
-        const res = await chai.request(server).keepOpen().post('/v1/features/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user)).set("Accept","text/csvCustom");
+        const res = await chai.request(server).keepOpen().post('/v1/features/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('features');
@@ -195,10 +195,10 @@ describe('/POST feature from file', () => {
         res.body.features[1]._id.should.be.eql("myFeat2");
         res.body.features[0].tags.length.should.be.eql(3);
         res.body.features[1].tags.length.should.be.eql(1);
-        res.body.features[0].items.length.should.be.eql(2);        
+        res.body.features[0].items.length.should.be.eql(5);        
         res.body.features[1].items.length.should.be.eql(6);
         res.body.features[0].items[1].type.should.be.eql("number");        
-        res.body.features[0].items[1].dimension.should.be.eql(0);
+        res.body.features[0].items[1].dimension.should.be.eql(1);
     });
 });
 

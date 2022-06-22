@@ -4,7 +4,7 @@ const { file } = require("../types/itemTypes.js");
 const { catchErrors } = require("./errorHandlers.js");
 const mongoose = require("mongoose");
 const persistence = require("./persistence.js");
-const featureController = require('../controllers/featureController');
+
 
 
 
@@ -47,8 +47,10 @@ exports.dataExtractor = async function (req, res, next, modelName) {
             if (!body) { return errors.manage(res, errors.wrong_header, err) }
             //console.log(body);
             req.body = body;
-            //const Model = mongoose.dbs[req.tenant.database].model(modelName);
-            return featureController.post(req, res);
+
+            let controllerName = modelName.toLowerCase();
+            const controller = require('../controllers/' + controllerName + 'Controller');
+            return controller.post(req, res);
         }
     }
     );
@@ -61,151 +63,160 @@ const readFile = function (req, fileData, modelName) {
     data = data.filter(function (el) {
         return el != "";
     });
+    const model = mongoose.dbs[req.tenant.database].model(modelName);
+    const schema = model.schema;
+    let requiredFields = [];
+    let optionalFields = [];
+    for (let key in schema.paths) {
+        if (schema.paths[key].isRequired && key != "owner") {//owner taken from request user id
+            requiredFields.push(key);
+        }
+        else {
+            optionalFields.push(key);
+        }
+    }
+    if (schema.subpaths) {
+        for (let key in schema.subpaths) {
+            if (schema.subpaths[key].isRequired) {
+                requiredFields.push(key);
+            }
+            else {
+                optionalFields.push(key);
+            }
+
+        }
+    }
     //console.log(data);
     let header = data[0].split(",");
     data.shift();
-    const headerExpected = [//tags optional
-        'visibility',
-        '_id',
-        'items.name',
-        'items.type',
-        'items.dimension',
-        'items.unit'
-    ]
-    let result = Array.isArray(headerExpected) &&
-        Array.isArray(header) &&
-        headerExpected.length <= header.length &&
-        headerExpected.every(ai => header.includes(ai));
 
-    if (!result) {
-        return [null, "expected this header: " + headerExpected + " , instead of " + header];
+    if (!requiredFields.every(ai => header.includes(ai))) {
+        let missing = [];
+        for (val of requiredFields) { if (!header.includes(val)) { missing.push(val); } }
+        return [null, "Missing some required fields: needed " + missing + " in the header " + header];
+    }
+
+    if (!header.every(el => requiredFields.includes(el) || optionalFields.includes(el))) {
+        let unrecognized = [];
+        for (val of header) { if (!requiredFields.includes(val) && !optionalFields.includes(val)) { unrecognized.push(val); } }
+        return [null, "Some optional element not recognized:  " + unrecognized + " .  Required elements are " + requiredFields + ", optional are " + optionalFields];
     }
 
     let bodyResults = null;
-    if (req.headers.accept == 'text/csvCustom') {
-        bodyResults = createRequestObjectCustom(req.user._id, header, data);
-    }
-    else {
-        bodyResults = createRequestObject(req.user._id, header, data);
-    }
-    return [bodyResults, null];
 
+    bodyResults = createRequestObject(req.user._id, header, data, schema);
+
+    return [bodyResults, null];
 }
 
-const createRequestObject = function (owner, header, data) {
+const createRequestObject = function (owner, header, data, schema) {//items over more lines, each feature separate by ## in _id column
+    let result = {};
     let results = [];
-    let result = null;
-    let items = [];
-    let arr = null;
-    let tagsArr = [];
-    for (let element of data) {
-        arr = element.split(",");
-        if (!arr[header.indexOf("_id")]) { continue; }//no id continue
-        if (header.indexOf("tags") != -1) { tagsArr = cleanFunction("tags", arr, header); }//tags optional
-        let nameArr = cleanFunction("items.name", arr, header);
-        let unitArr = cleanFunction("items.unit", arr, header);
-        let typeArr = cleanFunction("items.type", arr, header);
-        let dimensionArr = cleanFunction("items.dimension", arr, header);
+    let supportObj = {};
 
-        for (let itemElement in nameArr) {
-            let item = {};
-            item["name"] = nameArr[itemElement];
-            item["unit"] = unitArr[itemElement];
-            if (typeArr[itemElement] != null && typeArr[itemElement] != "") {//if null or "" use default value
-                item["type"] = typeArr[itemElement];
+    for (let element of data) {//da fare check quando esce e salvare
+
+        arr = element.split(",");
+
+        if (Object.keys(result).length > 0 && header.indexOf("_id") == -1) {//not found id
+            result["owner"] = owner;
+            results.push(result);
+            result = {};
+        }
+        else {
+            if (Object.keys(result).length > 0 && (arr[header.indexOf("_id")] != "" && arr[header.indexOf("_id")] != " " && arr[header.indexOf("_id")] != null)) {//new line
+                result["owner"] = owner;
+                results.push(result);
+                result = {};
             }
-            if (dimensionArr[itemElement] != null && dimensionArr[itemElement] != "") {//if null or "" use default value
-                item["dimension"] = dimensionArr[itemElement];
+        }
+        for (let key of header) {
+
+
+            if (schema.paths[key]) {//path
+                if (schema.paths[key].instance == 'Array') {
+                    if (!result[key]) {//not found, create it
+                        result[key] = [];
+                    }
+                    let value = cleanFunction(arr[header.indexOf(key)]);
+                    for (let v of value) { result[key].push(v); }
+                }
+                else {
+                    if (header.indexOf("_id") == -1) {
+                        result[key] = arr[header.indexOf(key)];
+                    }
+                    else {
+                        if (arr[header.indexOf("_id")] != "" && arr[header.indexOf("_id")] != " " && arr[header.indexOf("_id")] != null) {//an element that is not an Array can't have more than 1 line for its fields
+                            result[key] = arr[header.indexOf(key)];
+                        }
+                    }
+                }
             }
-            items.push(item);
+            else //subpath
+            {
+                if (arr[header.indexOf(key)] != "" && arr[header.indexOf(key)] != " " && arr[header.indexOf(key)] != null) {
+                    if (arr[header.indexOf(key)].startsWith("[")) {
+                        let stringData = arr[header.indexOf(key)];
+                        stringData = stringData.slice(1, -1);//remove []
+                        stringData = stringData.split(";");//doesn't remove "" because the position is important
+
+                        let subKey = key.split(".");
+
+                        if (!result[subKey[0]]) {//not found, create it
+                            result[subKey[0]] = [];
+                        }
+                        if (!supportObj[subKey[0]]) {//not found, create it                    
+                            supportObj[subKey[0]] = [];
+                        }
+                        if (supportObj[subKey[0]].length == 0 && stringData.length > 0) {//first time
+                            for (let i in stringData) {
+                                supportObj[subKey[0]].push({});
+                            }
+                        }
+                        for (let k in stringData) {
+                            if (stringData[k] != "" && stringData[k] != " " && stringData[k] != null) {
+                                supportObj[subKey[0]][k][subKey[1]] = stringData[k];
+                            }
+                        }
+                    }
+                    else {//the subpath is not an array
+                        let subKey = key.split(".");
+                        if (!result[subKey[0]]) {//not found, create it
+                            result[subKey[0]] = [];
+                        }
+                        if (!supportObj[subKey[0]]) {//not found, create it                    
+                            supportObj[subKey[0]] = {};
+                        }
+                        supportObj[subKey[0]][subKey[1]] = arr[header.indexOf(key)];
+                    }
+                }
+            }
+        }
+        if (Object.keys(supportObj).length > 0) {
+            for (let k of Object.keys(supportObj)) {
+                if (Array.isArray(supportObj[k])) {
+                    for (let j in supportObj[k]) {
+                        result[k].push(supportObj[k][j]);
+                    }
+                }
+                else {
+                    result[k].push(supportObj[k]);
+                }
+            }
+            supportObj = {};
         }
 
-        result = {
-            "_id": arr[header.indexOf("_id")],
-            "tags": tagsArr,
-            "visibility": arr[header.indexOf("visibility")],
-            "owner": owner,
-            "items": items
-        };
-        results.push(result);
-        result = null;
-        items = []
     }
+    //save at the end of for loop
+    result["owner"] = owner;
+    results.push(result);
     return results;
 };
 
-const cleanFunction = function (name, arr, header) {
-    let array = arr[header.indexOf(name)].split(/[[\];, ]/);
+const cleanFunction = function (arr) {
+    let array = arr.split(/[[\];, ]/);
     array = array.filter(function (el) {
         return el != "";
     });
     return array;
 }
-
-const createRequestObjectCustom = function (owner, header, data) {//items over more lines, each feature separate by ## in _id column
-    let results = [];
-    let result = null;
-
-
-    let arr = null;
-    let id = null;
-    let visibility = null;
-    let items = [];
-    let tags = [];
-
-    for (let element of data) {
-        arr = element.split(",");
-        if (arr[header.indexOf("_id")] === "##") { //save and reset
-            if (id != null && id != "##") {
-                result = {
-                    "_id": id,
-                    "tags": tags,
-                    "visibility": visibility,
-                    "owner": owner,
-                    "items": items
-                };
-                results.push(result);
-            }
-            result = null;
-            id = null;
-            visibility = null;
-            items = [];
-            tags = [];
-            continue;
-        }
-        else {
-            if (id == null) {//first row            
-                id = arr[header.indexOf("_id")];
-                visibility = arr[header.indexOf("visibility")];
-            }
-            if (arr[header.indexOf("items.name")] != "" && arr[header.indexOf("items.name")] != null) {
-                let item = {}
-                item["name"] = arr[header.indexOf("items.name")];
-                item["unit"] = arr[header.indexOf("items.unit")];
-                if (arr[header.indexOf("items.type")] != null && arr[header.indexOf("items.type")] != "") {//optional
-                    item["type"] = arr[header.indexOf("items.type")];
-                }
-                if (arr[header.indexOf("items.dimension")] != null && arr[header.indexOf("items.dimension")] != "") {//optional
-                    item["dimension"] = arr[header.indexOf("items.dimension")];
-                }
-                items.push(item);
-            }
-            if (header.indexOf("tags") != -1) {
-                if (arr[header.indexOf("tags")] != "" && arr[header.indexOf("tags")] != null) {
-                    tags.push(arr[header.indexOf("tags")]);
-                }
-            }
-        }
-    }
-    if (id != null && id != "##") {//save
-        result = {
-            "_id": id,
-            "tags": tags,
-            "visibility": visibility,
-            "owner": owner,
-            "items": items
-        };
-        results.push(result);
-    }
-    return results;
-};
