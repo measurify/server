@@ -219,6 +219,50 @@ describe('/POST device', () => {
     });
 });
 
+
+// Test the /POST file route
+describe('/POST device from file', () => {
+    it('it should POST devices  from file csv', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature1 = await factory.createFeature("feature1", user);
+        const feature2 = await factory.createFeature("feature2", user);
+        const feature3 = await factory.createFeature("feature3", user);
+        const feature4 = await factory.createFeature("feature4", user);
+        const testFile = './test/test/Device_test.csv';
+        
+        
+        const res = await chai.request(server).keepOpen().post('/v1/devices/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('devices');
+        res.body.devices.length.should.be.eql(4);
+        res.body.errors.length.should.be.eql(0);        
+        res.body.devices[0].should.have.property('_id');
+        res.body.devices[0].should.have.property('features');
+        res.body.devices[1].should.have.property('_id');
+        res.body.devices[1].should.have.property('features');
+        res.body.devices[2].should.have.property('_id');
+        res.body.devices[2].should.have.property('features');
+        res.body.devices[3].should.have.property('_id');
+        res.body.devices[3].should.have.property('features');
+        res.body.devices[0]._id.should.be.eql("device1");
+        res.body.devices[1]._id.should.be.eql("device2");        
+        res.body.devices[2]._id.should.be.eql("device3");
+        res.body.devices[3]._id.should.be.eql("device4");
+        res.body.devices[0].features.length.should.be.eql(1);
+        res.body.devices[1].features.length.should.be.eql(2);
+        res.body.devices[2].features.length.should.be.eql(2);
+        res.body.devices[3].features.length.should.be.eql(1);
+        res.body.devices[0].features[0].should.be.eql('feature1');        
+        res.body.devices[1].features[0].should.be.eql('feature1');            
+        res.body.devices[1].features[1].should.be.eql('feature2');    
+        res.body.devices[2].features[0].should.be.eql('feature3');            
+        res.body.devices[2].features[1].should.be.eql('feature4');                  
+        res.body.devices[3].features[0].should.be.eql('feature4');
+    });   
+});
+
+
 // Test the /DELETE route
 describe('/DELETE device', () => {
     it('it should DELETE a device', async () => {      

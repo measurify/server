@@ -303,6 +303,38 @@ describe("/POST users", () => {
   });
 });
 
+
+// Test the /POST file route
+describe('/POST user from file', () => {
+  it('it should POST users from file csv', async () => {   
+    const user = await factory.createUser("test-username-0", "test-password-0", UserRoles.admin);   
+      const testFile = './test/test/user_test.csv';      
+      
+      const res = await chai.request(server).keepOpen().post('/v1/users/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+      //console.log(res);
+      res.should.have.status(200);
+      res.body.should.be.a('object');
+      res.body.should.have.property('users');
+      res.body.users.length.should.be.eql(3);
+      res.body.errors.length.should.be.eql(0);        
+      res.body.users[0].should.have.property('username');
+      res.body.users[0].should.have.property('password');
+      res.body.users[0].should.have.property('_id');
+      res.body.users[1].should.have.property('username');
+      res.body.users[1].should.have.property('password');
+      res.body.users[1].should.have.property('_id');
+      res.body.users[2].should.have.property('username');
+      res.body.users[2].should.have.property('password');
+      res.body.users[2].should.have.property('_id');
+      res.body.users[0].username.should.be.eql("user-username-test-1");
+      res.body.users[1].username.should.be.eql("user-username-test-2");      
+      res.body.users[2].username.should.be.eql("user-username-test-3");      
+      res.body.users[0].type.should.be.eql("provider");             
+      res.body.users[1].type.should.be.eql("analyst");             
+      res.body.users[2].type.should.be.eql("supplier");   
+  });
+});
+
 // Test the /DELETE route
 describe("/DELETE users", () => {
   it("it should DELETE a user", async () => {

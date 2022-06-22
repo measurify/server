@@ -159,6 +159,27 @@ describe('/POST tag', () => {
     });
 });
 
+// Test the /POST file route
+describe('/POST tag from file', () => {
+    it('it should POST tags from file csv', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);        
+        const testFile = './test/test/Tag_test.csv';        
+        
+        const res = await chai.request(server).keepOpen().post('/v1/tags/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('tags');
+        res.body.tags.length.should.be.eql(3);
+        res.body.errors.length.should.be.eql(0);        
+        res.body.tags[0].should.have.property('_id');
+        res.body.tags[1].should.have.property('_id');
+        res.body.tags[2].should.have.property('_id');
+        res.body.tags[0]._id.should.be.eql("tag_test_1");
+        res.body.tags[1]._id.should.be.eql("tag_test_2");        
+        res.body.tags[2]._id.should.be.eql("tag_test_3");
+    });   
+});
+
 // Test the /DELETE route
 describe('/DELETE tag', () => {
     it('it should DELETE a tag', async () => {
