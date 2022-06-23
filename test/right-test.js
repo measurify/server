@@ -220,6 +220,58 @@ describe('/POST rights', () => {
     });
 });
 
+//problem to cast username instead of _id
+/*
+// Test the /POST file route
+describe('/POST right from file', () => {
+    it('it should POST rights  from file csv', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const tag = await factory.createTag("tag1", user);
+        const feature = await factory.createFeature("feature1", user);        
+        const device = await factory.createDevice("device1", user, [feature]);        
+        const thing = await factory.createThing("thing1", user);
+        const testFile = './test/test/Rights_test.csv';
+        
+        
+        const res = await chai.request(server).keepOpen().post('/v1/rights/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        console.log(res);
+        res.should.have.status(200);        
+        res.body.should.be.a('object');
+        res.body.should.have.property('rights');
+        res.body.rights.length.should.be.eql(4);
+        res.body.errors.length.should.be.eql(0);        
+        res.body.rights[0].should.have.property('_id');
+        res.body.rights[0].should.have.property('type');        
+        res.body.rights[0].should.have.property('resource');
+        res.body.rights[0].should.have.property('user');
+        res.body.rights[1].should.have.property('_id');
+        res.body.rights[1].should.have.property('type');        
+        res.body.rights[1].should.have.property('resource');
+        res.body.rights[1].should.have.property('user');
+        res.body.rights[2].should.have.property('_id');
+        res.body.rights[2].should.have.property('type');        
+        res.body.rights[2].should.have.property('resource');
+        res.body.rights[2].should.have.property('user');
+        res.body.rights[3].should.have.property('_id');
+        res.body.rights[3].should.have.property('type');        
+        res.body.rights[3].should.have.property('resource');
+        res.body.rights[3].should.have.property('user');
+        res.body.rights[0]._id.should.be.eql("right1");
+        res.body.rights[1]._id.should.be.eql("right2");        
+        res.body.rights[2]._id.should.be.eql("right3");
+        res.body.rights[3]._id.should.be.eql("right4");
+        res.body.rights[0].type.should.be.eql("Tag");
+        res.body.rights[1].type.should.be.eql("Device");
+        res.body.rights[2].type.should.be.eql("Feature");
+        res.body.rights[3].type.should.be.eql("Thing");
+        res.body.rights[0].resource.should.be.eql('tag1');        
+        res.body.rights[1].resource.should.be.eql('device1');            
+        res.body.rights[2].resource.should.be.eql('feature1');    
+        res.body.rights[3].resource.should.be.eql('thing1');  
+    });   
+});
+*/
+
 // Test the /DELETE route
 describe('/DELETE rights', () => {
     it('it should DELETE a right', async () => {

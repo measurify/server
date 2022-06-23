@@ -1,0 +1,5 @@
+_id,type,resource,user
+right1,Tag,tag1,test-username-1
+right2,Device,device1,test-username-1
+right3,Feature,feature1,test-username-1
+right4,Thing,thing1,test-username-1
