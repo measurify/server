@@ -4,6 +4,8 @@ const checker = require('./checker');
 const Authorization = require('../security/authorization.js'); 
 const errors = require('../commons/errors.js');
 
+const persistence = require('../commons/persistence.js');
+
 exports.get = async (req, res) => { 
     const Feature = mongoose.dbs[req.tenant.database].model('Feature');
     const select = await checker.whatCanSee(req, res, Feature)
@@ -39,11 +41,33 @@ exports.post = async (req, res) => {
 
 exports.put = async (req, res) => { 
     const Feature = mongoose.dbs[req.tenant.database].model('Feature');
-    const fields = ['tags'];
+    const fields = ['tags','_id'];
     let result = await checker.isAvailable(req, res, Feature); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.canModify(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Feature); if (result != true) return result;
+    if(req.body._id!=null){
+        const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
+        const Device = mongoose.dbs[req.tenant.database].model('Device');
+        const Feature = mongoose.dbs[req.tenant.database].model('Feature');
+        let result = await checker.isOwned(req, res); if (result != true) return result;
+        result = await checker.isNotUsed(req, res, Measurement, 'feature'); if (result != true) return result;
+        result = await checker.isNotUsed(req, res, Device, 'features'); if (result != true) return result;
+        result = await checker.hasRights(req, res, Feature); if (result != true) return result;
+        req.params.id=req.resource._id;
+        const select = await checker.whatCanSee(req, res, Feature)
+        let oldFeature=await persistence.get(req.params.id, null, Feature, select);
+        let newFeature=oldFeature._doc;
+        newFeature._id=req.body._id;
+        newFeature.owner = req.user._id;
+        result=await persistence.post(newFeature, Feature, req.tenant);
+        if(!!result.errors)console.log("ha fallito");
+        const results = await persistence.delete(req.params.id, Feature);
+        if (!results) return errors.manage(res, errors.resource_not_found, req.params.id);
+
+        console.log("qui");
+
+    }
     return await controller.updateResource(req, res, fields, Feature);
 }; 
 
