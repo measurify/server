@@ -105,6 +105,7 @@ exports.put = async (req, res) => {
         const resultPost = await persistence.post(newFeature, Feature, req.tenant);
         if (!!resultPost.errors) return errors.manage(res, errors.post_request_error, resultPost);
 
+        req.resource=resultPost._doc;
         //delete in controller
         try {
             const resultDelete = await persistence.delete(req.params.id, Feature);
@@ -115,7 +116,7 @@ exports.put = async (req, res) => {
             else return errors.manage(res, errors.delete_request_error, err);
         }
         //se arriva fino a qua significa che il cambio della risorsa ha funzionato
-        console.log("cambio _id effettuato");
+        //console.log("cambio _id effettuato");
     }
     return await controller.updateResource(req, res, fields, Feature);
 };

@@ -246,7 +246,7 @@ exports.deleteResourceList = async function (req, res, model, restriction) {
 exports.updateResource = async function (req, res, fields, model) {
     try {
         const modified_resource = await persistence.update(req.body, fields, req.resource, model, req.tenant);
-        if(modified_resource===null){return res.status(200).json("Changed _id from "+ req.params.id+" to "+req.body._id);}
+        //if(modified_resource===null){return await persistence.get(req.resource._id, null, Feature, select);}
         return res.status(200).json(modified_resource);
     }
     catch (err) { return errors.manage(res, errors.put_request_error, err); }
