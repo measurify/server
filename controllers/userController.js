@@ -12,13 +12,14 @@ const bcrypt = require('bcryptjs');
 
 exports.get = async (req, res) => { 
     const User = mongoose.dbs[req.tenant.database].model('User');
-    const select = await checker.whatCanSee(req, res, User)
+    const select = await checker.whatCanSee(req, res, User);
     const result = await checker.isAdminitrator(req, res); if (result != true) return result;
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, User); 
 };
 
 exports.pipe = async (req, res) => { 
-    const select = await checker.whatCanSee(req, res, User)
+    const User = mongoose.dbs[req.tenant.database].model('User');
+    const select = await checker.whatCanSee(req, res, User);
     const result = await checker.isAdminitrator(req, res); if (result != true) return result;
     controller.getResourcePipe(req, res, '{ "timestamp": "desc" }', select, User);
 };
@@ -30,7 +31,7 @@ exports.getusernames = async (req, res) => {
 
 exports.getone = async (req, res) => {
     const User = mongoose.dbs[req.tenant.database].model('User');
-    const select = await checker.whatCanSee(req, res, User)
+    const select = await checker.whatCanSee(req, res, User);
     let result = await checker.isAvailable(req, res, User); if (result != true) return result;
     result = await checker.isAdminitrator(req, res); if (result != true) return result;
     return await controller.getResource(req, res, null, User, select);

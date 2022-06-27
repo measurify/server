@@ -7,20 +7,21 @@ const persistence = require('../commons/persistence.js');
 
 exports.get = async (req, res) => { 
     const Computation = mongoose.dbs[req.tenant.database].model('Computation');
-    const select = await checker.whatCanSee(req, res, Computation)
+    const select = await checker.whatCanSee(req, res, Computation);
     const restriction = await checker.whatCanRead(req, res);
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Computation, restriction); 
 };
 
 exports.pipe = async (req, res) => { 
-    const select = await checker.whatCanSee(req, res, Computation)
+    const Computation = mongoose.dbs[req.tenant.database].model('Computation');
+    const select = await checker.whatCanSee(req, res, Computation);
     const restriction = await checker.whatCanRead(req, res);
     controller.getResourcePipe(req, res, '{ "timestamp": "desc" }', select, Computation, restriction);
 };
 
 exports.getone = async (req, res) => { 
     const Computation = mongoose.dbs[req.tenant.database].model('Computation');
-    const select = await checker.whatCanSee(req, res, Computation)
+    const select = await checker.whatCanSee(req, res, Computation);
     let result = await checker.isAvailable(req, res, Computation); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
     return await controller.getResource(req, res, null, Computation, select); 

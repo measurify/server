@@ -8,20 +8,21 @@ const persistence = require('../commons/persistence.js');
 
 exports.get = async (req, res) => { 
     const Script = mongoose.dbs[req.tenant.database].model('Script');
-    const select = await checker.whatCanSee(req, res, Script)
+    const select = await checker.whatCanSee(req, res, Script);
     const restriction = await checker.whatCanRead(req, res);
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Script, restriction); 
 };
 
 exports.pipe = async (req, res) => { 
-    const select = await checker.whatCanSee(req, res, Script)
+    const Script = mongoose.dbs[req.tenant.database].model('Script');
+    const select = await checker.whatCanSee(req, res, Script);
     const restriction = await checker.whatCanRead(req, res);
-    controller.getResourcePipe(req, res, '{ "timestamp": "desc" }', select, Script, restrictions);
+    controller.getResourcePipe(req, res, '{ "timestamp": "desc" }', select, Script, restriction);
 };
 
 exports.getone = async (req, res) => {
     const Script = mongoose.dbs[req.tenant.database].model('Script');
-    const select = await checker.whatCanSee(req, res, Script)
+    const select = await checker.whatCanSee(req, res, Script);
     let result = await checker.isAvailable(req, res, Script); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result; 
     return await controller.getResource(req, res, null, Script, select);

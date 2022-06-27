@@ -8,7 +8,7 @@ const persistence = require('../commons/persistence.js');
 
 exports.get = async (req, res) => {
     const Feature = mongoose.dbs[req.tenant.database].model('Feature');
-    const select = await checker.whatCanSee(req, res, Feature)
+    const select = await checker.whatCanSee(req, res, Feature);
     const restriction_1 = await checker.whatCanRead(req, res);
     const restriction_2 = await checker.whichRights(req, res, Feature);
     const restrictions = { ...restriction_1, ...restriction_2 };
@@ -16,7 +16,8 @@ exports.get = async (req, res) => {
 };
 
 exports.pipe = async (req, res) => {
-    const select = await checker.whatCanSee(req, res, Feature)
+    const Feature = mongoose.dbs[req.tenant.database].model('Feature');
+    const select = await checker.whatCanSee(req, res, Feature);
     const restriction_1 = await checker.whatCanRead(req, res);
     const restriction_2 = await checker.whichRights(req, res, Feature);
     const restrictions = { ...restriction_1, ...restriction_2 };
@@ -25,7 +26,7 @@ exports.pipe = async (req, res) => {
 
 exports.getone = async (req, res) => {
     const Feature = mongoose.dbs[req.tenant.database].model('Feature');
-    const select = await checker.whatCanSee(req, res, Feature)
+    const select = await checker.whatCanSee(req, res, Feature);
     let result = await checker.isAvailable(req, res, Feature); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Feature); if (result != true) return result;

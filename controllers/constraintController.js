@@ -7,20 +7,21 @@ const errors = require('../commons/errors.js');
 
 exports.get = async (req, res) => { 
     const Constraint = mongoose.dbs[req.tenant.database].model('Constraint');
-    const select = await checker.whatCanSee(req, res, Constraint)
+    const select = await checker.whatCanSee(req, res, Constraint);
     const restriction = await checker.whatCanRead(req, res);
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Constraint, restriction); 
 };
 
 exports.pipe = async (req, res) => { 
-    const select = await checker.whatCanSee(req, res, Constraint)
+    const Constraint = mongoose.dbs[req.tenant.database].model('Constraint');
+    const select = await checker.whatCanSee(req, res, Constraint);
     const restriction = await checker.whatCanRead(req, res);
     controller.getResourcePipe(req, res, '{ "timestamp": "desc" }', select, Constraint, restriction);
 };
 
 exports.getone = async (req, res) => { 
     const Constraint = mongoose.dbs[req.tenant.database].model('Constraint');
-    const select = await checker.whatCanSee(req, res, Constraint)
+    const select = await checker.whatCanSee(req, res, Constraint);
     let result = await checker.isAvailable(req, res, Constraint); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result;
     return await controller.getResource(req, res, null, Constraint, select); 

@@ -6,7 +6,7 @@ const persistence = require('../commons/persistence.js');
 exports.get = async (req, res) => { 
     const Right = mongoose.dbs[req.tenant.database].model('Right');
     const User = mongoose.dbs[req.tenant.database].model('User');
-    const select = await checker.whatCanSee(req, res, Right)
+    const select = await checker.whatCanSee(req, res, Right);
     const restriction = await checker.whatCanRead(req, res);
     /*
     if (req.query.hasOwnProperty('filter') ) { // Franz

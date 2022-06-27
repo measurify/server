@@ -11,6 +11,7 @@ exports.get = async (req, res) => {
 };
 
 exports.pipe = async (req, res) => { 
+    const Log = mongoose.dbs[req.tenant.database].model('Log');
     const result = await checker.isAdminitrator(req, res); if (result != true) return result;
     controller.getResourcePipe(req, res, '{ "timestamp": "desc" }', select, Log);
 };

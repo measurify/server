@@ -4,20 +4,21 @@ const checker = require('./checker');
 
 exports.get = async (req, res) => { 
     const Subscription = mongoose.dbs[req.tenant.database].model('Subscription');
-    const select = await checker.whatCanSee(req, res, Subscription)
+    const select = await checker.whatCanSee(req, res, Subscription);
     const restriction = await checker.whatCanRead(req, res);
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Subscription, restriction); 
 };
 
 exports.pipe = async (req, res) => { 
-    const select = await checker.whatCanSee(req, res, Subscription)
+    const Subscription = mongoose.dbs[req.tenant.database].model('Subscription');
+    const select = await checker.whatCanSee(req, res, Subscription);
     const restriction = await checker.whatCanRead(req, res);
-    controller.getResourcePipe(req, res, '{ "timestamp": "desc" }', select, Subscription, restrictions);
+    controller.getResourcePipe(req, res, '{ "timestamp": "desc" }', select, Subscription, restriction);
 };
 
 exports.getone = async (req, res) => {
     const Subscription = mongoose.dbs[req.tenant.database].model('Subscription');
-    const select = await checker.whatCanSee(req, res, Subscription)
+    const select = await checker.whatCanSee(req, res, Subscription);
     let result = await checker.isAvailable(req, res, Subscription); if (result != true) return result;
     result = await checker.canRead(req, res); if (result != true) return result; 
     return await controller.getResource(req, res, null, Subscription, select);
