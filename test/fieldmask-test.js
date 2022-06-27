@@ -221,6 +221,17 @@ describe('/DELETE fieldmasks', () => {
 
 // Test the /PUT route
 describe('/PUT fieldmasks', () => {
+    it('it should PUT a fieldmask _id', async () => {
+        const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const fieldmask = await factory.createFieldmask("fieldmask-test-1", [], [], [], ['samples'], [], [], [], admin)
+        const modification = { _id:"new-fieldmask-test-1" };
+        const res = await chai.request(server).keepOpen().put('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body._id.should.be.eql("new-fieldmask-test-1");
+    });
+
     it('it should PUT a fieldmasks to add a field', async () => {      
         const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const fieldmask = await factory.createFieldmask("fieldmask-test-1", [], [], [], ['samples'], [], [], [], admin)
@@ -228,6 +239,19 @@ describe('/PUT fieldmasks', () => {
         const res = await chai.request(server).keepOpen().put('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
         res.should.have.status(200);
         res.body.should.be.a('object');
+        res.body.should.have.property('measurement_fields');
+        res.body.measurement_fields.length.should.be.eql(2);
+    });
+
+    it('it should PUT a fieldmask _id and add a field', async () => {
+        const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const fieldmask = await factory.createFieldmask("fieldmask-test-1", [], [], [], ['samples'], [], [], [], admin)
+        const modification = { _id:"new-fieldmask-test-1",measurement_fields: { add: ['startDate'] }  };
+        const res = await chai.request(server).keepOpen().put('/v1/fieldmasks/' + fieldmask._id).set("Authorization", await factory.getUserToken(admin)).send(modification);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body._id.should.be.eql("new-fieldmask-test-1");
         res.body.should.have.property('measurement_fields');
         res.body.measurement_fields.length.should.be.eql(2);
     });
