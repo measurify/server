@@ -88,6 +88,12 @@ const readFile = function (req, fileData, modelName) {
     }
     //console.log(data);
     let header = data[0].split(",");
+    header = header.map(function (el) {
+        if (el.startsWith(" ")) { el=el.slice(1) };
+        if (el.endsWith(" ")) { el=el.slice(0, -1) };
+        return el;
+    });    
+
     data.shift();
 
     if (!requiredFields.every(ai => header.includes(ai))) {
@@ -114,10 +120,17 @@ const createRequestObject = function (owner, header, data, schema) {//items over
     let results = [];
     let supportObj = {};
 
-    for (let element of data) {//da fare check quando esce e salvare
-
+    for (let element of data) {
         arr = element.split(",");
-
+        arr = arr.map(function (el) {
+            if (el.startsWith(" ")) { el=el.slice(1) };
+            if (el.endsWith(" ")) { el=el.slice(0, -1) };
+            return el;
+        });   
+        if (arr.length > header.length) {
+            arr = arr.slice(0, header.length);
+        }    
+        
         if (Object.keys(result).length > 0 && header.indexOf("_id") == -1) {//not found id
             result["owner"] = owner;
             results.push(result);
