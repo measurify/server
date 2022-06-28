@@ -89,10 +89,10 @@ const readFile = function (req, fileData, modelName) {
     //console.log(data);
     let header = data[0].split(",");
     header = header.map(function (el) {
-        if (el.startsWith(" ")) { el=el.slice(1) };
-        if (el.endsWith(" ")) { el=el.slice(0, -1) };
+        if (el.startsWith(" ")) { el = el.slice(1) };
+        if (el.endsWith(" ")) { el = el.slice(0, -1) };
         return el;
-    });    
+    });
 
     data.shift();
 
@@ -110,12 +110,12 @@ const readFile = function (req, fileData, modelName) {
 
     let bodyResults = null;
 
-    bodyResults = createRequestObject(req.user._id, header, data, schema);
+    bodyResults = createRequestObject(req.user._id, header, data, schema, modelName);
 
     return [bodyResults, null];
 }
 
-const createRequestObject = function (owner, header, data, schema) {//items over more lines, each feature separate by ## in _id column
+const createRequestObject = function (owner, header, data, schema, modelName) {//items over more lines, each feature separate by ## in _id column
     let result = {};
     let results = [];
     let supportObj = {};
@@ -123,34 +123,49 @@ const createRequestObject = function (owner, header, data, schema) {//items over
     for (let element of data) {
         arr = element.split(",");
         arr = arr.map(function (el) {
-            if (el.startsWith(" ")) { el=el.slice(1) };
-            if (el.endsWith(" ")) { el=el.slice(0, -1) };
+            if (el.startsWith(" ")) { el = el.slice(1) };
+            if (el.endsWith(" ")) { el = el.slice(0, -1) };
             return el;
-        });   
+        });
         if (arr.length > header.length) {
             arr = arr.slice(0, header.length);
-        }    
-        
+        }
+
         if (Object.keys(result).length > 0 && header.indexOf("_id") == -1) {//not found id
+            if (modelName === "Feature") {//accept items.unit=" "
+                if (!!result.items) {
+                    result.items = result.items.map(function (el) {
+                        if (!!el.name) { if (!el.unit) { el.unit = " "; } }
+                        return el;
+                    })
+                }
+            }
             result["owner"] = owner;
             results.push(result);
             result = {};
         }
         else {
             if (Object.keys(result).length > 0 && (arr[header.indexOf("_id")] != "" && arr[header.indexOf("_id")] != " " && arr[header.indexOf("_id")] != null)) {//new line
+                if (modelName === "Feature") {//accept items.unit=" "
+                    if (!!result.items) {
+                        result.items = result.items.map(function (el) {
+                            if (!!el.name) { if (!el.unit) { el.unit = " "; } }
+                            return el;
+                        })
+                    }
+                }
                 result["owner"] = owner;
                 results.push(result);
                 result = {};
             }
         }
         for (let key of header) {
-
-
             if (schema.paths[key]) {//path
                 if (schema.paths[key].instance == 'Array') {
                     if (!result[key]) {//not found, create it
                         result[key] = [];
                     }
+                    if (!arr[header.indexOf(key)]) { continue; }
                     let value = cleanFunction(arr[header.indexOf(key)]);
                     for (let v of value) { result[key].push(v); }
                 }
@@ -221,6 +236,14 @@ const createRequestObject = function (owner, header, data, schema) {//items over
 
     }
     //save at the end of for loop
+    if (modelName === "Feature") {//accept items.unit="
+        if (!!result.items) {
+            result.items = result.items.map(function (el) {
+                if (!!el.name) { if (!el.unit) { el.unit = " "; } }
+                return el;
+            })
+        }
+    }
     result["owner"] = owner;
     results.push(result);
     return results;
