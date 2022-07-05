@@ -119,6 +119,7 @@ exports.update = async function(body, fields, resource, model, tenant) {
         if (typeof body[field] != 'object' && body[field]) { 
             if(field == 'password') if(tenant.passwordhash == true) body[field] = bcrypt.hashSync(body[field], 8);
             if(field =='_id') continue; 
+            if(model.modelName=="Feature"&&(field =='name'|| 'unit'|| 'dimension'|| 'type')) continue; 
             resource[field] = body[field]; continue; 
         }
         if (typeof body[field] == 'object' && body[field]) {
