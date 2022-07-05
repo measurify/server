@@ -135,6 +135,24 @@ describe('/POST feature', () => {
         res.body.features[1]._id.should.be.eql(features[3]._id);
         res.body.features[2]._id.should.be.eql(features[4]._id);
     });
+
+    it('it should NOT POST a feature with same items name', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = {
+            _id: "feature-name-text",
+            items: [
+                { name: "item-name-1", unit: "item-unit-1" },
+                { name: "item-name-1", unit: "item-unit-2" },
+                { name: "item-name-2", unit: "item-unit-3" }
+            ]
+        }
+        const res = await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(feature)
+        res.should.have.status(errors.post_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.post_request_error.message);
+        res.body.details.should.contain('ValidationError: items: Feature validation failed: items name duplicated (item-name-1)');
+    });
 });
 
 // Test the /POST file route
