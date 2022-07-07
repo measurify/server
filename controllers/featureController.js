@@ -88,12 +88,16 @@ exports.put = async (req, res) => {
 };
 
 exports.putItem = async (req, res) => {
+    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
+    const Device = mongoose.dbs[req.tenant.database].model('Device');
     const Feature = mongoose.dbs[req.tenant.database].model('Feature');
     const fields = ['name', 'unit', 'dimension', 'type'];
     let result = await checker.isAvailable(req, res, Feature); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.canModify(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Feature); if (result != true) return result;
+    result = await checker.isNotUsed(req, res, Measurement, 'feature'); if (result != true) return result;
+    result = await checker.isNotUsed(req, res, Device, 'features'); if (result != true) return result;
     let items = req.resource._doc.items;
     let index = items.findIndex(x => x.name === req.params.id2);
     if (index == -1) { return errors.manage(res, errors.put_request_error, "Item " + req.params.id2 + " not found in the feature " + req.params.id); }
