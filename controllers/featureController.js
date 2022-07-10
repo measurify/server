@@ -110,8 +110,8 @@ exports.putItem = async (req, res) => {
     }
     for (let field of fields) {
         if (req.body[field]) {
-            if (field == "dimension" && !(req.body[field] == 0 || req.body[field] ==1 || req.body[field] ==2)) {continue;}        
-            if (field == "type" && !(ItemTypes[req.body[field]])){continue;}            
+            if (field == "dimension" && !(req.body[field] == 0 || req.body[field] ==1 || req.body[field] ==2)) {return errors.manage(res, errors.put_request_error, "Dimension doesn't have a permitted value: "+req.body[field]);}        
+            if (field == "type" && !(ItemTypes[req.body[field]])){return errors.manage(res, errors.put_request_error, "type doesn't have a permitted value: "+req.body[field]);}            
             items[index][field] = req.body[field];
         }
     }

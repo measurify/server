@@ -385,16 +385,11 @@ describe('/PUT items feature', () => {
             "type":"wrong" 
         };
         const res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id+'/items/'+ "item-name-1").set("Authorization", await factory.getUserToken(user)).send(request);
-        res.should.have.status(200);
+        res.should.have.status(errors.put_request_error.status);
         res.body.should.be.a('object');
-        res.body.should.have.property('_id');
-        res.body.should.have.property('items');
-        res.body._id.should.be.eql('test-feature-1')
-        res.body.items.length.should.be.eql(3);        
-        res.body.items[0].name.should.be.eql('item-name-changed');
-        res.body.items[0].dimension.should.be.eql(0);
-        res.body.items[0].type.should.be.eql('number');
-        res.body.items[1].name.should.be.eql('item-name-2');        
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.put_request_error.message);
+        res.body.details.should.contain('Dimension doesn\'t have a permitted value: 50');     
     });
 });
 
