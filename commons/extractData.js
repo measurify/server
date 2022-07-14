@@ -58,8 +58,8 @@ exports.dataExtractor = async function (req, res, next, modelName) {
 
 
 const readFile = function (req, fileData, modelName) {
-    fileData = fileData.replace("\"", "");
-    let data = fileData.split("\r\n");
+    fileData = fileData.replace(/\"|\r/g, "");
+    let data = fileData.split("\n");
     data = data.filter(function (el) {
         return el != "";
     });
