@@ -135,6 +135,24 @@ describe('/POST feature', () => {
         res.body.features[1]._id.should.be.eql(features[3]._id);
         res.body.features[2]._id.should.be.eql(features[4]._id);
     });
+
+    it('it should NOT POST a feature with same items name', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = {
+            _id: "feature-name-text",
+            items: [
+                { name: "item-name-1", unit: "item-unit-1" },
+                { name: "item-name-1", unit: "item-unit-2" },
+                { name: "item-name-2", unit: "item-unit-3" }
+            ]
+        }
+        const res = await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(feature)
+        res.should.have.status(errors.post_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.post_request_error.message);
+        res.body.details.should.contain('ValidationError: items: Feature validation failed: items name duplicated (item-name-1)');
+    });
 });
 
 // Test the /POST file route
@@ -301,6 +319,77 @@ describe('/PUT feature', () => {
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
+    });
+});
+
+// Test the /PUT Items route
+describe('/PUT items feature', () => {   
+    it('it should PUT items of feature', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const items= [
+            { name: "item-name-1", unit: "item-unit-1", dimension:0, type:"number" },
+            { name: "item-name-2", unit: "item-unit-2" },
+            { name: "item-name-3", unit: "item-unit-3" }
+        ]
+        const feature = await factory.createFeature("test-feature-1", user,items);
+        const request = { 
+            "name": "item-name-changed",
+            "unit":"item-unit-changed",
+            "dimension":1,
+            "type":"text" 
+        };
+        const res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id+'/items/'+ "item-name-1").set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body.should.have.property('items');
+        res.body._id.should.be.eql('test-feature-1')
+        res.body.items.length.should.be.eql(3);        
+        res.body.items[0].name.should.be.eql('item-name-changed');
+        res.body.items[0].unit.should.be.eql('item-unit-changed');
+        res.body.items[0].dimension.should.be.eql(1);
+        res.body.items[0].type.should.be.eql('text');
+        res.body.items[1].name.should.be.eql('item-name-2');        
+    });
+
+    it('it should NOT PUT duplicated items name of feature', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const items= [
+            { name: "item-name-1", unit: "item-unit-1", dimension:0, type:"number" },
+            { name: "item-name-2", unit: "item-unit-2" },
+            { name: "item-name-3", unit: "item-unit-3" }
+        ]
+        const feature = await factory.createFeature("test-feature-1", user,items);
+        const request = { 
+            "name": "item-name-2"
+        };
+        const res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id+'/items/'+ "item-name-1").set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(errors.put_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.put_request_error.message);
+        res.body.details.should.contain('Items includes already item-name-2');
+    });
+
+    it('it should NOT PUT elements of feature unacceptable', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const items= [
+            { name: "item-name-1", unit: "item-unit-1", dimension:0, type:"number" },
+            { name: "item-name-2", unit: "item-unit-2" },
+            { name: "item-name-3", unit: "item-unit-3" }
+        ]
+        const feature = await factory.createFeature("test-feature-1", user,items);
+        const request = { 
+            "name": "item-name-changed",
+            "dimension":50,
+            "type":"wrong" 
+        };
+        const res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id+'/items/'+ "item-name-1").set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(errors.put_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.put_request_error.message);
+        res.body.details.should.contain('Dimension doesn\'t have a permitted value: 50');     
     });
 });
 

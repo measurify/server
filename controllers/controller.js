@@ -115,13 +115,12 @@ const jsonToCSVPlus = function (jsonData, columnsname) {
     if (!process.env.CSV_VECTOR_END) process.env.CSV_VECTOR_END = '';
     if (!process.env.CSV_VECTOR_DELIMITER) process.env.CSV_VECTOR_DELIMITER = ';'
     jsonData = JSON.stringify(jsonData);
-    //console.log(jsonData);
     const json =
         typeof jsonData !== "object" ? JSON.parse(jsonData) : jsonData;
     columnsname = columnsname.map(x => `"${x}"`).join(",");
 
     let str = process.env.CSV_VECTOR_START +
-        `${Object.keys(json.docs[0])//parte per mettere l'intestazione del csv con i nomi delle colonne
+        `${Object.keys(json.docs[0])//csv header
             .map((value) => {
                 if (value == "samples") {
                     return columnsname;
@@ -129,22 +128,22 @@ const jsonToCSVPlus = function (jsonData, columnsname) {
                 else return `"${value}"`
             })
             .join(process.env.CSV_DELIMITER)}` + process.env.CSV_DELIMITER + "\"deltatime\"" + "\n";
-    currentRow = "\n";//stringa virtuale usata per i samples con piu value.
-    json.docs.forEach(doc => {//compilazione campi riga per riga
-        str +=//entriamo per un doc ossia un singolo samples del json
-            `${Object.values(doc)//questo divide ogni singolo campo del samples, cicla per visility,tags ecc
+    currentRow = "\n";//string for samples with more values
+    json.docs.forEach(doc => {//loop for each sample
+        str +=//single sample
+            `${Object.values(doc)//for each field of sample, e.g. visibility,tags ecc
                 .map((value) => {
-                    if (isArray(value))//nel caso in cui sia tags o samples entra qui
+                    if (isArray(value))//for array values e.g. tags 
                     {
-                        if (value.length == 0) {//se il tags o samples non contiene valori metto un array vuoto
+                        if (value.length == 0) {//default empty
                             currentRow += `"[]"` + process.env.CSV_DELIMITER;
                             return `"[]"`;
                         }
                         if (isObject(value[0])) {
                             return value.map((x) => {
-                                delta = 0;//inizializzazione e nel caso nullo
-                                if (x.delta != null) delta = x.delta;  //lo aggiungo come colonna                            
-                                // se nei samples è un insieme di oggetti contenenti values entra qui dentro
+                                delta = 0;//inizialization and default = 0
+                                if (x.delta != null) delta = x.delta;  //add as a column                            
+                                // if it's an object containing values:
                                 return x.values.map(x => `"${x}"`).join(process.env.CSV_DELIMITER) + process.env.CSV_DELIMITER + "\"" + delta + "\"";//mappa i valori di values separandoli con una virgola. 
                             }
                             ).join(currentRow);
@@ -152,7 +151,7 @@ const jsonToCSVPlus = function (jsonData, columnsname) {
                         else {
                             currentRow += "[" + value + "]" + process.env.CSV_DELIMITER;
                             return "[" + value + "]";
-                        }//se è il tags ritorna il valore e basta
+                        }//for tags
                     }
                     else {
                         currentRow += `"${value}"` + process.env.CSV_DELIMITER;
@@ -160,7 +159,7 @@ const jsonToCSVPlus = function (jsonData, columnsname) {
                     }
                 }).join(process.env.CSV_DELIMITER)}` + "\n";
         currentRow = "\n";
-    });//se non è un array aggiunge semplicemente il valore alla stringa
+    });//if it is a single string field it only add the string to the row
     str += process.env.CSV_VECTOR_END;
     return str;
 }
@@ -240,7 +239,11 @@ exports.deleteResourceList = async function (req, res, model, restriction) {
 
 exports.updateResource = async function (req, res, fields, model) {
     try {
+<<<<<<< HEAD
         const modified_resource = await persistence.update(req.body, fields, req.resource, model, req.tenant);
+=======
+        const modified_resource = await persistence.update(req.body, fields, req.resource, model, req.tenant);        
+>>>>>>> 76fba45d68941793240d9386932e6e1046c8c8e8
         return res.status(200).json(modified_resource);
     }
     catch (err) { return errors.manage(res, errors.put_request_error, err); }

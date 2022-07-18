@@ -53,6 +53,20 @@ featureSchema.path('tags').validate({
     }
 });
 
+// validate items name
+featureSchema.path('items').validate({
+    validator: async function (values) { 
+        let nameItems=[];    
+        for(let i=0; i<values.length; i++) {
+            if(nameItems.includes(values[i].name.toLowerCase())){
+                throw new Error('Feature validation failed: items name duplicated (' + values[i].name.toLowerCase() + ')');
+            }
+            nameItems.push(values[i].name.toLowerCase());            
+        };
+        return true;
+    }
+});
+
 // validate id
 featureSchema.pre('save', async function () {
     const res = await this.constructor.findOne({ _id: this._id });

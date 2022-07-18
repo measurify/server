@@ -44,7 +44,7 @@ exports.isNotUsed = async function(resource, model, field) {
     let references = [];
     if(model.schema.path(field).instance === 'Array') references = await model.find({ [field] : { $elemMatch : {$in: [resource._id]}  } }).limit(1);
     else references = await model.find({ [field]: resource._id }).limit(1);
-    if (references.length != 0) return 'Used in ' + references._id + ' ' + model.modelName;
+    if (references.length != 0) return 'Used in ' + references.length + ' ' + model.modelName+', e.g. one _id is '+references[0]._doc._id;
     return true;
 } 
 
