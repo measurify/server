@@ -118,26 +118,18 @@ exports.update = async function(body, fields, resource, model, tenant) {
     for (let field of fields) {
         if (typeof body[field] != 'object' && body[field]) { 
             if(field == 'password') if(tenant.passwordhash == true) body[field] = bcrypt.hashSync(body[field], 8);
-            if(field =='_id') continue; 
+            if(field =='_id') continue; // TBD
             resource[field] = body[field]; continue; 
         }
         if (typeof body[field] == 'object' && body[field]) {
             do {
                 let result = null;
 
-                // List of resources
+                // Array of resources
                 let field_model = null;
                 const field_model_name = field[0].toUpperCase() + field.slice(1, -1);
                 try { if (tenant) field_model = await mongoose.dbs[tenant.database].model(field_model_name) } catch(err) {};
                 if (field_model) result = await modifyResourceList(body[field], field_model, resource, field);
-                if (result == true) break;
-                else if (result) throw result;
-            
-                // List of categorical data
-                let field_type = null;
-                const field_type_name = field[0].toUpperCase() + field.slice(1) + "Types";
-                try { field_type = require('../types/' + field_type_name + '.js'); } catch(err) {};
-                if (field_type) result = await modifyCategoricalValueList(body[field], field_type, resource, field);
                 if (result == true) break;
                 else if (result) throw result;
 
@@ -149,6 +141,22 @@ exports.update = async function(body, fields, resource, model, tenant) {
                 if (result == true) break;
                 else if (result) throw result;
 
+                // Array of embedded resources
+                if((body[field].add    && body[field].add.length>0 && typeof body[field].add[0]    == 'object') ||
+                   (body[field].remove && body[field].remove.length>0) ||
+                   (body[field].update && body[field].update.length>0 && typeof body[field].update[0] == 'object'))
+                   result = await modifyEmbeddedResourceList(body[field], resource, field);
+                if (result == true) break;
+                else if (result) throw result;
+
+                // Array of categorical data
+                let field_type = null;
+                const field_type_name = field[0].toUpperCase() + field.slice(1) + "Types";
+                try { field_type = require('../types/' + field_type_name + '.js'); } catch(err) { continue; };
+                if (field_type) result = await modifyCategoricalValueList(body[field], field_type, resource, field);
+                if (result == true) break;
+                else if (result) throw result;
+            
                 // Other lists? TBD
                 throw 'Cannot manage the field (' + field + ')';
                 break;
@@ -214,6 +222,27 @@ const modifyCategoricalValueList = async function(list, type, resource, field) {
     if(list.add) {
         for (let value of list.add) { if (!Object.values(type).includes(value))  throw 'Type to be added to the list not found: ' + value; };
         resource[field].push(...list.add);
+    }
+    resource[field] = [...new Set(resource[field])];
+    return true;
+}
+
+const modifyEmbeddedResourceList = async function(list, resource, field) {
+    if(list.remove) {
+        for (let value of list.remove) { if (!resource[field].some(element => element.name === value)) throw 'Embedded resource to be removed from list not found: ' + value; };
+        resource[field] = resource[field].filter(value => !list.remove.includes(value.name));
+    }
+    if(list.add) {
+        for (let value of list.add) { if (resource[field].some(element => element.name === value.name))  throw 'Embedded resource already exist: ' + value.name; };
+        resource[field].push(...list.add);
+    }
+    if(list.update) {
+        for (let value of list.update) { if (!resource[field].some(element => element.name === value.name )) throw 'Embedded resource to be updates from list not found: ' + value.name; };
+        resource[field] = resource[field].map( value =>  {
+            if (new_value = list.update.find(element => element.name == value.name)) 
+                return new_value.new
+            return value; 
+        });
     }
     resource[field] = [...new Set(resource[field])];
     return true;

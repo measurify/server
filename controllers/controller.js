@@ -102,7 +102,6 @@ exports.getResourceList = async function (req, res, sort, select, model, restric
         if (req.headers.accept == 'text/csv') {
             res.header('Content-Type', 'text/csv');
             csvresultlibrary = jsonToCSV(list);
-
             return res.status(200).json(csvresultlibrary);
         }
         else return res.status(200).json(list);
@@ -169,14 +168,10 @@ const jsonToCSVPlus = function (jsonData, columnsname) {
 const jsonToCSV = function (jsonData) {
     if (!process.env.CSV_DELIMITER) process.env.CSV_DELIMITER = ',';
     jsonData = JSON.stringify(jsonData);
-    const json =
-        typeof jsonData !== "object" ? JSON.parse(jsonData) : jsonData;
+    const json = typeof jsonData !== "object" ? JSON.parse(jsonData) : jsonData;
     const { Parser, transforms: { unwind } } = require('json2csv');
-
     const fields = ["visibility", "tags", "_id", "startDate", "endDate", "thing", "feature", "device", { label: 'values', value: 'samples.values' }, { label: 'deltatime', value: 'samples.delta', default: 0 }];
-
     const transforms = [unwind({ paths: ['samples'] })];
-
     const json2csvParser = new Parser({ fields, transforms, delimiter: process.env.CSV_DELIMITER });
     const csv = json2csvParser.parse(json.docs);
     return csv;
@@ -246,7 +241,6 @@ exports.deleteResourceList = async function (req, res, model, restriction) {
 exports.updateResource = async function (req, res, fields, model) {
     try {
         const modified_resource = await persistence.update(req.body, fields, req.resource, model, req.tenant);
-        //if(modified_resource===null){return await persistence.get(req.resource._id, null, Feature, select);}
         return res.status(200).json(modified_resource);
     }
     catch (err) { return errors.manage(res, errors.put_request_error, err); }

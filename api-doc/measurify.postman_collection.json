@@ -2,7 +2,8 @@
 	"info": {
 		"_postman_id": "f3274ad4-71d8-40b0-92eb-f2c008c9889c",
 		"name": "Measurify",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "56096"
 	},
 	"item": [
 		{
@@ -754,7 +755,54 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\",\n\t\"tenant\": \"atmosphere-dev\"\n}"
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\",\n\t\"tenant\": \"meaasurify-default\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LOGIN renew the token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer"
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/login",
@@ -1336,6 +1384,334 @@
 			"name": "TAGS",
 			"item": [
 				{
+					"name": "TAGS",
+					"item": [
+						{
+							"name": "LOGIN as admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+								},
+								"url": {
+									"raw": "{{url}}/v1/login",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET all tags",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/v1/tags",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"tags"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "POST a new tag",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.environment.set(\"tag\", JSON.parse(responseBody)._id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{ \n\t\"_id\": \"test_tag\"\n}"
+								},
+								"url": {
+									"raw": "{{url}}/v1/tags",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"tags"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET a tag",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/v1/tags/{{tag}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"tags",
+										"{{tag}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "POST a list of new tags (tagged)",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\r\n  { \"_id\": \"tagged-tag-1\", \"tags\": [\"{{tag}}\"] },\r\n  { \"_id\": \"tagged-tag-2\", \"tags\": [\"{{tag}}\"] },\r\n  { \"_id\": \"tagged-tag-3\", \"tags\": [\"{{tag}}\"] },\r\n  { \"_id\": \"tagged-tag-4\", \"tags\": [\"{{tag}}\"] }\r\n]"
+								},
+								"url": {
+									"raw": "{{url}}/v1/tags",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"tags"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "PUT a tag",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"visibility\": \"private\",\n    \"tags\": {\n        \"remove\": [],\n        \"add\": [\"tagged-tag-1\", \"tagged-tag-2\"]\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/v1/tags/{{tag}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"tags",
+										"{{tag}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET all tags filtered by tag",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var data = JSON.parse(responseBody);",
+											"if(data.docs) pm.environment.set('tag', data.docs[0]._id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/v1/tags?filter={\"tags\": \"{{tag}}\"}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"tags"
+									],
+									"query": [
+										{
+											"key": "filter",
+											"value": "{\"tags\": \"{{tag}}\"}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "DELETE a tag (not used)",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{url}}/v1/tags/{{tag}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"tags",
+										"{{tag}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "LOGIN as admin",
 					"event": [
 						{
@@ -1885,6 +2261,268 @@
 								"v1",
 								"features",
 								"{{feature}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "PROTOCOLS",
+			"item": [
+				{
+					"name": "LOGIN as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET all protocols",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"if(data.docs) pm.environment.set('protocol', data.docs[0]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/protocols",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"protocols"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET one protocol",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/protocols/{{protocol}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"protocols",
+								"{{protocol}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new protocol",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"feature\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"protocol name\",\n    \"description\": \"protocol description\",\n    \"metadata\": [\n        { \"name\": \"metadata-name-1\", \"description\": \"description metadata 1\", \"type\": \"scalar\"},\n        { \"name\": \"metadata-name-2\", \"description\": \"description metadata 2\", \"type\": \"text\"},\n        { \"name\": \"metadata-name-3\", \"description\": \"description metadata 3\", \"type\": \"scalar\"},\n        { \"name\": \"metadata-name-4\", \"description\": \"description metadata 4\", \"type\": \"vector\"}\n    ],\n    \"topics\": [\n        {\n            \"name\": \"topic name 1\",\n            \"description\": \"topic description 1\",\n            \"fields\": [\n                { \"name\": \"field-1\", \"description\": \"field description 1\", \"type\": \"scalar\"},\n                { \"name\": \"field-2\", \"description\": \"field description 2\", \"type\": \"text\"},\n                { \"name\": \"field-3\", \"description\": \"field description 3\", \"type\": \"vector\"}\n            ]\n        },\n        {\n            \"name\": \"topic name 2\",\n            \"description\": \"topic description 2\",\n            \"fields\": [\n                { \"name\": \"field-4\", \"description\": \"field description 4\", \"type\": \"scalar\"},\n                { \"name\": \"field-5\", \"description\": \"field description 5\", \"type\": \"text\"},\n                { \"name\": \"field-6\", \"description\": \"field description 6\", \"type\": \"vector\"}\n            ]\n        }\n    ] \n}\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/protocols",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"protocols"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT a protocol",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"feature\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"_id\": \"position\",\n    \"items\": [\n    \t{\n        \t\"name\": \"longitude\",\n            \"unit\": \"degree\",\n            \"type\": \"number\",\n            \"dimension\": 0\n        },\n        {\n        \t\"name\": \"latitude\",\n            \"unit\": \"degree\",\n            \"type\": \"number\",\n            \"dimension\": 0\n        }\n    ]\n}\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/protocols/{{protocol}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"protocols",
+								"{{protocol}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE a protocol (only if not used)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/v1/protocols/{{protocol}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"protocols",
+								"{{protocol}}"
 							]
 						}
 					},
@@ -6604,14 +7242,23 @@
 							}
 						],
 						"url": {
-							"raw": "{{url}}/v1/stream/entity={{thing}}&token={{token}}",
+							"raw": "{{url}}/v1/stream?thing={{thing}}&token={{token}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"v1",
-								"stream",
-								"entity={{thing}}&token={{token}}"
+								"stream"
+							],
+							"query": [
+								{
+									"key": "thing",
+									"value": "{{thing}}"
+								},
+								{
+									"key": "token",
+									"value": "{{token}}"
+								}
 							]
 						}
 					},

@@ -204,7 +204,6 @@ describe('/GET dataset', () => {
         res.body.results.should.contain("test-result");
         res.body.size.should.be.eql(1500);
     });
-
 });
 
 // Test the /POST route
@@ -219,8 +218,8 @@ describe('/POST dataset', () => {
         const thing1 = await factory.createThing("test-thing-1", user);
         const testFile = './test/test/test-file1.txt';
         const testDescription = './test/test/test-description.txt';
-        
         const res = await chai.request(server).keepOpen().post('/v1/dataset').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+        console.log(res.txt)
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('completed');
@@ -239,7 +238,6 @@ describe('/POST dataset', () => {
         const thing1 = await factory.createThing("test-thing-1", user);
         const testFile = './test/test/test-file2.txt';
         const testDescription = './test/test/test-description.txt';
-        
         const res = await chai.request(server).keepOpen().post('/v1/dataset').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(202);
         res.body.should.be.a('object');
@@ -268,7 +266,6 @@ describe('/POST dataset', () => {
         const thing1 = await factory.createThing("test-thing-1", user);
         const testFile = './test/test/test-file2.txt';
         const testDescription = './test/test/test-description.txt';
-        
         const res = await chai.request(server).keepOpen().post('/v1/dataset?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(202);
         res.body.should.be.a('object');
@@ -297,7 +294,6 @@ describe('/POST dataset', () => {
         const thing1 = await factory.createThing("test-thing-1", user);
         const testFile = './test/test/test-file2.txt';
         const testDescription = './test/test/test-fake-description.txt';
-        
         const res = await chai.request(server).keepOpen().post('/v1/dataset?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.description_not_json.status);
         res.body.should.be.a('object');
@@ -316,7 +312,6 @@ describe('/POST dataset', () => {
         const thing1 = await factory.createThing("test-thing-1", user);
         const testFile = './test/test/test-file1-multiple-features.txt';
         const testDescription = './test/test/test-description-multiple-features.txt';
-        
         const res = await chai.request(server).keepOpen().post('/v1/dataset').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -336,7 +331,6 @@ describe('/POST dataset', () => {
         const thing1 = await factory.createThing("test-thing-1", user);
         const testFile = './test/test/test-file2-multiple-features.txt';
         const testDescription = './test/test/test-description-multiple-features.txt';
-        
         const res = await chai.request(server).keepOpen().post('/v1/dataset').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(202);
         res.body.should.be.a('object');
@@ -365,7 +359,6 @@ describe('/POST dataset', () => {
         const thing1 = await factory.createThing("test-thing-1", user);
         const testFile = './test/test/test-file2-multiple-features.txt';
         const testDescription = './test/test/test-description-multiple-features.txt';
-        
         const res = await chai.request(server).keepOpen().post('/v1/dataset?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(202);
         res.body.should.be.a('object');
@@ -394,7 +387,6 @@ describe('/POST dataset', () => {
         const thing1 = await factory.createThing("test-thing-1", user);
         const testFile = './test/test/test-file2-multiple-features-no-header.txt';
         const testDescription = './test/test/test-description-multiple-features.txt';
-        
         const res = await chai.request(server).keepOpen().post('/v1/dataset?force=true&header=false').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(202);
         res.body.should.be.a('object');
@@ -423,7 +415,6 @@ describe('/POST dataset', () => {
         const thing1 = await factory.createThing("test-thing-1", user);
         const testFile = './test/test/test-file2-multiple-features.txt';
         const testDescription = './test/test/test-fake-description.txt';
-        
         const res = await chai.request(server).keepOpen().post('/v1/dataset?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.description_not_json.status);
         res.body.should.be.a('object');

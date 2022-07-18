@@ -36,7 +36,7 @@ exports.post = async (req, res, next, fileData, descriptionData, filename) => {
 
     result = await dataset.checkCommonElements(req, res, descriptionDataCleaned,force);
     if (result != true) return result;
-
+    
     let resourceDataupload
     [result, resourceDataupload] = await dataset.datauploadCheckAndCreate(req, res, descriptionDataCleaned, filename, fileData);
     if (result != true) return result;
@@ -61,7 +61,6 @@ exports.post = async (req, res, next, fileData, descriptionData, filename) => {
     //principal loop for each line
     report = await dataset.principalLoop(req, res, lines, elementsNumber, feature, report, descriptionDataCleaned, filename, force, header ,true);
     //console.log(report);
-
 
     result = await dataset.updateDataupload(req, res, report, resourceDataupload);
     if (result != true) {

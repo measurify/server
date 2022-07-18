@@ -202,7 +202,7 @@ exports.createTagRequest = async function (tagName) {
 exports.tagLoop = async function (descriptionDataCleaned, Tag) {
   let tags = [];
   for (let j in descriptionDataCleaned.tags) {
-    id = line[descriptionDataCleaned.tags[j]].replaceAll(/['"]+/g, "");
+    id = line[descriptionDataCleaned.tags[j]].replace(/['"]+/g, "");
     resultTag = await this.checkerIfExist(Tag, id);
     if (!resultTag) {
       errMessage = "tag " + id + " not found in database";
@@ -349,7 +349,7 @@ const createRequestObject = async function (
 exports.sampleLoop = async function (descriptionDataCleaned, line, feature) {
   let samples = [];
   for (let k in descriptionDataCleaned.items[feature._id]) {
-    str_val = line[descriptionDataCleaned.items[feature._id][k]].replaceAll(
+    str_val = line[descriptionDataCleaned.items[feature._id][k]].replace(
       /['"]+/g,
       ""
     );
@@ -433,7 +433,7 @@ exports.sampleLoop = async function (descriptionDataCleaned, line, feature) {
 exports.tagLoop = async function (descriptionDataCleaned, Tag, force, req) {
   let tags = [];
   for (let j in descriptionDataCleaned.tags) {
-    id = line[descriptionDataCleaned.tags[j]].replaceAll(/['"]+/g, "");
+    id = line[descriptionDataCleaned.tags[j]].replace(/['"]+/g, "");
     if (id == "") { continue; }
     resultTag = await this.checkerIfExist(Tag, id);
     if (!resultTag) {
@@ -478,6 +478,7 @@ exports.principalLoop = async function (
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   //TEST OTTIMIZZAZIONE let allMeasurementBody=[];
   //algorithm for check every line of the csv and save the value inside a measurement
+  
   for (let i in lines) {
     if (lines[i] == "") continue;
     if ((i == 0) & (header == true)) continue;
@@ -501,10 +502,7 @@ exports.principalLoop = async function (
       featureName = descriptionDataCleaned.commonElements["feature"];
       featureInfo = await Feature.findById(featureName);
     } else {
-      featureName = line[descriptionDataCleaned.feature].replaceAll(
-        /['"]+/g,
-        ""
-      );
+      featureName = line[descriptionDataCleaned.feature].replace(/['"]+/g,"");
 
       featureInfo = await Feature.findById(featureName);
       if (!featureInfo) {
@@ -543,7 +541,8 @@ exports.principalLoop = async function (
       //thing fixed
       thing = descriptionDataCleaned.commonElements["thing"];
     } else {
-      thing = line[descriptionDataCleaned.thing].replaceAll(/['"]+/g, "");
+      //thing = line[descriptionDataCleaned.thing].replace(/['"]+/g, "");
+      thing = line[descriptionDataCleaned.thing].replace(/['"]+/g, "")
 
       let resultThing = await this.checkerIfExist(Thing, thing);
       if (!resultThing) {
@@ -572,7 +571,8 @@ exports.principalLoop = async function (
       //device fixed
       device = descriptionDataCleaned.commonElements["device"];
     } else {
-      device = line[descriptionDataCleaned.device].replaceAll(/['"]+/g, "");
+      //device = line[descriptionDataCleaned.device].replace(/['"]+/g, "");
+      device = line[descriptionDataCleaned.device].replace(/['"]+/g, "");
 
       resultDevice = await this.checkerIfExist(Device, device);
       if (!resultDevice) {
@@ -673,49 +673,46 @@ exports.principalLoop = async function (
       //startdate fixed
       if (
         isNaN(
-          descriptionDataCleaned.commonElements["startdate"].replaceAll(
-            /['"]+/g,
-            ""
-          )
+          descriptionDataCleaned.commonElements["startdate"].replace(/['"]+/g,"")
         )
       ) {
         result = Date.parse(
-          descriptionDataCleaned.commonElements["startdate"].replaceAll(
+          descriptionDataCleaned.commonElements["startdate"].replace(
             /['"]+/g,
             ""
           )
         );
         startdate = descriptionDataCleaned.commonElements[
           "startdate"
-        ].replaceAll(/['"]+/g, "");
+        ].replace(/['"]+/g, "");
       } else {
         //is a number
-        result = descriptionDataCleaned.commonElements["startdate"].replaceAll(
+        result = descriptionDataCleaned.commonElements["startdate"].replace(
           /['"]+/g,
           ""
         );
         startdate = descriptionDataCleaned.commonElements[
           "startdate"
-        ].replaceAll(/['"]+/g, "");
+        ].replace(/['"]+/g, "");
       }
     } else {
       if (
-        isNaN(line[descriptionDataCleaned.startdate].replaceAll(/['"]+/g, ""))
+        isNaN(line[descriptionDataCleaned.startdate].replace(/['"]+/g, ""))
       ) {
         result = Date.parse(
-          line[descriptionDataCleaned.startdate].replaceAll(/['"]+/g, "")
+          line[descriptionDataCleaned.startdate].replace(/['"]+/g, "")
         ); //need to remove ""
-        startdate = line[descriptionDataCleaned.startdate].replaceAll(
+        startdate = line[descriptionDataCleaned.startdate].replace(
           /['"]+/g,
           ""
         );
       } else {
         //is a number
-        result = line[descriptionDataCleaned.startdate].replaceAll(
+        result = line[descriptionDataCleaned.startdate].replace(
           /['"]+/g,
           ""
         );
-        startdate = line[descriptionDataCleaned.startdate].replaceAll(
+        startdate = line[descriptionDataCleaned.startdate].replace(
           /['"]+/g,
           ""
         );
@@ -733,29 +730,29 @@ exports.principalLoop = async function (
       //enddate fixed
       if (
         isNaN(
-          descriptionDataCleaned.commonElements["enddate"].replaceAll(
+          descriptionDataCleaned.commonElements["enddate"].replace(
             /['"]+/g,
             ""
           )
         )
       ) {
         result = Date.parse(
-          descriptionDataCleaned.commonElements["enddate"].replaceAll(
+          descriptionDataCleaned.commonElements["enddate"].replace(
             /['"]+/g,
             ""
           )
         );
-        enddate = descriptionDataCleaned.commonElements["enddate"].replaceAll(
+        enddate = descriptionDataCleaned.commonElements["enddate"].replace(
           /['"]+/g,
           ""
         );
       } else {
         //is a number
-        result = descriptionDataCleaned.commonElements["enddate"].replaceAll(
+        result = descriptionDataCleaned.commonElements["enddate"].replace(
           /['"]+/g,
           ""
         );
-        enddate = descriptionDataCleaned.commonElements["enddate"].replaceAll(
+        enddate = descriptionDataCleaned.commonElements["enddate"].replace(
           /['"]+/g,
           ""
         );
@@ -768,22 +765,22 @@ exports.principalLoop = async function (
         enddate = startdate;
       } else {
         if (
-          isNaN(line[descriptionDataCleaned.enddate].replaceAll(/['"]+/g, ""))
+          isNaN(line[descriptionDataCleaned.enddate].replace(/['"]+/g, ""))
         ) {
           result = Date.parse(
-            line[descriptionDataCleaned.enddate].replaceAll(/['"]+/g, "")
+            line[descriptionDataCleaned.enddate].replace(/['"]+/g, "")
           ); //need to remove ""
-          enddate = line[descriptionDataCleaned.enddate].replaceAll(
+          enddate = line[descriptionDataCleaned.enddate].replace(
             /['"]+/g,
             ""
           );
         } else {
           //is a number
-          result = line[descriptionDataCleaned.enddate].replaceAll(
+          result = line[descriptionDataCleaned.enddate].replace(
             /['"]+/g,
             ""
           );
-          enddate = line[descriptionDataCleaned.enddate].replaceAll(
+          enddate = line[descriptionDataCleaned.enddate].replace(
             /['"]+/g,
             ""
           );

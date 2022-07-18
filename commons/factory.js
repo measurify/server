@@ -13,6 +13,8 @@ const VisibilityTypes = require("../types/visibilityTypes.js");
 const bcrypt = require("bcryptjs");
 const UserStatusTypes = require("../types/userStatusTypes");
 const IssueStatusTypes = require("../types/issueStatusTypes");
+const MetadataTypes = require('../types/metadataTypes.js');
+const TopicFieldTypes = require('../types/topicFieldTypes.js');
 
 function sha(content) {
   return crypto.createHash("sha256").update(content).digest("hex");
@@ -57,15 +59,7 @@ exports.getUserToken = async function (user, tenant) {
   return authentication.encode(user, tenant);
 };
 
-exports.createTenant = async function (
-  id,
-  organization,
-  address,
-  email,
-  phone,
-  admin_username,
-  admin_password
-) {
+exports.createTenant = async function (id, organization, address, email, phone, admin_username, admin_password) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   let tenant = await Tenant.findOne({ _id: id });
   if (!tenant) {
@@ -86,14 +80,7 @@ exports.createTenant = async function (
   return await Tenant.findById(tenant._id);
 };
 
-exports.createUser = async function (
-  username,
-  password,
-  type,
-  fieldmask,
-  email,
-  tenant
-) {
+exports.createUser = async function (username, password, type, fieldmask, email, tenant) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
   if (tenant.passwordhash == true || tenant.passwordhash == "true") {
@@ -138,14 +125,7 @@ exports.createTag = async function (name, owner, tags, visibility, tenant) {
   return tag._doc;
 };
 
-exports.createFeature = async function (
-  name,
-  owner,
-  items,
-  tags,
-  visibility,
-  tenant
-) {
+exports.createFeature = async function (name, owner, items, tags, visibility, tenant) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
   const Feature = mongoose.dbs[tenant.database].model("Feature");
@@ -163,15 +143,49 @@ exports.createFeature = async function (
   return feature._doc;
 };
 
-exports.createDevice = async function (
-  name,
-  owner,
-  features,
-  tags,
-  scripts,
-  visibility,
-  tenant
-) {
+
+exports.createMetadata = async function (name, description, type) {
+  metadata = { name: name || "metadata-name-" + this.uuid(), 
+               description: description || "description metadata " + this.uuid(), 
+               type: type || MetadataTypes.scalar
+             }
+  return metadata;
+}
+
+exports.createField = async function (name, description, type) {
+  field = { name: name || "field-name-" + this.uuid(), 
+            description: description || "description field " + this.uuid(), 
+            type: type || TopicFieldTypes.scalar
+          }
+  return field;
+}
+exports.createTopic = async function (name, description, fields) {
+  topic = { name: name || "topic-name-" + this.uuid(), 
+            description: description || "description topic " + this.uuid(), 
+            fields: fields || [ await this.createField(), await this.createField() ]
+          }
+  return topic;
+}
+
+exports.createProtocol = async function (name, description, owner, metadata, topics, tags, visibility, tenant) {
+  const Tenant = mongoose.dbs["catalog"].model("Tenant");
+  if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
+  const Protocol = mongoose.dbs[tenant.database].model("Protocol");
+  const req = {
+    _id: name,
+    description: description,
+    owner: owner,
+    metadata: metadata || [ await this.createMetadata(), await this.createMetadata() ],
+    topics: topics || [ await this.createTopic(), await this.createTopic() ],
+    tags: tags,
+    visibility: visibility,
+  };
+  const protocol = new Protocol(req);
+  await protocol.save();
+  return protocol._doc;
+};
+
+exports.createDevice = async function (name, owner, features, tags, scripts, visibility, tenant ) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
   const Device = mongoose.dbs[tenant.database].model("Device");
@@ -284,6 +298,7 @@ exports.createThing = async function (
   await thing.save();
   return thing._doc;
 };
+
 
 exports.createScript = async function (
   name,

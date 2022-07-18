@@ -5,9 +5,6 @@ const { catchErrors } = require("./errorHandlers.js");
 const mongoose = require("mongoose");
 const persistence = require("./persistence.js");
 
-
-
-
 //extract data when receive a form-data post
 exports.dataExtractor = async function (req, res, next, modelName) {
     if (!req.busboy) { return errors.manage(res, errors.empty_file, "not found any data"); }
@@ -58,8 +55,9 @@ exports.dataExtractor = async function (req, res, next, modelName) {
 
 
 const readFile = function (req, fileData, modelName) {
-    fileData = fileData.replace("\"", "");
-    let data = fileData.split("\r\n");
+    fileData = fileData.replace(/\"|\r/g, "");
+    let data = fileData.split("\n");
+
     data = data.filter(function (el) {
         return el != "";
     });
@@ -86,7 +84,7 @@ const readFile = function (req, fileData, modelName) {
 
         }
     }
-    //console.log(data);
+
     let header = data[0].split(",");
     header = header.map(function (el) {
         if (el.startsWith(" ")) { el = el.slice(1) };
