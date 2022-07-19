@@ -1,63 +1,40 @@
 const errors = require("./errors.js");
 const busboy = require("connect-busboy");
-const { file } = require("../types/itemTypes.js");
 const { catchErrors } = require("./errorHandlers.js");
 const mongoose = require("mongoose");
-const persistence = require("./persistence.js");
 
-//extract data when receive a form-data post
 exports.dataExtractor = async function (req, res, next, modelName) {
-    if (!req.busboy) { return errors.manage(res, errors.empty_file, "not found any data"); }
-    let fileData = null;
+    if (!req.busboy) return errors.manage(res, errors.empty_file, "not found any data");
+    let fileData = "";
     let errorOccurred = false;
     req.busboy.on("file", (fieldName, file, filename) => {
-        //fieldname is the key of the file
-
         if (!errorOccurred) {
-            //if there is some error the lambda function is stopped
+            //if there is some error the function is stopped
             if (fieldName != "file") {
                 errorOccurred = true;
                 return errors.manage(res, errors.fieldName_error, fieldName + " is not file");
             }
             file.on("data", (data) => {
-                if (!errorOccurred) {
-                    //if there is some error the lambda function is stopped
-                    if (fieldName == "file") {
-                        if (fileData === null) {
-                            fileData = data.toString();
-                        } else {
-                            fileData += data.toString();
-                            //return errors.manage(res, errors.max_one_file, "max one file for each post");
-                        }
-                    }
-                }
+                if (!errorOccurred) fileData += data.toString();
             });
         }
     });
     req.busboy.on("finish", () => {
-        if (!fileData) {
-            return errors.manage(res, errors.empty_file, "file data not found");
-        }
+        if (fileData == "") return errors.manage(res, errors.empty_file, "file data not found");
         if (!errorOccurred) {
-
             let [body, err] = readFile(req, fileData, modelName);
-            if (!body) { return errors.manage(res, errors.wrong_header, err) }
-            //console.log(body);
+            if (!body) return errors.manage(res, errors.wrong_header, err);
             req.body = body;
-
             let controllerName = modelName.toLowerCase();
             const controller = require('../controllers/' + controllerName + 'Controller');
             return controller.post(req, res);
         }
-    }
-    );
+    });
 };
 
-
 const readFile = function (req, fileData, modelName) {
-    fileData = fileData.replace(/\"|\r/g, "");
+    fileData = fileData.replace(/\"|\r| /g, "");
     let data = fileData.split("\n");
-
     data = data.filter(function (el) {
         return el != "";
     });
@@ -66,153 +43,70 @@ const readFile = function (req, fileData, modelName) {
     let requiredFields = [];
     let optionalFields = [];
     for (let key in schema.paths) {
-        if (schema.paths[key].isRequired && key != "owner") {//owner taken from request user id
-            requiredFields.push(key);
-        }
-        else {
-            optionalFields.push(key);
-        }
+        //owner taken from request user id
+        if (schema.paths[key].isRequired && key != "owner") requiredFields.push(key);
+        else optionalFields.push(key);
     }
     if (schema.subpaths) {
         for (let key in schema.subpaths) {
-            if (schema.subpaths[key].isRequired) {
-                requiredFields.push(key);
-            }
-            else {
-                optionalFields.push(key);
-            }
-
+            if (schema.subpaths[key].isRequired) requiredFields.push(key);
+            else optionalFields.push(key);
         }
     }
-
     let header = data[0].split(",");
-    header = header.map(function (el) {
-        if (el.startsWith(" ")) { el = el.slice(1) };
-        if (el.endsWith(" ")) { el = el.slice(0, -1) };
-        return el;
-    });
-
     data.shift();
-
     if (!requiredFields.every(ai => header.includes(ai))) {
         let missing = [];
         for (val of requiredFields) { if (!header.includes(val)) { missing.push(val); } }
         return [null, "Missing some required fields: needed " + missing + " in the header " + header];
     }
-
     if (!header.every(el => requiredFields.includes(el) || optionalFields.includes(el))) {
         let unrecognized = [];
         for (val of header) { if (!requiredFields.includes(val) && !optionalFields.includes(val)) { unrecognized.push(val); } }
         return [null, "Some optional element not recognized:  " + unrecognized + " .  Required elements are " + requiredFields + ", optional are " + optionalFields];
     }
-
-    let bodyResults = null;
-
-    bodyResults = createRequestObject(req.user._id, header, data, schema, modelName);
-
-    return [bodyResults, null];
+    return [createRequestObject(req.user._id, header, data, schema, modelName), null];
 }
 
 const createRequestObject = function (owner, header, data, schema, modelName) {//items over more lines, each feature separate by ## in _id column
     let result = {};
     let results = [];
     let supportObj = {};
-
     for (let element of data) {
         arr = element.split(",");
-        arr = arr.map(function (el) {
-            if (el.startsWith(" ")) { el = el.slice(1) };
-            if (el.endsWith(" ")) { el = el.slice(0, -1) };
-            return el;
-        });
-        if (arr.length > header.length) {
-            arr = arr.slice(0, header.length);
-        }
-
-        if (Object.keys(result).length > 0 && header.indexOf("_id") == -1) {//not found id
-            if (modelName === "Feature") {//accept items.unit=" "
-                if (!!result.items) {
-                    result.items = result.items.map(function (el) {
-                        if (!!el.name) { if (!el.unit) { el.unit = " "; } }
-                        return el;
-                    })
-                }
-            }
-            result["owner"] = owner;
-            results.push(result);
+        if (arr.length > header.length) arr = arr.slice(0, header.length);
+        if (Object.keys(result).length > 0 && (header.indexOf("_id") == -1 || arr[header.indexOf("_id")])) {//ended the entity, save it
+            results.push(saveResult(modelName, result, owner));
             result = {};
-        }
-        else {
-            if (Object.keys(result).length > 0 && (arr[header.indexOf("_id")] != "" && arr[header.indexOf("_id")] != " " && arr[header.indexOf("_id")] != null)) {//new line
-                if (modelName === "Feature") {//accept items.unit=" "
-                    if (!!result.items) {
-                        result.items = result.items.map(function (el) {
-                            if (!!el.name) { if (!el.unit) { el.unit = " "; } }
-                            return el;
-                        })
-                    }
-                }
-                result["owner"] = owner;
-                results.push(result);
-                result = {};
-            }
         }
         for (let key of header) {
             if (schema.paths[key]) {//path
                 if (schema.paths[key].instance == 'Array') {
-                    if (!result[key]) {//not found, create it
-                        result[key] = [];
-                    }
-                    if (!arr[header.indexOf(key)]) { continue; }
-                    let value = cleanFunction(arr[header.indexOf(key)]);
-                    for (let v of value) { result[key].push(v); }
+                    if (!result[key]) result[key] = [];//not found, create it   
+                    if (!arr[header.indexOf(key)]) continue;//blank element
+                    result[key].push(...cleanFunction(arr[header.indexOf(key)]));
                 }
-                else {
-                    if (header.indexOf("_id") == -1) {
-                        result[key] = arr[header.indexOf(key)];
-                    }
-                    else {
-                        if (arr[header.indexOf("_id")] != "" && arr[header.indexOf("_id")] != " " && arr[header.indexOf("_id")] != null) {//an element that is not an Array can't have more than 1 line for its fields
-                            result[key] = arr[header.indexOf(key)];
-                        }
-                    }
-                }
+                else if (header.indexOf("_id") == -1 || arr[header.indexOf("_id")]) result[key] = arr[header.indexOf(key)];//not Array elements can't be splitted in more lines
             }
             else //subpath
             {
-                if (arr[header.indexOf(key)] != "" && arr[header.indexOf(key)] != " " && arr[header.indexOf(key)] != null) {
-                    if (arr[header.indexOf(key)].startsWith("[")) {
+                if (arr[header.indexOf(key)]) {
+                    if (arr[header.indexOf(key)].startsWith("[")) {//Array
                         let stringData = arr[header.indexOf(key)];
                         stringData = stringData.slice(1, -1);//remove []
                         stringData = stringData.split(";");//doesn't remove "" because the position is important
-
                         let subKey = key.split(".");
-
-                        if (!result[subKey[0]]) {//not found, create it
-                            result[subKey[0]] = [];
-                        }
-                        if (!supportObj[subKey[0]]) {//not found, create it                    
-                            supportObj[subKey[0]] = [];
-                        }
+                        if (!result[subKey[0]]) result[subKey[0]] = [];//not found, create it
+                        if (!supportObj[subKey[0]]) supportObj[subKey[0]] = [];//not found, create it                        
                         if (supportObj[subKey[0]].length == 0 && stringData.length > 0) {//first time
-                            for (let i in stringData) {
-                                supportObj[subKey[0]].push({});
-                            }
+                            for (let i in stringData) { supportObj[subKey[0]].push({}); }
                         }
-                        for (let k in stringData) {
-                            if (stringData[k] != "" && stringData[k] != " " && stringData[k] != null) {
-                                supportObj[subKey[0]][k][subKey[1]] = stringData[k];
-                            }
-                        }
+                        for (let k in stringData) {if (stringData[k]) supportObj[subKey[0]][k][subKey[1]] = stringData[k];}
                     }
                     else {//the subpath is not an array
                         let subKey = key.split(".");
-                        if (!result[subKey[0]]) {//not found, create it
-                            result[subKey[0]] = [];
-                        }
-                        if (!supportObj[subKey[0]]) {//not found, create it                    
-                            supportObj[subKey[0]] = {};
-                        }
+                        if (!result[subKey[0]]) result[subKey[0]] = [];//not found, create it                      
+                        if (!supportObj[subKey[0]]) supportObj[subKey[0]] = {};//not found, create it    
                         supportObj[subKey[0]][subKey[1]] = arr[header.indexOf(key)];
                     }
                 }
@@ -220,30 +114,14 @@ const createRequestObject = function (owner, header, data, schema, modelName) {/
         }
         if (Object.keys(supportObj).length > 0) {
             for (let k of Object.keys(supportObj)) {
-                if (Array.isArray(supportObj[k])) {
-                    for (let j in supportObj[k]) {
-                        result[k].push(supportObj[k][j]);
-                    }
-                }
-                else {
-                    result[k].push(supportObj[k]);
-                }
+                if (Array.isArray(supportObj[k])) { for (let j in supportObj[k]) {result[k].push(supportObj[k][j]);} }
+                else result[k].push(supportObj[k]);
             }
             supportObj = {};
         }
-
     }
     //save at the end of for loop
-    if (modelName === "Feature") {//accept items.unit="
-        if (!!result.items) {
-            result.items = result.items.map(function (el) {
-                if (!!el.name) { if (!el.unit) { el.unit = " "; } }
-                return el;
-            })
-        }
-    }
-    result["owner"] = owner;
-    results.push(result);
+    results.push(saveResult(modelName, result, owner));
     return results;
 };
 
@@ -253,4 +131,17 @@ const cleanFunction = function (arr) {
         return el != "";
     });
     return array;
+}
+
+const saveResult = function (modelName, result, owner) {
+    if (modelName === "Feature") {//accept items.unit=" "
+        if (result.items) {
+            result.items = result.items.map(function (el) {
+                if (el.name) { if (!el.unit) { el.unit = " "; } }
+                return el;
+            })
+        }
+    }
+    result["owner"] = owner;
+    return result;
 }
