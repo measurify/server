@@ -320,10 +320,7 @@ describe('/PUT feature', () => {
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
     });
-});
-
-// Test the /PUT Items route
-describe('/PUT items feature', () => {   
+  
     it('it should PUT items of feature', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const items= [
@@ -332,26 +329,29 @@ describe('/PUT items feature', () => {
             { name: "item-name-3", unit: "item-unit-3" }
         ]
         const feature = await factory.createFeature("test-feature-1", user,items);
-        const request = { 
-            "name": "item-name-changed",
-            "unit":"item-unit-changed",
-            "dimension":1,
-            "type":"text" 
-        };
-        const res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id+'/items/'+ "item-name-1").set("Authorization", await factory.getUserToken(user)).send(request);
+        const request ={
+            "items":{
+                 "update" : [ { "name": "item-name-1", "new": { "name": "item-name-1-new", "unit": "item-unit-1-new", "type": "text","dimension":0} },
+                              { "name": "item-name-2", "new": { "name": "item-name-2-new", "unit": "item-unit-2-new", "type": "number","dimension":1}}]
+             }             
+         };
+        const res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user)).send(request);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
         res.body.should.have.property('items');
         res.body._id.should.be.eql('test-feature-1')
         res.body.items.length.should.be.eql(3);        
-        res.body.items[0].name.should.be.eql('item-name-changed');
-        res.body.items[0].unit.should.be.eql('item-unit-changed');
-        res.body.items[0].dimension.should.be.eql(1);
+        res.body.items[0].name.should.be.eql('item-name-1-new');
+        res.body.items[0].unit.should.be.eql('item-unit-1-new');
+        res.body.items[0].dimension.should.be.eql(0);
         res.body.items[0].type.should.be.eql('text');
-        res.body.items[1].name.should.be.eql('item-name-2');        
+        res.body.items[1].name.should.be.eql('item-name-2-new');
+        res.body.items[1].unit.should.be.eql('item-unit-2-new');
+        res.body.items[1].dimension.should.be.eql(1);
+        res.body.items[1].type.should.be.eql('number');      
     });
-
+    /*
     it('it should NOT PUT duplicated items name of feature', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const items= [
@@ -370,8 +370,9 @@ describe('/PUT items feature', () => {
         res.body.message.should.contain(errors.put_request_error.message);
         res.body.details.should.contain('Items includes already item-name-2');
     });
+    */
 
-    it('it should NOT PUT elements of feature unacceptable', async () => {
+    it('it should NOT PUT a wrong item', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const items= [
             { name: "item-name-1", unit: "item-unit-1", dimension:0, type:"number" },
@@ -379,17 +380,17 @@ describe('/PUT items feature', () => {
             { name: "item-name-3", unit: "item-unit-3" }
         ]
         const feature = await factory.createFeature("test-feature-1", user,items);
-        const request = { 
-            "name": "item-name-changed",
-            "dimension":50,
-            "type":"wrong" 
-        };
-        const res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id+'/items/'+ "item-name-1").set("Authorization", await factory.getUserToken(user)).send(request);
+        const request ={
+            "items":{
+                 "update" : [ { "name": "item-name-wrong", "new": { "name": "item-name-1-new", "unit": "item-unit-1-new", "type": "text","dimension":0} }]
+             }             
+         };
+        const res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user)).send(request);
         res.should.have.status(errors.put_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.put_request_error.message);
-        res.body.details.should.contain('Dimension doesn\'t have a permitted value: 50');     
+        res.body.details.should.contain('Embedded resource to be updates from list not found: item-name-wrong');     
     });
 });
 

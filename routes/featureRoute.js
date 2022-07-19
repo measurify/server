@@ -12,8 +12,6 @@ router.post('/', catchErrors(featureController.post));
 router.post('/file', busboy({ immediate: true }), (req, res, next) => { catchErrors(extractData.dataExtractor(req, res, next,"Feature")) });
 router.delete('/:id', catchErrors(featureController.delete));
 router.put('/:id', catchErrors(featureController.put));
-router.put('/:id/items/:id2', catchErrors(featureController.putItem));
-
 
 module.exports = router;
 
