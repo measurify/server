@@ -43,6 +43,21 @@ describe('/GET group', () => {
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
     });
+    
+    it("it should GET a specific group with user", async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1")
+        const group = await factory.createGroup("test-group-1", user, [], null, null, null,[user._id]);        
+        const res = await chai
+        .request(server)
+        .keepOpen()
+        .get("/v1/groups/" + group._id)
+        .set("Authorization", await factory.getAdminToken());    
+        res.should.have.status(200);
+        res.body.should.be.a("object");
+        res.body._id.should.eql(group._id.toString());
+        res.body.users.length.should.be.eql(1);
+        res.body.users[0].should.be.eql(user._id.toString());
+    });
 });
 
 // Test the /POST route
@@ -196,20 +211,7 @@ describe('/DELETE group', () => {
         groups_after.length.should.be.eql(1);
     });
 
-    it('it should not DELETE a group already used by user', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);        
-        const tag = await factory.createTag("test-tag", user);        
-        const group = await factory.createGroup("test-group-2", user, [], null, null, null);
-        await factory.createUser("test-username-2", "test-password-2", UserRoles.provider, null, null, null,[group]);
-        const groups_before = await before.Group.find();
-        groups_before.length.should.be.eql(1);
-        const res = await chai.request(server).keepOpen().delete('/v1/groups/' + group._id).set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.already_used.status);
-        res.body.should.be.a('object');
-        res.body.message.should.contain(errors.already_used.message);
-        const groups_after = await before.Group.find();
-        groups_after.length.should.be.eql(1);
-    });    
+     
 });
 
 // Test the /PUT route
@@ -340,4 +342,38 @@ describe('/PUT group', () => {
         res.body.message.should.contain(errors.put_request_error.message);
         res.body.details.should.contain('Request field cannot be updated ');
     });
+
+    it('it should PUT a group to add a user', async () => {
+        const user = await factory.createUser("test-username-0", "test-password-0", UserRoles.provider);
+        const group = await factory.createGroup("test-group-1", user, [], null, null, null);
+        const user1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
+        const user3 = await factory.createUser("test-username-3", "test-password-3", UserRoles.provider);
+           
+        const modification = { users: { add: [user1._id, user2._id, user3._id] } };
+        const res = await chai.request(server).keepOpen().put('/v1/groups/' + group._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body.users.length.should.be.eql(3);
+        res.body.users[0].should.be.eql(user1._id.toString());
+        res.body.users[1].should.be.eql(user2._id.toString());
+        res.body.users[2].should.be.eql(user3._id.toString());
+      });
+    
+      it('it should PUT a group to remove a user', async () => {
+        const user = await factory.createUser("test-username-0", "test-password-0", UserRoles.provider);
+        const user1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
+        const user3 = await factory.createUser("test-username-3", "test-password-3", UserRoles.provider);        
+        const group = await factory.createGroup("test-group-1", user, [], null, null, null,[user1._id,user2._id,user3._id]);
+        const modification = { users: { remove: [user2._id] } };
+        const res = await chai.request(server).keepOpen().put('/v1/groups/' + group._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body.users.length.should.be.eql(2);
+        res.body.users[0].should.be.eql(user1._id.toString());
+        res.body.users[1].should.be.eql(user3._id.toString());
+      });
 });

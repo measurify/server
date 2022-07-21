@@ -7,6 +7,7 @@ const groupSchema = new mongoose.Schema({
     _id: { type: String, required: "Please, supply an _id" },
     owner: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true },    
     tags: { type: [String], ref:'Tag' },
+    users: { type: [String], ref:'User' },
     description: {type: String},
     visibility: {type: String, default: VisibilityTypes.public },
     timestamp: {type: Date, default: Date.now, select: false },
@@ -34,6 +35,18 @@ groupSchema.path('tags').validate({
         for(let i=0; i<values.length; i++) {
             let tag = await Tag.findById(values[i]);
             if(!tag) throw new Error('Group validation failed: Tag not existent (' + values[i] + ')');
+        };
+        return true;
+    }
+});
+
+// validate users
+groupSchema.path('users').validate({
+    validator: async function (values) {
+        const User = this.constructor.model('User');
+        for(let i=0; i<values.length; i++) {
+            let user = await User.findById(values[i]);
+            if(!user) throw new Error('Group validation failed: User not existent (' + values[i] + ')');
         };
         return true;
     }
