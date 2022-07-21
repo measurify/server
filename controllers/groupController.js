@@ -49,7 +49,7 @@ exports.post = async (req, res) => {
 
 exports.put = async (req, res) => { 
     const Group = mongoose.dbs[req.tenant.database].model('Group');
-    const fields = ['tags','_id','description','visibility'];
+    const fields = ['tags','_id','description','visibility','users'];
     let result = await checker.isAvailable(req, res, Group); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.canModify(req, res); if (result != true) return result;
@@ -60,8 +60,7 @@ exports.put = async (req, res) => {
         result = await checker.hasRightsToCreate(req, res, ['tags']); if (result != true) return result;
         //check delete
         const User = mongoose.dbs[req.tenant.database].model('User');        
-        result = await checker.isOwned(req, res); if (result != true) return result;
-        result = await checker.isNotUsed(req, res, User, 'groups'); if (result != true) return result;       
+        result = await checker.isOwned(req, res); if (result != true) return result;             
         result = await checker.canDelete(req, res); if (result != true) return result;        
         //prepare id for the delete
         req.params.id = req.resource._id;
@@ -97,7 +96,6 @@ exports.delete = async (req, res) => {
     const User = mongoose.dbs[req.tenant.database].model('User');
     let result = await checker.isAvailable(req, res, Group); if (result != true) return result;
     result = await checker.isOwned(req, res); if (result != true) return result;
-    result = await checker.isNotUsed(req, res, User, 'groups'); if (result != true) return result;
     result = await checker.canDelete(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Group); if (result != true) return result;
     return await controller.deleteResource(req, res, Group);

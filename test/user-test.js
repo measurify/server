@@ -78,22 +78,6 @@ describe("/GET users", () => {
     res.body._id.should.eql(user._id.toString());
   });
 
-  it("it should GET a specific user with group", async () => {
-    const user1 = await factory.createUser("test-username-1", "test-password-1")
-    const group = await factory.createGroup("test-group-1", user1, [], null, null, null);
-    const user = await factory.createUser("test-username-2", "test-password-2",null,null,null,null,[group]);
-    const res = await chai
-      .request(server)
-      .keepOpen()
-      .get("/v1/users/" + user._id)
-      .set("Authorization", await factory.getAdminToken());    
-    res.should.have.status(200);
-    res.body.should.be.a("object");
-    res.body._id.should.eql(user._id.toString());
-    res.body.groups.length.should.be.eql(1);
-    res.body.groups[0].should.be.eql("test-group-1");
-  });
-
   it("it should not GET a specific user as a regular user", async () => {
     const regular = await factory.createUser(
       "test-username-1",
@@ -514,6 +498,19 @@ describe("/DELETE users", () => {
     const users_after = await before.User.find();
     users_after.length.should.be.eql(2);
   });
+
+  it('it should not DELETE a user of a group', async () => {
+    const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);  
+    const group = await factory.createGroup("test-group-1", user, [], null, null, null,[user._id]);
+    const users_before = await before.User.find();
+    users_before.length.should.be.eql(2);
+    const res = await chai.request(server).keepOpen().delete('/v1/users/' + user._id).set("Authorization", await factory.getAdminToken());
+    res.should.have.status(errors.already_used.status);
+    res.body.should.be.a('object');
+    res.body.message.should.contain(errors.already_used.message);
+    const users_after = await before.User.find();
+    users_after.length.should.be.eql(2);
+  });   
 });
 
 // Test the /PUT route
@@ -647,37 +644,5 @@ describe("/PUT user", () => {
     res.should.have.status(errors.not_you.status);
     res.body.should.be.a("object");
     res.body.message.should.contain(errors.not_you.message);
-  });
-
-  it('it should PUT a user to add a group', async () => {
-    const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-    const group1 = await factory.createGroup("test-group-1", user, [], null, null, null);
-    const group2 = await factory.createGroup("test-group-2", user, [], null, null, null);
-    const group3 = await factory.createGroup("test-group-3", user, [], null, null, null);    
-    const modification = { groups: { add: [group1._id, group2._id, group3._id] } };
-    const res = await chai.request(server).keepOpen().put('/v1/users/' + user._id).set("Authorization", await factory.getUserToken(user)).send(modification);
-    res.should.have.status(200);
-    res.body.should.be.a('object');
-    res.body.should.have.property('_id');
-    res.body.groups.length.should.be.eql(3);
-    res.body.groups[0].should.be.eql("test-group-1");
-    res.body.groups[1].should.be.eql("test-group-2");
-    res.body.groups[2].should.be.eql("test-group-3");
-  });
-
-  it('it should PUT a user to remove a group', async () => {
-    const user1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-    const group1 = await factory.createGroup("test-group-1", user1, [], null, null, null);
-    const group2 = await factory.createGroup("test-group-2", user1, [], null, null, null);
-    const group3 = await factory.createGroup("test-group-3", user1, [], null, null, null); 
-    const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider, null, null, null,[group1,group2,group3]);
-    const modification = { groups: { remove: [group2._id] } };
-    const res = await chai.request(server).keepOpen().put('/v1/users/' + user._id).set("Authorization", await factory.getUserToken(user)).send(modification);
-    res.should.have.status(200);
-    res.body.should.be.a('object');
-    res.body.should.have.property('_id');
-    res.body.groups.length.should.be.eql(2);
-    res.body.groups[0].should.be.eql("test-group-1");
-    res.body.groups[1].should.be.eql("test-group-3");
-  });
+  });  
 });

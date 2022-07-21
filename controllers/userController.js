@@ -45,7 +45,7 @@ exports.post = async (req, res) => {
 
 exports.put = async (req, res) => { 
     const User = mongoose.dbs[req.tenant.database].model('User');
-    const fields = ['password', 'fieldmask', 'email','groups'];
+    const fields = ['password', 'fieldmask', 'email'];
     let result = await checker.isAvailable(req, res, User); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.isValid(req, res, UserStatusTypes, 'status'); if (result != true) return result;
@@ -60,13 +60,16 @@ exports.delete = async (req, res) => {
     const Thing = mongoose.dbs[req.tenant.database].model('Thing');
     const Tag = mongoose.dbs[req.tenant.database].model('Tag');
     const User = mongoose.dbs[req.tenant.database].model('User');
+    const Group = mongoose.dbs[req.tenant.database].model('Group');
     let result = await checker.isAvailable(req, res, User); if (result != true) return result;
     result = await checker.isAdminitrator(req, res); if (result != true) return result;
     result = await checker.isNotUsed(req, res, Measurement, 'owner'); if (result != true) return result;
     result = await checker.isNotUsed(req, res, Device, 'owner'); if (result != true) return result;
     result = await checker.isNotUsed(req, res, Feature, 'owner'); if (result != true) return result;
     result = await checker.isNotUsed(req, res, Thing, 'owner'); if (result != true) return result;
-    result = await checker.isNotUsed(req, res, Tag, 'owner'); if (result != true) return result;
+    result = await checker.isNotUsed(req, res, Tag, 'owner'); if (result != true) return result;   
+    result = await checker.isNotUsed(req, res, Group, 'owner'); if (result != true) return result; 
+    result = await checker.isNotUsed(req, res, Group, 'users'); if (result != true) return result;
     return await controller.deleteResource(req, res, User);
 };
 
