@@ -61,7 +61,7 @@ issueSchema.pre('save', async function() {
                                                   date: this.date,
                                                   message:  this.message,
                                                   type: this.type });
-    if(res) throw new Error('The issue already exists');                       
+    if(res && res._id.toString() != this._id.toString()) throw new Error('The issue already exists');                       
 });
 
 module.exports = issueSchema;

@@ -5,6 +5,7 @@ const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 
 const persistence = require('../commons/persistence.js');
+const { checkerIfExist } = require('../commons/dataset');
 
 exports.get = async (req, res) => {
     const Protocol = mongoose.dbs[req.tenant.database].model('Protocol');

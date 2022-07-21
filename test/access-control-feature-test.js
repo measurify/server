@@ -21,7 +21,7 @@ const before = require('./before-test.js');
 // CREATE
 describe('Access create feature', () => {
     it('it should create a feature as admin', async () => {      
-const user_admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+       const user_admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const request = { _id: "feature-name-text", items: [{ name: "item-name-1", unit: "item-unit-1" }]}
         const res = await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user_admin)).send(request);
         res.should.have.status(200);
@@ -41,7 +41,7 @@ const user_admin = await factory.createUser("test-username-1", "test-password-1"
     });
 
     it('it should not create a feature as analyst', async () => {      
-const user_analyst = await factory.createUser("test-username-1", "test-password-1", UserRoles.analyst);
+        const user_analyst = await factory.createUser("test-username-1", "test-password-1", UserRoles.analyst);
         const request = { _id: "feature-name-text", items: [{ name: "item-name-1", unit: "item-unit-1" }]}
         const res = await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user_analyst)).send(request);
         res.should.have.status(errors.restricted_access_create.status);
@@ -54,7 +54,7 @@ const user_analyst = await factory.createUser("test-username-1", "test-password-
 // READ LIST
 describe('Access read a list of features', () => {
     it('it should get all the public/private features as admin or analyst', async () => {      
-const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
+        const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature_public_1 = await factory.createFeature("test-feature-1-public", owner, null, [], VisibilityTypes.public);
@@ -76,7 +76,7 @@ const user_admin = await factory.createUser("test-username-user", "test-password
     });
 
     it('it should get just his own or public features as provider', async () => {      
-const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
+        const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature_public_1 = await factory.createFeature("test-feature-1-public", owner, null, [], VisibilityTypes.public);
@@ -100,7 +100,7 @@ const user_admin = await factory.createUser("test-username-admin", "test-passwor
     });
 
     it('it should get a filtered list of his own or public features as provider', async () => {      
-const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
+        const user_admin = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.admin);
         const user_provider = await factory.createUser("test-username-provider", "test-password-provider", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature_public_1 = await factory.createFeature("test-feature-1-public", owner, null, [], VisibilityTypes.public);
@@ -128,7 +128,7 @@ const user_admin = await factory.createUser("test-username-admin", "test-passwor
 // READ
 describe('Access read a feature', () => {
     it('it should get a public/private feature as admin or analyst', async () => {      
-const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
+        const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature_public = await factory.createFeature("test-feature-1-public", owner, null, [], VisibilityTypes.public);
@@ -189,7 +189,7 @@ const user_admin = await factory.createUser("test-username-user", "test-password
 // MODIFY
 describe('Access modify features', () => {
     it('it should modify a feature as admin', async () => {      
-const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
+        const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner, null, [], VisibilityTypes.public);
         const tag = await factory.createTag("test-tag-1", owner);
@@ -202,7 +202,7 @@ const user_admin = await factory.createUser("test-username-user", "test-password
     });
 
     it('it should modify a feature as provider and owner', async () => {      
-const user_provide_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
+        const user_provide_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user_provide_owner, null, [], VisibilityTypes.public);
         const tag = await factory.createTag("test-tag-1", user_provide_owner);
         const modification = { tags: { add: [tag._id] } };
@@ -214,7 +214,7 @@ const user_provide_owner = await factory.createUser("test-username-user", "test-
     });
 
     it('it should not modify a feature as analyst', async () => {      
-const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
+        const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner, null, [], VisibilityTypes.public);
         const tag = await factory.createTag("test-tag-1", owner);
@@ -242,7 +242,7 @@ const user_analyst = await factory.createUser("test-username-user", "test-passwo
 
 describe('Access delete features', () => {
     it('it should delete a feature as admin', async () => {      
-const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
+        const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner, null, [], VisibilityTypes.public);
         let res = await chai.request(server).keepOpen().delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user_admin));
@@ -251,7 +251,7 @@ const user_admin = await factory.createUser("test-username-user", "test-password
     });
 
     it('it should delete a feature as provider and owner', async () => {      
-const user_provide_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
+        const user_provide_owner = await factory.createUser("test-username-user", "test-password-user", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user_provide_owner, null, [], VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user_provide_owner));
         res.should.have.status(200);
@@ -259,7 +259,7 @@ const user_provide_owner = await factory.createUser("test-username-user", "test-
     });
 
     it('it should not delete a feature as analyst', async () => {      
-const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
+        const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", owner, null, [], VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user_analyst));
@@ -282,7 +282,7 @@ const user_analyst = await factory.createUser("test-username-user", "test-passwo
 // RIGTHS
 describe('Access features with rights', () => {
     it('it should get all the public/private features with rights as analyst', async () => {      
-const user_admin = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.admin);
+        const user_admin = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.admin);
         const user_analyst = await factory.createUser("test-username-user-2", "test-password-user-2", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature_public_1 = await factory.createFeature("test-feature-1-public", owner, null, [], VisibilityTypes.public);
@@ -293,13 +293,12 @@ const user_admin = await factory.createUser("test-username-user-1", "test-passwo
         const feature_private_1 = await factory.createFeature("test-feature-1-private", owner, null, [], VisibilityTypes.private);
         const feature_private_2 = await factory.createFeature("test-feature-2-private", owner, null, [], VisibilityTypes.private);
         const feature_private_3 = await factory.createFeature("test-feature-3-private", owner, null, [], VisibilityTypes.private);
-        const right_1 = await factory.createRight("right-test-1", feature_public_1, "Feature", user_analyst, owner, []);
-        const right_2 = await factory.createRight("right-test-2", feature_public_2, "Feature", user_analyst, owner, []);
-        const right_3 = await factory.createRight("right-test-3", feature_private_1, "Feature", user_analyst, owner, []);
+        const right_1 = await factory.createRight("right-test-1", feature_public_1, "Feature", user_analyst._id, owner, []);
+        const right_2 = await factory.createRight("right-test-2", feature_public_2, "Feature", user_analyst._id, owner, []);
+        const right_3 = await factory.createRight("right-test-3", feature_private_1, "Feature", user_analyst._id, owner, []);
         let res = await chai.request(server).keepOpen().get('/v1/features/').set("Authorization", await factory.getUserToken(user_admin));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
-        res.body.docs.length.should.be.eql(8);
         res = await chai.request(server).keepOpen().get('/v1/features/').set("Authorization", await factory.getUserToken(user_analyst));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
@@ -426,7 +425,7 @@ describe('Modify features with rights', () => {
 
 describe('Create a a feature with rights', () => {
     it('it should not create a feature without rights on tag', async () => {      
-const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", owner);
         const tag_other = await factory.createTag("test-tag-2", owner);
@@ -440,7 +439,7 @@ const provider = await factory.createUser("test-username-admin", "test-password-
     });
 
     it('it should create a feature with rights', async () => {      
-const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
+        const provider = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.provider);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", owner);
         const right = await factory.createRight("right-test-1", tag, "Tag", provider, owner, []);

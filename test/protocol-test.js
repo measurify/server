@@ -18,6 +18,7 @@ const MetadataTypes = require('../types/metadataTypes.js');
 const TopicFieldTypes = require('../types/topicFieldTypes.js');
 
 // Test the /GET route
+
 describe('/GET protocol', () => {
     it('it should GET all the protocols', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
@@ -94,7 +95,25 @@ describe('/POST protocol', () => {
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.post_request_error.message);
-        res.body.details.should.contain('the _id is already used');
+        res.body.details.should.contain('duplicate key');
+    });
+
+    it('it should not POST a protocol with a fake tag', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const protocol = {
+            _id: "protocol name",
+            description: "protocol description",
+            metadata: [ { name: "metadata-name-1", description: "description metadata 1", type: "scalar"} ],
+            topics: [ { name: "topic name 1", description: "topic description 1", 
+                        fields: [ { name: "field-1", description: "field description 1", type: "scalar"} ] },],
+            tags: [ "fake-tag"] 
+        }
+        const res = await chai.request(server).keepOpen().post('/v1/protocols').set("Authorization", await factory.getUserToken(user)).send(protocol)
+        res.should.have.status(errors.post_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.post_request_error.message);
+        res.body.details.should.contain('Tag not existent');
     });
 
     it('it should GET the protocol posted before', async () => {
@@ -152,8 +171,8 @@ describe('/PUT protocol', () => {
         const tag_2 = await factory.createTag("test-tag-2", user, [], VisibilityTypes.public);
         const tag_3 = await factory.createTag("test-tag-3", user, [], VisibilityTypes.public);
         const tag_4 = await factory.createTag("test-tag-4", user, [], VisibilityTypes.public);
-        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user, [], [], ['test-tag-1', 'test-tag-2']);
-        const request = { tags: { add: ['test-tag-3', 'test-tag-4'], remove: ['test-tag-1'] } };
+        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user, [], [], [tag_1._id, tag_2._id]);
+        const request = { tags: { add: [tag_3._id, tag_4._id], remove: [tag_1._id] } };
         const res = await chai.request(server).keepOpen().put('/v1/protocols/' + protocol._id).set("Authorization", await factory.getUserToken(user)).send(request);
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -176,37 +195,69 @@ describe('/PUT protocol', () => {
         res.body.metadata.length.should.be.eql(3);
     });
 
-    /* TBD
-    it('it should PUT a protocol _id', async () => {
+    it('it should PUT a metadata of a protocol', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const request = { _id: "new-test-protocol-1" };
+        const metadata_1 = await factory.createMetadata("test-metadata-1", "test-metadata-description-1", "scalar");
+        const metadata_2 = await factory.createMetadata("test-metadata-2", "test-metadata-description-2", "scalar");
+        const metadata_3 = await factory.createMetadata("test-metadata-3", "test-metadata-description-3", "scalar");
+        const metadata_4 = await factory.createMetadata("test-metadata-4", "test-metadata-description-4", "scalar");
+        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user, [metadata_1, metadata_2, metadata_3, metadata_4 ], [], []);
+        const request = { metadata: { update: [ { name: metadata_3.name,  new: { name: "metadata-name-3-new", description: "description metadata 3", type: "vector" }},
+                                                { name: metadata_1.name,  new: { name: "metadata-name-1-new", description: "description metadata 1", type: "scalar" }}]}}
         const res = await chai.request(server).keepOpen().put('/v1/protocols/' + protocol._id).set("Authorization", await factory.getUserToken(user)).send(request);
         res.should.have.status(200);
         res.body.should.be.a('object');
-        res.body.should.have.property('_id');
-        res.body._id.should.be.eql("new-test-protocol-1");
+        res.body.should.have.property('metadata');
+        res.body.metadata.length.should.be.eql(4);
+        res.body.metadata[0].name.should.be.eql('metadata-name-1-new');
+        res.body.metadata[1].name.should.be.eql('test-metadata-2');
+        res.body.metadata[2].name.should.be.eql('metadata-name-3-new');
+        res.body.metadata[3].name.should.be.eql('test-metadata-4');
     });
-    */
 
-    /*
-    it('it should PUT a protocol _id and change list of tags', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);        
-        const tag_1 = await factory.createTag("test-tag-1", user, [], VisibilityTypes.public);
-        const tag_2 = await factory.createTag("test-tag-2", user, [], VisibilityTypes.public);
-        const tag_3 = await factory.createTag("test-tag-3", user, [], VisibilityTypes.public);
-        const tag_4 = await factory.createTag("test-tag-4", user, [], VisibilityTypes.public);
-        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user, [], [], ['test-tag-1', 'test-tag-2']);
-        const request = { _id:"new-test-protocol-1",tags: { add: ['test-tag-3', 'test-tag-4'], remove: ['test-tag-1'] } };
+    it('it should not PUT a metadata of a protocol with a fake type', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const metadata_1 = await factory.createMetadata("test-metadata-1", "test-metadata-description-1", "scalar");
+        const metadata_2 = await factory.createMetadata("test-metadata-2", "test-metadata-description-2", "scalar");
+        const metadata_3 = await factory.createMetadata("test-metadata-3", "test-metadata-description-3", "scalar");
+        const metadata_4 = await factory.createMetadata("test-metadata-4", "test-metadata-description-4", "scalar");
+        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user, [metadata_1, metadata_2, metadata_3, metadata_4 ], [], []);
+        const request = { metadata: { update: [ { name: metadata_3.name,  new: { name: "metadata-name-3-new", description: "description metadata 3", type: "fake-type" }},
+                                                { name: metadata_1.name,  new: { name: "metadata-name-1-new", description: "description metadata 1", type: "scalar" }}]}}
         const res = await chai.request(server).keepOpen().put('/v1/protocols/' + protocol._id).set("Authorization", await factory.getUserToken(user)).send(request);
-        res.should.have.status(200);
+        res.should.have.status(errors.put_request_error.status);
         res.body.should.be.a('object');
-        res.body.should.have.property('_id');
-        res.body._id.should.be.eql("new-test-protocol-1");
-        res.body.should.have.property('tags');
-        res.body.tags.length.should.be.eql(3);
+        res.body.details.should.contain('fake-type');
     });
-    */
+
+    // TBD
+    //it('it should PUT a protocol _id', async () => {
+    //   const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+    //    const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
+    //    const request = { _id: "new-test-protocol-1" };
+    //    const res = await chai.request(server).keepOpen().put('/v1/protocols/' + protocol._id).set("Authorization", await factory.getUserToken(user)).send(request);
+    //    res.should.have.status(200);
+    //    res.body.should.be.a('object');
+    //    res.body.should.have.property('_id');
+    //    res.body._id.should.be.eql("new-test-protocol-1");
+    //});
+    
+    //it('it should PUT a protocol _id and change list of tags', async () => {
+    //    const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);        
+    //    const tag_1 = await factory.createTag("test-tag-1", user, [], VisibilityTypes.public);
+    //    const tag_2 = await factory.createTag("test-tag-2", user, [], VisibilityTypes.public);
+    //    const tag_3 = await factory.createTag("test-tag-3", user, [], VisibilityTypes.public);
+    //    const tag_4 = await factory.createTag("test-tag-4", user, [], VisibilityTypes.public);
+    //    const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user, [], [], ['test-tag-1', 'test-tag-2']);
+    //    const request = { _id:"new-test-protocol-1",tags: { add: ['test-tag-3', 'test-tag-4'], remove: ['test-tag-1'] } };
+    //    const res = await chai.request(server).keepOpen().put('/v1/protocols/' + protocol._id).set("Authorization", await factory.getUserToken(user)).send(request);
+    //    res.should.have.status(200);
+    //    res.body.should.be.a('object');
+    //    res.body.should.have.property('_id');
+    //    res.body._id.should.be.eql("new-test-protocol-1");
+    //    res.body.should.have.property('tags');
+    //    res.body.tags.length.should.be.eql(3);
+    //});
 
     it('it should not PUT a protocol owner', async () => {
         const user_1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
@@ -305,20 +356,19 @@ describe('/DELETE protocol', () => {
         protocols_after.length.should.be.eql(1);
     });
     
-    it('it should not DELETE a protocol already used in a experiment', async () => {  
-        // TBD 
-        /*   
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user); 
-        const experiment = await factory.createExperiment("test-experiment-1", user, protocol);
-        const protocols_before = await before.Protocol.find();
-        protocols_before.length.should.be.eql(1);
-        const res = await chai.request(server).keepOpen().delete('/v1/protocols/' + protocol._id).set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.already_used.status);
-        res.body.should.be.a('object');
-        res.body.message.should.contain(errors.already_used.message);
-        const protocols_after = await before.Protocol.find();
-        protocols_after.length.should.be.eql(1);
-        */
-    });
+    //it('it should not DELETE a protocol already used in a experiment', async () => {  
+    //    const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+    //    const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user); 
+    //    const experiment = await factory.createExperiment("test-experiment-1", user, protocol);
+    //    const protocols_before = await before.Protocol.find();
+    //    protocols_before.length.should.be.eql(1);
+    //    const res = await chai.request(server).keepOpen().delete('/v1/protocols/' + protocol._id).set("Authorization", await factory.getUserToken(user));
+    //    res.should.have.status(errors.already_used.status);
+    //    res.body.should.be.a('object');
+    //    res.body.message.should.contain(errors.already_used.message);
+    //   const protocols_after = await before.Protocol.find();
+    //    protocols_after.length.should.be.eql(1);
+    //    
+    //});
 });
+

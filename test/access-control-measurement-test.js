@@ -1036,41 +1036,15 @@ describe("Access read a measurement", () => {
 // MODIFY
 describe("Access modify measurement", () => {
   it("it should modify a measurement as admin", async () => {
-    const user_admin = await factory.createUser(
-      "test-username-user",
-      "test-password-user",
-      UserRoles.admin
-    );
-    const owner = await factory.createUser(
-      "test-username-owner",
-      "test-password-owner",
-      UserRoles.provider
-    );
+    const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
+    const owner = await factory.createUser("test-username-owner","test-password-owner", UserRoles.provider);
     const feature = await factory.createFeature("test-feature", owner);
-    const device = await factory.createDevice("test-device-1", owner, [
-      feature,
-    ]);
+    const device = await factory.createDevice("test-device-1", owner, [feature]);
     const thing = await factory.createThing("test-thing-1", owner);
-    const measurement = await factory.createMeasurement(
-      owner,
-      feature,
-      device,
-      thing,
-      [],
-      factory.createSamples(2),
-      null,
-      null,
-      null,
-      VisibilityTypes.private
-    );
+    const measurement = await factory.createMeasurement(owner, feature, device, thing, [], factory.createSamples(2), null, null, null, VisibilityTypes.private);
     const tag = await factory.createTag("test-tag-1", owner);
     const modification = { tags: { add: [tag._id] } };
-    let res = await chai
-      .request(server)
-      .keepOpen()
-      .put("/v1/measurements/" + measurement._id)
-      .set("Authorization", await factory.getUserToken(user_admin))
-      .send(modification);
+    let res = await chai.request(server).keepOpen().put("/v1/measurements/" + measurement._id).set("Authorization", await factory.getUserToken(user_admin)).send(modification);
     res.should.have.status(200);
     res.body.should.be.a("object");
     res.body.tags.length.should.be.eql(1);
@@ -2035,64 +2009,20 @@ describe("Access delete a list of measurements", () => {
 });
 
 // RIGHTS
-describe("Access measurements withs right as analyst", () => {
+describe("Access measurements with right as analyst", () => {
   it("it should get only measurements of features with rights as analyst", async () => {
-    const analyst = await factory.createUser(
-      "test-username-admin",
-      "test-password-admin",
-      UserRoles.analyst
-    );
-    const owner = await factory.createUser(
-      "test-username-owner",
-      "test-password-owner",
-      UserRoles.provider
-    );
-    const feature_right_1 = await factory.createFeature(
-      "test-feature-1",
-      owner
-    );
-    const feature_right_2 = await factory.createFeature(
-      "test-feature-2",
-      owner
-    );
-    const feature_noright_1 = await factory.createFeature(
-      "test-feature-3",
-      owner
-    );
-    const feature_noright_2 = await factory.createFeature(
-      "test-feature-4",
-      owner
-    );
-    const feature_noright_3 = await factory.createFeature(
-      "test-feature-5",
-      owner
-    );
-    const device = await factory.createDevice("test-device-1", owner, [
-      feature_right_1,
-      feature_right_2,
-      feature_noright_1,
-      feature_noright_2,
-      feature_noright_3,
-    ]);
+    const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
+    const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
+    const feature_right_1 = await factory.createFeature("test-feature-1", owner);
+    const feature_right_2 = await factory.createFeature("test-feature-2", owner);
+    const feature_noright_1 = await factory.createFeature("test-feature-3", owner);
+    const feature_noright_2 = await factory.createFeature("test-feature-4", owner);
+    const feature_noright_3 = await factory.createFeature("test-feature-5", owner);
+    const device = await factory.createDevice("test-device-1", owner, [feature_right_1, feature_right_2, feature_noright_1, feature_noright_2, feature_noright_3]);
     const thing = await factory.createThing("test-thing-1-search", owner);
-    const right_1 = await factory.createRight(
-      "right-test-1",
-      feature_right_1,
-      "Feature",
-      analyst,
-      owner,
-      []
-    );
-    const right_2 = await factory.createRight(
-      "right-test-2",
-      feature_right_2,
-      "Feature",
-      analyst,
-      owner,
-      []
-    );
-    const measurement_right_1 = await factory.createMeasurement(
-      owner,
+    const right_1 = await factory.createRight("right-test-1", feature_right_1, "Feature", analyst, owner, []);
+    const right_2 = await factory.createRight("right-test-2", feature_right_2, "Feature", analyst, owner, []);
+    const measurement_right_1 = await factory.createMeasurement(owner,
       feature_right_1,
       device,
       thing,
@@ -2228,175 +2158,33 @@ describe("Access measurements withs right as analyst", () => {
   });
 
   it("it should get only measurements of tags with rights as analyst", async () => {
-    const analyst = await factory.createUser(
-      "test-username-admin",
-      "test-password-admin",
-      UserRoles.analyst
-    );
-    const owner = await factory.createUser(
-      "test-username-owner",
-      "test-password-owner",
-      UserRoles.provider
-    );
+    const analyst = await factory.createUser("test-username-admin", "test-password-admin", UserRoles.analyst);
+    const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
     const feature = await factory.createFeature("test-feature-1", owner);
-    const device = await factory.createDevice("test-device-1", owner, [
-      feature,
-    ]);
+    const device = await factory.createDevice("test-device-1", owner, [feature,]);
     const thing = await factory.createThing("test-thing-1-search", owner);
     const tag_right_1 = await factory.createTag("test-tag-1", owner);
     const tag_right_2 = await factory.createTag("test-tag-2", owner);
     const tag_noright_1 = await factory.createTag("test-tag-3", owner);
     const tag_noright_2 = await factory.createTag("test-tag-4", owner);
     const tag_noright_3 = await factory.createTag("test-tag-5", owner);
-    const right_1 = await factory.createRight(
-      "right-test-1",
-      tag_right_1,
-      "Tag",
-      analyst,
-      owner,
-      []
-    );
-    const right_2 = await factory.createRight(
-      "right-test-2",
-      tag_right_2,
-      "Tag",
-      analyst,
-      owner,
-      []
-    );
-    const measurement_right_1 = await factory.createMeasurement(
-      owner,
-      feature,
-      device,
-      thing,
-      [tag_right_1],
-      factory.createSamples(1),
-      null,
-      null,
-      null,
-      VisibilityTypes.public
-    );
-    const measurement_right_2 = await factory.createMeasurement(
-      owner,
-      feature,
-      device,
-      thing,
-      [tag_right_1],
-      factory.createSamples(2),
-      null,
-      null,
-      null,
-      VisibilityTypes.public
-    );
-    const measurement_right_3 = await factory.createMeasurement(
-      owner,
-      feature,
-      device,
-      thing,
-      [tag_right_1, tag_right_2],
-      factory.createSamples(3),
-      null,
-      null,
-      null,
-      VisibilityTypes.public
-    );
-    const measurement_right_4 = await factory.createMeasurement(
-      owner,
-      feature,
-      device,
-      thing,
-      [tag_right_2],
-      factory.createSamples(4),
-      null,
-      null,
-      null,
-      VisibilityTypes.public
-    );
-    const measurement_right_5 = await factory.createMeasurement(
-      owner,
-      feature,
-      device,
-      thing,
-      [tag_right_2, tag_noright_3],
-      factory.createSamples(5),
-      null,
-      null,
-      null,
-      VisibilityTypes.public
-    );
-    const measurement_right_6 = await factory.createMeasurement(
-      owner,
-      feature,
-      device,
-      thing,
-      [tag_right_2],
-      factory.createSamples(6),
-      null,
-      null,
-      null,
-      VisibilityTypes.public
-    );
-    const measurement_right_7 = await factory.createMeasurement(
-      owner,
-      feature,
-      device,
-      thing,
-      [tag_right_2],
-      factory.createSamples(7),
-      null,
-      null,
-      null,
-      VisibilityTypes.public
-    );
-    const measurement_noright_2 = await factory.createMeasurement(
-      owner,
-      feature,
-      device,
-      thing,
-      [tag_noright_2],
-      factory.createSamples(8),
-      null,
-      null,
-      null,
-      VisibilityTypes.public
-    );
-    const measurement_noright_3 = await factory.createMeasurement(
-      owner,
-      feature,
-      device,
-      thing,
-      [tag_noright_2],
-      factory.createSamples(9),
-      null,
-      null,
-      null,
-      VisibilityTypes.public
-    );
-    const measurement_noright_4 = await factory.createMeasurement(
-      owner,
-      feature,
-      device,
-      thing,
-      [tag_noright_3],
-      factory.createSamples(10),
-      null,
-      null,
-      null,
-      VisibilityTypes.public
-    );
-    let res = await chai
-      .request(server)
-      .keepOpen()
-      .get("/v1/measurements")
-      .set("Authorization", await factory.getUserToken(analyst));
+    const right_1 = await factory.createRight("right-test-1",tag_right_1,"Tag",analyst,owner,[]);
+    const right_2 = await factory.createRight( "right-test-2", tag_right_2, "Tag", analyst, owner, [] );
+    const measurement_right_1 = await factory.createMeasurement( owner, feature, device, thing, [tag_right_1], factory.createSamples(1), null, null, null, VisibilityTypes.public );
+    const measurement_right_2 = await factory.createMeasurement( owner, feature, device, thing, [tag_right_1], factory.createSamples(2), null, null, null, VisibilityTypes.public );
+    const measurement_right_3 = await factory.createMeasurement( owner, feature, device, thing, [tag_right_1, tag_right_2], factory.createSamples(3), null, null, null, VisibilityTypes.public );
+    const measurement_right_4 = await factory.createMeasurement( owner, feature, device, thing, [tag_right_2], factory.createSamples(4), null, null, null, VisibilityTypes.public );
+    const measurement_right_5 = await factory.createMeasurement( owner, feature, device, thing, [tag_right_2, tag_noright_3], factory.createSamples(5), null, null, null, VisibilityTypes.public );
+    const measurement_right_6 = await factory.createMeasurement( owner, feature, device, thing, [tag_right_2], factory.createSamples(6), null, null, null, VisibilityTypes.public );
+    const measurement_right_7 = await factory.createMeasurement( owner, feature, device, thing, [tag_right_2], factory.createSamples(7), null, null, null, VisibilityTypes.public );
+    const measurement_noright_2 = await factory.createMeasurement( owner, feature, device, thing, [tag_noright_2], factory.createSamples(8), null, null, null, VisibilityTypes.public );
+    const measurement_noright_3 = await factory.createMeasurement( owner, feature, device, thing, [tag_noright_2], factory.createSamples(9), null, null, null, VisibilityTypes.public );
+    const measurement_noright_4 = await factory.createMeasurement( owner, feature, device, thing, [tag_noright_3], factory.createSamples(10), null, null, null, VisibilityTypes.public );
+    let res = await chai.request(server).keepOpen().get("/v1/measurements").set("Authorization", await factory.getUserToken(analyst));
     res.should.have.status(200);
     res.body.docs.should.be.a("array");
     res.body.docs.length.should.be.eql(7);
-    res = await chai
-      .request(server)
-      .keepOpen()
-      .get("/v1/measurements/count")
-      .set("Authorization", await factory.getUserToken(analyst));
+    res = await chai.request(server).keepOpen().get("/v1/measurements/count").set("Authorization", await factory.getUserToken(analyst));
     res.body.size.should.be.eql(7);
   });
 

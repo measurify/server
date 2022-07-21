@@ -274,7 +274,7 @@ describe('Access delete things', () => {
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.not_yours.message);
     });
-});
+}); 
 
 // RIGTHS
 describe('Access things with rights', () => {

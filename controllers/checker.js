@@ -127,8 +127,7 @@ exports.whichRights = async function(req, res, model) {
         return authorizator.whichRights(req.user, rights, 'type');
     }
     else {
-        let type = model.modelName.toLowerCase();
-        if(type == 'tag') type = 'tags';
+        let type = model.modelName;
         const rights = await Right.find({user: req.user._id, type: type});
         return authorizator.whichRights(req.user, rights, 'inside');
     }
@@ -143,8 +142,7 @@ exports.hasRights = async function(req, res, model) {
         return true;
     }
     else {
-        let type = model.modelName.toLowerCase();
-        if(type == 'tag') type = 'tags';
+        let type = model.modelName;
         const rights = await Right.find({user: req.user._id, type: type});
         if(!authorizator.hasRights(req.user, rights, item, 'inside')) return errors.manage(res, errors.restricted_access, item._id);
         return true;

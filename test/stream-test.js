@@ -49,7 +49,8 @@ describe("Thing stream", () => {
       "&token=" +
       analyst_token;
     const client = new WebSocket(url);
-    client.on("message", function (message) {
+    client.on("message", function (message, isBinary) {
+      message = isBinary ? message : message.toString();
       message.should.be.a("string");
       message.should.contains(thing._id);
       client.close();
@@ -102,7 +103,8 @@ describe("Thing stream", () => {
       "&token=" +
       analyst_token;
     const client = new WebSocket(url);
-    client.on("message", function (message) {
+    client.on("message", function (message, isBinary) {
+      message = isBinary ? message : message.toString();
       message.should.be.a("string");
       message.should.contains(device._id);
       client.close();
@@ -152,7 +154,8 @@ describe("Thing stream", () => {
     const url =
       "wss://127.0.0.1:443/v1/streams?thing=fake-thing&token=" + analyst_token;
     const client = await new WebSocket(url);
-    client.on("message", function (message) {
+    client.on("message", function (message, isBinary) {
+      message = isBinary ? message : message.toString();
       message.should.be.a("string");
       message.should.contains("fake-thing");
       message.should.contains("Resource Not found");
@@ -205,7 +208,8 @@ describe("Thing stream", () => {
       "wss://127.0.0.1:443/v1/streams?device=fake-device&token=" +
       analyst_token;
     const client = await new WebSocket(url);
-    client.on("message", function (message) {
+    client.on("message", function (message, isBinary) {
+      message = isBinary ? message : message.toString();
       message.should.be.a("string");
       message.should.contains("fake-device");
       message.should.contains("Resource Not found");
@@ -257,7 +261,8 @@ describe("Thing stream", () => {
     const url =
       "wss://127.0.0.1:443/v1/streams?thing=" + thing._id + "&token=fake-token";
     const client = await new WebSocket(url);
-    client.on("message", function (message) {
+    client.on("message", function (message, isBinary) {
+      message = isBinary ? message : message.toString();
       message.should.be.a("string");
       message.should.contains("Websocket disconnected due to invalid token");
       client.close();
@@ -309,7 +314,8 @@ describe("Thing stream", () => {
       device._id +
       "&token=fake-token";
     const client = await new WebSocket(url);
-    client.on("message", function (message) {
+    client.on("message", function (message, isBinary) {
+      message = isBinary ? message : message.toString();
       message.should.be.a("string");
       message.should.contains("Websocket disconnected due to invalid token");
       client.close();
@@ -376,7 +382,8 @@ describe("Thing stream", () => {
       "&token=" +
       analyst_token;
     const client = await new WebSocket(url);
-    client.on("message", function (message) {
+    client.on("message", function (message, isBinary) {
+      message = isBinary ? message : message.toString();
       message.should.be.a("string");
       message.should.contains("You cannot access this resource");
       client.close();
@@ -442,7 +449,8 @@ describe("Thing stream", () => {
       "&token=" +
       analyst_token;
     const client = await new WebSocket(url);
-    client.on("message", function (message) {
+    client.on("message", function (message, isBinary) {
+      message = isBinary ? message : message.toString();
       message.should.be.a("string");
       message.should.contains(thing._id);
       client.close();
@@ -513,7 +521,8 @@ describe("Thing stream", () => {
       "&token=" +
       analyst_token;
     const client_1 = await new WebSocket(url_1);
-    client_1.on("message", function (message) {
+    client_1.on("message", function (message, isBinary) {
+      message = isBinary ? message : message.toString();
       message.should.be.a("string");
       message.should.contains(thing_1._id);
       client_1.close();
@@ -522,7 +531,8 @@ describe("Thing stream", () => {
       assert.fail(message);
     });
     const client_2 = await new WebSocket(url_2);
-    client_2.on("message", function (message) {
+    client_2.on("message", function (message, isBinary) {
+      message = isBinary ? message : message.toString();
       message.should.be.a("string");
       message.should.contains(thing_2._id);
       client_2.close();

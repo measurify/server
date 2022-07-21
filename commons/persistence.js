@@ -165,15 +165,20 @@ exports.update = async function(body, fields, resource, model, tenant) {
         }
     } 
     resource.lastmod = Date.now();
-    const modified_resource = await model.findOneAndUpdate({_id: resource._id}, resource, { new: true });
-    return modified_resource;
+
+    await resource.save();
+    return resource;
+    //const modified_resource = await model.findOne({_id: resource._id});
+    
+    //const modified_resource = await model.findOneAndUpdate({_id: resource._id}, resource, { new: true });
+    //return modified_resource;
 }
 
 exports.deletemore = async function(filter, restriction, model) {  
     if (!filter) filter = '{}'; 
     filter = prepareFilter(filter, restriction);
     const result = await model.deleteMany(filter);
-    return result.n;
+    return result.deletedCount;
 }
 
 // local functions 

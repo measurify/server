@@ -62,20 +62,12 @@ rightSchema.pre('save', async function() {
     if(!resource) throw new Error('Resource not found (' + this.resource + ')');                   
 });
 
-// check type
-rightSchema.pre('save', async function() {
-    if(!this.type) throw new Error('Right validation failed: supply an right type');  
-    if(!Object.values(RightTypes).includes(this.type)) throw new Error('Right validation failed: resource type ' + this.type + ' not valid'); 
-    this.type = this.type.toLowerCase();
-    if(this.type == 'tag') this.type = 'tags';                     
-});
-
 // check if already have a similar right (idempotent)
 rightSchema.pre('save', async function() {
     const res = await this.constructor.findOne( { type: this.type,
                                                   resource: this.resource,
                                                   user: this.user });
-    if(res) throw new Error('The right already exists (' + res._id + ')');                       
+    if(res && res._id.toString() != this._id.toString()) throw new Error('The right already exists (' + res._id + ')');                       
 });
 
 module.exports = rightSchema;

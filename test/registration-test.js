@@ -98,7 +98,7 @@ describe('/POST self', () => {
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.post_request_error.message);
-        res.body.details.should.contain("a user with the same username already exists")
+        res.body.details.should.contain("duplicate key")
     });
 
     it('it should not POST a user with a fake tenant', async () => {
@@ -119,7 +119,7 @@ describe('/POST self', () => {
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.post_request_error.message);
-        res.body.details.should.contain("a user with the same username already exists")
+        res.body.details.should.contain("duplicate key error")
     });
 });
 

@@ -43,11 +43,5 @@ fieldmaskSchema.pre('save', async function() {
     }));
 });
 
-// validate id
-fieldmaskSchema.pre('save', async function () {
-    const res = await this.constructor.findOne({ _id: this._id });
-    if (res) throw new Error('Fieldmask validation failed: the _id is already used (' + this._id + ')');
-});
-
 //module.exports = this.constructor.models.Fieldmask || this.constructor.model('Fieldmask', fieldmaskSchema);
 module.exports = fieldmaskSchema;

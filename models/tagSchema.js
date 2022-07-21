@@ -42,10 +42,4 @@ tagSchema.path('tags').validate({
     message: 'Tag not existent'
 });
 
-// validate id
-tagSchema.pre('save', async function () {
-    const res = await this.constructor.findOne({ _id: this._id });
-    if (res) throw new Error('Tag validation failed: the _id is already used (' + this._id + ')');
-});
-
 module.exports = tagSchema;

@@ -54,6 +54,7 @@ exports.put = async (req, res) => {
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.canModify(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Thing); if (result != true) return result;
+    /*
     if (req.body._id != null) {        
         //check post        
         let result = await checker.canCreate(req, res); if (result != true) return result;
@@ -90,6 +91,7 @@ exports.put = async (req, res) => {
             else return errors.manage(res, errors.delete_request_error, err);
         }        
     }
+    */
     return await controller.updateResource(req, res, fields, Thing);
 };   
 

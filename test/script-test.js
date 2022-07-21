@@ -99,7 +99,7 @@ describe('/POST script', () => {
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.be.eql(errors.post_request_error.message);
-        res.body.details.should.contain('the _id is already used');
+        res.body.details.should.contain('duplicate key');
     });
 
     it('it should POST a list of script', async () => {
@@ -193,16 +193,16 @@ describe('/DELETE script', () => {
 
 // Test the /PUT route
 describe('/PUT script', () => {
-    it('it should PUT a script _id', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const script = await factory.createScript("test-script-1", user, "test-code-1", []);
-        const request = { _id:"new-test-script-1" };
-        const res = await chai.request(server).keepOpen().put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(request);
-        res.should.have.status(200);
-        res.body.should.be.a('object');
-        res.body.should.have.property('_id');
-        res.body._id.should.be.eql("new-test-script-1");
-    });
+    // it('it should PUT a script _id', async () => {
+    //     const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+    //     const script = await factory.createScript("test-script-1", user, "test-code-1", []);
+    //     const request = { _id:"new-test-script-1" };
+    //     const res = await chai.request(server).keepOpen().put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(request);
+    //     res.should.have.status(200);
+    //     res.body.should.be.a('object');
+    //     res.body.should.have.property('_id');
+    //     res.body._id.should.be.eql("new-test-script-1");
+    // });
 
     it('it should PUT a script to modify code', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
@@ -215,17 +215,17 @@ describe('/PUT script', () => {
         res.body.code.should.be.eql("this is the new code");
     });
 
-    it('it should PUT a script _id and modify code', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const script = await factory.createScript("test-script-1", user, "test-code-1", []);
-        const request = { _id:"new-test-script-1",code: "this is the new code" };
-        const res = await chai.request(server).keepOpen().put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(request);
-        res.should.have.status(200);
-        res.body.should.be.a('object');
-        res.body.should.have.property('_id');
-        res.body._id.should.be.eql("new-test-script-1");
-        res.body.code.should.be.eql("this is the new code");
-    });
+    // it('it should PUT a script _id and modify code', async () => {
+    //     const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+    //     const script = await factory.createScript("test-script-1", user, "test-code-1", []);
+    //     const request = { _id:"new-test-script-1",code: "this is the new code" };
+    //     const res = await chai.request(server).keepOpen().put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(request);
+    //     res.should.have.status(200);
+    //     res.body.should.be.a('object');
+    //     res.body.should.have.property('_id');
+    //     res.body._id.should.be.eql("new-test-script-1");
+    //     res.body.code.should.be.eql("this is the new code");
+    // });
 
     it('it should PUT a script to modify visibility', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);

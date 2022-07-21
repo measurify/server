@@ -57,10 +57,4 @@ thingSchema.path('relations').validate({
     message: 'Relation not existent'
 });
 
-// validate id
-thingSchema.pre('save', async function () {
-    const res = await this.constructor.findOne({ _id: this._id });
-    if (res) throw new Error('Thing validation failed: the _id is already used (' + this._id + ')');
-});
-
 module.exports = thingSchema;

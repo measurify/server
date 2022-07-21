@@ -85,10 +85,4 @@ computationSchema.pre('save', async function() {
     if(!Object.values(ComputationCodeTypes).includes(this.code)) throw new Error('Computation validation failed: unrecognized code');                      
 });
 
-// validate id
-computationSchema.pre('save', async function () {
-    const res = await this.constructor.findOne({ _id: this._id });
-    if (res) throw new Error('Computation validation failed: the _id is already used (' + this._id + ')');
-});
-
 module.exports = computationSchema;

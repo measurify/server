@@ -72,9 +72,10 @@ subscriptionSchema.pre('save', async function () {
 // same token/device/thing
 subscriptionSchema.pre('save', async function() {
     const res = await this.constructor.findOne( { token: this.token,
-                                                  device: this.device,
-                                                  thing: this.thing});
-    if(res) throw new Error('The subscription already exists');                       
+                                               device: this.device,
+                                               thing: this.thing});    
+                                          
+    if(res && res._id.toString() != this._id.toString()) throw new Error('The subscription already exists');                       
 });
 
 module.exports = subscriptionSchema;

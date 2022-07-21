@@ -208,25 +208,14 @@ describe("/POST users", () => {
   it("it should not POST a user with already existant username field", async () => {
     await factory.createUser("test-user", "test-userpassword-1");
     await factory.createUser("test-username-1", "test-password-1");
-    const user = {
-      username: "test-username-1",
-      password: "test-password-1",
-      type: UserRoles.analyst,
-    };
-    const res = await chai
-      .request(server)
-      .keepOpen()
-      .post("/v1/users")
-      .set("Authorization", await factory.getAdminToken())
-      .send(user);
+    const user = {username: "test-username-1", password: "test-password-1", type: UserRoles.analyst};
+    const res = await chai.request(server).keepOpen().post("/v1/users").set("Authorization", await factory.getAdminToken()).send(user);
     res.should.have.status(errors.post_request_error.status);
     res.body.should.be.a("object");
     res.body.message.should.be.a("string");
     res.should.have.status(errors.post_request_error.status);
     res.body.message.should.contain(errors.post_request_error.message);
-    res.body.details.should.contain(
-      "a user with the same username already exists"
-    );
+    res.body.details.should.contain("duplicate key");
   });
 
   it("it should POST a list of users", async () => {

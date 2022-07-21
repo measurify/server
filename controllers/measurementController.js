@@ -16,14 +16,7 @@ exports.get = async (req, res) => {
   const restriction_1 = await checker.whatCanRead(req, res);
   const restriction_2 = await checker.whichRights(req, res, Measurement);
   const restrictions = { ...restriction_1, ...restriction_2 };
-  return await controller.getResourceList(
-    req,
-    res,
-    '{ "timestamp": "desc" }',
-    select,
-    Measurement,
-    restrictions
-  );
+  return await controller.getResourceList( req, res, '{ "timestamp": "desc" }', select, Measurement, restrictions );
 };
 
 exports.pipe = async (req, res) => {
@@ -32,14 +25,7 @@ exports.pipe = async (req, res) => {
   const restriction_1 = await checker.whatCanRead(req, res);
   const restriction_2 = await checker.whichRights(req, res, Measurement);
   const restrictions = { ...restriction_1, ...restriction_2 };
-  controller.getResourcePipe(
-    req,
-    res,
-    '{ "timestamp": "desc" }',
-    select,
-    Measurement,
-    restrictions
-  );
+  controller.getResourcePipe( req, res, '{ "timestamp": "desc" }', select, Measurement, restrictions );
 };
 
 exports.count = async (req, res) => {
@@ -47,12 +33,7 @@ exports.count = async (req, res) => {
   const restriction_1 = await checker.whatCanRead(req, res);
   const restriction_2 = await checker.whichRights(req, res, Measurement);
   const restrictions = { ...restriction_1, ...restriction_2 };
-  return await controller.getResourceListSize(
-    req,
-    res,
-    Measurement,
-    restrictions
-  );
+  return await controller.getResourceListSize( req, res, Measurement, restrictions );
 };
 
 exports.getone = async (req, res) => {
@@ -68,24 +49,12 @@ exports.getone = async (req, res) => {
 };
 
 exports.post = async (req, res) => {
-  if (Array.isArray(req.body)) {
-    req.body.map((r) => {
-      if (r._id == undefined) {
-        r._id = sha(JSON.stringify(r));
-      }
-    });
-  } else if (req.body._id == undefined) {
-    req.body._id = sha(JSON.stringify(req.body));
-  }
+  if (Array.isArray(req.body)) { req.body.map((r) => { if (r._id == undefined) { r._id = sha(JSON.stringify(r)); } }); } 
+  else if (req.body._id == undefined) { req.body._id = sha(JSON.stringify(req.body));}
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   let result = await checker.canCreate(req, res);
   if (result != true) return result;
-  result = await checker.hasRightsToCreate(req, res, [
-    "thing",
-    "device",
-    "feature",
-    "tags",
-  ]);
+  result = await checker.hasRightsToCreate(req, res, [ "thing", "device", "feature", "tags", ]);
   if (result != true) return result;
   return await controller.postResource(req, res, Measurement);
 };
@@ -111,12 +80,7 @@ exports.delete = async (req, res) => {
   const restriction_1 = await checker.whatCanDelete(req, res);
   const restriction_2 = await checker.whichRights(req, res, Measurement);
   const restrictions = { ...restriction_1, ...restriction_2 };
-  return await controller.deleteResourceList(
-    req,
-    res,
-    Measurement,
-    restrictions
-  );
+  return await controller.deleteResourceList(req, res, Measurement, restrictions);
 };
 
 exports.deleteone = async (req, res) => {
@@ -145,12 +109,7 @@ exports.poststream = async (ws, req) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   let result = await checker.canCreate(req, ws);
   if (result != true) return result;
-  result = await checker.hasRightsToCreate(req, ws, [
-    "thing",
-    "device",
-    "feature",
-    "tags",
-  ]);
+  result = await checker.hasRightsToCreate(req, ws, [ "thing", "device", "feature", "tags", ]);
   if (result != true) return result;
   ws.on("message", async function incoming(data) {
     const res = await controller.streamResource(req, data, Measurement);

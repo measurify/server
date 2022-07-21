@@ -323,14 +323,7 @@ exports.createScript = async function (
   return script._doc;
 };
 
-exports.createSubscription = async function (
-  token,
-  owner,
-  device,
-  thing,
-  tags,
-  tenant
-) {
+exports.createSubscription = async function (token, owner, device, thing, tags, tenant) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
   const Subscription = mongoose.dbs[tenant.database].model("Subscription");

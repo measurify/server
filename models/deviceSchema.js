@@ -97,10 +97,4 @@ deviceSchema.path('owner').validate({
     message: 'User not existent'
 });
 
-// validate id
-deviceSchema.pre('save', async function () {
-    const res = await this.constructor.findOne({ _id: this._id });
-    if (res) throw new Error('Device validation failed: the _id is already used (' + this._id + ')');
-});
-
 module.exports = deviceSchema;

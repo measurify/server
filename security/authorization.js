@@ -92,6 +92,8 @@ exports.whatCanRead = function(user) {
     if (this.isAdministrator(user)) return result;
     if (this.isAnalyst(user)) return result;
     if (this.isProvider(user)) result = { $or: [  { owner: user._id }, { visibility: VisibilityTypes.public } ] };
+    //if (this.isProvider(user)) result = { $or: [  { owner: user._id }, { $and: [{ visibility: {$exists: true} , visibility: VisibilityTypes.public }] } ] };
+    //if (this.isProvider(user)) result = { pincopallo: {$exists: false} };
     return result;
 } 
 
@@ -100,6 +102,8 @@ exports.whichRights = function(user, rights, where) {
     if (this.isAdministrator(user)) return result;
     rights.forEach(right => { 
         if(where == 'type') {
+            right.type = right.type.toLowerCase()
+            if(right.type == 'tag') right.type = 'tags';
             if(!result[right.type]) result[right.type] = { $in: [] };
             result[right.type].$in.push(right.resource)
         }

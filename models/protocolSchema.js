@@ -47,7 +47,8 @@ protocolSchema.plugin(require('mongoose-autopopulate'));
 // validate owner
 protocolSchema.path('owner').validate({
     validator: async function (value) {
-        const User = this.model('User');
+        let User = this.User;
+        if(!User) User = this.model('User');  
         let user = await User.findById(value);
         if(!user) return false;
         return true;
@@ -58,7 +59,7 @@ protocolSchema.path('owner').validate({
 // validate tags
 protocolSchema.path('tags').validate({
     validator: async function (values) {
-        const Tag = this.model('Tag');
+        Tag = this.model('Tag');        
         for(let i=0; i<values.length; i++) {
             let tag = await Tag.findById(values[i]);
             if(!tag) throw new Error('Protocol validation failed: Tag not existent (' + values[i] + ')');
@@ -91,16 +92,10 @@ protocolSchema.path('topics').validate({
     }
 });
 
-// validate id
-protocolSchema.pre('save', async function () {
-    const res = await this.constructor.findOne({ _id: this._id });
-    if (res) throw new Error('Protocol validation failed: the _id is already used (' + this._id + ')');
-});
-
 // validate also on update
 //protocolSchema.pre('findOneAndUpdate', function(next) {
-//    this.options.runValidators = true;
 //    this.options.context = 'query';
+//    this.options.runValidators = true;
 //    next();
 //});
   

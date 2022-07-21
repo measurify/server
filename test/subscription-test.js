@@ -239,7 +239,7 @@ describe('/PUT subscription', () => {
         const tag_2 = await factory.createTag("test-tag-2", owner);
         const tag_3 = await factory.createTag("test-tag-3", owner);
         const thing = await factory.createThing("test-thing-1", owner);
-        const subscription = await factory.createSubscription("test-subscription-1", owner, null, thing, [tag_1, tag_2]);
+        const subscription = await factory.createSubscription("test-subscription-1", owner, null, thing, [tag_1._id, tag_2._id]);
         const modification = { tags: { add: [tag_3._id] } };
         const res = await chai.request(server).keepOpen().put('/v1/subscriptions/' + subscription._id).set("Authorization", await factory.getUserToken(owner)).send(modification);
         res.should.have.status(200);

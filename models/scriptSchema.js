@@ -42,10 +42,4 @@ scriptSchema.path('owner').validate({
     message: 'User not existent'
 });
 
-// validate id
-scriptSchema.pre('save', async function () {
-    const res = await this.constructor.findOne({ _id: this._id });
-    if (res) throw new Error('Script validation failed: the _id is already used (' + this._id + ')');
-});
-
 module.exports = scriptSchema;
