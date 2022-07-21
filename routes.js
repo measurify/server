@@ -36,6 +36,10 @@ router.use('/' + process.env.VERSION + '/usernames', passport.authenticate('jwt-
 const selfRoute = require('./routes/selfRoute');
 router.use('/' + process.env.VERSION + '/self', selfRoute);
 
+// group
+const groupsRoute = require('./routes/groupRoute');
+router.use('/' + process.env.VERSION + '/groups', passport.authenticate('jwt-token', {session: false}), groupsRoute);
+
 // measurement
 const measurementsRoute = require('./routes/measurementRoute');
 router.use('/' + process.env.VERSION + '/measurements', passport.authenticate('jwt-token', {session: false}), measurementsRoute);
@@ -77,8 +81,8 @@ const protocolsRoute = require('./routes/protocolRoute');
 router.use('/' + process.env.VERSION + '/protocols', passport.authenticate('jwt-token', {session: false}), protocolsRoute);
 
 // dataset
-const datasetRoute = require('./routes/datasetRoute');
-router.use('/' + process.env.VERSION + '/dataset', passport.authenticate('jwt-token', {session: false}), datasetRoute);
+const datasetsRoute = require('./routes/datasetRoute');
+router.use('/' + process.env.VERSION + '/datasets', passport.authenticate('jwt-token', {session: false}), datasetsRoute);
 
 // type
 const typesRoute = require('./routes/typeRoute');

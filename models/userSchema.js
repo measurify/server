@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true, unique: true, select: false },
     email: { type: String, index: true },
     type: { type: String, enum: UserRoles, required: true },
+    groups: { type: [String], ref:'Group' },
     fieldmask: { type: String, ref: 'Fieldmask' },
     status: { type: String, enum: UserStatusTypes, default: UserStatusTypes.enabled },
     timestamp: {type: Date, default: Date.now, select: false },
@@ -19,6 +20,18 @@ const userSchema = new mongoose.Schema({
 
 userSchema.plugin(require('mongoose-autopopulate'));
 userSchema.plugin(require('mongoose-paginate-v2'));
+
+// validate groups
+userSchema.path('groups').validate({
+    validator: async function (values) {
+        const Group = this.constructor.model('Group');
+        for(let i=0; i<values.length; i++) {
+            let group = await Group.findById(values[i]);
+            if(!group) throw new Error('User validation failed: Group not existent (' + values[i] + ')');
+        };
+        return true;
+    }
+});
 
 // check type
 userSchema.pre('save', async function() {

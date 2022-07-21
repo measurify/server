@@ -80,7 +80,7 @@ exports.createTenant = async function (id, organization, address, email, phone, 
   return await Tenant.findById(tenant._id);
 };
 
-exports.createUser = async function (username, password, type, fieldmask, email, tenant) {
+exports.createUser = async function (username, password, type, fieldmask, email, tenant, groups) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
   if (tenant.passwordhash == true || tenant.passwordhash == "true") {
@@ -95,11 +95,35 @@ exports.createUser = async function (username, password, type, fieldmask, email,
       fieldmask: fieldmask,
       email: email,
       type: type || UserRoles.provider,
+      groups: groups||[]
     };
     user = new User(req);
     await user.save();
   }
   return await User.findById(user._id);
+};
+
+exports.createGroup = async function (
+  name,
+  owner,
+  tags,
+  description,  
+  visibility,
+  tenant
+) {
+  const Tenant = mongoose.dbs["catalog"].model("Tenant");
+  if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
+  const Group = mongoose.dbs[tenant.database].model("Group");
+  const req = {
+    _id: name,
+    owner: owner,
+    tags: tags,
+    description: description,    
+    visibility: visibility || VisibilityTypes.private,
+  };
+  const group = new Group(req);
+  await group.save();
+  return group._doc;
 };
 
 exports.createSamples = function (value, delta) {

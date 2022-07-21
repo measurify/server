@@ -45,7 +45,7 @@ exports.post = async (req, res) => {
 
 exports.put = async (req, res) => { 
     const User = mongoose.dbs[req.tenant.database].model('User');
-    const fields = ['password', 'fieldmask', 'email'];
+    const fields = ['password', 'fieldmask', 'email','groups'];
     let result = await checker.isAvailable(req, res, User); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.isValid(req, res, UserStatusTypes, 'status'); if (result != true) return result;

@@ -28,7 +28,7 @@ describe('/GET dataset', () => {
         const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(1));
         const measurement2 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(2));
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(3));
-        const res = await chai.request(server).keepOpen().get('/v1/dataset').set("Authorization", await factory.getUserToken(owner));
+        const res = await chai.request(server).keepOpen().get('/v1/datasets').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body[0].id.should.be.a('array');
         res.body[0].id.length.should.be.eql(3);
@@ -44,7 +44,7 @@ describe('/GET dataset', () => {
         const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(1));
         const measurement2 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(2));
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(3));
-        const res = await chai.request(server).keepOpen().get('/v1/dataset').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv');
+        const res = await chai.request(server).keepOpen().get('/v1/datasets').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv');
         res.should.have.status(200);
         res.text.should.be.a('string');
         res.text.should.include('"visibility","tags","_id","startDate","endDate","thing","feature","device","values","deltatime"');
@@ -60,7 +60,7 @@ describe('/GET dataset', () => {
         const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(1));
         const measurement2 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(2));
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(3));
-        const res = await chai.request(server).keepOpen().get('/v1/dataset?filter={"feature":"test-feature"}').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv+');
+        const res = await chai.request(server).keepOpen().get('/v1/datasets?filter={"feature":"test-feature"}').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv+');
         res.should.have.status(200);
         res.text.should.be.a('string');
         res.text.should.contain('"visibility","tags","_id","startDate","endDate","location","thing","feature","device","item-name-1","deltatime"');
@@ -77,7 +77,7 @@ describe('/GET dataset', () => {
         const measurement2 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(2));
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(3));
         const measurement4 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(4));
-        const res = await chai.request(server).keepOpen().get('/v1/dataset?limit=2&page=1').set("Authorization", await factory.getUserToken(owner));
+        const res = await chai.request(server).keepOpen().get('/v1/datasets?limit=2&page=1').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body[0].id.should.be.a('array');
         res.body[0].id.length.should.be.eql(2);
@@ -95,11 +95,11 @@ describe('/GET dataset', () => {
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(3));
         const measurement4 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(4));
         const measurement5 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(5));
-        let res = await chai.request(server).keepOpen().get('/v1/dataset?filter={"tags":"test-tag-1"}').set("Authorization", await factory.getUserToken(owner));
+        let res = await chai.request(server).keepOpen().get('/v1/datasets?filter={"tags":"test-tag-1"}').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body[0].id.should.be.a('array');
         res.body[0].id.length.should.be.eql(4);
-        res = await chai.request(server).keepOpen().get('/v1/dataset?filter={"tags":"test-tag-2"}').set("Authorization", await factory.getUserToken(owner));
+        res = await chai.request(server).keepOpen().get('/v1/datasets?filter={"tags":"test-tag-2"}').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body[0].id.should.be.a('array');
         res.body[0].id.length.should.be.eql(2);
@@ -115,7 +115,7 @@ describe('/GET dataset', () => {
         const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(1));
         const measurement2 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(2));
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(3));
-        const res = await chai.request(server).keepOpen().get('/v1/dataset?filter={"feature":"'+feature._id+'"}').set("Authorization", await factory.getUserToken(owner));
+        const res = await chai.request(server).keepOpen().get('/v1/datasets?filter={"feature":"'+feature._id+'"}').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body[0].id.should.be.a('array');
         res.body[0].id.length.should.be.eql(3);
@@ -135,11 +135,11 @@ describe('/GET dataset', () => {
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag2], factory.createSamples(3));
         const measurement4 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(4));
         const measurement5 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(5));
-        let res = await chai.request(server).keepOpen().get('/v1/dataset/'+dataupload1._id).set("Authorization", await factory.getUserToken(owner));
+        let res = await chai.request(server).keepOpen().get('/v1/datasets/'+dataupload1._id).set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body[0].id.should.be.a('array');
         res.body[0].id.length.should.be.eql(3);
-        res = await chai.request(server).keepOpen().get('/v1/dataset/'+dataupload2._id).set("Authorization", await factory.getUserToken(owner));
+        res = await chai.request(server).keepOpen().get('/v1/datasets/'+dataupload2._id).set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body[0].id.should.be.a('array');
         res.body[0].id.length.should.be.eql(2);
@@ -159,11 +159,11 @@ describe('/GET dataset', () => {
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag2], factory.createSamples(3));
         const measurement4 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(4));
         const measurement5 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(5));
-        let res = await chai.request(server).keepOpen().get('/v1/dataset/'+dataupload1._id).set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv');
+        let res = await chai.request(server).keepOpen().get('/v1/datasets/'+dataupload1._id).set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv');
         res.should.have.status(200);
         res.text.should.be.a('string');
         res.text.should.contain('"visibility","tags","_id","startDate","endDate","thing","feature","device","values","deltatime"');
-        res = await chai.request(server).keepOpen().get('/v1/dataset/'+dataupload2._id).set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv');
+        res = await chai.request(server).keepOpen().get('/v1/datasets/'+dataupload2._id).set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv');
         res.should.have.status(200);
         res.text.should.be.a('string');
         res.text.should.contain('"visibility","tags","_id","startDate","endDate","thing","feature","device","values","deltatime"');
@@ -183,11 +183,11 @@ describe('/GET dataset', () => {
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag2], factory.createSamples(3));
         const measurement4 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(4));
         const measurement5 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(5));
-        let res = await chai.request(server).keepOpen().get('/v1/dataset/'+dataupload1._id+'?filter={"feature":"test-feature"}').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv+');
+        let res = await chai.request(server).keepOpen().get('/v1/datasets/'+dataupload1._id+'?filter={"feature":"test-feature"}').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv+');
         res.should.have.status(200);
         res.text.should.be.a('string');
         res.text.should.contain('"visibility","tags","_id","startDate","endDate","location","thing","feature","device","item-name-1","deltatime"');
-        res = await chai.request(server).keepOpen().get('/v1/dataset/'+dataupload2._id+'?filter={"feature":"test-feature"}').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv+');
+        res = await chai.request(server).keepOpen().get('/v1/datasets/'+dataupload2._id+'?filter={"feature":"test-feature"}').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv+');
         res.should.have.status(200);
         res.text.should.be.a('string');
         res.text.should.contain('"visibility","tags","_id","startDate","endDate","location","thing","feature","device","item-name-1","deltatime"');
@@ -197,7 +197,7 @@ describe('/GET dataset', () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const dataupload = await factory.createDataupload("test-dataupload", owner,Date.now(),1500,"test-result",Date.now());
-        let res = await chai.request(server).keepOpen().get('/v1/dataset/'+dataupload._id+'/info').set("Authorization", await factory.getUserToken(owner));
+        let res = await chai.request(server).keepOpen().get('/v1/datasets/'+dataupload._id+'/info').set("Authorization", await factory.getUserToken(owner));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body._id.should.contain(dataupload._id);
@@ -218,7 +218,7 @@ describe('/POST dataset', () => {
         const thing1 = await factory.createThing("test-thing-1", user);
         const testFile = './test/test/test-file1.txt';
         const testDescription = './test/test/test-description.txt';
-        const res = await chai.request(server).keepOpen().post('/v1/dataset').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().post('/v1/datasets').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         console.log(res.txt)
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -238,7 +238,7 @@ describe('/POST dataset', () => {
         const thing1 = await factory.createThing("test-thing-1", user);
         const testFile = './test/test/test-file2.txt';
         const testDescription = './test/test/test-description.txt';
-        const res = await chai.request(server).keepOpen().post('/v1/dataset').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().post('/v1/datasets').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(202);
         res.body.should.be.a('object');
         res.body.should.have.property('completed');
@@ -266,7 +266,7 @@ describe('/POST dataset', () => {
         const thing1 = await factory.createThing("test-thing-1", user);
         const testFile = './test/test/test-file2.txt';
         const testDescription = './test/test/test-description.txt';
-        const res = await chai.request(server).keepOpen().post('/v1/dataset?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().post('/v1/datasets?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(202);
         res.body.should.be.a('object');
         res.body.should.have.property('completed');
@@ -294,7 +294,7 @@ describe('/POST dataset', () => {
         const thing1 = await factory.createThing("test-thing-1", user);
         const testFile = './test/test/test-file2.txt';
         const testDescription = './test/test/test-fake-description.txt';
-        const res = await chai.request(server).keepOpen().post('/v1/dataset?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().post('/v1/datasets?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.description_not_json.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');        
@@ -312,7 +312,7 @@ describe('/POST dataset', () => {
         const thing1 = await factory.createThing("test-thing-1", user);
         const testFile = './test/test/test-file1-multiple-features.txt';
         const testDescription = './test/test/test-description-multiple-features.txt';
-        const res = await chai.request(server).keepOpen().post('/v1/dataset').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().post('/v1/datasets').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('completed');
@@ -331,7 +331,7 @@ describe('/POST dataset', () => {
         const thing1 = await factory.createThing("test-thing-1", user);
         const testFile = './test/test/test-file2-multiple-features.txt';
         const testDescription = './test/test/test-description-multiple-features.txt';
-        const res = await chai.request(server).keepOpen().post('/v1/dataset').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().post('/v1/datasets').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(202);
         res.body.should.be.a('object');
         res.body.should.have.property('completed');
@@ -359,7 +359,7 @@ describe('/POST dataset', () => {
         const thing1 = await factory.createThing("test-thing-1", user);
         const testFile = './test/test/test-file2-multiple-features.txt';
         const testDescription = './test/test/test-description-multiple-features.txt';
-        const res = await chai.request(server).keepOpen().post('/v1/dataset?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().post('/v1/datasets?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(202);
         res.body.should.be.a('object');
         res.body.should.have.property('completed');
@@ -387,7 +387,7 @@ describe('/POST dataset', () => {
         const thing1 = await factory.createThing("test-thing-1", user);
         const testFile = './test/test/test-file2-multiple-features-no-header.txt';
         const testDescription = './test/test/test-description-multiple-features.txt';
-        const res = await chai.request(server).keepOpen().post('/v1/dataset?force=true&header=false').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().post('/v1/datasets?force=true&header=false').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(202);
         res.body.should.be.a('object');
         res.body.should.have.property('completed');
@@ -415,7 +415,7 @@ describe('/POST dataset', () => {
         const thing1 = await factory.createThing("test-thing-1", user);
         const testFile = './test/test/test-file2-multiple-features.txt';
         const testDescription = './test/test/test-fake-description.txt';
-        const res = await chai.request(server).keepOpen().post('/v1/dataset?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().post('/v1/datasets?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.description_not_json.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');        
@@ -438,7 +438,7 @@ describe('/DELETE dataset', () => {
         measurements_before.length.should.be.eql(1);
         const datauploads_before = await before.Dataupload.find();
         datauploads_before.length.should.be.eql(1);
-        const res = await chai.request(server).keepOpen().delete('/v1/dataset/'+dataupload1._id).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().delete('/v1/datasets/'+dataupload1._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
         const measurements_after = await before.Measurement.find();
@@ -460,7 +460,7 @@ describe('/DELETE dataset', () => {
         measurements_before.length.should.be.eql(1);
         const datauploads_before = await before.Dataupload.find();
         datauploads_before.length.should.be.eql(1);
-        const res = await chai.request(server).keepOpen().delete('/v1/dataset/fake_measurement').set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().delete('/v1/datasets/fake_measurement').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
