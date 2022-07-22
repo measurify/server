@@ -66,7 +66,7 @@ rightSchema.pre('save', async function() {
 rightSchema.pre('save', async function() {
     const res = await this.constructor.findOne( { type: this.type,
                                                   resource: this.resource,
-                                                  user: this.user });
+                                                  user: this.user });                                            
     if(res && res._id.toString() != this._id.toString()) throw new Error('The right already exists (' + res._id + ')');                       
 });
 

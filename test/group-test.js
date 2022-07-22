@@ -216,18 +216,18 @@ describe('/DELETE group', () => {
 
 // Test the /PUT route
 describe('/PUT group', () => {
-    // it('it should PUT a group _id', async () => {
-    //     const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-    //     const tag_1 = await factory.createTag("test-tag-1", user);
-    //     const tag_2 = await factory.createTag("test-tag-2", user);
-    //     const group = await factory.createGroup("test-group-1", user, [tag_1, tag_2], null, null, null);
-    //     const modification = { _id:"new-test-group-1" };
-    //     const res = await chai.request(server).keepOpen().put('/v1/groups/' + group._id).set("Authorization", await factory.getUserToken(user)).send(modification);
-    //     res.should.have.status(200);
-    //     res.body.should.be.a('object');
-    //     res.body.should.have.property('_id');
-    //     res.body._id.should.be.eql("new-test-group-1");
-    // });
+    it('it should PUT a group _id', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag_1 = await factory.createTag("test-tag-1", user);
+        const tag_2 = await factory.createTag("test-tag-2", user);
+        const group = await factory.createGroup("test-group-1", user, [tag_1, tag_2], null, null, null);
+        const modification = { _id:"new-test-group-1" };
+        const res = await chai.request(server).keepOpen().put('/v1/groups/' + group._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body._id.should.be.eql("new-test-group-1");
+    });
 
     it('it should PUT a group to add a tag', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
@@ -243,20 +243,20 @@ describe('/PUT group', () => {
         res.body.tags.length.should.be.eql(3);
     });
 
-    // it('it should PUT a group _id and add a tag', async () => {
-    //     const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-    //     const tag_1 = await factory.createTag("test-tag-1", user);
-    //     const tag_2 = await factory.createTag("test-tag-2", user);
-    //     const tag_3 = await factory.createTag("test-tag-3", user);
-    //     const group = await factory.createGroup("test-group-1", user, [tag_1, tag_2], null, null, null);
-    //     const modification = { _id:"new-test-group-1",tags: { add: [tag_3._id] } };
-    //     const res = await chai.request(server).keepOpen().put('/v1/groups/' + group._id).set("Authorization", await factory.getUserToken(user)).send(modification);
-    //     res.should.have.status(200);
-    //     res.body.should.be.a('object');
-    //     res.body.should.have.property('_id');
-    //     res.body._id.should.be.eql("new-test-group-1");
-    //     res.body.tags.length.should.be.eql(3);
-    // });
+    it('it should PUT a group _id and add a tag', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag_1 = await factory.createTag("test-tag-1", user);
+        const tag_2 = await factory.createTag("test-tag-2", user);
+        const tag_3 = await factory.createTag("test-tag-3", user);
+        const group = await factory.createGroup("test-group-1", user, [tag_1, tag_2], null, null, null);
+        const modification = { _id:"new-test-group-1",tags: { add: [tag_3._id] } };
+        const res = await chai.request(server).keepOpen().put('/v1/groups/' + group._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body._id.should.be.eql("new-test-group-1");
+        res.body.tags.length.should.be.eql(3);
+    });
 
     it('it should PUT a group to remove a tag', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);

@@ -48,47 +48,6 @@ exports.put = async (req, res) => {
     result = await checker.canModify(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Tag); if (result != true) return result;
     result = await checker.isValid(req, res, VisibilityTypes, 'visibility'); if (result != true) return result;
-    if (req.body._id != null) {        
-        //check post        
-        let result = await checker.canCreate(req, res); if (result != true) return result;
-        result = await checker.hasRightsToCreate(req, res, ['tags']); if (result != true) return result;   
-        //check delete                 
-        const Device = mongoose.dbs[req.tenant.database].model('Device');
-        const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
-        const Feature = mongoose.dbs[req.tenant.database].model('Feature');
-        const Thing = mongoose.dbs[req.tenant.database].model('Thing');        
-        result = await checker.isNotUsed(req, res, Device, 'tags'); if (result != true) return result;
-        result = await checker.isNotUsed(req, res, Measurement, 'tags'); if (result != true) return result;
-        result = await checker.isNotUsed(req, res, Feature, 'tags'); if (result != true) return result;
-        result = await checker.isNotUsed(req, res, Thing, 'tags'); if (result != true) return result;
-        result = await checker.isNotUsed(req, res, Tag, 'tags'); if (result != true) return result;
-        result = await checker.canDelete(req, res); if (result != true) return result;        
-        //prepare id for the delete
-        req.params.id = req.resource._id;
-        //check getone    
-        const select = await checker.whatCanSee(req, res, Tag);        
-        result = await checker.canRead(req, res); if (result != true) return result;
-        //get
-        const oldTag = await persistence.get(req.params.id, null, Tag, select);
-        if (!oldTag) return errors.manage(res, errors.resource_not_found, req.params.id);
-        //prepare newTag body for the post
-        let newTag = oldTag._doc;
-        newTag._id = req.body._id;
-        newTag.owner = req.user._id;
-        //post
-        const resultPost = await persistence.post(newTag, Tag, req.tenant);
-        if (!!resultPost.errors) return errors.manage(res, errors.post_request_error, resultPost);
-        req.resource=resultPost._doc;
-        //delete
-        try {
-            const resultDelete = await persistence.delete(req.params.id, Tag);
-            if (!resultDelete) return errors.manage(res, errors.resource_not_found, req.params.id);
-        }
-        catch (err) {
-            if (err.name == 'CastError') return errors.manage(res, errors.resource_not_found);
-            else return errors.manage(res, errors.delete_request_error, err);
-        }        
-    }
     return await controller.updateResource(req, res, fields, Tag);
 };
 

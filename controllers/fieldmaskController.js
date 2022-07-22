@@ -38,37 +38,6 @@ exports.put = async (req, res) => {
     let result = await checker.isAdminitrator(req, res); if (result != true) return result;
     result = await checker.isAvailable(req, res, Fieldmask); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
-    if (req.body._id != null) {        
-        //check post        
-        let result = await checker.isAdminitrator(req, res); if (result != true) return result;
-        //check delete        
-        const User = mongoose.dbs[req.tenant.database].model('User');
-        result = await checker.isNotUsed(req, res, User, 'fieldmask'); if (result != true) return result;
-        //prepare id for the delete
-        req.params.id = req.resource._id;
-        //check getone        
-        const select = await checker.whatCanSee(req, res, Fieldmask);        
-        //get
-        const oldFieldmask = await persistence.get(req.params.id, null, Fieldmask, select);
-        if (!oldFieldmask) return errors.manage(res, errors.resource_not_found, req.params.id);
-        //prepare newFieldmask body for the post
-        let newFieldmask = oldFieldmask._doc;
-        newFieldmask._id = req.body._id;
-        newFieldmask.owner = req.user._id;
-        //post
-        const resultPost = await persistence.post(newFieldmask, Fieldmask, req.tenant);
-        if (!!resultPost.errors) return errors.manage(res, errors.post_request_error, resultPost);
-        req.resource=resultPost._doc;
-        //delete
-        try {
-            const resultDelete = await persistence.delete(req.params.id, Fieldmask);
-            if (!resultDelete) return errors.manage(res, errors.resource_not_found, req.params.id);
-        }
-        catch (err) {
-            if (err.name == 'CastError') return errors.manage(res, errors.resource_not_found);
-            else return errors.manage(res, errors.delete_request_error, err);
-        }        
-    }
     return await controller.updateResource(req, res, fields, Fieldmask);
 };  
 

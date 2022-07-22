@@ -172,7 +172,7 @@ describe('/POST thing', () => {
         res.body.relations.length.should.be.eql(2);
     });
 });
-
+ 
 // Test the /POST file route
 describe('/POST thing from file', () => {
     it('it should POST things from file csv', async () => {
@@ -256,18 +256,18 @@ describe('/DELETE thing', () => {
 // Test the /PUT route
 describe('/PUT thing', () => {
     
-    // it('it should PUT a thing _id', async () => {
-    //     const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-    //     const tag_1 = await factory.createTag("test-tag-1", user);
-    //     const tag_2 = await factory.createTag("test-tag-2", user);
-    //     const thing = await factory.createThing("test-thing-1", user, [tag_1, tag_2]);
-    //     const modification = { _id:"new-test-thing-1" };
-    //     const res = await chai.request(server).keepOpen().put('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user)).send(modification);
-    //     res.should.have.status(200);
-    //     res.body.should.be.a('object');
-    //     res.body.should.have.property('_id');
-    //     res.body._id.should.be.eql("new-test-thing-1");
-    // });
+    it('it should PUT a thing _id', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag_1 = await factory.createTag("test-tag-1", user);
+        const tag_2 = await factory.createTag("test-tag-2", user);
+        const thing = await factory.createThing("test-thing-1", user, [tag_1, tag_2]);
+        const modification = { _id:"new-test-thing-1" };
+        const res = await chai.request(server).keepOpen().put('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body._id.should.be.eql("new-test-thing-1");
+    });
 
     it('it should PUT a thing to add a tag', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
@@ -283,20 +283,20 @@ describe('/PUT thing', () => {
         res.body.tags.length.should.be.eql(3);
     });
 
-    // it('it should PUT a thing _id and add a tag', async () => {
-    //     const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-    //     const tag_1 = await factory.createTag("test-tag-1", user);
-    //     const tag_2 = await factory.createTag("test-tag-2", user);
-    //     const tag_3 = await factory.createTag("test-tag-3", user);
-    //     const thing = await factory.createThing("test-thing-1", user, [tag_1, tag_2]);
-    //     const modification = { _id:"new-test-thing-1",tags: { add: [tag_3._id] } };
-    //     const res = await chai.request(server).keepOpen().put('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user)).send(modification);
-    //     res.should.have.status(200);
-    //     res.body.should.be.a('object');
-    //     res.body.should.have.property('_id');
-    //     res.body._id.should.be.eql("new-test-thing-1");
-    //     res.body.tags.length.should.be.eql(3);
-    // });
+    it('it should PUT a thing _id and add a tag', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const tag_1 = await factory.createTag("test-tag-1", user);
+        const tag_2 = await factory.createTag("test-tag-2", user);
+        const tag_3 = await factory.createTag("test-tag-3", user);
+        const thing = await factory.createThing("test-thing-1", user, [tag_1, tag_2]);
+        const modification = { _id:"new-test-thing-1",tags: { add: [tag_3._id] } };
+        const res = await chai.request(server).keepOpen().put('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user)).send(modification);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body._id.should.be.eql("new-test-thing-1");
+        res.body.tags.length.should.be.eql(3);
+    });
 
     it('it should PUT a thing to remove a tag', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);

@@ -115,10 +115,11 @@ exports.delete = async function(id, model) {
 
 exports.update = async function(body, fields, resource, model, tenant) {
     for (let field in body) if(!fields.includes(field)) throw 'Request field cannot be updated (' + field + ')';
+    let old_id = null;
     for (let field of fields) {
         if (typeof body[field] != 'object' && body[field]) { 
             if(field == 'password') if(tenant.passwordhash == true) body[field] = bcrypt.hashSync(body[field], 8);
-            if(field =='_id') continue; // TBD
+            if(field == '_id') old_id =  resource[field];
             resource[field] = body[field]; continue; 
         }
         if (typeof body[field] == 'object' && body[field]) {
@@ -141,7 +142,7 @@ exports.update = async function(body, fields, resource, model, tenant) {
                 if (result == true) break;
                 else if (result) throw result;
 
-                // Array of embedded resources
+                 // Array of embedded resources
                 if((body[field].add    && body[field].add.length>0 && typeof body[field].add[0]    == 'object') ||
                    (body[field].remove && body[field].remove.length>0) ||
                    (body[field].update && body[field].update.length>0 && typeof body[field].update[0] == 'object'))
@@ -166,12 +167,12 @@ exports.update = async function(body, fields, resource, model, tenant) {
     } 
     resource.lastmod = Date.now();
 
-    await resource.save();
+    if(old_id) {
+        resource.isNew = true;
+        await model.findOneAndDelete({ _id: old_id });
+    }
+    resource = await resource.save();
     return resource;
-    //const modified_resource = await model.findOne({_id: resource._id});
-    
-    //const modified_resource = await model.findOneAndUpdate({_id: resource._id}, resource, { new: true });
-    //return modified_resource;
 }
 
 exports.deletemore = async function(filter, restriction, model) {  

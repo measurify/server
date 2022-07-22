@@ -230,34 +230,33 @@ describe('/PUT protocol', () => {
         res.body.details.should.contain('fake-type');
     });
 
-    // TBD
-    //it('it should PUT a protocol _id', async () => {
-    //   const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-    //    const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-    //    const request = { _id: "new-test-protocol-1" };
-    //    const res = await chai.request(server).keepOpen().put('/v1/protocols/' + protocol._id).set("Authorization", await factory.getUserToken(user)).send(request);
-    //    res.should.have.status(200);
-    //    res.body.should.be.a('object');
-    //    res.body.should.have.property('_id');
-    //    res.body._id.should.be.eql("new-test-protocol-1");
-    //});
+    it('it should PUT a protocol _id', async () => {
+      const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+       const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
+       const request = { _id: "new-test-protocol-1" };
+       const res = await chai.request(server).keepOpen().put('/v1/protocols/' + protocol._id).set("Authorization", await factory.getUserToken(user)).send(request);
+       res.should.have.status(200);
+       res.body.should.be.a('object');
+       res.body.should.have.property('_id');
+       res.body._id.should.be.eql("new-test-protocol-1");
+    });
     
-    //it('it should PUT a protocol _id and change list of tags', async () => {
-    //    const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);        
-    //    const tag_1 = await factory.createTag("test-tag-1", user, [], VisibilityTypes.public);
-    //    const tag_2 = await factory.createTag("test-tag-2", user, [], VisibilityTypes.public);
-    //    const tag_3 = await factory.createTag("test-tag-3", user, [], VisibilityTypes.public);
-    //    const tag_4 = await factory.createTag("test-tag-4", user, [], VisibilityTypes.public);
-    //    const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user, [], [], ['test-tag-1', 'test-tag-2']);
-    //    const request = { _id:"new-test-protocol-1",tags: { add: ['test-tag-3', 'test-tag-4'], remove: ['test-tag-1'] } };
-    //    const res = await chai.request(server).keepOpen().put('/v1/protocols/' + protocol._id).set("Authorization", await factory.getUserToken(user)).send(request);
-    //    res.should.have.status(200);
-    //    res.body.should.be.a('object');
-    //    res.body.should.have.property('_id');
-    //    res.body._id.should.be.eql("new-test-protocol-1");
-    //    res.body.should.have.property('tags');
-    //    res.body.tags.length.should.be.eql(3);
-    //});
+    it('it should PUT a protocol _id and change list of tags', async () => {
+       const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);        
+       const tag_1 = await factory.createTag("test-tag-1", user, [], VisibilityTypes.public);
+       const tag_2 = await factory.createTag("test-tag-2", user, [], VisibilityTypes.public);
+       const tag_3 = await factory.createTag("test-tag-3", user, [], VisibilityTypes.public);
+       const tag_4 = await factory.createTag("test-tag-4", user, [], VisibilityTypes.public);
+       const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user, [], [], ['test-tag-1', 'test-tag-2']);
+       const request = { _id:"new-test-protocol-1",tags: { add: ['test-tag-3', 'test-tag-4'], remove: ['test-tag-1'] } };
+       const res = await chai.request(server).keepOpen().put('/v1/protocols/' + protocol._id).set("Authorization", await factory.getUserToken(user)).send(request);
+       res.should.have.status(200);
+       res.body.should.be.a('object');
+       res.body.should.have.property('_id');
+       res.body._id.should.be.eql("new-test-protocol-1");
+       res.body.should.have.property('tags');
+       res.body.tags.length.should.be.eql(3);
+    });
 
     it('it should not PUT a protocol owner', async () => {
         const user_1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);

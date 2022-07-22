@@ -241,16 +241,16 @@ describe('/DELETE tenant', () => {
 
 // Test the /PUT route
 describe('/PUT tenant', () => {    
-    // it('it should PUT a tenant _id', async () => {
-    //     const tenant = await factory.createTenant("test-tenant-300", "organization-test-1", "test street", "test@email", "433232", "test", "test");
-    //     const modification = { _id:"new-test-tenant-300" };
-    //     const res = await
-    //     chai.request(server).keepOpen().put('/v1/tenants/' + tenant._id).set("Authorization", process.env.API_TOKEN).send(modification);
-    //     res.should.have.status(200);
-    //     res.body.should.be.a('object');
-    //     res.body.should.have.property('_id');
-    //     res.body._id.should.be.eql("new-test-tenant-300");
-    // });
+    it('it should PUT a tenant _id', async () => {
+        const tenant = await factory.createTenant("test-tenant-300", "organization-test-1", "test street", "test@email", "433232", "test", "test");
+        const modification = { _id:"new-test-tenant-300" };
+        const res = await
+        chai.request(server).keepOpen().put('/v1/tenants/' + tenant._id).set("Authorization", process.env.API_TOKEN).send(modification);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body._id.should.be.eql("new-test-tenant-300");
+    });
 
     it('it should PUT a tenant to change organization', async () => {
         const tenant = await factory.createTenant("test-tenant-300", "organization-test-1", "test street", "test@email", "433232", "test", "test");
@@ -262,17 +262,17 @@ describe('/PUT tenant', () => {
         res.body.organization.should.be.eql("organization-test-2");
     });
 
-    // it('it should PUT a tenant _id and change organization', async () => {
-    //     const tenant = await factory.createTenant("test-tenant-300", "organization-test-1", "test street", "test@email", "433232", "test", "test");
-    //     const modification = { _id:"new-test-tenant", organization: "organization-test-2"};
-    //     const res = await chai.request(server).keepOpen().put('/v1/tenants/' + tenant._id).set("Authorization", process.env.API_TOKEN).send(modification);
-    //     res.should.have.status(200);
-    //     res.body.should.be.a('object');
-    //     res.body.should.have.property('_id');
-    //     res.body._id.should.be.eql("new-test-tenant");
-    //     res.body.should.have.property('organization');
-    //     res.body.organization.should.be.eql("organization-test-2");
-    // });
+    it('it should PUT a tenant _id and change organization', async () => {
+        const tenant = await factory.createTenant("test-tenant-300", "organization-test-1", "test street", "test@email", "433232", "test", "test");
+        const modification = { _id:"new-test-tenant", organization: "organization-test-2"};
+        const res = await chai.request(server).keepOpen().put('/v1/tenants/' + tenant._id).set("Authorization", process.env.API_TOKEN).send(modification);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body._id.should.be.eql("new-test-tenant");
+        res.body.should.have.property('organization');
+        res.body.organization.should.be.eql("organization-test-2");
+    });
 
 
     it('it should PUT a tenant to change address', async () => {
