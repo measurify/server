@@ -418,7 +418,7 @@ describe('/PUT feature', () => {
         res.body.message.should.contain(errors.put_request_error.message);
         res.body.details.should.contain('Embedded resource to be updates from list not found: item-name-wrong');     
     });
-/*
+
     it('it should NOT PUT with a wrong key', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const items= [
@@ -439,7 +439,6 @@ describe('/PUT feature', () => {
         res.body.message.should.contain(errors.put_request_error.message);
         res.body.details.should.contain('Cannot manage the field (items)');     
     });
-*/
 });
 
 // Test the /DELETE route

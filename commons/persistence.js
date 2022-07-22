@@ -157,11 +157,11 @@ exports.update = async function(body, fields, resource, model, tenant) {
                 // Array of categorical data
                 let field_type = null;
                 const field_type_name = field[0].toUpperCase() + field.slice(1) + "Types";
-                try { field_type = require('../types/' + field_type_name + '.js'); } catch(err) { continue; };
+                try { field_type = require('../types/' + field_type_name + '.js'); } catch(err) { };
                 if (field_type) result = await modifyCategoricalValueList(body[field], field_type, resource, field);
                 if (result == true) break;
                 else if (result) throw result;
-            
+
                 // Other lists? TBD
                 throw 'Cannot manage the field (' + field + ')';
                 break;
