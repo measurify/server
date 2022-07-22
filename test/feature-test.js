@@ -418,6 +418,28 @@ describe('/PUT feature', () => {
         res.body.message.should.contain(errors.put_request_error.message);
         res.body.details.should.contain('Embedded resource to be updates from list not found: item-name-wrong');     
     });
+/*
+    it('it should NOT PUT with a wrong key', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const items= [
+            { name: "item-name-1", unit: "item-unit-1", dimension:0, type:"number" },
+            { name: "item-name-2", unit: "item-unit-2" },
+            { name: "item-name-3", unit: "item-unit-3" }
+        ]
+        const feature = await factory.createFeature("test-feature-1", user,items);
+        const request ={
+            "items":{
+                 "addd" : [ { "name": "item-name-1-new", "unit": "item-unit-1-new", "type": "text","dimension":0} ]
+             }             
+         };
+        const res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(errors.put_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.put_request_error.message);
+        res.body.details.should.contain('Cannot manage the field (items)');     
+    });
+*/
 });
 
 // Test the /DELETE route
