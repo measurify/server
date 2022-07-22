@@ -42,12 +42,16 @@ exports.post = async (req, res) => {
 };
 
 exports.put = async (req, res) => {
+    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
+    const Device = mongoose.dbs[req.tenant.database].model('Device');
     const Feature = mongoose.dbs[req.tenant.database].model('Feature');
-    const fields = ['tags', '_id','items'];
+    const fields = ['tags', '_id', 'items'];
     let result = await checker.isAvailable(req, res, Feature); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.canModify(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Feature); if (result != true) return result;
+    if (req.body._id) result = await checker.isNotUsed(req, res, Measurement, 'feature'); if (result != true) return result;
+    if (req.body._id) result = await checker.isNotUsed(req, res, Device, 'features'); if (result != true) return result;
     return await controller.updateResource(req, res, fields, Feature);
 };
 

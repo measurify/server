@@ -269,6 +269,20 @@ describe('/PUT thing', () => {
         res.body._id.should.be.eql("new-test-thing-1");
     });
 
+    it('it should not PUT a thing _id used in a measurement', async () => {      
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature-2", user);
+        const tag = await factory.createTag("test-tag", user);
+        const device = await factory.createDevice("test-device-2", user, [feature]);
+        const thing = await factory.createThing("test-thing-2", user);
+        const measurement = await factory.createMeasurement(user, feature, device, thing, [tag]);
+        const request = { _id:"new-test-thing-2" };
+        const res = await chai.request(server).keepOpen().put('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(errors.already_used.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.already_used.message);
+    });
+
     it('it should PUT a thing to add a tag', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag_1 = await factory.createTag("test-tag-1", user);

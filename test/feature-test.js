@@ -161,8 +161,7 @@ describe('/POST feature from file', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag1 = await factory.createTag("tag1", user);
         const tag2 = await factory.createTag("tag2", user);
-        const testFile = './test/test/feature_test.csv';
-        
+        const testFile = './test/test/feature_test.csv';        
         
         const res = await chai.request(server).keepOpen().post('/v1/features/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -247,6 +246,32 @@ describe('/PUT feature', () => {
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
         res.body._id.should.be.eql("new-test-feature-1");
+    });
+
+    it('it should not PUT a feature _id used in a measurement', async () => {      
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature-1", user);
+        const tag = await factory.createTag("test-tag", user);
+        const device = await factory.createDevice("test-device-1", user, [feature]);
+        const thing = await factory.createThing("test-thing-1", user);
+        const measurement = await factory.createMeasurement(user, feature, device, thing, [tag]);
+        const request = { _id:"new-test-feature-1" };
+        const res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(errors.already_used.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.already_used.message);
+    });
+
+    it('it should not PUT a feature _id used in a device', async () => {      
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature-2", user);
+        const tag = await factory.createTag("test-tag", user);
+        const device = await factory.createDevice("test-device-2", user, [feature]);        
+        const request = { _id:"new-test-device-2" };
+        const res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(errors.already_used.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.already_used.message);
     });
 
     it('it should PUT a feature _id and change list of tags', async () => {
@@ -351,7 +376,7 @@ describe('/PUT feature', () => {
         res.body.items[1].dimension.should.be.eql(1);
         res.body.items[1].type.should.be.eql('number');      
     });
-    /*
+    
     it('it should NOT PUT duplicated items name of feature', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const items= [
@@ -360,17 +385,18 @@ describe('/PUT feature', () => {
             { name: "item-name-3", unit: "item-unit-3" }
         ]
         const feature = await factory.createFeature("test-feature-1", user,items);
-        const request = { 
-            "name": "item-name-2"
-        };
-        const res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id+'/items/'+ "item-name-1").set("Authorization", await factory.getUserToken(user)).send(request);
+        const request = {
+            "items":{
+                 "update" : [ { "name": "item-name-1", "new": { "name": "item-name-2", "unit": "item-unit-1-new", "type": "text","dimension":0} } ]
+             }             
+         };
+        const res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user)).send(request);
         res.should.have.status(errors.put_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.put_request_error.message);
-        res.body.details.should.contain('Items includes already item-name-2');
-    });
-    */
+        res.body.details.should.be.eql('ValidationError: items: Feature validation failed: items name duplicated (item-name-2)');
+    });    
 
     it('it should NOT PUT a wrong item', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);

@@ -41,6 +41,10 @@ exports.post = async (req, res) => {
 };
 
 exports.put = async (req, res) => { 
+    const Device = mongoose.dbs[req.tenant.database].model('Device');
+    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
+    const Feature = mongoose.dbs[req.tenant.database].model('Feature');
+    const Thing = mongoose.dbs[req.tenant.database].model('Thing');
     const Tag = mongoose.dbs[req.tenant.database].model('Tag');
     const fields = ['_id','visibility', 'tags', 'description'];
     let result = await checker.isAvailable(req, res, Tag); if (result != true) return result;
@@ -48,6 +52,11 @@ exports.put = async (req, res) => {
     result = await checker.canModify(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Tag); if (result != true) return result;
     result = await checker.isValid(req, res, VisibilityTypes, 'visibility'); if (result != true) return result;
+    if(req.body._id)result = await checker.isNotUsed(req, res, Device, 'tags'); if (result != true) return result;
+    if(req.body._id)result = await checker.isNotUsed(req, res, Measurement, 'tags'); if (result != true) return result;
+    if(req.body._id)result = await checker.isNotUsed(req, res, Feature, 'tags'); if (result != true) return result;
+    if(req.body._id)result = await checker.isNotUsed(req, res, Thing, 'tags'); if (result != true) return result;
+    if(req.body._id)result = await checker.isNotUsed(req, res, Tag, 'tags'); if (result != true) return result;
     return await controller.updateResource(req, res, fields, Tag);
 };
 

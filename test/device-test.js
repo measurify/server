@@ -332,7 +332,7 @@ describe('/PUT device', () => {
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
         res.body._id.should.be.eql("new-test-device-1");
-    });
+    });    
 
     it('it should not PUT a device _id used in a measurement', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
@@ -346,6 +346,23 @@ describe('/PUT device', () => {
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
+    });
+
+    it('it should not PUT a device _id with an _id used', async () => {      
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature-1", user);
+        const device1 = await factory.createDevice("test-device-1", user, [feature]);
+        const device2 = await factory.createDevice("test-device-2", user, [feature]);
+        const devices_before = await before.Device.find();
+        devices_before.length.should.be.eql(2);
+        const request = { _id:"test-device-2" };
+        const res = await chai.request(server).keepOpen().put('/v1/devices/' + device1._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(errors.put_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.put_request_error.message);
+        res.body.details.should.contain("MongoError: E11000 duplicate key error collection");
+        const devices_after = await before.Device.find();
+        devices_after.length.should.be.eql(2);
     });
 
     it('it should PUT a device visibility', async () => {

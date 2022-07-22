@@ -204,6 +204,18 @@ describe('/PUT script', () => {
         res.body._id.should.be.eql("new-test-script-1");
     });
 
+    it('it should not PUT a script _id used in a device', async () => {      
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const script = await factory.createScript("test-script-1", user, "test-code-1", []);
+        const feature = await factory.createFeature("test-feature-1", user);        
+        const device = await factory.createDevice("test-device-1", user, [feature],[],[script]);
+        const request = { _id:"new-test-script-1" };
+        const res = await chai.request(server).keepOpen().put('/v1/scripts/' + script._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        res.should.have.status(errors.already_used.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.already_used.message);
+    });
+
     it('it should PUT a script to modify code', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const script = await factory.createScript("test-script-1", user, "test-code-1", []);
