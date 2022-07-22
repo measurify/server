@@ -63,7 +63,8 @@ rightSchema.pre('save', async function() {
 });
 
 // check if already have a similar right (idempotent)
-rightSchema.pre('save', async function() {
+rightSchema.pre('save', async function(next, opts, callback) {
+    if(opts.update) return;
     const res = await this.constructor.findOne( { type: this.type,
                                                   resource: this.resource,
                                                   user: this.user });                                            

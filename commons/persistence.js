@@ -3,6 +3,7 @@ const broker = require('../commons/broker.js');
 const tenancy = require('../commons/tenancy.js');
 const factory = require('../commons/factory.js');
 const bcrypt = require('bcryptjs');
+const { getResourceDataset } = require('../controllers/controller.js');
 
 exports.get = async function(id, field, model, select) {
     try {
@@ -114,12 +115,15 @@ exports.delete = async function(id, model) {
 }
 
 exports.update = async function(body, fields, resource, model, tenant) {
+
     for (let field in body) if(!fields.includes(field)) throw 'Request field cannot be updated (' + field + ')';
+    
     let old_id = null;
+    if(body._id) old_id = resource._id;
+    
     for (let field of fields) {
         if (typeof body[field] != 'object' && body[field]) { 
             if(field == 'password') if(tenant.passwordhash == true) body[field] = bcrypt.hashSync(body[field], 8);
-            if(field == '_id') old_id =  resource[field];
             resource[field] = body[field]; continue; 
         }
         if (typeof body[field] == 'object' && body[field]) {
@@ -166,12 +170,11 @@ exports.update = async function(body, fields, resource, model, tenant) {
         }
     } 
     resource.lastmod = Date.now();
+    
+    if(old_id) resource.isNew = true;
+    resource = await resource.save({update: true});
+    if(old_id) await model.findOneAndDelete({ _id: old_id });
 
-    if(old_id) {
-        resource.isNew = true;
-        await model.findOneAndDelete({ _id: old_id });
-    }
-    resource = await resource.save();
     return resource;
 }
 
