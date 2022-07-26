@@ -163,3 +163,13 @@ exports.readJustOwned = async function(req, res) {
 exports.whatCanDelete = async function(req, res) {
     return authorizator.whatCanDelete(req.user);
 } 
+exports.changeUsernameWithId = async function(req,list) {
+    const User = mongoose.dbs[req.tenant.database].model('User');
+    return await Promise.all(list.map(async function (e) {
+        if (!mongoose.Types.ObjectId.isValid(e)) {
+            const user = await User.findOne({ username: e });
+            if (user) return user._id;
+        }
+        return e;
+    }))
+}
