@@ -168,7 +168,7 @@ exports.changeUsernameWithId = async function(req,list) {
     return await Promise.all(list.map(async function (e) {
         if (!mongoose.Types.ObjectId.isValid(e)) {
             const user = await User.findOne({ username: e });
-            if (user) return user._id;
+            if (user) return user._id.toString();
         }
         return e;
     }))

@@ -2,6 +2,7 @@ const errors = require("./errors.js");
 const busboy = require("connect-busboy");
 const { catchErrors } = require("./errorHandlers.js");
 const mongoose = require("mongoose");
+const checker = require('../controllers/checker.js');
 
 exports.dataExtractor = async function (req, res, next, modelName) {
     if (!req.busboy) return errors.manage(res, errors.empty_file, "not found any data");
@@ -19,11 +20,17 @@ exports.dataExtractor = async function (req, res, next, modelName) {
             });
         }
     });
-    req.busboy.on("finish", () => {
+    req.busboy.on("finish",async () => {
         if (fileData == "") return errors.manage(res, errors.empty_file, "file data not found");
         if (!errorOccurred) {
             let [body, err] = readFile(req, fileData, modelName);
             if (!body) return errors.manage(res, errors.wrong_header, err);
+            if (modelName === "Group") {
+                body = await  Promise.all(body.map(async function (e) {
+                    if (e.users) e.users=await  checker.changeUsernameWithId(req, e.users);
+                    return e;
+                }))
+            }
             req.body = body;
             let controllerName = modelName.toLowerCase();
             const controller = require('../controllers/' + controllerName + 'Controller');
@@ -101,7 +108,7 @@ const createRequestObject = function (owner, header, data, schema, modelName) {/
                         if (supportObj[subKey[0]].length == 0 && stringData.length > 0) {//first time
                             for (let i in stringData) { supportObj[subKey[0]].push({}); }
                         }
-                        for (let k in stringData) {if (stringData[k]) supportObj[subKey[0]][k][subKey[1]] = stringData[k];}
+                        for (let k in stringData) { if (stringData[k]) supportObj[subKey[0]][k][subKey[1]] = stringData[k]; }
                     }
                     else {//the subpath is not an array
                         let subKey = key.split(".");
@@ -114,7 +121,7 @@ const createRequestObject = function (owner, header, data, schema, modelName) {/
         }
         if (Object.keys(supportObj).length > 0) {
             for (let k of Object.keys(supportObj)) {
-                if (Array.isArray(supportObj[k])) { for (let j in supportObj[k]) {result[k].push(supportObj[k][j]);} }
+                if (Array.isArray(supportObj[k])) { for (let j in supportObj[k]) { result[k].push(supportObj[k][j]); } }
                 else result[k].push(supportObj[k]);
             }
             supportObj = {};

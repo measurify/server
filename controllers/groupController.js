@@ -55,8 +55,8 @@ exports.put = async (req, res) => {
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.canModify(req, res); if (result != true) return result;
     result = await checker.hasRights(req, res, Group); if (result != true) return result;
-    if (req.body.users.add)req.body.users.add = await checker.changeUsernameWithId(req,req.body.users.add);  
-    if (req.body.users.remove)req.body.users.remove = await checker.changeUsernameWithId(req,req.body.users.remove);  
+    if (req.body.users&&req.body.users.add)req.body.users.add = await checker.changeUsernameWithId(req,req.body.users.add);  
+    if (req.body.users&&req.body.users.remove)req.body.users.remove = await checker.changeUsernameWithId(req,req.body.users.remove);  
     return await controller.updateResource(req, res, fields, Group);
 };
 
