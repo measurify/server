@@ -17,38 +17,16 @@ const sampleSchema = new mongoose.Schema(
 const measurementSchema = new mongoose.Schema({
   _id: { type: String, required: "Please, supply an _id" },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  location: {
-    type: mongoose.SchemaTypes.GeoJSON,
-    required: false,
-    index: "2dsphere",
-  },
+  location: { type: mongoose.SchemaTypes.GeoJSON, required: false, index: "2dsphere"},
   startDate: { type: Date, default: Date.now },
   endDate: { type: Date, default: Date.now },
-  thing: {
-    type: String,
-    required: "Please, supply a thing",
-    ref: "Thing",
-    index: true,
-  },
-  device: {
-    type: String,
-    required: "Please, supply a device",
-    ref: "Device",
-    index: true,
-  },
-  feature: {
-    type: String,
-    required: "Please, supply a feature",
-    ref: "Feature",
-    index: true,
-  },
+  thing: { type: String, required: "Please, supply a thing", ref: "Thing", index: true },
+  device: { type: String, required: "Please, supply a device", ref: "Device", index: true },
+  feature: { type: String, required: "Please, supply a feature", ref: "Feature", index: true },
+  experiment: { type: String, ref: "Experiment", index: true },
   script: { type: String, ref: "Script", index: true },
   samples: [sampleSchema],
-  visibility: {
-    type: String,
-    enum: VisibilityTypes,
-    default: VisibilityTypes.private,
-  },
+  visibility: { type: String, enum: VisibilityTypes, default: VisibilityTypes.private },
   tags: { type: [String], ref: "Tag" },
   timestamp: { type: Date, default: Date.now },
   lastmod: { type: Date, default: Date.now, select: false },
@@ -94,6 +72,19 @@ measurementSchema.path("thing").validate({
     const thing = await Thing.findById(value);
     if (!thing) throw new Error("Thing not existent (" + value + ")");
     cache.set(value+"_thing", thing);
+    return true;
+  },
+});
+
+// validate experiment
+measurementSchema.path("experiment").validate({
+  validator: async function (value) {
+    if(!value) return true;
+    if (cache.get(value+"_experiment")) return true;
+    const Experiment = this.constructor.model("Experiment");
+    const experiment = await Experiment.findById(value);
+    if (!experiment) throw new Error("Experiment not existent (" + value + ")");
+    cache.set(value+"_experiment", experiment);
     return true;
   },
 });

@@ -1,5 +1,7 @@
 const ItemTypes = require('../types/itemTypes.js');
 const ComputationCodeTypes = require('../types/computationCodeTypes.js');
+const MetadataTypes = require('../types/metadataTypes.js');
+const TopicFieldTypes = require('../types/TopicFieldTypes.js');
 
 const authorizator = require('../security/authorization.js');
 
@@ -59,3 +61,37 @@ exports.hasValues =  function(sample) {
     if (!sample.values || sample.values.length == 0) return false;
     return true;
 }
+
+exports.checkMetadata =  function(metadata, protocol) {
+    const protocol_metadata = protocol.metadata.find(element => { if (element.name === metadata.name) return true; } );
+    if(!protocol_metadata) return "metadata " + metadata.name + " not found in protocol";
+    if (metadata.value.length > 1 && protocol_metadata.type == MetadataTypes.vector) return true;
+    if (metadata.value.length == 1 && typeof metadata.value[0] == "string" && protocol_metadata.type == MetadataTypes.text) return true;
+    if (metadata.value.length == 1 && typeof metadata.value[0] == "number" && protocol_metadata.type == MetadataTypes.scalar) return true;
+
+    return 'metadata value ' + metadata.value + ' is not coherent with protocol type: ' + protocol_metadata.type;
+}
+
+exports.checkHistory =  function(history_element, protocol) {
+    const protocol_fields = [];
+    for (let topic of protocol.topics) protocol_fields.push(...topic.fields)
+    for (let field of history_element.fields) {
+        console.log
+        const protocol_field = protocol_fields.find(element => { if (element.name === field.name) return true; } );
+        if(!protocol_field) return "history field " + field.name + " not found in protocol";
+
+        let coherent = false
+
+        if (field.value.length > 1) {
+            if (protocol_field.type == TopicFieldTypes.vector) coherent = true;
+        }
+        else {
+            if (typeof field.value[0] == "string" && protocol_field.type == TopicFieldTypes.text) coherent = true;
+            if (typeof field.value[0] == "number" && protocol_field.type == TopicFieldTypes.scalar) coherent = true;
+        }
+        
+        if(coherent == false) return 'history (step: ' + history_element.step + ') value ' + field.value + ' is not coherent with protocol type: ' + protocol_field.type;
+    }
+    return true;
+}
+

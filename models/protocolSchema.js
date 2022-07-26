@@ -15,14 +15,14 @@ const metadataSchema = new mongoose.Schema({
 const fieldSchema = new mongoose.Schema({ 
     name: { type: String, required: "Please, supply a name" },
     description: {type: String},
-    field: { type: String, enum: TopicFieldTypes, default: TopicFieldTypes.scalar }, },
+    type: { type: String, enum: TopicFieldTypes, default: TopicFieldTypes.scalar }, },
     { _id: false }  
 );
 
 const topicSchema = new mongoose.Schema({ 
     name: { type: String, required: "Please, supply a name" },
     description: {type: String},
-    field: [ fieldSchema ], },
+    fields: [ fieldSchema ], },
     { _id: false } 
 );
 
@@ -91,12 +91,5 @@ protocolSchema.path('topics').validate({
         return true;
     }
 });
-
-// validate also on update
-//protocolSchema.pre('findOneAndUpdate', function(next) {
-//    this.options.context = 'query';
-//    this.options.runValidators = true;
-//    next();
-//});
   
 module.exports = protocolSchema;

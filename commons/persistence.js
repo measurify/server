@@ -147,10 +147,13 @@ exports.update = async function(body, fields, resource, model, tenant) {
                 else if (result) throw result;
 
                  // Array of embedded resources
+                if(model.modelName == 'Experiment' && field == 'history') identifier = 'step' 
+                else identifier = 'name';
                 if((body[field].add    && body[field].add.length>0 && typeof body[field].add[0]    == 'object') ||
                    (body[field].remove && body[field].remove.length>0) ||
-                   (body[field].update && body[field].update.length>0 && typeof body[field].update[0] == 'object'))
-                   result = await modifyEmbeddedResourceList(body[field], resource, field);
+                   (body[field].update && body[field].update.length>0 && typeof body[field].update[0] == 'object')){
+                   result = await modifyEmbeddedResourceList(body[field], resource, field, identifier);
+                   }
                 if (result == true) break;
                 else if (result) throw result;
 
@@ -236,19 +239,20 @@ const modifyCategoricalValueList = async function(list, type, resource, field) {
     return true;
 }
 
-const modifyEmbeddedResourceList = async function(list, resource, field) {
+const modifyEmbeddedResourceList = async function(list, resource, field, identifier) {
+    if(!identifier) identifier = 'name'
     if(list.remove) {
-        for (let value of list.remove) { if (!resource[field].some(element => element.name === value)) throw 'Embedded resource to be removed from list not found: ' + value; };
-        resource[field] = resource[field].filter(value => !list.remove.includes(value.name));
+        for (let value of list.remove) { if (!resource[field].some(element => element[identifier] === value)) throw 'Embedded resource to be removed from list not found: ' + value; };
+        resource[field] = resource[field].filter(value => !list.remove.includes(value[identifier]));
     }
     if(list.add) {
-        for (let value of list.add) { if (resource[field].some(element => element.name === value.name))  throw 'Embedded resource already exist: ' + value.name; };
+        for (let value of list.add) { if (resource[field].some(element => element[identifier] === value[identifier]))  throw 'Embedded resource already exist: ' + value[identifier]; };
         resource[field].push(...list.add);
     }
     if(list.update) {
-        for (let value of list.update) { if (!resource[field].some(element => element.name === value.name )) throw 'Embedded resource to be updates from list not found: ' + value.name; };
+        for (let value of list.update) { if (!resource[field].some(element => element[identifier] === value[identifier] )) throw 'Embedded resource to be updates from list not found: ' + value[identifier]; };
         resource[field] = resource[field].map( value =>  {
-            if (new_value = list.update.find(element => element.name == value.name)) 
+            if (new_value = list.update.find(element => element[identifier] == value[identifier]))
                 return new_value.new
             return value; 
         });

@@ -43,20 +43,22 @@ exports.post = async (req, res) => {
 
 exports.put = async (req, res) => {
     const Protocol = mongoose.dbs[req.tenant.database].model('Protocol');
+    const Experiment = mongoose.dbs[req.tenant.database].model('Experiment');
     const fields = ['_id', 'description', 'metadata', 'topics', 'tags'];
     let result = await checker.isAvailable(req, res, Protocol); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.canModify(req, res); if (result != true) return result;
+    result = await checker.isNotUsed(req, res, Experiment, 'protocol'); if (result != true) return result;
     result = await checker.hasRights(req, res, Protocol); if (result != true) return result;
     return await controller.updateResource(req, res, fields, Protocol);
 };
 
 exports.delete = async (req, res) => {
     const Protocol = mongoose.dbs[req.tenant.database].model('Protocol');
-    //const Experiment = mongoose.dbs[req.tenant.database].model('Experiment');
+    const Experiment = mongoose.dbs[req.tenant.database].model('Experiment');
     let result = await checker.isAvailable(req, res, Protocol); if (result != true) return result;
     result = await checker.isOwned(req, res); if (result != true) return result;
-    //result = await checker.isNotUsed(req, res, Experiment, 'protocol'); if (result != true) return result;
+    result = await checker.isNotUsed(req, res, Experiment, 'protocol'); if (result != true) return result;
     result = await checker.hasRights(req, res, Protocol); if (result != true) return result;
     return await controller.deleteResource(req, res, Protocol);
 };

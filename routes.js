@@ -80,6 +80,10 @@ router.use('/' + process.env.VERSION + '/features', passport.authenticate('jwt-t
 const protocolsRoute = require('./routes/protocolRoute');
 router.use('/' + process.env.VERSION + '/protocols', passport.authenticate('jwt-token', {session: false}), protocolsRoute);
 
+// experiment
+const experimentsRoute = require('./routes/experimentRoute');
+router.use('/' + process.env.VERSION + '/experiments', passport.authenticate('jwt-token', {session: false}), experimentsRoute);
+
 // dataset
 const datasetsRoute = require('./routes/datasetRoute');
 router.use('/' + process.env.VERSION + '/datasets', passport.authenticate('jwt-token', {session: false}), datasetsRoute);

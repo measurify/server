@@ -8,13 +8,15 @@ const jwt = require("jsonwebtoken");
 const ItemTypes = require("../types/itemTypes.js");
 const ComputationStatusTypes = require("../types/computationStatusTypes.js");
 const PasswordResetStatusTypes = require("../types/passwordResetStatusTypes.js");
+const ExperimentStateTypes = require("../types/experimentStateTypes.js");
+const TopicFieldTypes = require('../types/topicFieldTypes.js');
 const IssueTypes = require("../types/issueTypes.js");
 const VisibilityTypes = require("../types/visibilityTypes.js");
 const bcrypt = require("bcryptjs");
 const UserStatusTypes = require("../types/userStatusTypes");
 const IssueStatusTypes = require("../types/issueStatusTypes");
 const MetadataTypes = require('../types/metadataTypes.js');
-const TopicFieldTypes = require('../types/topicFieldTypes.js');
+const { index } = require("mathjs");
 
 function sha(content) {
   return crypto.createHash("sha256").update(content).digest("hex");
@@ -208,6 +210,60 @@ exports.createProtocol = async function (name, description, owner, metadata, top
   const protocol = new Protocol(req);
   await protocol.save();
   return protocol._doc;
+};
+
+exports.createExperimentMetadata = async function (protocol) {
+  const metadata = [];
+  for (let protocol_metadata of protocol.metadata) {
+    value = this.random(100);
+    if(protocol_metadata.type === MetadataTypes.vector) value = [this.random(100), this.random(100), this.random(100)];
+    if(protocol_metadata.type === MetadataTypes.text) value = "random_text_" + this.uuid();     
+    experiment_metadata = { name: protocol_metadata.name, value: value }
+    metadata.push(experiment_metadata);
+  }
+  return metadata;
+}
+
+exports.createExperimentHistory = async function (protocol, steps, start) {
+  if(!start) start = 0;
+  const history = [];
+  for(let step=0; step<steps; step++) {
+    const protocol_fields = [];
+    for (let protocol_topic of protocol.topics) protocol_fields.push(...protocol_topic.fields)
+    fields = [];
+    for (let field of protocol_fields) {
+      value = this.random(100);
+      if(field.type === TopicFieldTypes.vector) value = [this.random(100), this.random(100), this.random(100)];
+      if(field.type === TopicFieldTypes.text) value = "random_text_" + this.uuid(); 
+      fields.push({name: field.name, value: value})
+    }
+    history.push({ step: step+start, timestamp: Date.now(), fields: fields })     
+  }
+  return history;
+}
+
+exports.createExperiment = async function (name, description, owner, anonymization, state, startDate, endDate, location, protocol, metadata, history, tags, visibility, tenant) {
+  const Tenant = mongoose.dbs["catalog"].model("Tenant");
+  if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
+  const Experiment = mongoose.dbs[tenant.database].model("Experiment");
+  const req = {
+    _id: name,
+    description: description,
+    anonymization: anonymization || true,
+    state: state || ExperimentStateTypes.ongoing,
+    startDate: startDate || Date.now(),
+    endDate: endDate || Date.now(),
+    owner: owner,
+    location: location || { type: "Point", coordinates: [12.123456, 13.1345678] },
+    protocol: protocol,
+    metadata: metadata || await this.createExperimentMetadata(protocol),
+    history: history || await this.createExperimentHistory(protocol, 3),
+    tags: tags,
+    visibility: visibility,
+  };
+  const experiment = new Experiment(req);
+  await experiment.save();
+  return experiment._doc;
 };
 
 exports.createDevice = async function (name, owner, features, tags, scripts, visibility, tenant ) {
@@ -445,6 +501,7 @@ exports.createMeasurement = async function (
   enddate,
   location,
   visibility,
+  experiment,
   tenant
 ) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
@@ -465,6 +522,7 @@ exports.createMeasurement = async function (
     samples: samples || [{ values: [10.4], delta: 200 }],
     tags: tags,
     visibility: visibility,
+    experiment: experiment
   };
   const id = sha(JSON.stringify(req));
   req._id = id;

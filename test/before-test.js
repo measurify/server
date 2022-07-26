@@ -29,6 +29,7 @@ exports.Constraint = null;
 exports.PasswordReset = null;
 exports.Tenant = null;
 exports.Protocol = null;
+exports.Experiment = null;
 
 before(async () => { 
     // Init Database
@@ -55,6 +56,7 @@ before(async () => {
     this.Constraint = mongoose.dbs[process.env.DEFAULT_TENANT_DATABASE].model('Constraint');
     this.PasswordReset = mongoose.dbs[process.env.DEFAULT_TENANT_DATABASE].model('PasswordReset');
     this.Protocol = mongoose.dbs[process.env.DEFAULT_TENANT_DATABASE].model('Protocol');
+    this.Experiment = mongoose.dbs[process.env.DEFAULT_TENANT_DATABASE].model('Experiment');
     this.Tenant = mongoose.dbs['catalog'].model('Tenant');
 });
 
