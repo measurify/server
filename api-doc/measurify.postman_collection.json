@@ -2370,6 +2370,58 @@
 					"response": []
 				},
 				{
+					"name": "POST a new protocol",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"protocol\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"_id\": \"protocol name\",\n    \"description\": \"protocol description\",\n    \"metadata\": [\n        { \"name\": \"metadata-name-1\", \"description\": \"description metadata 1\", \"type\": \"scalar\"},\n        { \"name\": \"metadata-name-2\", \"description\": \"description metadata 2\", \"type\": \"text\"},\n        { \"name\": \"metadata-name-3\", \"description\": \"description metadata 3\", \"type\": \"scalar\"},\n        { \"name\": \"metadata-name-4\", \"description\": \"description metadata 4\", \"type\": \"vector\"}\n    ],\n    \"topics\": [\n        {\n            \"name\": \"topic name 1\",\n            \"description\": \"topic description 1\",\n            \"fields\": [\n                { \"name\": \"field-1\", \"description\": \"field description 1\", \"type\": \"scalar\"},\n                { \"name\": \"field-2\", \"description\": \"field description 2\", \"type\": \"text\"},\n                { \"name\": \"field-3\", \"description\": \"field description 3\", \"type\": \"vector\"}\n            ]\n        },\n        {\n            \"name\": \"topic name 2\",\n            \"description\": \"topic description 2\",\n            \"fields\": [\n                { \"name\": \"field-4\", \"description\": \"field description 4\", \"type\": \"scalar\"},\n                { \"name\": \"field-5\", \"description\": \"field description 5\", \"type\": \"text\"},\n                { \"name\": \"field-6\", \"description\": \"field description 6\", \"type\": \"vector\"}\n            ]\n        }\n    ] \n}\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/protocols",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"protocols"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "GET one protocol",
 					"request": {
 						"method": "GET",
@@ -2395,58 +2447,6 @@
 					"response": []
 				},
 				{
-					"name": "POST a new protocol",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.environment.set(\"feature\", JSON.parse(responseBody)._id);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "{{token}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"protocol name\",\n    \"description\": \"protocol description\",\n    \"metadata\": [\n        { \"name\": \"metadata-name-1\", \"description\": \"description metadata 1\", \"type\": \"scalar\"},\n        { \"name\": \"metadata-name-2\", \"description\": \"description metadata 2\", \"type\": \"text\"},\n        { \"name\": \"metadata-name-3\", \"description\": \"description metadata 3\", \"type\": \"scalar\"},\n        { \"name\": \"metadata-name-4\", \"description\": \"description metadata 4\", \"type\": \"vector\"}\n    ],\n    \"topics\": [\n        {\n            \"name\": \"topic name 1\",\n            \"description\": \"topic description 1\",\n            \"fields\": [\n                { \"name\": \"field-1\", \"description\": \"field description 1\", \"type\": \"scalar\"},\n                { \"name\": \"field-2\", \"description\": \"field description 2\", \"type\": \"text\"},\n                { \"name\": \"field-3\", \"description\": \"field description 3\", \"type\": \"vector\"}\n            ]\n        },\n        {\n            \"name\": \"topic name 2\",\n            \"description\": \"topic description 2\",\n            \"fields\": [\n                { \"name\": \"field-4\", \"description\": \"field description 4\", \"type\": \"scalar\"},\n                { \"name\": \"field-5\", \"description\": \"field description 5\", \"type\": \"text\"},\n                { \"name\": \"field-6\", \"description\": \"field description 6\", \"type\": \"vector\"}\n            ]\n        }\n    ] \n}\n"
-						},
-						"url": {
-							"raw": "{{url}}/v1/protocols",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"protocols"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "PUT a protocol",
 					"event": [
 						{
@@ -2462,14 +2462,14 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.environment.set(\"feature\", JSON.parse(responseBody)._id);"
+									""
 								],
 								"type": "text/javascript"
 							}
 						}
 					],
 					"request": {
-						"method": "POST",
+						"method": "PUT",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -2483,7 +2483,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"_id\": \"position\",\n    \"items\": [\n    \t{\n        \t\"name\": \"longitude\",\n            \"unit\": \"degree\",\n            \"type\": \"number\",\n            \"dimension\": 0\n        },\n        {\n        \t\"name\": \"latitude\",\n            \"unit\": \"degree\",\n            \"type\": \"number\",\n            \"dimension\": 0\n        }\n    ]\n}\n"
+							"raw": "{\n    \"metadata\": {\n\t    \"remove\": [ \"metadata-name-2\" ]\n    }\n}\n"
 						},
 						"url": {
 							"raw": "{{url}}/v1/protocols/{{protocol}}",
@@ -2523,6 +2523,373 @@
 								"v1",
 								"protocols",
 								"{{protocol}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "EXPERIMENTS",
+			"item": [
+				{
+					"name": "LOGIN as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET all experiments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"if(data.docs) pm.environment.set('protocol', data.docs[0]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/experiments",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"experiments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new protocol",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"protocol\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"_id\": \"protocol name\",\n    \"description\": \"protocol description\",\n    \"metadata\": [\n        { \"name\": \"metadata-name-1\", \"description\": \"description metadata 1\", \"type\": \"scalar\"},\n        { \"name\": \"metadata-name-2\", \"description\": \"description metadata 2\", \"type\": \"text\"},\n        { \"name\": \"metadata-name-3\", \"description\": \"description metadata 3\", \"type\": \"scalar\"},\n        { \"name\": \"metadata-name-4\", \"description\": \"description metadata 4\", \"type\": \"vector\"}\n    ],\n    \"topics\": [\n        {\n            \"name\": \"topic name 1\",\n            \"description\": \"topic description 1\",\n            \"fields\": [\n                { \"name\": \"field-1\", \"description\": \"field description 1\", \"type\": \"scalar\"},\n                { \"name\": \"field-2\", \"description\": \"field description 2\", \"type\": \"text\"},\n                { \"name\": \"field-3\", \"description\": \"field description 3\", \"type\": \"vector\"}\n            ]\n        },\n        {\n            \"name\": \"topic name 2\",\n            \"description\": \"topic description 2\",\n            \"fields\": [\n                { \"name\": \"field-4\", \"description\": \"field description 4\", \"type\": \"scalar\"},\n                { \"name\": \"field-5\", \"description\": \"field description 5\", \"type\": \"text\"},\n                { \"name\": \"field-6\", \"description\": \"field description 6\", \"type\": \"vector\"}\n            ]\n        }\n    ] \n}\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/protocols",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"protocols"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new experiment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"experiment\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"_id\": \"experiment id\",\n    \"description\": \"experiment description\",\n    \"anonymization\": true,\n    \"state\": \"completed\",\n    \"startDate\": \"2022-05-30T07:15:17.396Z\",\n    \"endDate\": \"2022-09-15T18:15:17.396Z\",\n    \"protocol\": \"{{protocol}}\",\n    \"metadata\": [\n        { \"name\": \"metadata-name-1\", \"value\": 10 },\n        { \"name\": \"metadata-name-2\", \"value\": \"value 2\" },\n        { \"name\": \"metadata-name-3\", \"value\": 55 },\n        { \"name\": \"metadata-name-4\", \"value\": [34, 25, 45] }\n    ],\n    \"history\": [\n        {\n            \"step\": 1,\n            \"timestamp\": \"2022-09-15T18:15:17.396Z\",\n            \"fields\": [\n                { \"name\": \"field-1\", \"value\": 55 },\n                { \"name\": \"field-2\", \"value\": \"text value\" },\n                { \"name\": \"field-3\", \"value\": [21, 32, 432] },\n                { \"name\": \"field-4\", \"value\": 13 },\n                { \"name\": \"field-5\", \"value\": \"another text value\" },\n                { \"name\": \"field-6\", \"value\": [324, 432, 432]  }\n            ]\n        },\n        {\n            \"step\": 2,\n            \"timestamp\": \"2022-12-15T18:15:17.396Z\",\n            \"fields\": [\n                { \"name\": \"field-1\", \"value\": 65 },\n                { \"name\": \"field-2\", \"value\": \"text value 2\" },\n                { \"name\": \"field-3\", \"value\": [3, 56] },\n                { \"name\": \"field-4\", \"value\": 33 },\n                { \"name\": \"field-5\", \"value\": \"another text value 2\" },\n                { \"name\": \"field-6\", \"value\": [543, 534, 5656]  }\n            ]\n        }\n    ]\n}\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/experiments",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"experiments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ADD an history element",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"history\": {\n\t    \"add\": [ { \"step\": 3,\n                   \"timestamp\": \"2022-09-15T18:15:17.396Z\",\n                   \"fields\": [\n                        { \"name\": \"field-1\", \"value\": 55 },\n                        { \"name\": \"field-2\", \"value\": \"text value\" },\n                        { \"name\": \"field-3\", \"value\": [21, 32, 432] },\n                        { \"name\": \"field-4\", \"value\": 13 },\n                        { \"name\": \"field-5\", \"value\": \"another text value\" },\n                        { \"name\": \"field-6\", \"value\": [324, 432, 432]  }\n                    ]\n                  } \n                ]\n    }\n}\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/experiments/{{experiment}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"experiments",
+								"{{experiment}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT to modify an experiment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"state\": \"on going\",\n    \"metadata\": {\n\t    \"update\": [ { \"name\": \"metadata-name-1\", \"new\": { \"name\": \"metadata-name-1\", \"value\": 12 } } ]\n    },\n    \"history\": {\n\t    \"update\": [ { \"step\": 2, \"new\": { \"step\": 2, \"timestamp\": \"2022-12-15T18:15:17.396Z\", \"fields\": [ { \"name\": \"field-1\", \"value\": 128 },\n                                                                                                          { \"name\": \"field-2\", \"value\": \"new 1\" },\n                                                                                                          { \"name\": \"field-3\", \"value\": [3, 56] },\n                                                                                                          { \"name\": \"field-4\", \"value\": 33 },\n                                                                                                          { \"name\": \"field-5\", \"value\": \"new 2\" },\n                                                                                                          { \"name\": \"field-6\", \"value\": [5, 2, 1]}]\n                                        } \n                    } ]\n    }\n}\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/experiments/{{experiment}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"experiments",
+								"{{experiment}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET one experiment",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/experiments/{{experiment}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"experiments",
+								"{{experiment}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE an experiment (only if not used)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/v1/experiments/{{experiment}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"experiments",
+								"{{experiment}}"
 							]
 						}
 					},
