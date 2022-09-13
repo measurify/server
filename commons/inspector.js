@@ -95,3 +95,30 @@ exports.checkHistory =  function(history_element, protocol) {
     return true;
 }
 
+exports.checkHeader = function(schema,header){
+    let requiredFields = [];
+    let optionalFields = [];
+    for (let key in schema.paths) {
+        //owner taken from request user id
+        if (schema.paths[key].isRequired && key != "owner") requiredFields.push(key);
+        else optionalFields.push(key);
+    }
+    if (schema.subpaths) {
+        for (let key in schema.subpaths) {
+            if (schema.subpaths[key].isRequired) requiredFields.push(key);
+            else optionalFields.push(key);
+        }
+    }
+    if (!requiredFields.every(ai => header.includes(ai))) {
+        let missing = [];
+        for (val of requiredFields) { if (!header.includes(val)) { missing.push(val); } }
+        return  "Missing some required fields: needed " + missing + " in the header " + header;
+    }
+    if (!header.every(el => requiredFields.includes(el) || optionalFields.includes(el))) {
+        let unrecognized = [];
+        for (val of header) { if (!requiredFields.includes(val) && !optionalFields.includes(val)) { unrecognized.push(val); } }
+        return  "Some optional element not recognized:  " + unrecognized + " .  Required elements are " + requiredFields + ", optional are " + optionalFields;
+    }
+    return true;
+}
+
