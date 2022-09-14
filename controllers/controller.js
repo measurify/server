@@ -1,10 +1,7 @@
-
 const mongoose = require('mongoose');
 const persistence = require('../commons/persistence.js');
 const errors = require('../commons/errors.js');
-const { isArray, forEach, isObject } = require('underscore');
-const bodyParser = require('body-parser');
-const express = require('express');
+const conversion = require('../commons/conversion.js');
 
 exports.getResource = async function (req, res, field, model, select) {
     try {
@@ -57,7 +54,7 @@ exports.getResourceDataset = async function (req, res, sort, select, model) {
                     let columnsName = [];
                     item.items.forEach(elem => columnsName.push(elem.name));
                     let tocsvresult = '';
-                    tocsvresult = jsonToCSVPlus(list, columnsName);
+                    tocsvresult = conversion.jsonToCSVPlus(list, columnsName);
                     return res.status(200).send(tocsvresult);
                 }
                 else { req.headers.accept = 'text/csv' }
@@ -71,7 +68,7 @@ exports.getResourceDataset = async function (req, res, sort, select, model) {
 
             res.header('Content-Type', 'text/csv');
             let csvresultlibrary = '';
-            csvresultlibrary = jsonToCSV(list);
+            csvresultlibrary = conversion.jsonToCSV(list);
             return res.status(200).send(csvresultlibrary);
         }
         //else no accept headers parameters or else
@@ -83,7 +80,6 @@ exports.getResourceDataset = async function (req, res, sort, select, model) {
         else return errors.manage(res, errors.get_request_error, err);
     }
 };
-
 
 exports.getResourcePipe = function (req, res, sort, select, model, restriction) {
     try {
@@ -101,79 +97,12 @@ exports.getResourceList = async function (req, res, sort, select, model, restric
         let list = await persistence.getList(query.filter, query.sort, select, query.page, query.limit, restriction, model);
         if (req.headers.accept == 'text/csv') {
             res.header('Content-Type', 'text/csv');
-            csvresultlibrary = jsonToCSV(list);
+            csvresultlibrary = conversion.jsonToCSV(list);
             return res.status(200).json(csvresultlibrary);
         }
         else return res.status(200).json(list);
     }
     catch (err) { return errors.manage(res, errors.get_request_error, err); }
-}
-
-const jsonToCSVPlus = function (jsonData, columnsname) {
-    if (!process.env.CSV_DELIMITER) process.env.CSV_DELIMITER = ',';
-    if (!process.env.CSV_VECTOR_START) process.env.CSV_VECTOR_START = '';
-    if (!process.env.CSV_VECTOR_END) process.env.CSV_VECTOR_END = '';
-    if (!process.env.CSV_VECTOR_DELIMITER) process.env.CSV_VECTOR_DELIMITER = ';'
-    jsonData = JSON.stringify(jsonData);
-    const json =
-        typeof jsonData !== "object" ? JSON.parse(jsonData) : jsonData;
-    columnsname = columnsname.map(x => `"${x}"`).join(",");
-
-    let str = process.env.CSV_VECTOR_START +
-        `${Object.keys(json.docs[0])//csv header
-            .map((value) => {
-                if (value == "samples") {
-                    return columnsname;
-                }
-                else return `"${value}"`
-            })
-            .join(process.env.CSV_DELIMITER)}` + process.env.CSV_DELIMITER + "\"deltatime\"" + "\n";
-    currentRow = "\n";//string for samples with more values
-    json.docs.forEach(doc => {//loop for each sample
-        str +=//single sample
-            `${Object.values(doc)//for each field of sample, e.g. visibility,tags ecc
-                .map((value) => {
-                    if (isArray(value))//for array values e.g. tags 
-                    {
-                        if (value.length == 0) {//default empty
-                            currentRow += `"[]"` + process.env.CSV_DELIMITER;
-                            return `"[]"`;
-                        }
-                        if (isObject(value[0])) {
-                            return value.map((x) => {
-                                delta = 0;//inizialization and default = 0
-                                if (x.delta != null) delta = x.delta;  //add as a column                            
-                                // if it's an object containing values:
-                                return x.values.map(x => `"${x}"`).join(process.env.CSV_DELIMITER) + process.env.CSV_DELIMITER + "\"" + delta + "\"";//mappa i valori di values separandoli con una virgola. 
-                            }
-                            ).join(currentRow);
-                        }
-                        else {
-                            currentRow += "[" + value + "]" + process.env.CSV_DELIMITER;
-                            return "[" + value + "]";
-                        }//for tags
-                    }
-                    else {
-                        currentRow += `"${value}"` + process.env.CSV_DELIMITER;
-                        return `"${value}"`
-                    }
-                }).join(process.env.CSV_DELIMITER)}` + "\n";
-        currentRow = "\n";
-    });//if it is a single string field it only add the string to the row
-    str += process.env.CSV_VECTOR_END;
-    return str;
-}
-
-const jsonToCSV = function (jsonData) {
-    if (!process.env.CSV_DELIMITER) process.env.CSV_DELIMITER = ',';
-    jsonData = JSON.stringify(jsonData);
-    const json = typeof jsonData !== "object" ? JSON.parse(jsonData) : jsonData;
-    const { Parser, transforms: { unwind } } = require('json2csv');
-    const fields = ["visibility", "tags", "_id", "startDate", "endDate", "thing", "feature", "device", { label: 'values', value: 'samples.values' }, { label: 'deltatime', value: 'samples.delta', default: 0 }];
-    const transforms = [unwind({ paths: ['samples'] })];
-    const json2csvParser = new Parser({ fields, transforms, delimiter: process.env.CSV_DELIMITER });
-    const csv = json2csvParser.parse(json.docs);
-    return csv;
 }
 
 exports.getResourceListSize = async function (req, res, model, restriction) {
