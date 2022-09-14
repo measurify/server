@@ -19,7 +19,7 @@ const historySchema = new mongoose.Schema({
     { _id: false }  
 );
 
-const citySchema = new mongoose.Schema({ 
+const placeSchema = new mongoose.Schema({ 
     name: { type: String, required: "Please, supply a location name" },
     location: { type: mongoose.SchemaTypes.GeoJSON, required: false, index: "2dsphere"}},
     {_id: false }  
@@ -33,7 +33,7 @@ const experimentSchema = new mongoose.Schema({
     startDate: { type: Date },
     endDate: { type: Date },
     owner: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true },
-    city: [citySchema],
+    place: [placeSchema],
     manager:{ type: String },
     protocol: { type: String, required: "Please, supply a protocol", ref: "Protocol", index: true },
     metadata: [ fieldSchema ],
