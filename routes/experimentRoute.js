@@ -12,5 +12,7 @@ router.post('/', catchErrors(experimentController.post));
 router.post('/file', busboy({ immediate: true }), (req, res, next) => { catchErrors(extractData.dataExtractor(req, res, next, "Experiment")) });
 router.delete('/:id', catchErrors(experimentController.delete));
 router.put('/:id', catchErrors(experimentController.put));
+router.put('/:id/file', busboy({ immediate: true }), (req, res, next) => { catchErrors(extractData.dataExtractor(req, res, next, "Experiment")) });
+
 
 module.exports = router;
