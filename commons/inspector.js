@@ -65,7 +65,7 @@ exports.hasValues = function (sample) {
 exports.checkMetadata = function (metadata, protocol) {
     const protocol_metadata = protocol.metadata.find(element => { if (element.name === metadata.name) return true; });
     if (!protocol_metadata) return "metadata " + metadata.name + " not found in protocol";
-    if (metadata.value.length > 1 && protocol_metadata.type == MetadataTypes.vector) return true;
+    if (Array.isArray(metadata.value) && protocol_metadata.type == MetadataTypes.vector) return true;
     if (metadata.value.length == 1 && typeof metadata.value[0] == "string" && protocol_metadata.type == MetadataTypes.text) return true;
     if (metadata.value.length == 1 && typeof metadata.value[0] == "number" && protocol_metadata.type == MetadataTypes.scalar) return true;
     if (metadata.value.length == 1 && typeof metadata.value[0] == "string" && protocol_metadata.type == MetadataTypes.scalar) {
@@ -73,6 +73,11 @@ exports.checkMetadata = function (metadata, protocol) {
             metadata.value[0] = Number(metadata.value[0]);
             return true;
         }
+    }
+    if (typeof metadata.value[0] == "string" && protocol_metadata.type == MetadataTypes.vector && metadata.value[0].startsWith('[') && metadata.value[0].endsWith(']')) {
+        if (!process.env.CSV_VECTOR_DELIMITER) process.env.CSV_VECTOR_DELIMITER = ';';
+        metadata.value = metadata.value[0].slice(1, -1).split(process.env.CSV_VECTOR_DELIMITER);
+        return true;
     }
     return 'metadata value ' + metadata.value + ' is not coherent with protocol type: ' + protocol_metadata.type;
 }
@@ -96,7 +101,7 @@ exports.checkHistory = function (history_element, protocol) {
             if (typeof field.value[0] == "string" && protocol_field.type == TopicFieldTypes.scalar) {
                 if (!isNaN(field.value[0])) {
                     field.value[0] = Number(field.value[0]);
-                    coherent=true;
+                    coherent = true;
                 }
             }
         }
@@ -116,7 +121,7 @@ exports.checkHeader = function (schema, header) {
     }
     if (schema.subpaths) {
         for (let key in schema.subpaths) {
-            if (schema.subpaths[key].isRequired&&key!="history.step"&&key!="history.fields.name") requiredFields.push(key);
+            if (schema.subpaths[key].isRequired && key != "history.step" && key != "history.fields.name") requiredFields.push(key);
             else optionalFields.push(key);
         }
     }

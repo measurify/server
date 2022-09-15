@@ -219,7 +219,6 @@ describe('/POST dataset', () => {
         const testFile = './test/test/test-file1.txt';
         const testDescription = './test/test/test-description.txt';
         const res = await chai.request(server).keepOpen().post('/v1/datasets').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
-        console.log(res.txt)
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('completed');
