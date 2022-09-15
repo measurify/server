@@ -5,7 +5,7 @@ exports.csv2json = function (owner, header, data, schema, modelName) {//items ov
     let results = [];
     let supportObj = {};
     for (let element of data) {
-        arr = element.split(",");
+        arr = element.split(process.env.CSV_DELIMITER).map(el=>el.replace(/^\s+|\s+$/g, ""));
         if (arr.length > header.length) arr = arr.slice(0, header.length);
         if (Object.keys(result).length > 0 && (header.indexOf("_id") == -1 || arr[header.indexOf("_id")])) {//ended the entity, save it
             results.push(saveResult(modelName, result, owner));

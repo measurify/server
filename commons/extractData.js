@@ -54,14 +54,15 @@ const readFile = function (req, fileData, modelName, transpose) {
     let fileText = {};
     fileText.userId = req.user._id;
     if (transpose) { fileData = transposeCsv(fileData); }
-    fileData = fileData.replace(/\"|\r| /g, "");
+    fileData = fileData.replace(/\"|\r/g, "");
     let data = fileData.split("\n");
     data = data.filter(function (el) {
         return el != "";
     });
     const model = mongoose.dbs[req.tenant.database].model(modelName);
     fileText.schema = model.schema;
-    fileText.header = data[0].split(",");
+    if (!process.env.CSV_DELIMITER) process.env.CSV_DELIMITER = ',';
+    fileText.header = data[0].split(process.env.CSV_DELIMITER).map(el=>el.replace(/^\s+|\s+$/g, ""));
     data.shift();
     fileText.data = data;
     return fileText;
@@ -81,7 +82,7 @@ const addHistory = function (req, res, fileText, modelName) {
     let data = fileText.data;
     for (let element of data) {
         let obj = { "fields": [] };
-        arr = element.split(",");
+        arr = element.split(process.env.CSV_DELIMITER).map(el=>el.replace(/^\s+|\s+$/g, ""));
         for (let el in arr) {
             if (fileText.header[el] === "step"|| fileText.header[el] === "Step" || fileText.header[el] === "timestamp") { obj[fileText.header[el].toLowerCase()] = arr[el] }
             else { if (arr[el]) { obj.fields.push({ "name": fileText.header[el], "value": arr[el] }) } }
