@@ -1,7 +1,7 @@
 import React from "react";
-import { Button } from "../button/button.comp";
+import { Button } from "react-bootstrap";
 import locale from "../../common/locale";
-
+import { languages } from "../../config";
 import "./languageSelector.scss";
 
 export const LanguageSelector = () => {
@@ -9,24 +9,15 @@ export const LanguageSelector = () => {
     localStorage.setItem("diten-language", language);
     window.location.reload();
   }
+
   return (
     <div>
       {locale().language}
       <div>
-        <Button
-          outlined="outlined"
-          color="darkBlue"
-          title="It"
-          onClick={() => setSessionLanguage("it")}
-        >
+        <Button variant="outline-info" onClick={() => setSessionLanguage("it")}>
           Ita
         </Button>
-        <Button
-          outlined="outlined"
-          color="darkBlue"
-          title="En"
-          onClick={() => setSessionLanguage("en")}
-        >
+        <Button variant="outline-info" onClick={() => setSessionLanguage("en")}>
           Eng
         </Button>
       </div>

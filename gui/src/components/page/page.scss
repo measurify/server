@@ -1,4 +1,4 @@
-.app-page {
+.page {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -7,7 +7,7 @@
   min-height: 100vh;
 }
 
-.app-page-header {
+.page-header {
   position: relative;
   padding: 30px;
   //background: rgba(255,255,255,0.4);
@@ -21,17 +21,6 @@
     padding: 15px;
     flex-direction: column;
     text-align: center;
-  }
-
-  .add-item {
-    font-size: 18px;
-    padding: 12px 30px;
-
-    @media screen and (max-width: 800px) {
-      margin-top: 15px;
-      font-size: 14px;
-      padding: 7px 15px;
-    }
   }
 
   hgroup {
@@ -60,22 +49,24 @@
   }
 }
 
-.app-page-content {
+.page-content {
   position: relative;
   padding: 30px;
   background: #f1f9fc; // #d5e1e6;
+  width: 100%;
+  height: auto;
 
   .pagination-state {
     margin: 20px 0;
   }
 
   @media screen and (max-width: 800px) {
-    .app-loader,
-    .app-error {
+    .page-loader,
+    .page-error {
       position: relative;
     }
 
-    .app-error {
+    .page-error {
       transform: none;
       left: 0;
       top: 0;
@@ -88,8 +79,8 @@ hr {
   border: 2px solid #5d98cf;
 }
 
-.app-error,
-.app-loader {
+.page-error,
+.page-loader {
   position: absolute;
   left: 50%;
   top: 50%;

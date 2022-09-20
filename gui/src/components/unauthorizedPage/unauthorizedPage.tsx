@@ -1,11 +1,9 @@
 import "./unauthorizedPage.scss";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import locale from "../../common/locale";
-import { IAppContext } from "../app.context";
-import { withAppContext } from "../withContext/withContext.comp";
 
-const notAuthPageComp = () => {
+export default function UnauthorizedPage() {
   return (
     <div className="unAuth-page">
       <div className="info-box">
@@ -13,6 +11,4 @@ const notAuthPageComp = () => {
       </div>
     </div>
   );
-};
-
-export const UnauthorizedPage = withAppContext(notAuthPageComp);
+}

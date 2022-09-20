@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import locale from "../../common/locale";
-import { IAppContext } from "../app.context";
-import { withAppContext } from "../withContext/withContext.comp";
 
 import "./notFoundPage.scss";
 
@@ -19,6 +17,7 @@ const notFoundPageComp = () => {
           <a
             href="https://github.com/measurify/server/issues"
             target="_blank"
+            rel="noopener noreferrer"
             title="https://github.com/measurify/server/issues"
           >
             {locale().github_issue_page_hp}
@@ -29,4 +28,4 @@ const notFoundPageComp = () => {
   );
 };
 
-export const NotFoundPage = withAppContext(notFoundPageComp);
+export const NotFoundPage = notFoundPageComp;
