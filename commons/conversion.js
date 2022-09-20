@@ -5,6 +5,7 @@ exports.csv2json = function (owner, header, data, schema, modelName) {//items ov
     let results = [];
     let supportObj = {};
     let subKey=[];
+    let keyMemory={};
     for (let element of data) {
         arr = element.split(process.env.CSV_DELIMITER).map(el => el.replace(/^\s+|\s+$/g, ""));
         if (arr.length > header.length) arr = arr.slice(0, header.length);
@@ -14,6 +15,7 @@ exports.csv2json = function (owner, header, data, schema, modelName) {//items ov
         }
         for (let key of header) {
             if (schema.paths[key]) {//path
+                if(!keyMemory)keyMemory.key=1;
                 if (schema.paths[key].instance == 'Array') {
                     if (!result[key]) result[key] = [];//not found, create it   
                     if (!arr[header.indexOf(key)]) continue;//blank element
@@ -25,6 +27,8 @@ exports.csv2json = function (owner, header, data, schema, modelName) {//items ov
             {
                 if (arr[header.indexOf(key)]) {
                     subKey = key.split(".");
+                    if(!keyMemory[subKey[0]])keyMemory[subKey[0]]=subKey.length;
+                    else{if(keyMemory[subKey[0]]<subKey.length){keyMemory[subKey[0]]=subKey.length}}
                     if (subKey.length == 2) {
                         if (arr[header.indexOf(key)].startsWith("[")) {//Array
                             let stringData = arr[header.indexOf(key)];
@@ -52,11 +56,12 @@ exports.csv2json = function (owner, header, data, schema, modelName) {//items ov
 
                             if (!result[subKey[0]]) result[subKey[0]] = [];//not found, create it
                             if (!result[subKey[0]][subKey[1]]) result[subKey[0]][subKey[1]] = [];//not found, create it
-                            if (!supportObj[subKey[1]]) supportObj[subKey[1]] = [];//not found, create it                        
-                            if (supportObj[subKey[1]].length == 0 && stringData.length > 0) {//first time
-                                for (let i in stringData) { supportObj[subKey[1]].push({}); }
+                            if (!supportObj[subKey[0]]) supportObj[subKey[0]] = [];//not found, create it 
+                            if (!supportObj[subKey[0]][subKey[1]]) supportObj[subKey[0]][subKey[1]] = [];//not found, create it                        
+                            if (supportObj[subKey[0]][subKey[1]].length == 0 && stringData.length > 0) {//first time
+                                for (let i in stringData) { supportObj[subKey[0]][subKey[1]].push({}); }
                             }
-                            for (let k in stringData) { if (stringData[k]) supportObj[subKey[1]][k][subKey[2]] = stringData[k]; }
+                            for (let k in stringData) { if (stringData[k]) supportObj[subKey[0]][subKey[1]][k][subKey[2]] = stringData[k]; }
                         }
                         else {//the subpath is not an array                        
                             if (!result[subKey[0]]) result[subKey[0]] = [];//not found, create it   
@@ -72,7 +77,7 @@ exports.csv2json = function (owner, header, data, schema, modelName) {//items ov
         if (Object.keys(supportObj).length > 0) {
             for (let k of Object.keys(supportObj)) {
                 if (Array.isArray(supportObj[k])) {
-                    if (subKey.length<=2||supportObj[k].name||supportObj[k]._id) {//exist .name, otherwise it's a part of the previous line
+                    if (keyMemory[k]<=2||supportObj[k].name||supportObj[k]._id) {//exist .name, otherwise it's a part of the previous line
                         for (let j in supportObj[k]) { result[k].push(supportObj[k][j]); }
                     }
                     else{
