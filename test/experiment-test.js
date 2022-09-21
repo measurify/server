@@ -776,6 +776,46 @@ describe('/PUT experiment', () => {
         res.body.history.length.should.be.eql(6);
     });
 
+    it('it should PUT NOT change history of a duplicate step without override', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, true, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const history_element_to_add = await factory.createExperimentHistory(protocol, 3, experiment.history.length)
+        request = { history: { add: history_element_to_add } };
+        const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        const history_element_to_add2 = await factory.createExperimentHistory(protocol, 3, experiment.history.length)
+        request = { history: { add: history_element_to_add2 } };
+        const res2 = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user)).send(request);
+
+        res2.should.have.status(200);
+        res2.body.should.be.a('object');
+        res2.body.should.have.property('history');
+        res2.body.history.length.should.be.eql(6);
+        res2.body.history[3].fields[0].value[0].should.be.eql(history_element_to_add[0].fields[0].value);
+        res2.body.history[4].fields[0].value[0].should.be.eql(history_element_to_add[1].fields[0].value);
+        res2.body.history[5].fields[0].value[0].should.be.eql(history_element_to_add[2].fields[0].value);
+    });
+
+    it('it should PUT change history of a duplicate step with override', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, true, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const history_element_to_add = await factory.createExperimentHistory(protocol, 3, experiment.history.length)
+        request = { history: { add: history_element_to_add } };
+        const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user)).send(request);
+        const history_element_to_add2 = await factory.createExperimentHistory(protocol, 3, experiment.history.length)
+        request = { history: { add: history_element_to_add2 } };
+        const res2 = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id+'?override=true').set("Authorization", await factory.getUserToken(user)).send(request);
+
+        res2.should.have.status(200);
+        res2.body.should.be.a('object');
+        res2.body.should.have.property('history');
+        res2.body.history.length.should.be.eql(6);
+        res2.body.history[3].fields[0].value[0].should.be.eql(history_element_to_add2[0].fields[0].value);
+        res2.body.history[4].fields[0].value[0].should.be.eql(history_element_to_add2[1].fields[0].value);
+        res2.body.history[5].fields[0].value[0].should.be.eql(history_element_to_add2[2].fields[0].value);
+    });
+
     it('it should PUT experiment history to update an item', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);

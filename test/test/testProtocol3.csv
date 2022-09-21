@@ -1,0 +1,5 @@
+_id,description,metadata.name,metadata.description,metadata.type,topics.name,topics.description,topics.fields.name,topics.fields.description,topics.fields.type
+Test3,Test3 protocol,metadata1,description metadata1,scalar,topics1,topics1 description,[field1;field5],[field1 description;field5 description],[scalar;scalar]
+,,metadata2,description metadata2,scalar,,,field3,field3 description,scalar
+,,[metadata3;metadata4],[description metadata3;description metadata4],[scalar;scalar],topics2,topics2 description,field2,field2 description,scalar
+,,,,,,,field4,field4 description,scalar
