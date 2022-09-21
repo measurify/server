@@ -114,7 +114,7 @@ exports.delete = async function(id, model) {
     return result;
 }
 
-exports.update = async function(body, fields, resource, model, tenant) {
+exports.update = async function(body, fields, resource, model, tenant, query) {
 
     for (let field in body) if(!fields.includes(field)) throw 'Request field cannot be updated (' + field + ')';
     
@@ -152,7 +152,7 @@ exports.update = async function(body, fields, resource, model, tenant) {
                 if((body[field].add    && body[field].add.length>0 && typeof body[field].add[0]    == 'object') ||
                    (body[field].remove && body[field].remove.length>0) ||
                    (body[field].update && body[field].update.length>0 && typeof body[field].update[0] == 'object')){
-                   result = await modifyEmbeddedResourceList(body[field], resource, field, identifier);
+                   result = await modifyEmbeddedResourceList(body[field], resource, field, identifier,model,query);
                    }
                 if (result == true) break;
                 else if (result) throw result;
@@ -239,15 +239,21 @@ const modifyCategoricalValueList = async function(list, type, resource, field) {
     return true;
 }
 
-const modifyEmbeddedResourceList = async function(list, resource, field, identifier) {
+const modifyEmbeddedResourceList = async function(list, resource, field, identifier,model,query) {
     if(!identifier) identifier = 'name'
     if(list.remove) {
         for (let value of list.remove) { if (!resource[field].some(element => element[identifier] === value)) throw 'Embedded resource to be removed from list not found: ' + value; };
         resource[field] = resource[field].filter(value => !list.remove.includes(value[identifier]));
     }
     if(list.add) {
-        for (let value of list.add) { if (resource[field].some(element => element[identifier] === value[identifier]))  throw 'Embedded resource already exist: ' + value[identifier]; };
-        resource[field].push(...list.add);
+        for (let value of list.add) { if (!resource[field].some(element => element[identifier] === value[identifier]))  resource[field].push(value);
+            else{
+                if(model.modelName == 'Experiment' && field == 'history'&& query.override ==="true"){
+                    resource[field] = resource[field].filter(el => el[identifier]!=value[identifier]);
+                    resource[field].push(value);
+                }
+            }
+        }
     }
     if(list.update) {
         for (let value of list.update) { if (!resource[field].some(element => element[identifier] === value[identifier] )) throw 'Embedded resource to be updates from list not found: ' + value[identifier]; };
