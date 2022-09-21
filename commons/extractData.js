@@ -53,7 +53,7 @@ exports.dataExtractor = async function (req, res, next, modelName) {
 const readFile = function (req, fileData, modelName, transpose) {
     let fileText = {};
     fileText.userId = req.user._id;
-    if (transpose) { fileData = transposeCsv(fileData); }
+    if (transpose) { fileData = exports.transposeCsv(fileData); }
     fileData = fileData.replace(/\"|\r/g, "");
     let data = fileData.split("\n");
     data = data.filter(function (el) {
@@ -68,7 +68,7 @@ const readFile = function (req, fileData, modelName, transpose) {
     return fileText;
 }
 
-const transposeCsv = function (text) {
+exports.transposeCsv = function (text) {
     if (!process.env.CSV_DELIMITER) process.env.CSV_DELIMITER = ',';
     let separator = process.env.CSV_DELIMITER;
     return csvtranspose.transpose(text, separator);

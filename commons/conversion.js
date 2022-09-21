@@ -1,4 +1,5 @@
 const { isArray, forEach, isObject } = require('underscore');
+const extractData = require("./extractData.js");
 
 exports.csv2json = function (owner, header, data, schema, modelName) {//items over more lines
     let result = {};
@@ -179,5 +180,27 @@ exports.jsonToCSV = function (jsonData) {
     const transforms = [unwind({ paths: ['samples'] })];
     const json2csvParser = new Parser({ fields, transforms, delimiter: process.env.CSV_DELIMITER });
     const csv = json2csvParser.parse(json.docs);
+    return csv;
+}
+
+exports.json2CSVHistory = function (jsonHistory,protocol) {
+    if (!process.env.CSV_DELIMITER) process.env.CSV_DELIMITER = ',';  
+    let header=["step"];
+    jsonHistory = JSON.stringify(jsonHistory);
+    jsonHistory = typeof jsonHistory !== "object" ? JSON.parse(jsonHistory) : jsonHistory;
+    protocol = JSON.stringify(protocol.topics);
+    protocol = typeof protocol !== "object" ? JSON.parse(protocol) : protocol;
+    for(value of protocol){for(el of value.fields)header.push(el.name)};
+    let csv=header.join(process.env.CSV_DELIMITER)+" \n ";
+    for(value2 of jsonHistory){
+        let line=[value2.step];
+        for (el2 of header){if(el2!="step"){ 
+            let topic=value2.fields.find(element => element.name==el2);
+            if(topic)line.push(topic.value[0]); else line.push(null);            
+        }}
+        csv+=line.join(process.env.CSV_DELIMITER)+"\n";
+    }
+    csv = extractData.transposeCsv(csv); 
+    csv=csv.replace(/\r|\"/g,"");
     return csv;
 }
