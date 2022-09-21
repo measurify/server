@@ -161,6 +161,70 @@ describe('/POST protocol', () => {
         res.body.protocols[1]._id.should.be.eql(protocols[3]._id);
         res.body.protocols[2]._id.should.be.eql(protocols[4]._id);
     });
+
+    it('it should POST protocol 1 loaded from CSV file', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);                
+        const testFile = './test/test/testProtocol.csv';
+
+        const res = await chai.request(server).keepOpen().post('/v1/protocols/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.protocols[0].should.have.property('_id');
+        res.body.protocols[0].should.have.property('metadata');
+        res.body.protocols[0].should.have.property('topics');
+        res.body.protocols[0].should.have.property('description');        
+        res.body.protocols[0].metadata.length.should.be.eql(2);
+        res.body.protocols[0].topics.length.should.be.eql(2);
+    });
+
+    it('it should POST protocol 2 loaded from CSV file', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);                
+        const testFile = './test/test/testProtocol2.csv';
+
+        const res = await chai.request(server).keepOpen().post('/v1/protocols/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.protocols[0].should.have.property('_id');
+        res.body.protocols[0].should.have.property('metadata');
+        res.body.protocols[0].should.have.property('topics');
+        res.body.protocols[0].should.have.property('description');        
+        res.body.protocols[0].metadata.length.should.be.eql(2);
+        res.body.protocols[0].topics.length.should.be.eql(2);
+    });
+
+    it('it should POST protocol 3 loaded from CSV file', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);                
+        const testFile = './test/test/testProtocol3.csv';
+
+        const res = await chai.request(server).keepOpen().post('/v1/protocols/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.protocols[0].should.have.property('_id');
+        res.body.protocols[0].should.have.property('metadata');
+        res.body.protocols[0].should.have.property('topics');
+        res.body.protocols[0].should.have.property('description');  
+        res.body.protocols[0].metadata.length.should.be.eql(4);
+        res.body.protocols[0].topics.length.should.be.eql(2);
+        res.body.protocols[0].topics[0].fields.length.should.be.eql(3);        
+        res.body.protocols[0].topics[1].fields.length.should.be.eql(2);
+    });
+
+    it('it should POST protocol 4 loaded from CSV file', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);                
+        const testFile = './test/test/testProtocol4.csv';
+
+        const res = await chai.request(server).keepOpen().post('/v1/protocols/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.protocols[0].should.have.property('_id');
+        res.body.protocols[0].should.have.property('metadata');
+        res.body.protocols[0].should.have.property('topics');
+        res.body.protocols[0].should.have.property('description');        
+        res.body.protocols[0].metadata.length.should.be.eql(4);
+        res.body.protocols[0].topics.length.should.be.eql(2);        
+        res.body.protocols[0].topics[0].fields.length.should.be.eql(5);        
+        res.body.protocols[0].topics[1].fields.length.should.be.eql(4);
+    });
 });
 
 // Test the /PUT route
