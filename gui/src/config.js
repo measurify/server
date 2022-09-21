@@ -45,13 +45,7 @@ viewFields["features"] = [
 viewFields["tags"] = ["tags"];
 viewFields["devices"] = ["_id", "features", "tags", "scripts"];
 viewFields["protocols"] = ["_id", "description", "metadata"];
-viewFields["experiments"] = [
-  "_id",
-  "description",
-  "protocol",
-  "history",
-  "metadata",
-];
+viewFields["experiments"] = ["_id", "description", "protocol", "metadata"];
 
 //edit dictionary: key is the page, value array contains the fields that can be edited with "edit" action
 //fields should be specified in the same format of the objet that will be represented:
