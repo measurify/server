@@ -254,7 +254,7 @@ const modifyEmbeddedResourceList = async function (list, resource, field, identi
     }
     if (list.add) {
         for (let value of list.add) {
-            if (!resource[field].some(element => element[identifier] === value[identifier])) { resource[field].push(value); if (report&& field == 'history') report.success.push(value[identifier]); }
+            if (!resource[field].some(element => element[identifier] == value[identifier])) { resource[field].push(value); if (report&& field == 'history') report.success.push(value[identifier]); }
             else {
                 if (model.modelName == 'Experiment' && field == 'history') {
                     if (query.override === "true") {

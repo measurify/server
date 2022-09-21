@@ -32,6 +32,17 @@ exports.getone = async (req, res) => {
     return await controller.getResource(req, res, null, Experiment, select);
 };
 
+exports.gethistory = async (req, res) => {
+    const Experiment = mongoose.dbs[req.tenant.database].model('Experiment');
+    const select = await checker.whatCanSee(req, res, Experiment);
+    let result = await checker.isAvailable(req, res, Experiment); if (result != true) return result;
+    result = await checker.canRead(req, res); if (result != true) return result;
+    result = await checker.hasRights(req, res, Experiment); if (result != true) return result;
+    const item = await persistence.get(req.params.id, null, Experiment, select);
+    if (!item) return errors.manage(res, errors.resource_not_found, req.params.id);
+    //...incompleted json2csvHistory
+};
+
 exports.post = async (req, res) => {
     const Experiment = mongoose.dbs[req.tenant.database].model('Experiment');
     let result = await checker.canCreate(req, res); if (result != true) return result;

@@ -8,6 +8,7 @@ const extractData = require('../commons/extractData.js');
 router.get('/', catchErrors(experimentController.get));
 router.get('/pipe', catchErrors(experimentController.pipe));
 router.get('/:id', catchErrors(experimentController.getone));
+router.get('/:id/history', catchErrors(experimentController.gethistory));
 router.post('/', catchErrors(experimentController.post));
 router.post('/file', busboy({ immediate: true }), (req, res, next) => { catchErrors(extractData.dataExtractor(req, res, next, "Experiment")) });
 router.delete('/:id', catchErrors(experimentController.delete));
