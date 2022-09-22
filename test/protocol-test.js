@@ -162,6 +162,22 @@ describe('/POST protocol', () => {
         res.body.protocols[2]._id.should.be.eql(protocols[4]._id);
     });
 
+    it('it should POST protocol loaded from JSON file', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);                
+        const testFile = './test/test/testProtocol.json';
+
+        const res = await chai.request(server).keepOpen().post('/v1/protocols/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);        
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body.should.have.property('metadata');
+        res.body.should.have.property('topics');
+        res.body.should.have.property('description');        
+        res.body.metadata.length.should.be.eql(2);
+        res.body.topics.length.should.be.eql(2);        
+    });
+
+
     it('it should POST protocol 1 loaded from CSV file', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);                
         const testFile = './test/test/testProtocol.csv';

@@ -12,8 +12,10 @@ exports.dataExtractor = async function (req, res, next, modelName) {
     if (!req.busboy) return errors.manage(res, errors.empty_file, "not found any data");
     let fileData = "";
     let errorOccurred = false;
+    let namefile = null;
     req.busboy.on("file", (fieldName, file, filename) => {
         if (!errorOccurred) {
+            if (!namefile) namefile = filename.filename;
             //if there is some error the function is stopped
             if (fieldName != "file") {
                 errorOccurred = true;
@@ -27,25 +29,33 @@ exports.dataExtractor = async function (req, res, next, modelName) {
     req.busboy.on("finish", async () => {
         if (fileData == "") return errors.manage(res, errors.empty_file, "file data not found");
         if (!errorOccurred) {
-            let transpose = false;
-            if (req.method === 'PUT' && modelName === "Experiment") { transpose = true; }
-            let fileText = readFile(req, fileData, modelName, transpose);
-            if (req.method === 'PUT' && modelName === "Experiment") { return addHistory(req, res, fileText, modelName) }
-            let result = inspector.checkHeader(fileText.schema, fileText.header);
-            if (result !== true) return errors.manage(res, errors.wrong_header, result);
-            let body = conversion.csv2json(fileText.userId, fileText.header, fileText.data, fileText.schema, modelName);
+            if (namefile.toLowerCase().endsWith('.csv')){
+                let transpose = false;
+                if (req.method === 'PUT' && modelName === "Experiment") { transpose = true; }
+                let fileText = readFile(req, fileData, modelName, transpose);
+                if (req.method === 'PUT' && modelName === "Experiment") { return addHistory(req, res, fileText, modelName) }
+                let result = inspector.checkHeader(fileText.schema, fileText.header);
+                if (result !== true) return errors.manage(res, errors.wrong_header, result);
+                let body = conversion.csv2json(fileText.userId, fileText.header, fileText.data, fileText.schema, modelName);
 
-            if (modelName === "Group") {
-                body = await Promise.all(body.map(async function (e) {
-                    if (e.users) e.users = await checker.changeUsernameWithId(req, e.users);
-                    return e;
-                }))
+                if (modelName === "Group") {
+                    body = await Promise.all(body.map(async function (e) {
+                        if (e.users) e.users = await checker.changeUsernameWithId(req, e.users);
+                        return e;
+                    }))
+                }
+
+                req.body = body;
+                let controllerName = modelName.toLowerCase();
+                const controller = require('../controllers/' + controllerName + 'Controller');
+                return controller.post(req, res);
             }
-
-            req.body = body;
-            let controllerName = modelName.toLowerCase();
-            const controller = require('../controllers/' + controllerName + 'Controller');
-            return controller.post(req, res);
+            else{//.txt .JSON ecc
+                try{req.body=JSON.parse(fileData);}catch(error){return errors.manage(res, errors.post_request_error, "data not in JSON. "+error);}                
+                let controllerName = modelName.toLowerCase();
+                const controller = require('../controllers/' + controllerName + 'Controller');
+                return controller.post(req, res);
+            }
         }
     });
 };
@@ -62,7 +72,7 @@ const readFile = function (req, fileData, modelName, transpose) {
     const model = mongoose.dbs[req.tenant.database].model(modelName);
     fileText.schema = model.schema;
     if (!process.env.CSV_DELIMITER) process.env.CSV_DELIMITER = ',';
-    fileText.header = data[0].split(process.env.CSV_DELIMITER).map(el=>el.replace(/^\s+|\s+$/g, ""));
+    fileText.header = data[0].split(process.env.CSV_DELIMITER).map(el => el.replace(/^\s+|\s+$/g, ""));
     data.shift();
     fileText.data = data;
     return fileText;
@@ -75,16 +85,16 @@ exports.transposeCsv = function (text) {
 }
 
 const addHistory = function (req, res, fileText, modelName) {
-    if (!fileText.header.includes("step")&&!fileText.header.includes("Step")) return errors.manage(res, errors.wrong_header, "Needed step row in the csv");
+    if (!fileText.header.includes("step") && !fileText.header.includes("Step")) return errors.manage(res, errors.wrong_header, "Needed step row in the csv");
     let body = {
         "history": { "add": [] }
     }
     let data = fileText.data;
     for (let element of data) {
         let obj = { "fields": [] };
-        arr = element.split(process.env.CSV_DELIMITER).map(el=>el.replace(/^\s+|\s+$/g, ""));
+        arr = element.split(process.env.CSV_DELIMITER).map(el => el.replace(/^\s+|\s+$/g, ""));
         for (let el in arr) {
-            if (fileText.header[el] === "step"|| fileText.header[el] === "Step" || fileText.header[el] === "timestamp") { obj[fileText.header[el].toLowerCase()] = arr[el] }
+            if (fileText.header[el] === "step" || fileText.header[el] === "Step" || fileText.header[el] === "timestamp") { obj[fileText.header[el].toLowerCase()] = arr[el] }
             else { if (arr[el]) { obj.fields.push({ "name": fileText.header[el], "value": arr[el] }) } }
         }
         body.history.add.push(obj);

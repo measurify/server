@@ -1,0 +1,23 @@
+{
+    "_id": "Test1",
+    "description": "Test1 protocol",
+    "metadata": [
+        { "name": "metadata1", "description": "description metadata1", "type": "scalar"},		
+        { "name": "metadata2", "description": "description metadata2", "type": "scalar"}								
+    ],
+    "topics": [	{
+            "name": "topics1",
+            "description": "topics1 description",
+            "fields": [
+                { "name": "field1", "description": "field1 description", "type": "scalar"}
+            ]
+        },
+								{
+            "name": "topics2",
+            "description": "topics2 description",
+            "fields": [
+                { "name": "field2", "description": "field2 description", "type": "scalar"}
+            ]
+        }
+    ] 
+}
