@@ -123,6 +123,7 @@ exports.update = async function (body, fields, resource, model, tenant, query,re
     for (let field in body) if (!fields.includes(field)) throw 'Request field cannot be updated (' + field + ')';
 
     let old_id = null;
+    let report = null;
     if (body._id) old_id = resource._id;
 
     for (let field of fields) {
@@ -157,7 +158,7 @@ exports.update = async function (body, fields, resource, model, tenant, query,re
                     (body[field].remove && body[field].remove.length > 0) ||
                     (body[field].update && body[field].update.length > 0 && typeof body[field].update[0] == 'object')) {
                     [result,report] = await modifyEmbeddedResourceList(body[field], resource, field, identifier, model, query);
-                    if(report)res.report=report;
+                    
                 }
                 if (result == true) break;
                 else if (result) throw result;
@@ -182,7 +183,7 @@ exports.update = async function (body, fields, resource, model, tenant, query,re
     if (old_id) resource.isNew = true;
     resource = await resource.save({ update: true });
     if (old_id) await model.findOneAndDelete({ _id: old_id });
-
+    if(report)resource._doc.report=report;
     return resource;
 }
 

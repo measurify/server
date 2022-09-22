@@ -807,6 +807,8 @@ describe('/PUT experiment', () => {
         res2.body.history[3].fields[0].value[0].should.be.eql(history_element_to_add[0].fields[0].value);
         res2.body.history[4].fields[0].value[0].should.be.eql(history_element_to_add[1].fields[0].value);
         res2.body.history[5].fields[0].value[0].should.be.eql(history_element_to_add[2].fields[0].value);
+        const expectedReport={ success: [], ignored: [3, 4, 5], overridden: [] }
+        res2.body.report.should.be.eql(expectedReport);
     });
 
     it('it should PUT change history of a duplicate step with override', async () => {
@@ -827,6 +829,8 @@ describe('/PUT experiment', () => {
         res2.body.history[3].fields[0].value[0].should.be.eql(history_element_to_add2[0].fields[0].value);
         res2.body.history[4].fields[0].value[0].should.be.eql(history_element_to_add2[1].fields[0].value);
         res2.body.history[5].fields[0].value[0].should.be.eql(history_element_to_add2[2].fields[0].value);
+        const expectedReport={ success: [], ignored: [], overridden: [3, 4, 5] };
+        res2.body.report.should.be.eql(expectedReport);
     });
 
     it('it should PUT experiment history to update an item', async () => {
@@ -1016,6 +1020,8 @@ describe('/PUT CSV file experiment', () => {
         res.body.should.be.a('object');
         res.body.should.have.property('history');
         res.body.history.length.should.be.eql(2);
+        const expectedReport={ success: [ '1', '2' ], ignored: [], overridden: [] }
+        res.body.report.should.be.eql(expectedReport);
     });
 
     it('it should POST and PUT experiment history from csv file', async () => {
@@ -1043,6 +1049,8 @@ describe('/PUT CSV file experiment', () => {
         res2.body.should.have.property('metadata');
         res2.body.metadata.length.should.be.eql(2);
         res2.body.history.length.should.be.eql(2);
+        const expectedReport={ success: [ '1', '2' ], ignored: [], overridden: [] }
+        res2.body.report.should.be.eql(expectedReport);
     });
 });
 
