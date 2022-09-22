@@ -5,8 +5,8 @@ exports.csv2json = function (owner, header, data, schema, modelName) {//items ov
     let result = {};
     let results = [];
     let supportObj = {};
-    let subKey=[];
-    let keyMemory={};
+    let subKey = [];
+    let keyMemory = {};
     for (let element of data) {
         arr = element.split(process.env.CSV_DELIMITER).map(el => el.replace(/^\s+|\s+$/g, ""));
         if (arr.length > header.length) arr = arr.slice(0, header.length);
@@ -16,7 +16,7 @@ exports.csv2json = function (owner, header, data, schema, modelName) {//items ov
         }
         for (let key of header) {
             if (schema.paths[key]) {//path
-                if(!keyMemory)keyMemory.key=1;
+                if (!keyMemory) keyMemory.key = 1;
                 if (schema.paths[key].instance == 'Array') {
                     if (!result[key]) result[key] = [];//not found, create it   
                     if (!arr[header.indexOf(key)]) continue;//blank element
@@ -28,8 +28,8 @@ exports.csv2json = function (owner, header, data, schema, modelName) {//items ov
             {
                 if (arr[header.indexOf(key)]) {
                     subKey = key.split(".");
-                    if(!keyMemory[subKey[0]])keyMemory[subKey[0]]=subKey.length;
-                    else{if(keyMemory[subKey[0]]<subKey.length){keyMemory[subKey[0]]=subKey.length}}
+                    if (!keyMemory[subKey[0]]) keyMemory[subKey[0]] = subKey.length;
+                    else { if (keyMemory[subKey[0]] < subKey.length) { keyMemory[subKey[0]] = subKey.length } }
                     if (subKey.length == 2) {
                         if (arr[header.indexOf(key)].startsWith("[")) {//Array
                             let stringData = arr[header.indexOf(key)];
@@ -78,11 +78,11 @@ exports.csv2json = function (owner, header, data, schema, modelName) {//items ov
         if (Object.keys(supportObj).length > 0) {
             for (let k of Object.keys(supportObj)) {
                 if (Array.isArray(supportObj[k])) {
-                    if (keyMemory[k]<=2||supportObj[k].name||supportObj[k]._id) {//exist .name, otherwise it's a part of the previous line
+                    if (keyMemory[k] <= 2 || supportObj[k].name || supportObj[k]._id) {//exist .name, otherwise it's a part of the previous line
                         for (let j in supportObj[k]) { result[k].push(supportObj[k][j]); }
                     }
-                    else{
-                        for (let j in supportObj[k]) { result[k][result[k].length-1][j].push(...supportObj[k][j]); }
+                    else {
+                        for (let j in supportObj[k]) { result[k][result[k].length - 1][j].push(...supportObj[k][j]); }
                     }
                 }
                 else result[k].push(supportObj[k]);
@@ -183,24 +183,28 @@ exports.jsonToCSV = function (jsonData) {
     return csv;
 }
 
-exports.json2CSVHistory = function (jsonHistory,protocol) {
-    if (!process.env.CSV_DELIMITER) process.env.CSV_DELIMITER = ',';  
-    let header=["step"];
+exports.json2CSVHistory = function (jsonHistory, protocol) {
+    if (!process.env.CSV_DELIMITER) process.env.CSV_DELIMITER = ',';
+    let header = ["step"];
     jsonHistory = JSON.stringify(jsonHistory);
     jsonHistory = typeof jsonHistory !== "object" ? JSON.parse(jsonHistory) : jsonHistory;
     protocol = JSON.stringify(protocol.topics);
     protocol = typeof protocol !== "object" ? JSON.parse(protocol) : protocol;
-    for(value of protocol){for(el of value.fields)header.push(el.name)};
-    let csv=header.join(process.env.CSV_DELIMITER)+" \n ";
-    for(value2 of jsonHistory){
-        let line=[value2.step];
-        for (el2 of header){if(el2!="step"){ 
-            let topic=value2.fields.find(element => element.name==el2);
-            if(topic)line.push(topic.value[0]); else line.push(null);            
-        }}
-        csv+=line.join(process.env.CSV_DELIMITER)+"\n";
+    let topics = {}
+    for (value of protocol) { for (el of value.fields) { header.push(el.name); topics[el.name] = el.type } };
+    let csv = header.join(process.env.CSV_DELIMITER) + " \n ";
+    for (value2 of jsonHistory) {
+        let line = [value2.step];
+        for (el2 of header) {
+            if (el2 != "step") {
+                let topic = value2.fields.find(element => element.name == el2);
+                if(!topic){line.push(null);}
+                else{if (topics.topic == "vector")line.push(topic.value);else line.push(topic.value[0]);}
+            }
+        }
+        csv += line.join(process.env.CSV_DELIMITER) + "\n";
     }
-    csv = extractData.transposeCsv(csv); 
-    csv=csv.replace(/\r|\"/g,"");
+    csv = extractData.transposeCsv(csv);
+    csv = csv.replace(/\r|\"/g, "");
     return csv;
 }
