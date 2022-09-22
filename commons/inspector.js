@@ -86,7 +86,6 @@ exports.checkHistory = function (history_element, protocol) {
     const protocol_fields = [];
     for (let topic of protocol.topics) protocol_fields.push(...topic.fields)
     for (let field of history_element.fields) {
-        console.log
         const protocol_field = protocol_fields.find(element => { if (element.name === field.name) return true; });
         if (!protocol_field) return "history field " + field.name + " not found in protocol";
 

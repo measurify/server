@@ -49,6 +49,19 @@ describe('/GET experiment', () => {
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
     });
+
+    it('it should GET a history of an experiment in csv', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
+        const experiment = await factory.createExperiment("test-experiment", "test-protoco-description", user, true, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const res = await chai.request(server).keepOpen().get('/v1/experiments/' + experiment._id+'/history').set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('string');
+        res.body.should.contain("step,");
+        res.body.should.contain(experiment.history[0].fields[0].name+',');
+        res.body.should.contain(experiment.history[0].fields[1].name+',');
+        res.body.should.contain(experiment.history[0].fields[2].name+',');
+    });
 });
 
 // Test the /POST route
