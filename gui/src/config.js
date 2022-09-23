@@ -1,7 +1,7 @@
 import { isFeatureInUse, alwaysTrue } from "./services/validations";
 
 //url of API to POST/GET the data
-export const api_url = "https://35.158.77.35/v1";
+export const api_url = "https://hi-drive.measurify.org/v1";
 
 //name of this gui, shown to the user
 export const website_name = "Measurify Admin Dashboard";
