@@ -23,8 +23,10 @@ fontawesome.library.add(faEye, faPencilAlt, faCopy);
 
 function ActionContent(props) {
   const toShow = {};
+  console.log({ props });
   viewFields[props.resType].map((k) => {
-    if (k instanceof Object) {
+    console.log(k.constructor === Object);
+    if (k.constructor === Object) {
       Object.keys(k).map((subK) => {
         if (Array.isArray(props.resource[subK])) {
           toShow[subK] = props.resource[subK].map((e) => {
@@ -45,57 +47,84 @@ function ActionContent(props) {
     }
   });
 
+  console.log({ toShow });
   //render accordion with table when field is array of object
+  return UnrollView(toShow);
+}
+
+function UnrollView(item) {
   return (
-    <Accordion
-      defaultActiveKey="0"
-      style={{ width: 15 + "vw", minWidth: 380 + "px" }}
-    >
+    <Accordion defaultActiveKey={0} size="lg">
       {React.Children.toArray(
-        Object.keys(toShow).map((key, index) => {
+        Object.entries(item).map(([key, value], i) => {
           return (
-            <Accordion.Item eventKey={index}>
+            <Accordion.Item eventKey={i}>
               <Accordion.Header>
                 <b>{key}</b>
               </Accordion.Header>
               <Accordion.Body>
-                {toShow[key] !== null ? (
-                  Array.isArray(toShow[key]) ? (
-                    toShow[key][0] instanceof Object ? (
-                      <Table responsive striped bordered hover size="sm">
-                        <thead>
-                          <tr>
+                {value instanceof Object ? (
+                  Array.isArray(value) ? (
+                    value[0] !== undefined ? (
+                      Object.values(value[0]).some(
+                        (e) => e instanceof Object
+                      ) ? (
+                        React.Children.toArray(
+                          value.map((single, i) => {
+                            return (
+                              <Accordion>
+                                <Accordion.Item eventKey="0">
+                                  <Accordion.Header>
+                                    {key} <i>[{i}]</i>
+                                  </Accordion.Header>
+                                  <Accordion.Body>
+                                    {UnrollView(single)}
+                                  </Accordion.Body>
+                                </Accordion.Item>
+                              </Accordion>
+                            );
+                          })
+                        )
+                      ) : value[0] instanceof Object ? (
+                        <Table responsive striped bordered hover size="sm">
+                          <thead>
+                            <tr>
+                              {React.Children.toArray(
+                                Object.keys(value[0]).map((e) => {
+                                  return <th>{e}</th>;
+                                })
+                              )}
+                            </tr>
+                          </thead>
+                          <tbody>
                             {React.Children.toArray(
-                              Object.keys(toShow[key][0]).map((e) => {
-                                return <th>{e}</th>;
+                              value.map((row) => {
+                                return (
+                                  <tr>
+                                    {React.Children.toArray(
+                                      Object.values(row).map((v) => {
+                                        return <td>{v}</td>;
+                                      })
+                                    )}
+                                  </tr>
+                                );
                               })
                             )}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {React.Children.toArray(
-                            toShow[key].map((row, index) => {
-                              return (
-                                <tr>
-                                  {React.Children.toArray(
-                                    Object.values(row).map((v) => {
-                                      return <td>{v}</td>;
-                                    })
-                                  )}
-                                </tr>
-                              );
-                            })
-                          )}
-                        </tbody>
-                      </Table>
+                          </tbody>
+                        </Table>
+                      ) : (
+                        "[ " + value.join(" , ") + " ]"
+                      )
                     ) : (
-                      "[ " + toShow[key].join(" - ") + " ]"
+                      "[ ]"
                     )
                   ) : (
-                    toShow[key]
+                    "AAAA"
                   )
+                ) : value === undefined || value == null ? (
+                  <i>None</i>
                 ) : (
-                  "None"
+                  value
                 )}
               </Accordion.Body>
             </Accordion.Item>
