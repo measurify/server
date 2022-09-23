@@ -105,7 +105,7 @@ exports.checkHistory = function (history_element, protocol) {
             }
         }
 
-        if (coherent == false) return 'history (step: ' + history_element.step + ') value ' + field.value + ' is not coherent with protocol type: ' + protocol_field.type;
+        if (coherent == false) return 'history (step: ' + history_element.step + ') value ' + field.value +' in '+field.name + ' is not coherent with protocol type: ' + protocol_field.type;
     }
     return true;
 }

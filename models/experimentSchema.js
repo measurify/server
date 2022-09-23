@@ -13,7 +13,7 @@ const fieldSchema = new mongoose.Schema({
 );
 
 const historySchema = new mongoose.Schema({ 
-    step: { type: Number, required: "Please, supply a step value" },
+    step: { type: Number, required: "Please, supply a numeric step value" },
     timestamp: { type: Date, default: Date.now },
     fields: [ fieldSchema ] },
     { _id: false }  

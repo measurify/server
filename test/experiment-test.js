@@ -886,7 +886,7 @@ describe('/PUT experiment', () => {
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user)).send(request);
         res.should.have.status(errors.put_request_error.status);
         res.body.should.be.a('object');
-        res.body.details.should.contain('value fake_value is not coherent with protocol type');
+        res.body.details.should.contain('value fake_value in '+history_element_updated[0].fields[0].name+' is not coherent with protocol type');
     });
 
     it('it should PUT a experiment _id', async () => {
