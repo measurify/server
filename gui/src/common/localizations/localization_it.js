@@ -34,7 +34,7 @@ const localization_it = {
   //404
   oh_no: "Oh No!",
   broken_link:
-    "Sembra che tu abbia utilizzato un collegamento non funzionante. Se sei arrivato a questa pagina utilizzando le funzioni dell'interfaccia segnala il bug: un team accuratamente selezionato di studenti universitari proverà a risolvere il problema.",
+    "Sembra che tu abbia utilizzato un collegamento non funzionante.",
 
   ///Azioni
   submit: "Invio",

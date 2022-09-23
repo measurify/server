@@ -34,8 +34,7 @@ const localization_en = {
 
   //404
   oh_no: "Oh No!",
-  broken_link:
-    "It looks like you used a broken link. If you arrived at this page using the interface features report the bug: a carefully selected team of college students will try to fix it.",
+  broken_link: "It looks like you have clicked on a broken link.",
 
   ///Actions
   submit: "Submit",
