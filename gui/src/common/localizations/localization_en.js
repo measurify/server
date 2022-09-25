@@ -24,11 +24,10 @@ const localization_en = {
   //Homepage
   welcome_hp: "Welcome to Measurify dashboard!",
   left_bar_descr_hp:
-    "The left bar contains all the links for the pages you are allowed to navigate to",
+    "The left bar contains the information about your account and links for the pages",
   right_bar_descr_hp:
-    "The right bar contains the information about your account and the expiration of the current session.",
-  session_expire_info_hp:
-    "When this session will expire you will not be logged-out instantly, you will still be able to watch the active page. Each action on this or another page will force your log-out.",
+    'The right bar can be opened clicking on the "notifications" button to show the notifications list.',
+  session_expire_info_hp: "",
   github_page_hp: "Measurify Github page",
   github_issue_page_hp: "Report bugs or issues",
 

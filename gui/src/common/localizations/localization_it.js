@@ -24,10 +24,10 @@ const localization_it = {
   //Homepage
   welcome_hp: "Benvenuto nel pannello di controllo di Measurify!",
   left_bar_descr_hp:
-    "Nella barra a sinistra sono presenti i collegamenti alle pagine per le quali possiedi l'autorizzazione.",
+    "Nella barra a sinistra sono presenti le informazioni relative al tuo account e i collegamenti alle pagine.",
   right_bar_descr_hp:
-    "Nella barra a destra sono presenti le informazioni relative al tuo account e alla scadenza della sessione corrente.",
-  session_expire_info_hp: `Al termine della sessione non sarai espulso automaticamente e potrai continuare a visualizzare la pagina attiva. Ogni azione successiva porterà alla disconnessione.`,
+    'La barra a destra può essere aperta cliccando sul pulsante "Notifiche" per mostrare la lista delle notifiche.',
+  session_expire_info_hp: ``,
   github_page_hp: "Pagina Github di Measurify",
   github_issue_page_hp: "Segnala bug o problemi",
 
