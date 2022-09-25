@@ -189,36 +189,24 @@ const NavigationComp = () => {
             <b>{tenant}</b>
           </h3>
           <h3>
-            {displayTime !== locale().session_expired
-              ? locale().session_expire_in + displayTime
-              : displayTime}
-          </h3>
-          <h3>
-            {locale().keep_logged}
-            {"  "}
-
             {keepLogged === "keep" ? (
-              <i
-                className="fa fa-check"
-                id="logged_icon_check"
-                aria-hidden="true"
-                style={{
-                  width: 10 + "px",
-                  height: 10 + "px",
-                  marginRight: 2 + "px",
-                }}
-              ></i>
+              <React.Fragment>
+                {locale().keep_logged}
+                <i
+                  className="fa fa-check"
+                  id="logged_icon_check"
+                  aria-hidden="true"
+                  style={{
+                    width: 10 + "px",
+                    height: 10 + "px",
+                    marginRight: 2 + "px",
+                  }}
+                ></i>
+              </React.Fragment>
+            ) : displayTime !== locale().session_expired ? (
+              locale().session_expire_in + displayTime
             ) : (
-              <i
-                className="fa fa-times"
-                id="logged_icon_times"
-                aria-hidden="true"
-                style={{
-                  width: 10 + "px",
-                  height: 10 + "px",
-                  marginRight: 2 + "px",
-                }}
-              ></i>
+              displayTime
             )}
           </h3>
         </div>
