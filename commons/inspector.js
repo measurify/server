@@ -76,7 +76,9 @@ exports.checkMetadata = function (metadata, protocol) {
     }
     if (typeof metadata.value[0] == "string" && protocol_metadata.type == MetadataTypes.vector && metadata.value[0].startsWith('[') && metadata.value[0].endsWith(']')) {
         if (!process.env.CSV_VECTOR_DELIMITER) process.env.CSV_VECTOR_DELIMITER = ';';
-        metadata.value = metadata.value[0].slice(1, -1).split(process.env.CSV_VECTOR_DELIMITER);
+        metadata.value = metadata.value[0].slice(1, -1).split(process.env.CSV_VECTOR_DELIMITER).map(function (item) {
+            if (!isNaN(item)) return parseInt(item, 10); else return item;
+        });
         return true;
     }
     return 'metadata value ' + metadata.value + ' is not coherent with protocol type: ' + protocol_metadata.type;
@@ -103,9 +105,16 @@ exports.checkHistory = function (history_element, protocol) {
                     coherent = true;
                 }
             }
+            if (typeof field.value[0] == "string" && protocol_field.type == TopicFieldTypes.vector && field.value[0].startsWith('[') && field.value[0].endsWith(']')) {
+                if (!process.env.CSV_VECTOR_DELIMITER) process.env.CSV_VECTOR_DELIMITER = ';';
+                field.value = field.value[0].slice(1, -1).split(process.env.CSV_VECTOR_DELIMITER).map(function (item) {
+                    if (!isNaN(item)) return parseInt(item, 10); else return item;
+                });
+                coherent = true;
+            }
         }
 
-        if (coherent == false) return 'history (step: ' + history_element.step + ') value ' + field.value +' in '+field.name + ' is not coherent with protocol type: ' + protocol_field.type;
+        if (coherent == false) return 'history (step: ' + history_element.step + ') value ' + field.value + ' in ' + field.name + ' is not coherent with protocol type: ' + protocol_field.type;
     }
     return true;
 }
