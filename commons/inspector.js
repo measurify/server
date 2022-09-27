@@ -1,7 +1,7 @@
 const ItemTypes = require("../types/itemTypes.js");
 const ComputationCodeTypes = require("../types/computationCodeTypes.js");
 const MetadataTypes = require("../types/metadataTypes.js");
-const TopicFieldTypes = require("../types/topicFieldTypes.js");
+const TopicFieldTypes = require("../types/TopicFieldTypes.js");
 
 const authorizator = require("../security/authorization.js");
 
@@ -126,7 +126,6 @@ exports.checkMetadata = function (metadata, protocol) {
       metadata.value[0] = Number(metadata.value[0]);
       return true;
     }
-<<<<<<< HEAD
   }
   if (
     typeof metadata.value[0] == "string" &&
@@ -138,7 +137,11 @@ exports.checkMetadata = function (metadata, protocol) {
       process.env.CSV_VECTOR_DELIMITER = ";";
     metadata.value = metadata.value[0]
       .slice(1, -1)
-      .split(process.env.CSV_VECTOR_DELIMITER);
+      .split(process.env.CSV_VECTOR_DELIMITER)
+      .map(function (item) {
+        if (!isNaN(item)) return parseInt(item, 10);
+        else return item;
+      });
     return true;
   }
   return (
@@ -148,17 +151,6 @@ exports.checkMetadata = function (metadata, protocol) {
     protocol_metadata.type
   );
 };
-=======
-    if (typeof metadata.value[0] == "string" && protocol_metadata.type == MetadataTypes.vector && metadata.value[0].startsWith('[') && metadata.value[0].endsWith(']')) {
-        if (!process.env.CSV_VECTOR_DELIMITER) process.env.CSV_VECTOR_DELIMITER = ';';
-        metadata.value = metadata.value[0].slice(1, -1).split(process.env.CSV_VECTOR_DELIMITER).map(function (item) {
-            if (!isNaN(item)) return parseInt(item, 10); else return item;
-        });
-        return true;
-    }
-    return 'metadata value ' + metadata.value + ' is not coherent with protocol type: ' + protocol_metadata.type;
-}
->>>>>>> master
 
 exports.checkHistory = function (history_element, protocol) {
   const protocol_fields = [];
@@ -193,29 +185,24 @@ exports.checkHistory = function (history_element, protocol) {
           field.value[0] = Number(field.value[0]);
           coherent = true;
         }
-<<<<<<< HEAD
       }
-=======
-        else {
-            if (typeof field.value[0] == "string" && protocol_field.type == TopicFieldTypes.text) coherent = true;
-            if (typeof field.value[0] == "number" && protocol_field.type == TopicFieldTypes.scalar) coherent = true;
-            if (typeof field.value[0] == "string" && protocol_field.type == TopicFieldTypes.scalar) {
-                if (!isNaN(field.value[0])) {
-                    field.value[0] = Number(field.value[0]);
-                    coherent = true;
-                }
-            }
-            if (typeof field.value[0] == "string" && protocol_field.type == TopicFieldTypes.vector && field.value[0].startsWith('[') && field.value[0].endsWith(']')) {
-                if (!process.env.CSV_VECTOR_DELIMITER) process.env.CSV_VECTOR_DELIMITER = ';';
-                field.value = field.value[0].slice(1, -1).split(process.env.CSV_VECTOR_DELIMITER).map(function (item) {
-                    if (!isNaN(item)) return parseInt(item, 10); else return item;
-                });
-                coherent = true;
-            }
-        }
-
-        if (coherent == false) return 'history (step: ' + history_element.step + ') value ' + field.value + ' in ' + field.name + ' is not coherent with protocol type: ' + protocol_field.type;
->>>>>>> master
+      if (
+        typeof field.value[0] == "string" &&
+        protocol_field.type == TopicFieldTypes.vector &&
+        field.value[0].startsWith("[") &&
+        field.value[0].endsWith("]")
+      ) {
+        if (!process.env.CSV_VECTOR_DELIMITER)
+          process.env.CSV_VECTOR_DELIMITER = ";";
+        field.value = field.value[0]
+          .slice(1, -1)
+          .split(process.env.CSV_VECTOR_DELIMITER)
+          .map(function (item) {
+            if (!isNaN(item)) return parseInt(item, 10);
+            else return item;
+          });
+        coherent = true;
+      }
     }
 
     if (coherent == false)
