@@ -14,6 +14,7 @@ export const FormManager = (props) => {
     props.disabledFields === undefined ||
     props.functionalFields === undefined ||
     props.submitFunction === undefined ||
+    props.backFunction === undefined ||
     props.handleChangesCallback === undefined ||
     props.arrayDeleteCallback === undefined
   )
@@ -25,6 +26,7 @@ export const FormManager = (props) => {
     disabledFields: props.disabledFields,
     functionalFields: props.functionalFields,
     submitFunction: props.submitFunction,
+    backFunction: props.backFunction,
     handleChangesCallback: props.handleChangesCallback,
     arrayDeleteCallback: props.arrayDeleteCallback,
   });
@@ -662,7 +664,10 @@ export const FormManager = (props) => {
           )}
       </Container>
       <Button variant="primary" type="submit" key={"submit"}>
-        Submit
+        {locale().submit}
+      </Button>
+      <Button variant="secondary" key={"cancel"} onClick={props.backFunction}>
+        {locale().cancel}
       </Button>
     </Form>
   );

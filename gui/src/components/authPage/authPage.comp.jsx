@@ -86,7 +86,7 @@ const AuthPageComp = () => {
               onChange={handleTenantChange}
             />
           </div>
-          <div className="form-row row">
+          {/* <div className="form-row row">
             <label>{locale().keep_logged}</label>
             <input
               type="checkbox"
@@ -97,7 +97,7 @@ const AuthPageComp = () => {
                 setLogged(e.target.checked);
               }}
             />
-          </div>
+            </div>*/}
           <div className="buttons-wrapper center">
             <Button type="submit" variant="success">
               {locale().submit}

@@ -188,7 +188,7 @@ const NavigationComp = () => {
             {locale().tenant + " "}
             <b>{tenant}</b>
           </h3>
-          <h3>
+          {/*<h3>
             {keepLogged === "keep" ? (
               <React.Fragment>
                 {locale().keep_logged}
@@ -208,7 +208,7 @@ const NavigationComp = () => {
             ) : (
               displayTime
             )}
-          </h3>
+            </h3>*/}
         </div>
 
         <br />

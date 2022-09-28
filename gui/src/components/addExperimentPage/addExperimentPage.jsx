@@ -119,8 +119,6 @@ export default function AddExperimentPage(props) {
         item
       );
     }
-
-    console.log({ tmpVals });
     setValues(tmpVals);
   };
 
@@ -304,6 +302,11 @@ export default function AddExperimentPage(props) {
     }
   };
 
+  const back = (e) => {
+    e.preventDefault();
+    navigate(-1);
+  };
+
   const postFile = async (e) => {
     e.preventDefault();
     let res;
@@ -414,6 +417,7 @@ export default function AddExperimentPage(props) {
                 handleChangesCallback={handleChanges}
                 arrayDeleteCallback={handleDeleteItemArray}
                 submitFunction={postBody}
+                backFunction={back}
               />
 
               <br />

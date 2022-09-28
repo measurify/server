@@ -232,6 +232,11 @@ export default function AddPage(props) {
     return tmp;
   };
 
+  const back = (e) => {
+    e.preventDefault();
+    navigate(-1);
+  };
+
   //post the body for forms
   const postBody = async (e) => {
     e.preventDefault();
@@ -372,6 +377,7 @@ export default function AddPage(props) {
                 handleChangesCallback={handleChanges}
                 arrayDeleteCallback={handleDeleteItemArray}
                 submitFunction={postBody}
+                backFunction={back}
               />
 
               <br />

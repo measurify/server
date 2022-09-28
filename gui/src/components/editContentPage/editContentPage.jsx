@@ -177,6 +177,11 @@ export default function EditContentPage(props) {
     setValues(tmpVals);
   };
 
+  const back = (e) => {
+    e.preventDefault();
+    navigate(-1);
+  };
+
   const handleDeleteItemArray = (path) => {
     let val = cloneDeep(values);
     let tmpPtr = val;
@@ -398,6 +403,7 @@ export default function EditContentPage(props) {
           handleChangesCallback={handleChanges}
           arrayDeleteCallback={handleDeleteItemArray}
           submitFunction={submit}
+          backFunction={back}
         />
         <br />
         <font style={{ marginLeft: 5 + "px" }}>{msg}</font>
