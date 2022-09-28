@@ -11,7 +11,7 @@ const should = chai.should();
 const factory = require('../commons/factory.js');
 const IssueTypes = require('../types/issueTypes.js');
 const IssueStatusTypes = require('../types/issueStatusTypes.js');
-const UserRoles = require('../types/UserRoles.js');
+const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
 const before = require('./before-test.js');

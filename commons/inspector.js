@@ -1,7 +1,7 @@
 const ItemTypes = require('../types/itemTypes.js');
 const ComputationCodeTypes = require('../types/computationCodeTypes.js');
 const MetadataTypes = require('../types/metadataTypes.js');
-const TopicFieldTypes = require('../types/TopicFieldTypes.js');
+const TopicFieldTypes = require('../types/topicFieldTypes.js');
 
 const authorizator = require('../security/authorization.js');
 
