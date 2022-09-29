@@ -7,7 +7,7 @@ const https = require("https");
 const instance = axios.create({
   httpsAgent: new https.Agent({
     ///unsafe, delete in prod
-    rejectUnauthorized: false,
+    //rejectUnauthorized: false,
   }),
 });
 
