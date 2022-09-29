@@ -8,11 +8,19 @@ const database = require("../database.js");
 const server = require("../server.js");
 const mongoose = require("mongoose");
 const should = chai.should();
+<<<<<<< HEAD
 const factory = require("../commons/factory.js");
 const IssueTypes = require("../types/issueTypes.js");
 const IssueStatusTypes = require("../types/issueStatusTypes.js");
 const UserRoles = require("../types/userRoles.js");
 const errors = require("../commons/errors.js");
+=======
+const factory = require('../commons/factory.js');
+const IssueTypes = require('../types/issueTypes.js');
+const IssueStatusTypes = require('../types/issueStatusTypes.js');
+const UserRoles = require('../types/userRoles.js');
+const errors = require('../commons/errors.js');
+>>>>>>> origin/master
 chai.use(chaiHttp);
 const before = require("./before-test.js");
 
