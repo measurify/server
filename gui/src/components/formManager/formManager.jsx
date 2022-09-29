@@ -109,7 +109,7 @@ export const FormManager = (props) => {
         <Col sm={4}>
           <Form.Group className="mb-3">
             <Form.Control
-              type="text"
+              type={key === "password" ? "password" : "text"}
               id={key}
               onChange={(e) => {
                 e.preventDefault();

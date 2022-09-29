@@ -22,13 +22,13 @@ const localization_en = {
   add_tenant: "Add tenant",
 
   //Homepage
-  welcome_hp: "Welcome to Measurify dashboard!",
+  welcome_hp: "Welcome to the Administration dashboard!",
   left_bar_descr_hp:
-    "The left bar contains the information about your account and links for the pages",
+    "The left bar contains the information about your account and  the list of tabs",
   right_bar_descr_hp:
-    'The right bar can be opened clicking on the "notifications" button to show the notifications list.',
+    'The right bar contains the notification bar (Click on "Notifications" to open).',
   session_expire_info_hp: "",
-  github_page_hp: "Measurify Github page",
+  github_page_hp: "",
   github_issue_page_hp: "Report bugs or issues",
 
   //404

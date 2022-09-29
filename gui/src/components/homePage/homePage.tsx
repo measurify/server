@@ -26,16 +26,6 @@ const HomePageComp = () => {
               <br />
               <br />
               <a
-                href="https://github.com/measurify/server/tree/r2.0"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="https://github.com/measurify/server/tree/r2.0"
-              >
-                {locale().github_page_hp}
-              </a>
-              <br />
-              <br />
-              <a
                 href="https://github.com/measurify/server/issues"
                 target="_blank"
                 rel="noopener noreferrer"
