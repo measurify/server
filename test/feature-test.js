@@ -77,6 +77,21 @@ describe('/POST feature', () => {
         res.body.items.length.should.be.eql(3);
     });
 
+    it('it should POST a feature with an enum item ', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = {
+            _id: "feature-name-text",
+            items: [ { name: "item-name-1", unit: "item-unit-1", type: "enum", range:["a", "b"]} ]
+        }
+        const res = await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(feature)
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body.should.have.property('items');
+        res.body._id.should.be.eql(feature._id);
+        res.body.items.length.should.be.eql(1);
+    });
+
     it('it should not POST a feature with already existant _id field', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = { _id: "feature-name-text", owner: user };
@@ -152,6 +167,20 @@ describe('/POST feature', () => {
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('ValidationError: items: Feature validation failed: items name duplicated (item-name-1)');
+    });
+
+    it('it should NOT POST a feature with an enum item without range', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = {
+            _id: "feature-name-text",
+            items: [ { name: "item-name-1", unit: "item-unit-1", type: "enum" } ]
+        }
+        const res = await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(feature)
+        res.should.have.status(errors.post_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.post_request_error.message);
+        res.body.details.should.contain('Feature validation failed: enum item without range');
     });
 });
 

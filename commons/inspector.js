@@ -34,6 +34,12 @@ function areSameTypes(values, feature) {
         if ((isNumber(value) && !shouldBeNumber(feature.items[i])) ||
             (!isNumber(value) && shouldBeNumber(feature.items[i])))
             return 'No match between sample value type and feature items type  (' + value + ' not of type ' + feature.items[i].type + '). Item no. ' + i + ', value: ' + value; // Franz xxx
+        
+        if(feature.items[i].type == ItemTypes.enum) {
+            if(!feature.items[i].range.includes(value)) 
+                return 'No match between sample value type and feature items type  (' + value + ' not in range ' + feature.items[i].range + '). Item no. ' + i + ', value: ' + value;
+            
+        }
     }
     return true;
 }
