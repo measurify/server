@@ -1,14 +1,7 @@
-<<<<<<< HEAD
 const ItemTypes = require("../types/itemTypes.js");
 const ComputationCodeTypes = require("../types/computationCodeTypes.js");
 const MetadataTypes = require("../types/metadataTypes.js");
 const TopicFieldTypes = require("../types/topicFieldTypes.js");
-=======
-const ItemTypes = require('../types/itemTypes.js');
-const ComputationCodeTypes = require('../types/computationCodeTypes.js');
-const MetadataTypes = require('../types/metadataTypes.js');
-const TopicFieldTypes = require('../types/topicFieldTypes.js');
->>>>>>> origin/master
 
 const authorizator = require("../security/authorization.js");
 
@@ -29,7 +22,6 @@ function areSameDimension(value, item) {
 }
 
 function areSameTypes(values, feature) {
-<<<<<<< HEAD
   for (let [i, value] of values.entries()) {
     if (!areSameDimension(value, feature.items[i])) {
       if (!Array.isArray(value)) {
@@ -52,24 +44,6 @@ function areSameTypes(values, feature) {
         feature._id +
         "]"
       ); // Franz xxx
-=======
-    for (let [i, value] of values.entries()) {
-        if (!areSameDimension(value, feature.items[i])) {
-            if (!Array.isArray(value)) { size = 0; }
-            else if (!Array.isArray(value[0])) { size = 1; }
-            else { size = 2; }
-            return 'No match between sample value size and feature items dimension  (' + size + ' != ' + feature.items[i].dimension + '). Item no. ' + i + ', value: ' + value + ' [' + feature._id + ']'; // Franz xxx
-        }
-        if ((isNumber(value) && !shouldBeNumber(feature.items[i])) ||
-            (!isNumber(value) && shouldBeNumber(feature.items[i])))
-            return 'No match between sample value type and feature items type  (' + value + ' not of type ' + feature.items[i].type + '). Item no. ' + i + ', value: ' + value; // Franz xxx
-        
-        if(feature.items[i].type == ItemTypes.enum) {
-            if(!feature.items[i].range.includes(value)) 
-                return 'No match between sample value type and feature items type  (' + value + ' not in range ' + feature.items[i].range + '). Item no. ' + i + ', value: ' + value;
-            
-        }
->>>>>>> origin/master
     }
     if (
       (isNumber(value) && !shouldBeNumber(feature.items[i])) ||
@@ -85,6 +59,20 @@ function areSameTypes(values, feature) {
         ", value: " +
         value
       ); // Franz xxx
+
+    if (feature.items[i].type == ItemTypes.enum) {
+      if (!feature.items[i].range.includes(value))
+        return (
+          "No match between sample value type and feature items type  (" +
+          value +
+          " not in range " +
+          feature.items[i].range +
+          "). Item no. " +
+          i +
+          ", value: " +
+          value
+        );
+    }
   }
   return true;
 }
