@@ -84,9 +84,28 @@ export default function EditContentPage(props) {
       //delete non-requested keys
       const keys = Object.keys(tmpValues);
       const requestedKeys = Object.keys(editFields[resource]);
+      console.log({ keys, requestedKeys });
       for (let i = 0; i < keys.length; i++) {
         if (!requestedKeys.includes(keys[i])) {
           delete tmpValues[keys[i]];
+        } else {
+          if (editFields[resource][keys[i]].constructor === Object) {
+          }
+          //remove undesidered keys for objects inside arrays
+          else if (
+            Array.isArray(editFields[resource][keys[i]]) &&
+            editFields[resource][keys[i]][0].constructor === Object
+          ) {
+            const objKeys = Object.keys(editFields[resource][keys[i]][0]);
+            const valObjKeys = Object.keys(tmpValues[keys[i]][0]);
+            for (let k = 0; k < tmpValues[keys[i]].length; k++) {
+              for (let j = 0; j < valObjKeys.length; j++) {
+                if (!objKeys.includes(valObjKeys[j])) {
+                  delete tmpValues[keys[i]][k][valObjKeys[j]];
+                }
+              }
+            }
+          }
         }
       }
 
