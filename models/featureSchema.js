@@ -8,7 +8,8 @@ const itemSchema = new mongoose.Schema({
     name: { type: String, required: "Please, supply a name" },
     unit: { type: String, required: "Please, supply a unit" },
     dimension: { type: Number, default: 0 },
-    type: { type: String, enum: ItemTypes, default: ItemTypes.number }, },
+    type: { type: String, enum: ItemTypes, default: ItemTypes.number }, 
+    range: [ String ], default:[] },
     { _id: false }  
 );
 
@@ -53,15 +54,14 @@ featureSchema.path('tags').validate({
     }
 });
 
-// validate items name
+// validate items
 featureSchema.path('items').validate({
     validator: async function (values) { 
         let nameItems=[];    
         for(let i=0; i<values.length; i++) {
-            if(nameItems.includes(values[i].name.toLowerCase())){
-                throw new Error('Feature validation failed: items name duplicated (' + values[i].name.toLowerCase() + ')');
-            }
+            if(nameItems.includes(values[i].name.toLowerCase())){ throw new Error('Feature validation failed: items name duplicated (' + values[i].name.toLowerCase() + ')');}
             nameItems.push(values[i].name.toLowerCase());            
+            if( values[i].type == ItemTypes.enum && values[i].range.length == 0 ) { throw new Error('Feature validation failed: enum item without range (' + values[i].name.toLowerCase() + ')'); }
         };
         return true;
     }

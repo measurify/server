@@ -59,6 +59,20 @@ function areSameTypes(values, feature) {
         ", value: " +
         value
       ); // Franz xxx
+
+    if (feature.items[i].type == ItemTypes.enum) {
+      if (!feature.items[i].range.includes(value))
+        return (
+          "No match between sample value type and feature items type  (" +
+          value +
+          " not in range " +
+          feature.items[i].range +
+          "). Item no. " +
+          i +
+          ", value: " +
+          value
+        );
+    }
   }
   return true;
 }

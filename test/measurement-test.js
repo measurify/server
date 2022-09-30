@@ -18,16 +18,8 @@ const before = require("./before-test.js");
 // Test the /GET route
 describe("/GET measurements", () => {
   it("it should not GET a fake measurement", async () => {
-    const user = await factory.createUser(
-      "test-username-1",
-      "test-password-1",
-      UserRoles.provider
-    );
-    const res = await chai
-      .request(server)
-      .keepOpen()
-      .get("/v1/measurements/fake-measurement")
-      .set("Authorization", await factory.getUserToken(user));
+    const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+    const res = await chai.request(server).keepOpen().get("/v1/measurements/fake-measurement").set("Authorization", await factory.getUserToken(user));
     res.should.have.status(errors.resource_not_found.status);
     res.body.should.be.a("object");
     res.body.message.should.contain(errors.resource_not_found.message);
@@ -885,6 +877,33 @@ describe("/POST measurement", () => {
     );
   });
 
+  it("it should not POST a measurement with a enum samples with value out of feature range", async () => {
+    const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin );
+    const items = [ { name: "item-name-1", unit: "item-unit-1", type: ItemTypes.enum, range: ["A", "B"] }];
+    const feature = await factory.createFeature("test-feature-3", user, items);
+    const device = await factory.createDevice("test-device-1", user, [feature]);
+    const thing = await factory.createThing("test-thing-1", user);
+    const measurement = {
+      owner: user,
+      startDate: new Date().toISOString,
+      endDate: new Date().toISOString,
+      position: { type: "Point", coordinates: [12.123456, 13.1345678]},
+      thing: thing._id,
+      device: device._id,
+      feature: feature._id,
+      samples: [ { values: "A", delta: 200 },
+                 { values: "C", delta: 220 }
+      ],
+    };
+    const res = await chai.request(server).keepOpen().post("/v1/measurements").set("Authorization", await factory.getUserToken(user)).send(measurement);
+    res.should.have.status(errors.post_request_error.status);
+    res.body.should.be.a("object");
+    res.body.message.should.be.a("string");
+    res.should.have.status(errors.post_request_error.status);
+    res.body.message.should.contain(errors.post_request_error.message);
+    res.body.details.should.contain("No match between sample value type and feature items type");
+  });
+
   it("it should not POST a measurement with textual samples with a numeric feature", async () => {
     const user = await factory.createUser(
       "test-username-1",
@@ -1048,6 +1067,38 @@ describe("/POST measurement", () => {
       .post("/v1/measurements")
       .set("Authorization", await factory.getUserToken(user))
       .send(measurement);
+    res.should.have.status(200);
+    res.body.should.be.a("object");
+    res.body.should.have.property("_id");
+    res.body.should.have.property("startDate");
+    res.body.should.have.property("thing");
+    res.body.should.have.property("feature");
+    res.body.should.have.property("device");
+    res.body.should.have.property("timestamp");
+    res.body.should.have.property("samples");
+    res.body.thing.should.be.eql(measurement.thing);
+    res.body.feature.should.be.eql(measurement.feature);
+    res.body.device.should.be.eql(measurement.device);
+  });
+
+  it("it should POST a measurement with a enum item", async () => {
+    const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+    const items = [ { name: "item-name-1", unit: "item-unit-1", type: ItemTypes.enum, range: ["A", "B"] } ];
+    const feature = await factory.createFeature("test-feature-3", user, items);
+    const device = await factory.createDevice("test-device-3", user, [feature]);
+    const thing = await factory.createThing("test-thing-3", user);
+    const measurement = {
+      owner: user,
+      startDate: new Date().toISOString,
+      endDate: new Date().toISOString,
+      position: { type: "Point", coordinates: [12.123456, 13.1345678], },
+      thing: thing._id,
+      device: device._id,
+      feature: feature._id,
+      samples: [ { values: "A", delta: 200 },
+                 { values: "B", delta: 200 } ],
+    };
+    const res = await chai.request(server).keepOpen().post("/v1/measurements").set("Authorization", await factory.getUserToken(user)).send(measurement);
     res.should.have.status(200);
     res.body.should.be.a("object");
     res.body.should.have.property("_id");
