@@ -139,9 +139,9 @@ export const editFieldsSpecifier = {};
 export const addTypes = {};
 /*addTypes["tags"] = ["form", "file"];
 addTypes["features"] = ["form", "file"];
-addTypes["tenants"] = ["form"];
 addTypes["users"] = ["form", "file"];
 addTypes["devices"] = ["form", "file"];*/
+addTypes["tenants"] = ["form"];
 addTypes["protocols"] = ["form", "file"];
 addTypes["experiments"] = ["form", "file"];
 
