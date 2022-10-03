@@ -37,6 +37,48 @@ It is possible to get information about routes and data model from the following
 
     {{url}}/docs.html
 
+## Run in Dev Mode
+
+To run Measurify in dev mode on a local machine, [Node JS](https://nodejs.org/en/) (version >= 14.x) and [MongoDB](https://www.mongodb.com/) are required.
+Clone this repository, then install the dependencies:
+
+    npm install
+
+To test the source code, run:
+
+    npm run test
+
+To run server in dev mode, run:
+
+    npm run dev
+
+To run server in production mode, run:
+
+    npm run prod
+
+## GUI configuration
+
+The source code of the GUI Dashboard can be accessed in _/gui_ folder. The GUI Dashboard you can found here, is already configured to be started with the server and can be accessed from https://localhost:8080/
+
+### Deploy your own version of the GUI
+
+Change the working directory to _/gui_
+Install the dependencies:
+
+    npm install
+
+Pages, base api, etc., can be configured from the _.\src\config.js_ file.
+Follow instructions in comments for further details to properly edit the dashboard.
+Build the dashboard (from Windows)
+
+    npm run build-win
+
+Build the dashboard (from MacOS)
+
+    npm run build-mac
+
+_npm run build-win_ and _npm run build-mac_ are batch instructions to build the dashboard combining _npm run react-scripts build_ and the copy of the ./build folder to ../public
+
 ## Deploy
 
 The Measurify API Sever is developed using [Node JS](https://nodejs.org/en/) and [MongoDB](https://www.mongodb.com/). The following steps show how to deploy a server on Ubuntu 18.04, using Docker. However it can be adapted also for MacOS or Windows operating systems.
