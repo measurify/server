@@ -51,7 +51,7 @@ exports.dataExtractor = async function (req, res, next, saveDataset) {
               descriptionData = data.toString();
             } else {
               errorOccurred = true;
-              return errors.manage(res, errors.max_one_description_file);
+              return errors.manage(res, errors.max_one_description_file,descriptionData);
             }
           }
         }
