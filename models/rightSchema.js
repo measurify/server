@@ -9,7 +9,7 @@ const rightSchema = new mongoose.Schema({
     type: { type: String, enum: RightTypes, required: "Please, supply the resource type" },
     resource: { type: String, required: "Please, supply a resource" },
     user: { type: [mongoose.Schema.Types.ObjectId], ref:'User', autopopulate: true },
-    group: { type: [mongoose.Schema.Types.ObjectId], ref:'Group', autopopulate: true },
+    group: { type: [String], ref:'Group' },
     owner: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true },
     tags: { type: [String], ref: 'Tag' },
     timestamp: {type: Date, default: Date.now, select: false },
@@ -33,10 +33,24 @@ rightSchema.path('owner').validate({
 
 // validate user
 rightSchema.path('user').validate({
-    validator: async function (value) {
+    validator: async function (values) {
         const User = this.constructor.model('User');
-        let user = await User.findById(value);
-        if (!user) throw new Error('User not existent (' + value + ')');
+        for (let i = 0; i < values.length; i++) {
+            const user = await User.findById(values[i]);
+            if (!user) throw new Error('User not existent (' + values[i] + ')');
+        };
+        return true;
+    }
+});
+
+// validate group
+rightSchema.path('group').validate({
+    validator: async function (values) {
+        const Group = this.constructor.model('Group');
+        for (let i = 0; i < values.length; i++) {
+            const group = await Group.findById(values[i]);
+            if (!group) throw new Error('Group not existent (' + values[i] + ')');
+        };
         return true;
     }
 });
@@ -63,12 +77,18 @@ rightSchema.pre('save', async function() {
     if(!resource) throw new Error('Resource not found (' + this.resource + ')');                   
 });
 
+// group and user have at least one element
+rightSchema.pre('save', async function() {    
+    if(this.user.length==0&&this.group.length==0) throw new Error('user and group fields cannot be both empty');                  
+});
+
 // check if already have a similar right (idempotent)
 rightSchema.pre('save', async function(next, opts, callback) {
     if(opts.update) return;
     const res = await this.constructor.findOne( { type: this.type,
                                                   resource: this.resource,
-                                                  user: this.user });                                            
+                                                  user: this.user,
+                                                  group: this.group });                                            
     if(res && res._id.toString() != this._id.toString()) throw new Error('The right already exists (' + res._id + ')');                       
 });
 

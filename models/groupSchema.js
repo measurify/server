@@ -14,6 +14,8 @@ const groupSchema = new mongoose.Schema({
     lastmod: {type: Date, default: Date.now, select: false }
 });
 
+groupSchema.set('toJSON', { versionKey: false });
+groupSchema.index({ owner: 1 });
 groupSchema.plugin(require('mongoose-autopopulate'));
 groupSchema.plugin(paginate);
 
