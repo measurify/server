@@ -122,13 +122,15 @@ exports.whatCanSee = async function(req, res, model) {
 
 exports.whichRights = async function(req, res, model) {
     const Right = mongoose.dbs[req.tenant.database].model('Right');
+    const Group = mongoose.dbs[req.tenant.database].model('Group');
+    const groups = await Group.find({users: req.user._id});
     if(model.modelName == "Measurement") {
-        const rights = await Right.find({user: req.user._id});
+        const rights = await Right.find({$or:[{user: req.user._id},{group: { $in: groups }}]});
         return authorizator.whichRights(req.user, rights, 'type');
     }
     else {
         let type = model.modelName;
-        const rights = await Right.find({user: req.user._id, type: type});
+        const rights = await Right.find({$or:[{user: req.user._id},{group:{ $in:groups}}], type: type});
         return authorizator.whichRights(req.user, rights, 'inside');
     }
 } 
@@ -136,14 +138,16 @@ exports.whichRights = async function(req, res, model) {
 exports.hasRights = async function(req, res, model) {
     const Right = mongoose.dbs[req.tenant.database].model('Right');
     const item = await authorizator.isAvailable(req.params.id, null, model);
+    const Group = mongoose.dbs[req.tenant.database].model('Group');
+    const groups = await Group.find({users: req.user._id});
     if(model.modelName == "Measurement") {
-        const rights = await Right.find({user: req.user._id});
+        const rights = await Right.find({$or:[{user: req.user._id},{group: { $in: groups }}]});
         if(!authorizator.hasRights(req.user, rights, item, 'type')) return errors.manage(res, errors.restricted_access, item._id);
         return true;
     }
     else {
         let type = model.modelName;
-        const rights = await Right.find({user: req.user._id, type: type});
+        const rights = await Right.find({$or:[{user: req.user._id},{group:{ $in:groups}}], type: type});
         if(!authorizator.hasRights(req.user, rights, item, 'inside')) return errors.manage(res, errors.restricted_access, item._id);
         return true;
     }
@@ -151,7 +155,9 @@ exports.hasRights = async function(req, res, model) {
 
 exports.hasRightsToCreate = async function(req, res, fields) {
     const Right = mongoose.dbs[req.tenant.database].model('Right');
-    const rights = await Right.find({user: req.user._id});
+    const Group = mongoose.dbs[req.tenant.database].model('Group');
+    const groups = await Group.find({users: req.user._id});
+    const rights = await Right.find({$or:[{user: req.user._id},{group: { $in: groups }}]});
     if(!authorizator.hasRightsToCreate(req.user, rights, req.body, fields)) return errors.manage(res, errors.restricted_access, 'You miss rigths on some resources');
     return true;
 } 

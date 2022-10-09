@@ -93,7 +93,7 @@ describe('/POST rights', () => {
         res.body.details.should.contain('Please, supply the resource type');
     });
 
-    it('it should not POST a right without user field', async () => {
+    it('it should not POST a right without user and group field', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const resource = await factory.createTag("tag-test-1", owner, [], VisibilityTypes.private);
@@ -102,8 +102,8 @@ describe('/POST rights', () => {
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.post_request_error.message);
-        res.body.details.should.contain('Please, supply the user');
+        res.body.message.should.contain("Resource not created");
+        res.body.details.should.contain("user and group fields cannot be both empty");
     });
 
     it('it should not POST a right with resource and type mismatch', async () => {

@@ -428,7 +428,8 @@ exports.createRight = async function (
   user,
   owner,
   tags,
-  tenant
+  tenant,
+  group
 ) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
@@ -440,6 +441,7 @@ exports.createRight = async function (
     user: user,
     owner: owner,
     tags: tags,
+    group:group
   };
   const right = new Right(req);
   await right.save();
