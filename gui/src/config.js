@@ -127,7 +127,7 @@ addFields["experiments"] = {
 
 //edit fields specifiers dictionary
 //this dictionary allow to specify particular behaviour for input fields, that can be managed by a specific function
-// type can be "disable" -> policy is applied to fields to be disabled
+// type can be "disable" -> policy is applied to fields to be disabled, true when field should be disabled
 //
 export const editFieldsSpecifier = {};
 editFieldsSpecifier["features"] = {
@@ -139,16 +139,15 @@ editFieldsSpecifier["features"] = {
 export const addTypes = {};
 addTypes["tags"] = ["form", "file"];
 addTypes["features"] = ["form", "file"];
-addTypes["tenants"] = ["form"];
 addTypes["users"] = ["form", "file"];
 addTypes["devices"] = ["form", "file"];
+addTypes["tenants"] = ["form"];
 addTypes["protocols"] = ["form", "file"];
 addTypes["experiments"] = ["form", "file"];
 
 //fetched types alias
 export const fetchedPageTypes = {};
-/*fetchedPageTypes["users"] = { type: "UserRoles", status: "UserStatusTypes" };
+fetchedPageTypes["users"] = { type: "UserRoles", status: "UserStatusTypes" };
 fetchedPageTypes["devices"] = {
   measurementBufferPolicy: "MeasurementBufferPolicyTypes",
 };
-*/

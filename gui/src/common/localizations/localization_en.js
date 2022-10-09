@@ -31,6 +31,15 @@ const localization_en = {
   github_page_hp: "",
   github_issue_page_hp: "Report bugs or issues",
 
+  //profile page
+  profile_page_desc:
+    "from this page you can view your own profile or change the password",
+  pass_change_confirm: "Password will be changed, do you confirm?",
+  pass_not_match:
+    "Provided password and the confirmation do not match. Please insert them again",
+  pass_not_null: "Password cannot be empty",
+  password_changed: "Password changed",
+
   //404
   oh_no: "Oh No!",
   broken_link: "It looks like you have clicked on a broken link.",
@@ -40,6 +49,7 @@ const localization_en = {
   cancel: "Cancel",
   login: "Login",
   logout: "Logout",
+  repeat: "Repeat",
 
   ///Errors
   login_error: "Wrong login!",

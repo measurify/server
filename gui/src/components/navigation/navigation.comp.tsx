@@ -178,7 +178,10 @@ const NavigationComp = () => {
         <div>
           <h3>
             {locale().welcome + " "}
-            <b>{username}</b>
+
+            <NavLink to={`/viewProfile/`} key={`viewProfile`}>
+              <b>{username}</b>
+            </NavLink>
           </h3>
           <h3>
             {locale().role + " "}

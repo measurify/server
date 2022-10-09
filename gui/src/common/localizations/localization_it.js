@@ -31,6 +31,15 @@ const localization_it = {
   github_page_hp: "Pagina Github di Measurify",
   github_issue_page_hp: "Segnala bug o problemi",
 
+  //profile page
+  profile_page_desc:
+    "questa è la pagina in cui puoi visionare il tuo profilo o modificare la password",
+  pass_change_confirm: "La password verrà modificata, procedere?",
+  pass_not_match:
+    "La password inserita e la conferma non combaciano, si prega di reinserirle",
+  pass_not_null: "La password non può essere vuota",
+  password_changed: "Password cambiata",
+
   //404
   oh_no: "Oh No!",
   broken_link:
@@ -41,6 +50,7 @@ const localization_it = {
   cancel: "Annulla",
   login: "Accedi",
   logout: "Esci",
+  repeat: "Ripeti",
 
   ///Errori
   login_error: "Login errata!",
