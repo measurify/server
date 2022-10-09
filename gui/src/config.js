@@ -127,7 +127,7 @@ addFields["experiments"] = {
 
 //edit fields specifiers dictionary
 //this dictionary allow to specify particular behaviour for input fields, that can be managed by a specific function
-// type can be "disable" -> policy is applied to fields to be disabled
+// type can be "disable" -> policy is applied to fields to be disabled, true when field should be disabled
 //
 export const editFieldsSpecifier = {};
 /*editFieldsSpecifier["features"] = {
