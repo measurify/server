@@ -6,7 +6,7 @@ Measurify Cloud API Server is designed, developed and maintained by **[Elios Lab
 
 In order to support the IoT developer community, Measeurify Cloud API Server is released open source under **MIT licence**.
 
-## Quick start
+## Quick start (on Docker)
 
 Clone code and run the container
 
@@ -36,6 +36,57 @@ to get info:
 It is possible to get information about routes and data model from the following route:
 
     {{url}}/docs.html
+
+## Run directly on NodeJS
+
+To run Measurify on NodeJS (e.g., on a local machine), [Node JS](https://nodejs.org/en/) (version >= 14.x) and [MongoDB](https://www.mongodb.com/) are required.
+Clone this repository, then install the dependencies:
+
+    git clone https://github.com/measurify/server.git measurify
+    npm install
+
+To test the source code, run:
+
+    npm run test
+
+To start the server in developer mode, run:
+
+    npm run dev
+
+To start the server in production mode, run:
+
+    npm run prod
+
+## Admin Dashboard GUI configuration and Building
+
+The source code of the Admin Dashboard GUI can be accessed in _./gui_ folder. The Admin Dashboard you can found here is already configured and it will start together with the server. It can be accessed from a web browser from https://localhost:8080/ (the actual URL is specified in the configuration file, see next)
+
+### Deploy your own version of the Admin Dashboard GUI
+
+Change the working directory to _./gui_ and install the dependencies:
+
+    cd gui
+    npm install
+
+### Admin GUI Dashboard Configuration
+
+Pages, base api, etc., are managed by the configuration defined in the _.\src\config.js_ file.
+Follow instructions in comments inside _config.js_ for further details to properly configure the Admin Dashboard. <br/>
+
+### Build Admin GUI Dashboard
+
+To build the Admin Dashboard from Windows machine, run:
+
+    npm run build-win
+
+To build the Admin Dashboard from MacOS machine, run:
+
+    npm run build-mac
+
+_npm run build-win_ and _npm run build-mac_ are batch instructions to build and move the dashboard in the proper folder, combining
+
+- _npm run react-scripts build_ and _cp -r ./build/\* ../public/_ (MacOS)
+- _npm run react-scripts build_ and _(robocopy build/ ../public/ /Mir) ^& IF %ERRORLEVEL% LSS 8 SET ERRORLEVEL=0_ (Windows)
 
 ## Deploy
 
