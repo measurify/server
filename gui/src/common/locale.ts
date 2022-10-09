@@ -34,6 +34,13 @@ interface ILocalization {
   github_page_hp: string;
   github_issue_page_hp: string;
 
+  //profile page
+  profile_page_desc: string;
+  pass_change_confirm: string;
+  pass_not_match: string;
+  pass_not_null: string;
+  password_changed: string;
+
   //404
   oh_no: string;
   broken_link: string;
@@ -43,6 +50,7 @@ interface ILocalization {
   cancel: string;
   login: string;
   logout: string;
+  repeat: string;
 
   ///Errors
   login_error: string;

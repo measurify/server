@@ -11,7 +11,7 @@ import { HomePage } from "./components/homePage/homePage";
 import { NotFoundPage } from "./components/notFoundPage/notFoundPage";
 import { Navigation } from "./components/navigation/navigation.comp";
 import Page from "./components/page/page";
-
+import ProfilePage from "./components/profilePage/profilePage";
 import "./App.scss";
 import UnauthorizedPage from "./components/unauthorizedPage/unauthorizedPage";
 
@@ -133,6 +133,7 @@ function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/home" element={<HomePage />} />
+              <Route path="/viewProfile" element={<ProfilePage />} />
               <Route path="/add/experiments/" element={<AddExperimentPage />} />
 
               <Route path="/edit/:resource/:id" element={<EditContentPage />} />

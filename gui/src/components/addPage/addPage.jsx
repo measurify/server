@@ -473,7 +473,7 @@ export default function AddPage(props) {
                   </Accordion>
                 )}
                 <Button variant="primary" type="submit">
-                  Submit
+                  {locale().submit}
                 </Button>
                 <br />
                 <font style={{ marginLeft: 5 + "px" }}>{msg}</font>
