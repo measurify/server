@@ -433,7 +433,7 @@ const provider = await factory.createUser("test-username-admin", "test-password-
         res.body.message.should.be.a('string');
         res.should.have.status(errors.restricted_access.status);
         res.body.message.should.contain(errors.restricted_access.message);
-        res.body.details.should.contain('You miss rigths on some resources');
+        res.body.details.should.contain('You miss rights on some resources');
     });
 
     it('it should create a thing with rights', async () => {      

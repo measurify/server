@@ -158,7 +158,7 @@ exports.hasRightsToCreate = async function(req, res, fields) {
     const Group = mongoose.dbs[req.tenant.database].model('Group');
     const groups = await Group.find({users: req.user._id});
     const rights = await Right.find({$or:[{user: req.user._id},{group: { $in: groups }}]});
-    if(!authorizator.hasRightsToCreate(req.user, rights, req.body, fields)) return errors.manage(res, errors.restricted_access, 'You miss rigths on some resources');
+    if(!authorizator.hasRightsToCreate(req.user, rights, req.body, fields)) return errors.manage(res, errors.restricted_access, 'You miss rights on some resources');
     return true;
 } 
 
