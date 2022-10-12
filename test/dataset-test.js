@@ -14,6 +14,7 @@ const errors = require('../commons/errors.js');
 const ItemTypes = require('../types/itemTypes.js');
 chai.use(chaiHttp);
 const before = require('./before-test.js');
+const VisibilityTypes = require('../types/visibilityTypes.js');
 
 
 // Test the /GET route
@@ -426,7 +427,7 @@ describe('/POST dataset', () => {
 describe('/DELETE dataset', () => {
     it('it should DELETE a dataset', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user = await factory.createUser("test-username-2", "test-password-1", UserRoles.provider);
+        const user = await factory.createUser("test-username-2", "test-password-1", UserRoles.admin);
         const feature = await factory.createFeature("test-feature", user);
         const device = await factory.createDevice("test-device-4", user, [feature]);
         const thing = await factory.createThing("test-thing", user);

@@ -208,7 +208,7 @@ describe("/POST users", () => {
   it("it should not POST a user with already existant username field", async () => {
     await factory.createUser("test-user", "test-userpassword-1");
     await factory.createUser("test-username-1", "test-password-1");
-    const user = {username: "test-username-2", password: "test-password-1", type: UserRoles.analyst};
+    const user = {username: "test-username-1", password: "test-password-1", type: UserRoles.analyst};
     const res = await chai.request(server).keepOpen().post("/v1/users").set("Authorization", await factory.getAdminToken()).send(user);
     res.should.have.status(errors.post_request_error.status);
     res.body.should.be.a("object");
@@ -340,6 +340,29 @@ describe("/DELETE users", () => {
       .request(server)
       .keepOpen()
       .delete("/v1/users/" + user_1._id)
+      .set("Authorization", await factory.getAdminToken());
+    res.should.have.status(200);
+    res.body.should.be.a("object");
+    res.body.username.should.be.eql(user_1.username);
+    const users_after = await before.User.find();
+    users_after.length.should.be.eql(2);
+  });
+
+  it("it should DELETE a user by username", async () => {
+    const user_1 = await factory.createUser(
+      "test-username-1",
+      "test-password-1"
+    );
+    const user_2 = await factory.createUser(
+      "test-username-2",
+      "test-password-2"
+    );
+    const users_before = await before.User.find();
+    users_before.length.should.be.eql(3);
+    const res = await chai
+      .request(server)
+      .keepOpen()
+      .delete("/v1/users/" + user_1.username)
       .set("Authorization", await factory.getAdminToken());
     res.should.have.status(200);
     res.body.should.be.a("object");

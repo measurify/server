@@ -26,6 +26,7 @@ userSchema.pre('save', async function() {
     if(res) throw new Error('The username '+this.username+' already exists'); }                      
 });
 
+
 // check type
 userSchema.pre('save', async function() {
     if(!this.type) throw new Error('User validation failed: please specify the user type');  

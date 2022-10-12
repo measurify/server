@@ -337,7 +337,7 @@ exports.createConstraint = async function (
   return constraint._doc;
 };
 
-exports.createDataupload = async function(name, owner, timestamp, size, results, lastmod, tenant) {
+exports.createDataupload = async function(name, owner, timestamp, size, results, lastmod, tenant,visibility) {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
     const Dataupload = mongoose.dbs[tenant.database].model('Dataupload');
@@ -347,7 +347,8 @@ exports.createDataupload = async function(name, owner, timestamp, size, results,
         timestamp: timestamp,
         size: size,
         results: results,
-        lastmod: lastmod 
+        lastmod: lastmod ,
+        visibility: visibility
     }
     const dataupload = new Dataupload(req);
     await dataupload.save();
