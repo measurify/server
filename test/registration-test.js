@@ -92,7 +92,7 @@ describe('/POST self', () => {
 
     it('it should not POST a user with already existant username field', async () => {
         await factory.createUser("test-username-1", "test-password-1");
-        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT };
+        const user = { username : "test-username-2", password : "test-password-1", email: "test-email-1", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT };
         const res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self').send(user);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -113,7 +113,7 @@ describe('/POST self', () => {
 
     it('it should not POST a user with already existant email', async () => {
         await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
-        const user = { username : "test-username-1", password : "test-password-1", email: "test-email-1@test.it", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT };
+        const user = { username : "test-username-2", password : "test-password-1", email: "test-email-1@test.it", type : UserRoles.analyst, tenant: process.env.DEFAULT_TENANT };
         const res = await chai.request(server).keepOpen().post('/' + process.env.VERSION + '/self').send(user);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');

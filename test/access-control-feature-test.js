@@ -54,8 +54,9 @@ describe('Access create feature', () => {
 // READ LIST
 describe('Access read a list of features', () => {
     it('it should get all the public/private features as admin or analyst', async () => {      
-        const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
-        const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
+        const user_admin = await factory.createUser("test-username-user1", "test-password-user", UserRoles.admin);
+        const user_analyst = await factory.createUser("test-username-user2", "test-password-user", UserRoles.analyst);
+        const user_supplier = await factory.createUser("test-username-user-3", "test-password-user", UserRoles.supplier);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature_public_1 = await factory.createFeature("test-feature-1-public", owner, null, [], VisibilityTypes.public);
         const feature_public_2 = await factory.createFeature("test-feature-2-public", owner, null, [], VisibilityTypes.public);
@@ -73,6 +74,10 @@ describe('Access read a list of features', () => {
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
         res.body.docs.length.should.be.eql(8);
+        res = await chai.request(server).keepOpen().get('/v1/features/').set("Authorization", await factory.getUserToken(user_supplier));
+        res.should.have.status(200);
+        res.body.docs.should.be.a('array');
+        res.body.docs.length.should.be.eql(0);
     });
 
     it('it should get just his own or public features as provider', async () => {      
@@ -128,8 +133,8 @@ describe('Access read a list of features', () => {
 // READ
 describe('Access read a feature', () => {
     it('it should get a public/private feature as admin or analyst', async () => {      
-        const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
-        const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
+        const user_admin = await factory.createUser("test-username-user1", "test-password-user", UserRoles.admin);
+        const user_analyst = await factory.createUser("test-username-user2", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature_public = await factory.createFeature("test-feature-1-public", owner, null, [], VisibilityTypes.public);
         const feature_private = await factory.createFeature("test-feature-1-private", owner, null, [], VisibilityTypes.private);

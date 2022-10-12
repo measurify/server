@@ -19,7 +19,7 @@ exports.isTenantAvailable = async function(req, res) {
 
 exports.isAvailable = async function(req, res, model) {
     try {
-        const item = await authorizator.isAvailable(req.params.id, null, model);
+        const item = await authorizator.isAvailable(req.params.id, null, model,req);
         if(!item) return errors.manage(res, errors.resource_not_found, req.params.id); 
         req.resource = item;
         return true;

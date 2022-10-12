@@ -818,12 +818,12 @@ describe("Access read a list of measurements", () => {
 describe("Access read a measurement", () => {
   it("it should get a public/private measurement as admin or analyst", async () => {
     const user_admin = await factory.createUser(
-      "test-username-user",
+      "test-username-user1",
       "test-password-user",
       UserRoles.admin
     );
     const user_analyst = await factory.createUser(
-      "test-username-user",
+      "test-username-user2",
       "test-password-user",
       UserRoles.analyst
     );

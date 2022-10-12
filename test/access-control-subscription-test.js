@@ -32,7 +32,7 @@ describe('Access create subscriptions', () => {
 
     it('it should create a subscription as provider', async () => {      
 const admin = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const owner = await factory.createUser("test-username-2", "test-password-1", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", admin);
         const subscription = { token: "subscription-id", thing: thing._id, tags: [] };
         const res = await chai.request(server).keepOpen().post('/v1/subscriptions').set("Authorization", await factory.getUserToken(owner)).send(subscription);
@@ -101,8 +101,8 @@ const admin = await factory.createUser("test-username-1", "test-password-1", Use
 // READ LIST
 describe('Access read a list of subscriptions', () => {
     it('it should get all the subscriptions as admin or analyst', async () => {      
-const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
-        const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
+const user_admin = await factory.createUser("test-username-user1", "test-password-user", UserRoles.admin);
+        const user_analyst = await factory.createUser("test-username-user2", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", owner);
         const subscription_1 = await factory.createSubscription("test-subscription-1", owner, null, thing, []);
@@ -169,8 +169,8 @@ const user_admin = await factory.createUser("test-username-admin", "test-passwor
 // READ
 describe('Access read a subscription', () => {
     it('it should get a subscription as admin or analyst', async () => {      
-const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
-        const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
+const user_admin = await factory.createUser("test-username-user1", "test-password-user", UserRoles.admin);
+        const user_analyst = await factory.createUser("test-username-user2", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing = await factory.createThing("test-thing-1", owner);
         const subscription = await factory.createSubscription("test-subscription-1", owner, null, thing, []);

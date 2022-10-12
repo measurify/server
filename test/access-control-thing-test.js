@@ -52,8 +52,8 @@ describe('Access create things', () => {
 // READ LIST
 describe('Access read a list of things', () => {
     it('it should get all the public/private things as admin or analyst', async () => {      
-        const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
-        const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
+        const user_admin = await factory.createUser("test-username-user1", "test-password-user", UserRoles.admin);
+        const user_analyst = await factory.createUser("test-username-user2", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing_public_1 = await factory.createThing("test-thing-public-1", owner, [], null, [], VisibilityTypes.public);
         const thing_public_2 = await factory.createThing("test-thing-public-2", owner, [], null, [], VisibilityTypes.public);
@@ -126,8 +126,8 @@ describe('Access read a list of things', () => {
 // READ
 describe('Access read a thing', () => {
     it('it should get a public/private thing as admin or analyst', async () => {      
-        const user_admin = await factory.createUser("test-username-user", "test-password-user", UserRoles.admin);
-        const user_analyst = await factory.createUser("test-username-user", "test-password-user", UserRoles.analyst);
+        const user_admin = await factory.createUser("test-username-user1", "test-password-user", UserRoles.admin);
+        const user_analyst = await factory.createUser("test-username-user2", "test-password-user", UserRoles.analyst);
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing_public = await factory.createThing("test-thing-public", owner, [], null, [], VisibilityTypes.public);
         const thing_private = await factory.createThing("test-thing-private", owner, [], null, [], VisibilityTypes.private);

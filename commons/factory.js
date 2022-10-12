@@ -89,18 +89,16 @@ exports.createUser = async function (username, password, type, fieldmask, email,
     password = bcrypt.hashSync(password, 8);
   }
   const User = mongoose.dbs[tenant.database].model("User");
-  let user = await User.findOne({ username: username });
-  if (!user) {
-    const req = {
-      username: username,
-      password: password,
-      fieldmask: fieldmask,
-      email: email,
-      type: type || UserRoles.provider
-    };
-    user = new User(req);
-    await user.save();
-  }
+  const req = {
+    username: username,
+    password: password,
+    fieldmask: fieldmask,
+    email: email,
+    type: type || UserRoles.provider
+  };
+  let user = new User(req);
+  await user.save();
+  
   return await User.findById(user._id);
 };
 

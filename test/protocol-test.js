@@ -351,7 +351,7 @@ describe('/PUT protocol', () => {
 
     it('it should not PUT a protocol owner', async () => {
         const user_1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user_2 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user_2 = await factory.createUser("test-username-2", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user_1);        
         const request = { owner: user_2._id };
         const res = await chai.request(server).keepOpen().put('/v1/protocols/' + protocol._id).set("Authorization", await factory.getUserToken(user_1)).send(request);

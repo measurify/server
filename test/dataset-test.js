@@ -426,7 +426,7 @@ describe('/POST dataset', () => {
 describe('/DELETE dataset', () => {
     it('it should DELETE a dataset', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user = await factory.createUser("test-username-2", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user);
         const device = await factory.createDevice("test-device-4", user, [feature]);
         const thing = await factory.createThing("test-thing", user);
@@ -448,7 +448,7 @@ describe('/DELETE dataset', () => {
 
     it('it should not DELETE a fake dataset', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user = await factory.createUser("test-username-2", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", user);
         const device = await factory.createDevice("test-device-4", user, [feature]);
         const thing = await factory.createThing("test-thing", user);
