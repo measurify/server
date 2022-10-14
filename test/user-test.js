@@ -53,8 +53,8 @@ describe("/GET users", () => {
       "test-password-1",
       UserRoles.provider
     );
-    await factory.createUser("test-username-1", "test-password-1");
-    await factory.createUser("test-username-2", "test-password-2");
+    await factory.createUser("test-username-2", "test-password-1");
+    await factory.createUser("test-username-3", "test-password-2");
     const res = await chai
       .request(server)
       .keepOpen()
@@ -84,7 +84,7 @@ describe("/GET users", () => {
       "test-password-1",
       UserRoles.regular
     );
-    const user = await factory.createUser("test-username-1", "test-password-1");
+    const user = await factory.createUser("test-username-2", "test-password-1");
     const res = await chai
       .request(server)
       .keepOpen()
@@ -215,7 +215,7 @@ describe("/POST users", () => {
     res.body.message.should.be.a("string");
     res.should.have.status(errors.post_request_error.status);
     res.body.message.should.contain(errors.post_request_error.message);
-    res.body.details.should.contain("duplicate key");
+    res.body.details.should.contain("The username test-username-1 already exists");
   });
 
   it("it should POST a list of users", async () => {
@@ -348,6 +348,29 @@ describe("/DELETE users", () => {
     users_after.length.should.be.eql(2);
   });
 
+  it("it should DELETE a user by username", async () => {
+    const user_1 = await factory.createUser(
+      "test-username-1",
+      "test-password-1"
+    );
+    const user_2 = await factory.createUser(
+      "test-username-2",
+      "test-password-2"
+    );
+    const users_before = await before.User.find();
+    users_before.length.should.be.eql(3);
+    const res = await chai
+      .request(server)
+      .keepOpen()
+      .delete("/v1/users/" + user_1.username)
+      .set("Authorization", await factory.getAdminToken());
+    res.should.have.status(200);
+    res.body.should.be.a("object");
+    res.body.username.should.be.eql(user_1.username);
+    const users_after = await before.User.find();
+    users_after.length.should.be.eql(2);
+  });
+
   it("it should not DELETE a fake user", async () => {
     const user = await factory.createUser("test-username-1", "test-password-1");
     const users_before = await before.User.find();
@@ -367,12 +390,12 @@ describe("/DELETE users", () => {
   it("it should not DELETE a by non-admin", async () => {
     const user = await factory.createUser("test-username-1", "test-password-1");
     const no_admin = await factory.createUser(
-      "test-username-1",
+      "test-username-2",
       "test-password-1",
-      UserRoles.admin
+      UserRoles.provider
     );
     const users_before = await before.User.find();
-    users_before.length.should.be.eql(2);
+    users_before.length.should.be.eql(3);//admin added by default
     const res = await chai
       .request(server)
       .keepOpen()
@@ -382,7 +405,7 @@ describe("/DELETE users", () => {
     res.body.should.be.a("object");
     res.body.message.should.contain(errors.admin_restricted_access.message);
     const users_after = await before.User.find();
-    users_after.length.should.be.eql(2);
+    users_after.length.should.be.eql(3);
   });
 
   it("it should not DELETE a user owner of a device", async () => {
@@ -524,7 +547,7 @@ describe("/PUT user", () => {
     const user = await factory.createUser(
       "test-username-2",
       "test-password-2",
-      UserRoles.provide
+      UserRoles.provider
     );
     const modification = { password: "new_password" };
     const res = await chai
@@ -533,6 +556,7 @@ describe("/PUT user", () => {
       .put("/v1/users/" + user._id)
       .set("Authorization", await factory.getUserToken(admin))
       .send(modification);
+      //console.log(res)
     res.should.have.status(200);
     res.body.should.be.a("object");
   });

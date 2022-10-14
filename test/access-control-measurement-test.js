@@ -818,12 +818,12 @@ describe("Access read a list of measurements", () => {
 describe("Access read a measurement", () => {
   it("it should get a public/private measurement as admin or analyst", async () => {
     const user_admin = await factory.createUser(
-      "test-username-user",
+      "test-username-user1",
       "test-password-user",
       UserRoles.admin
     );
     const user_analyst = await factory.createUser(
-      "test-username-user",
+      "test-username-user2",
       "test-password-user",
       UserRoles.analyst
     );
@@ -4604,7 +4604,7 @@ describe("Create a measurements with rights", () => {
       .send(request);
     res.should.have.status(errors.restricted_access.status);
     res.body.message.should.contain(errors.restricted_access.message);
-    res.body.details.should.contain("You miss rigths on some resources");
+    res.body.details.should.contain("You miss rights on some resources");
   });
 
   it("it should not create a measurements without rights on device", async () => {
@@ -4651,7 +4651,7 @@ describe("Create a measurements with rights", () => {
       .send(request);
     res.should.have.status(errors.restricted_access.status);
     res.body.message.should.contain(errors.restricted_access.message);
-    res.body.details.should.contain("You miss rigths on some resources");
+    res.body.details.should.contain("You miss rights on some resources");
   });
 
   it("it should not create a measurements without rights on feature", async () => {
@@ -4697,7 +4697,7 @@ describe("Create a measurements with rights", () => {
     res.body.message.should.be.a("string");
     res.should.have.status(errors.restricted_access.status);
     res.body.message.should.contain(errors.restricted_access.message);
-    res.body.details.should.contain("You miss rigths on some resources");
+    res.body.details.should.contain("You miss rights on some resources");
   });
 
   it("it should not create a measurements without rights on tag", async () => {
@@ -4743,7 +4743,7 @@ describe("Create a measurements with rights", () => {
     res.body.message.should.be.a("string");
     res.should.have.status(errors.restricted_access.status);
     res.body.message.should.contain(errors.restricted_access.message);
-    res.body.details.should.contain("You miss rigths on some resources");
+    res.body.details.should.contain("You miss rights on some resources");
   });
 
   it("it should create a measurements with rights", async () => {

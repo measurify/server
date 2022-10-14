@@ -438,7 +438,7 @@ describe("/PUT issue", () => {
       UserRoles.provider
     );
     const user_2 = await factory.createUser(
-      "test-username-1",
+      "test-username-2",
       "test-password-1",
       UserRoles.provider
     );

@@ -44,7 +44,7 @@ describe("Thing stream", () => {
     const provider_token = await factory.getUserToken(provider);
     const analyst_token = await factory.getUserToken(analyst);
     const url =
-      "wss://127.0.0.1:443/v1/streams?thing=" +
+      process.env.STREAM_TEST_URL + "thing=" +
       thing._id +
       "&token=" +
       analyst_token;
@@ -98,7 +98,7 @@ describe("Thing stream", () => {
     const provider_token = await factory.getUserToken(provider);
     const analyst_token = await factory.getUserToken(analyst);
     const url =
-      "wss://127.0.0.1:443/v1/streams?device=" +
+      process.env.STREAM_TEST_URL + "device=" +
       device._id +
       "&token=" +
       analyst_token;
@@ -152,7 +152,7 @@ describe("Thing stream", () => {
     const provider_token = await factory.getUserToken(provider);
     const analyst_token = await factory.getUserToken(analyst);
     const url =
-      "wss://127.0.0.1:443/v1/streams?thing=fake-thing&token=" + analyst_token;
+      process.env.STREAM_TEST_URL + "thing=fake-thing&token=" + analyst_token;
     const client = await new WebSocket(url);
     client.on("message", function (message, isBinary) {
       message = isBinary ? message : message.toString();
@@ -205,7 +205,7 @@ describe("Thing stream", () => {
     const provider_token = await factory.getUserToken(provider);
     const analyst_token = await factory.getUserToken(analyst);
     const url =
-      "wss://127.0.0.1:443/v1/streams?device=fake-device&token=" +
+      process.env.STREAM_TEST_URL + "device=fake-device&token=" +
       analyst_token;
     const client = await new WebSocket(url);
     client.on("message", function (message, isBinary) {
@@ -259,7 +259,7 @@ describe("Thing stream", () => {
     const provider_token = await factory.getUserToken(provider);
     const analyst_token = await factory.getUserToken(analyst);
     const url =
-      "wss://127.0.0.1:443/v1/streams?thing=" + thing._id + "&token=fake-token";
+      process.env.STREAM_TEST_URL + "thing=" + thing._id + "&token=fake-token";
     const client = await new WebSocket(url);
     client.on("message", function (message, isBinary) {
       message = isBinary ? message : message.toString();
@@ -310,7 +310,7 @@ describe("Thing stream", () => {
     const provider_token = await factory.getUserToken(provider);
     const analyst_token = await factory.getUserToken(analyst);
     const url =
-      "wss://127.0.0.1:443/v1/streams?device=" +
+      process.env.STREAM_TEST_URL + "device=" +
       device._id +
       "&token=fake-token";
     const client = await new WebSocket(url);
@@ -377,7 +377,7 @@ describe("Thing stream", () => {
     const provider_token = await factory.getUserToken(provider);
     const analyst_token = await factory.getUserToken(analyst);
     const url =
-      "wss://127.0.0.1:443/v1/streams?thing=" +
+      process.env.STREAM_TEST_URL + "thing=" +
       thing._id +
       "&token=" +
       analyst_token;
@@ -444,7 +444,7 @@ describe("Thing stream", () => {
     const provider_token = await factory.getUserToken(provider);
     const analyst_token = await factory.getUserToken(analyst);
     const url =
-      "wss://127.0.0.1:443/v1/streams?thing=" +
+      process.env.STREAM_TEST_URL + "thing=" +
       thing._id +
       "&token=" +
       analyst_token;
@@ -511,12 +511,12 @@ describe("Thing stream", () => {
     const provider_token = await factory.getUserToken(provider);
     const analyst_token = await factory.getUserToken(analyst);
     const url_1 =
-      "wss://127.0.0.1:443/v1/streams?thing=" +
+      process.env.STREAM_TEST_URL + "thing=" +
       thing_1._id +
       "&token=" +
       analyst_token;
     const url_2 =
-      "wss://127.0.0.1:443/v1/streams?thing=" +
+      process.env.STREAM_TEST_URL + "thing=" +
       thing_2._id +
       "&token=" +
       analyst_token;

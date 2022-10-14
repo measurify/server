@@ -937,7 +937,7 @@ describe('/PUT experiment', () => {
 
     it('it should not PUT a experiment owner', async () => {
         const user_1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user_2 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user_2 = await factory.createUser("test-username-2", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user_1);
         const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user_1, true, ExperimentStateTypes.ongoing, null, null, null, protocol);
         const request = { owner: user_2._id };

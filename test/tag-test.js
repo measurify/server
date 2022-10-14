@@ -375,7 +375,7 @@ describe('/PUT tag', () => {
 
     it('it should not PUT a tag owner', async () => {
         const user_1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user_2 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user_2 = await factory.createUser("test-username-2", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", user_1, [], VisibilityTypes.public);
         const request = { ownser: user_2._id };
         const res = await chai.request(server).keepOpen().put('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user_1)).send(request);
@@ -407,7 +407,7 @@ describe('/PUT tag', () => {
 
     it('it should not PUT a tag without any field', async () => {
         const user_1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user_2 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user_2 = await factory.createUser("test-username-2", "test-password-1", UserRoles.provider);
         const tag = await factory.createTag("test-tag-1", user_1, [], VisibilityTypes.public);
         const request = { };
         const res = await chai.request(server).keepOpen().put('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user_1)).send(request);

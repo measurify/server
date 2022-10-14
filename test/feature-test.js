@@ -322,7 +322,7 @@ describe('/PUT feature', () => {
 
     it('it should not PUT a feature owner', async () => {
         const user_1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user_2 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user_2 = await factory.createUser("test-username-2", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user_1);        
         const request = { owner: user_2._id };
         const res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user_1)).send(request);
