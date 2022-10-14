@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from "react";
-import locale from "../../common/locale";
-import {
-  pages,
-  aliasPages,
-  addFields,
-  addTypes,
-  fetchedPageTypes,
-} from "../../config";
-import { fetchedData } from "../../fetchedData";
+import { addFields, addTypes } from "../../config";
 import {
   post_generic,
   get_generic,
@@ -20,16 +12,15 @@ import {
 import { useParams, useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-import {
-  Button,
-  Form,
-  Nav,
-  InputGroup,
-  Accordion,
-  Table,
-  FloatingLabel,
-} from "react-bootstrap";
+import { Nav } from "react-bootstrap";
 import { FormManager } from "../formManager/formManager";
+import { FormFile } from "../formFileComp/formFile";
+
+import {
+  sortObject,
+  maintainEmptyElement,
+  maintainEmptyElements,
+} from "../../services/objects_manipulation";
 
 const cloneDeep = require("clone-deep");
 
@@ -72,9 +63,9 @@ export default function AddPage(props) {
 
   //file upload state
   const [file, setFile] = useState(undefined);
-  const [contentHeader, setContentHeader] = useState(undefined);
-  const [contentBody, setContentBody] = useState(undefined);
-  const [contentPlain, setContentPlain] = useState(undefined);
+  const [contentHeader, setContentHeader] = useState(null);
+  const [contentBody, setContentBody] = useState(null);
+  const [contentPlain, setContentPlain] = useState(null);
 
   //useeffect to get resource if required
   useEffect(() => {
@@ -82,39 +73,21 @@ export default function AddPage(props) {
       // get the data from the api
       const response = await get_generic(resource, qs);
 
-      //test with deep copy
-      const test = cloneDeep(values);
-      //for each key of addFields, check if it's present from the fetched data and put it into values (if not default for arrays)
-      Object.keys(test).map((k) => {
-        if (response.docs[0][k] !== undefined) {
-          if (Array.isArray(response.docs[0][k])) {
-            if (!isDefault(response.docs[0][k])) {
-              if (response.docs[0][k][0].constructor === Object) {
-                const keys = Object.keys(test[k][0]);
-                const temp = response.docs[0][k].map((e) => {
-                  const assign = {};
-                  keys.map((k) => (assign[k] = null));
-                  return Object.assign(assign, e);
-                });
-                test[k] = temp.concat(test[k]);
-              } else {
-                test[k] = response.docs[0][k].concat(test[k]);
-              }
-            }
-          } else {
-            test[k] = response.docs[0][k];
-          }
-        }
-      });
-      setValues(test);
-      // set state with the result
+      const data = response.docs[0];
+      let tmpValues = cloneDeep(values);
+
+      tmpValues = sortObject(data, tmpValues);
+
+      tmpValues = maintainEmptyElements(tmpValues, addFields, resource);
+      setValues(tmpValues);
     };
+
     if (searchParams.get("from") === null || searchParams.get("from") === "")
       return;
     const fst = { _id: searchParams.get("from") };
     const qs = { filter: JSON.stringify(fst) };
     fetchData(qs);
-  }, [props, searchParams]);
+  }, [searchParams, resource]);
 
   //return if page shouldn't be rendered
   if (addFields[resource] === undefined)
@@ -132,8 +105,15 @@ export default function AddPage(props) {
       if (typeof path[i] === "number") lastIndexNumber = i;
     }
     valuesPtr[path[i]] = val;
+    if (typeof path[i] === "number") lastIndexNumber = i;
+
     if (lastIndexNumber !== -1)
-      tmpVals = maintainEmptyElement(tmpVals, path.slice(0, lastIndexNumber));
+      tmpVals = maintainEmptyElement(
+        tmpVals,
+        path.slice(0, lastIndexNumber),
+        addFields,
+        resource
+      );
 
     setValues(tmpVals);
   };
@@ -150,87 +130,11 @@ export default function AddPage(props) {
 
     tmpPtr.splice(path[i], 1);
 
-    val = maintainEmptyElement(val, path.slice(0, i));
+    val = maintainEmptyElement(val, path.slice(0, i), addFields, resource);
     setValues(val);
   };
   //handle way selector to post new entity
   const handleTypeSelect = (eventKey) => setPostType(eventKey);
-
-  const maintainEmptyElement = (original, path, item = undefined) => {
-    let tmp = cloneDeep(original);
-    let tmpPtr = tmp;
-    let addFldTmp = cloneDeep(addFields[resource]);
-    const tmpPath = [...path];
-
-    //get more nested array
-    for (let i = 0; i < tmpPath.length; i++) {
-      if (path[i] === undefined) break;
-      tmpPtr = tmpPtr[path[i]];
-    }
-
-    //get the appropriate item, if possible
-    for (let i = 0; i < tmpPath.length; i++) {
-      if (path[i] === undefined) break;
-      if (addFldTmp === undefined) break;
-      //ignore indexes for addFldTmp
-      if (typeof path[i] === "number") addFldTmp = addFldTmp[0];
-      else addFldTmp = addFldTmp[path[i]];
-    }
-
-    //non array case
-    if (!Array.isArray(addFldTmp)) return tmp;
-
-    //add item according to addfield dictionary
-    if (addFldTmp !== undefined) {
-      //0-length array
-      if (tmpPtr.length === 0) {
-        if (addFldTmp[0].constructor === Object) {
-          tmpPtr.push({
-            ...addFldTmp[0],
-          });
-        } else {
-          tmpPtr.push("");
-        }
-      }
-      //else 0-length array
-      else {
-        if (tmpPtr[0].constructor === Object) {
-          //check if there are no default elements in array
-          if (tmpPtr.filter((e) => isDefault(e)).length === 0) {
-            tmpPtr.push({
-              ...addFldTmp[0],
-            });
-          }
-        } else {
-          if (!tmpPtr.includes("")) {
-            tmpPtr.push("");
-          }
-        }
-      }
-    }
-
-    //add item according to params
-    if (item !== undefined && addFldTmp === undefined) {
-      if (tmpPtr.length === 0) {
-        if (item.constructor === Object) {
-          tmpPtr.push({ ...item });
-        } else {
-          tmpPtr.push(item);
-        }
-      }
-      //else 0-length array
-      else {
-        if (tmpPtr.filter((e) => isDefault(e)).length === 0) {
-          if (item.constructor === Object) {
-            tmpPtr.push({ ...item });
-          } else {
-            tmpPtr.push(item);
-          }
-        }
-      }
-    }
-    return tmp;
-  };
 
   const back = (e) => {
     e.preventDefault();
@@ -250,7 +154,6 @@ export default function AddPage(props) {
 
     let tmpValues = cloneDeep(body);
     removeDefaultElements(tmpValues);
-
     let res;
     try {
       const resp = await post_generic(
@@ -272,7 +175,7 @@ export default function AddPage(props) {
     }
 
     if (res.status === 200) {
-      if (window.confirm("Back to resource page?") == true) {
+      if (window.confirm("Back to resource page?") === true) {
         if (resource === "tenants") navigate("/");
         else navigate("/" + resource);
       } else {
@@ -305,7 +208,6 @@ export default function AddPage(props) {
       }
     }
     if (file.name.endsWith(".json")) {
-      console.log(contentPlain);
       try {
         const resp = await post_generic(resource, contentPlain, undefined);
         res = resp.response;
@@ -323,7 +225,7 @@ export default function AddPage(props) {
     }
 
     if (res.status === 200) {
-      if (window.confirm("Back to resource page?") == true) {
+      if (window.confirm("Back to resource page?") === true) {
         navigate("/" + resource);
       } else {
       }
@@ -386,98 +288,18 @@ export default function AddPage(props) {
           )}
           {postType === "file" && (
             <div style={{ margin: 5 + "px" }}>
-              <Form onSubmit={postFile}>
-                <Form.Label>
-                  <b>{locale().select_file}</b>
-                </Form.Label>
-                <Form.Control
-                  className="mb-3"
-                  type="file"
-                  accept=".csv, .json"
-                  label="File"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    setFile(file);
-                    console.log(file);
-                    const fileReader = new FileReader();
-
-                    fileReader.onloadend = () => {
-                      const content = fileReader.result;
-                      if (file.name.endsWith(".csv")) {
-                        const regex = new RegExp("\r", "g");
-                        let splitted = content.replace(regex, "").split("\n");
-
-                        setContentHeader(splitted[0]);
-                        splitted.splice(0, 1);
-                        setContentBody(splitted);
-                      }
-                      if (file.name.endsWith(".json")) {
-                        const content = fileReader.result;
-                        setContentPlain(content);
-                      }
-                    };
-                    fileReader.readAsText(file);
-                  }}
-                />
-                {contentBody !== undefined && contentHeader !== undefined && (
-                  <Accordion>
-                    <Accordion.Item eventKey="0">
-                      <Accordion.Header>
-                        {locale().file_content}
-                      </Accordion.Header>
-                      <Accordion.Body
-                        style={{ overflow: "scroll", height: 70 + "vh" }}
-                      >
-                        <Table responsive striped bordered hover>
-                          <thead>
-                            <tr>
-                              {React.Children.toArray(
-                                contentHeader.split(",").map((h) => {
-                                  return <th>{h}</th>;
-                                })
-                              )}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {React.Children.toArray(
-                              contentBody.map((e) => {
-                                return (
-                                  <tr>
-                                    {React.Children.toArray(
-                                      e.split(",").map((h) => {
-                                        return <td>{h}</td>;
-                                      })
-                                    )}
-                                  </tr>
-                                );
-                              })
-                            )}
-                          </tbody>
-                        </Table>
-                      </Accordion.Body>
-                    </Accordion.Item>
-                  </Accordion>
-                )}
-                {contentPlain !== undefined && (
-                  <Accordion>
-                    <Accordion.Item eventKey="0">
-                      <Accordion.Header>
-                        {locale().file_content}
-                      </Accordion.Header>
-                      <Accordion.Body
-                        style={{ overflow: "scroll", height: 70 + "vh" }}
-                      >
-                        {contentPlain}
-                      </Accordion.Body>
-                    </Accordion.Item>
-                  </Accordion>
-                )}
-                <Button variant="primary" type="submit">
-                  {locale().submit}
-                </Button>
-                <br />
-                <font style={{ marginLeft: 5 + "px" }}>{msg}</font>
-              </Form>
+              <FormFile
+                submitFunction={postFile}
+                backFunction={back}
+                setContentBody={setContentBody}
+                setContentHeader={setContentHeader}
+                setContentPlain={setContentPlain}
+                setFile={setFile}
+                contentPlain={contentPlain}
+                contentHeader={contentHeader}
+                contentBody={contentBody}
+              />
+              <font style={{ marginLeft: 5 + "px" }}>{msg}</font>
             </div>
           )}
         </div>

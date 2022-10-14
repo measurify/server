@@ -9,23 +9,25 @@ import {
 import { AuthPage } from "./components/authPage/authPage.comp";
 import { HomePage } from "./components/homePage/homePage";
 import { NotFoundPage } from "./components/notFoundPage/notFoundPage";
-import { Navigation } from "./components/navigation/navigation.comp";
+import Navigation from "./components/navigation/navigation.comp";
 import Page from "./components/page/page";
 import ProfilePage from "./components/profilePage/profilePage";
 import "./App.scss";
 import UnauthorizedPage from "./components/unauthorizedPage/unauthorizedPage";
 
-import NotificationBar from "./components/notificationBar/notificationBar";
-import { website_name } from "./config";
+import { Container, Row, Col } from "react-bootstrap";
 
+import NotificationBar from "./components/notificationBar/notificationBar";
+import HorizontalNavigationBar from "./components/horizontalNavigationBar/horizontalNavigationBar";
 import AppContext from "./context";
 
 import { notificationManager, get_generic } from "./services/http_operations";
+import MobilePlaceholderPage from "./components/mobilePlaceholderPage/mobilePlaceholderPage";
 import EditContentPage from "./components/editContentPage/editContentPage";
 import AddPage from "./components/addPage/addPage";
 import AddExperimentPage from "./components/addExperimentPage/addExperimentPage";
 import { SetFetchedData, fetchedData } from "./fetchedData";
-
+import { layout } from "./config";
 /*
     notifications follow this schema
 
@@ -46,8 +48,8 @@ interface INotification {
 
 function App() {
   const [notifications, setNotifications] = useState<INotification[]>([]);
-  const appName: string = website_name;
 
+  let layoutRef = React.useRef<string | null>();
   const tkn = localStorage.getItem("diten-token");
 
   //use effect to fetch static data from the server (like types)
@@ -103,6 +105,15 @@ function App() {
   notificationManager.PushNotification = PushNotification;
   notificationManager.RemoveNotification = RemoveNotification;
 
+  //mobile view only allowed to be vertical
+  if (/Mobi/i.test(window.navigator.userAgent) == true) {
+    layoutRef.current = "vertical";
+  } else {
+    layoutRef.current = layout;
+  }
+  console.log(window);
+
+  //not logged => show auth page
   if (tkn === null)
     return (
       <div className="app">
@@ -118,39 +129,74 @@ function App() {
       </div>
     );
 
+  console.log(layoutRef.current);
   return (
     <AppContext.Provider value={notificationsSettings}>
-      <div className="app">
-        <Router>
-          <aside>
-            <NavLink to="/home" className="nav-wrap">
-              {appName}
-            </NavLink>
-            <Navigation />
-          </aside>
+      <Router>
+        <Container
+          fluid
+          style={{
+            paddingLeft: 0,
+            paddingRight: 0,
+            height: 100 + "%",
+          }}
+        >
+          {layoutRef.current === "horizontal" ? (
+            <Row style={{ padding: 0 }}>
+              <HorizontalNavigationBar />
+            </Row>
+          ) : (
+            ""
+          )}
+          <Row
+            style={{
+              padding: 0,
+            }}
+          >
+            {layoutRef.current === "vertical" ? (
+              <Col md="auto" style={{ padding: 0, minWidth: 250 + "px" }}>
+                <Navigation />
+              </Col>
+            ) : (
+              ""
+            )}
+            {/Mobi/i.test(window.navigator.userAgent) == true && (
+              <Col md="auto" style={{ padding: 0 }}>
+                <NotificationBar />
+              </Col>
+            )}
+            <Col style={{ paddingLeft: 0, paddingRight: 0 }}>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/home" element={<HomePage />} />
+                <Route path="/viewProfile" element={<ProfilePage />} />
+                <Route
+                  path="/add/experiments/"
+                  element={<AddExperimentPage />}
+                />
 
-          <div className="main">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/home" element={<HomePage />} />
-              <Route path="/viewProfile" element={<ProfilePage />} />
-              <Route path="/add/experiments/" element={<AddExperimentPage />} />
+                <Route
+                  path="/edit/:resource/:id"
+                  element={<EditContentPage />}
+                />
+                <Route path="/add/:resource/" element={<AddPage />} />
+                <Route path="/:page" element={<Page res=":page" />} />
 
-              <Route path="/edit/:resource/:id" element={<EditContentPage />} />
-              <Route path="/add/:resource/" element={<AddPage />} />
-              <Route path="/:page" element={<Page res=":page" />} />
+                <Route path="/unauthorized" element={<UnauthorizedPage />} />
+                <Route path="/404" element={<NotFoundPage />} />
 
-              <Route path="/unauthorized" element={<UnauthorizedPage />} />
-              <Route path="/404" element={<NotFoundPage />} />
-
-              <Route path="*" element={<Navigate to="/404" replace />} />
-            </Routes>
-          </div>
-          <div className="right-bar">
-            <NotificationBar />
-          </div>
-        </Router>
-      </div>
+                <Route path="*" element={<Navigate to="/404" replace />} />
+              </Routes>
+            </Col>
+            {layoutRef.current === "vertical" &&
+              /Mobi/i.test(window.navigator.userAgent) == false && (
+                <Col md="auto" style={{ paddingLeft: 0, paddingRight: 0 }}>
+                  <NotificationBar />
+                </Col>
+              )}
+          </Row>
+        </Container>
+      </Router>
     </AppContext.Provider>
   );
 }

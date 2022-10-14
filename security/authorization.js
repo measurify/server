@@ -2,6 +2,7 @@
 const UserRoles = require('../types/userRoles.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 const persistence = require('../commons/persistence.js');
+const { equalScalarDependencies } = require('mathjs');
 
 exports.isAdministrator = function(user) {
     if (user.type == UserRoles.admin) return true;
@@ -33,9 +34,9 @@ exports.isHim = function(resource, user) {
     return resource._id.equals(user._id); 
 }
 
-exports.isAvailable = async function(id, field, model) {
+exports.isAvailable = async function(id, field, model,req) {
     let item = await persistence.get(id, field, model);
-    if(!item && model.modelName == 'User') item = await persistence.get(id, 'username', model); 
+    if(!item && model.modelName == 'User') {item = await persistence.get(id, 'username', model);if(item)req.params.id=item._id} 
     if(!item) return null; 
     return item;
 }
@@ -73,14 +74,14 @@ exports.canModify = function(resource, user) {
 
 exports.canDelete = function(resource, user) {
     if (this.isAdministrator(user)) return true;
-    if (this.isSupplier(user)) return true;
+    if (this.isSupplier(user)) return false;
     if (this.isProvider(user) && this.isOwner(resource, user)) return true;
     return false;
 } 
 
 exports.canDeleteList = function(user) {
     if (this.isAdministrator(user)) return true;
-    if (this.isSupplier(user)) return true;
+    if (this.isSupplier(user)) return false;
     if (this.isProvider(user)) return true;
     if (this.isAnalyst(user)) return false;
     return false;
@@ -88,7 +89,7 @@ exports.canDeleteList = function(user) {
 
 exports.whatCanRead = function(user) {
     let result = {};
-    if (this.isSupplier(user)) result = { visibility: VisibilityTypes.public };
+    if (this.isSupplier(user)) result = { $and: [  { owner: user._id }, { visibility: VisibilityTypes.public },{ visibility: VisibilityTypes.private } ] };//can't see anything
     if (this.isAdministrator(user)) return result;
     if (this.isAnalyst(user)) return result;
     if (this.isProvider(user)) result = { $or: [  { owner: user._id }, { visibility: VisibilityTypes.public } ] };
@@ -164,7 +165,7 @@ exports.readJustOwned = function(user) {
 
 exports.whatCanDelete = function(user) {
     if (this.isAdministrator(user)) return null;
-    if (this.isSupplier(user)) return null;
+    if (this.isSupplier(user)) return { $and: [  { owner: user._id }, { visibility: VisibilityTypes.public },{ visibility: VisibilityTypes.private } ] };
     if (this.isProvider(user)) return { owner: user._id };
     return null;
 } 

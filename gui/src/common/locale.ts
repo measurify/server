@@ -51,6 +51,7 @@ interface ILocalization {
   login: string;
   logout: string;
   repeat: string;
+  close: string;
 
   ///Errors
   login_error: string;

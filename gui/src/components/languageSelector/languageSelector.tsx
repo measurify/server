@@ -14,12 +14,22 @@ export const LanguageSelector = () => {
     <div>
       {locale().language}
       <div>
-        <Button variant="outline-info" onClick={() => setSessionLanguage("it")}>
-          Ita
-        </Button>
-        <Button variant="outline-info" onClick={() => setSessionLanguage("en")}>
-          Eng
-        </Button>
+        {languages.includes("it") && (
+          <Button
+            variant="outline-info"
+            onClick={() => setSessionLanguage("it")}
+          >
+            Ita
+          </Button>
+        )}
+        {languages.includes("en") && (
+          <Button
+            variant="outline-info"
+            onClick={() => setSessionLanguage("en")}
+          >
+            Eng
+          </Button>
+        )}
       </div>
     </div>
   );

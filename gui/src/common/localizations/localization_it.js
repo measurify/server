@@ -51,6 +51,7 @@ const localization_it = {
   login: "Accedi",
   logout: "Esci",
   repeat: "Ripeti",
+  close: "Chiudi",
 
   ///Errori
   login_error: "Login errata!",

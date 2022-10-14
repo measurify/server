@@ -9,8 +9,12 @@ export const website_name = "Admin Dashboard";
 
 //languages enabled for this GUI, only english "en" and italian "it" are supported with this version
 //if no languages are enabled, the GUI will be localized in english
-//export const languages = ["en","it"];
+//export const languages = ["en", "it"];
 export const languages = [];
+
+//gui layout
+// options are "horizontal" or "vertical"
+export const layout = "vertical";
 
 //dictionary of pages: key is the route for the API REST, value is an array that contains the fields shown to users
 //action is a special field that will enable actions for each row || still required, future version may have it removed

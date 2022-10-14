@@ -20,6 +20,12 @@ const userSchema = new mongoose.Schema({
 userSchema.plugin(require('mongoose-autopopulate'));
 userSchema.plugin(require('mongoose-paginate-v2'));
 
+//check username duplicated
+userSchema.pre('save', async function() {
+    if(this.isNew){let res = await this.constructor.findOne( { username:this.username});                                             
+    if(res) throw new Error('The username '+this.username+' already exists'); }                      
+});
+
 
 // check type
 userSchema.pre('save', async function() {

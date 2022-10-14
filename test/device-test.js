@@ -44,6 +44,16 @@ describe('/GET device', () => {
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
     });
+
+    it('a supplier should NOT GET anything', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.supplier);
+        await factory.createDevice("test-device-1", user);
+        await factory.createDevice("test-device-2", user);
+        const res = await chai.request(server).keepOpen().get('/v1/devices').set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.docs.length.should.be.eql(0);
+    });
 });
 
 // Test the /POST route
@@ -452,7 +462,7 @@ describe('/PUT device', () => {
 
     it('it should not PUT a device owner', async () => {
         const user_1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const user_2 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const user_2 = await factory.createUser("test-username-2", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature-1", user_1);
         const device = await factory.createDevice("test-device-1", user_1, [feature]);
         const request = { owner: user_2._id };

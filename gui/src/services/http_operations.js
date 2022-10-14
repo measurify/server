@@ -6,7 +6,7 @@ const https = require("https");
 
 const instance = axios.create({
   httpsAgent: new https.Agent({
-    ///unsafe, delete in prod
+    //unsafe, delete in prod
     //rejectUnauthorized: false,
   }),
 });
@@ -28,7 +28,7 @@ export function login(username, password, tenant) {
     headers: {
       "Content-Type": "application/json",
       "Cache-Control": "no-cache",
-      Authorization: GetToken(),
+      //Authorization: GetToken(),
     },
   };
 
@@ -80,7 +80,10 @@ export function refreshToken() {
           "diten-login-time",
           new Date().getTime().toString()
         );
-
+        localStorage.setItem(
+          "diten-token-expiration-time",
+          response.data.token_expiration_time
+        );
         resolve(response);
       })
       .catch((error) => {
@@ -130,20 +133,6 @@ export function checkThingAlreadyIn(thingId) {
         /*else {
           reject(false);
         }*/
-      });
-  });
-}
-
-function get_how_many_docs(resource_type, fst) {
-  return new Promise((resolve, reject) => {
-    get_generic(resource_type, fst)
-      .then((response) => {
-        resolve(response);
-      })
-      .catch((error) => {
-        console.log('Error: function "get_how_many_docs" threw an error');
-        console.log(error);
-        reject(error);
       });
   });
 }
@@ -249,6 +238,10 @@ export async function put_generic(resource_type, body, id, token = undefined) {
     instance
       .put(url_string, body, options)
       .then((response) => {
+        //obscure password in notification bar
+        if (body["password"] !== undefined)
+          body["password"] = "".padStart(body["password"].length, "*");
+
         notificationManager.PushNotification({
           name: "info",
           time: new Date().toTimeString(),
@@ -264,6 +257,10 @@ export async function put_generic(resource_type, body, id, token = undefined) {
         resolve({ response: response }); //true;
       })
       .catch((error) => {
+        //obscure password in notification bar
+        if (body["password"] !== undefined)
+          body["password"] = "".padStart(body["password"].length, "*");
+
         notificationManager.PushNotification({
           name: "error",
           time: new Date().toTimeString(),

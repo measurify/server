@@ -50,6 +50,7 @@ const localization_en = {
   login: "Login",
   logout: "Logout",
   repeat: "Repeat",
+  close: "Close",
 
   ///Errors
   login_error: "Wrong login!",

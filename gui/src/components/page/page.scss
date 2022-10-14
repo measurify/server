@@ -4,7 +4,8 @@
   flex-direction: column;
   max-width: 100%;
   overflow: auto;
-  min-height: 100vh;
+  height: 100%;
+  min-height: 83vh;
 }
 
 .page-header {
@@ -54,7 +55,7 @@
   padding: 30px;
   background: #f1f9fc; // #d5e1e6;
   width: 100%;
-  height: auto;
+  height: 100%;
 
   .pagination-state {
     margin: 20px 0;

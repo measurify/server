@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import locale from "../../common/locale";
 import { get_generic, put_generic } from "../../services/http_operations";
 import { useParams } from "react-router-dom";
 import {
@@ -8,16 +7,17 @@ import {
   removeDefaultElements,
 } from "../../services/misc_functions";
 
-import {
-  editFields,
-  editFieldsSpecifier,
-  fetchedPageTypes,
-} from "../../config";
-import { fetchedData } from "../../fetchedData";
+import { editFields, editFieldsSpecifier } from "../../config";
 
 import { useNavigate } from "react-router-dom";
 
 import { FormManager } from "../formManager/formManager";
+
+import {
+  sortObject,
+  maintainEmptyElement,
+  maintainEmptyElements,
+} from "../../services/objects_manipulation";
 
 const cloneDeep = require("clone-deep");
 
@@ -38,9 +38,7 @@ export default function EditContentPage(props) {
   const [deleted, setDeleted] = useState({});
 
   const [disabledFields, setDisabledFields] = useState(undefined);
-  const [mounted, setMounted] = useState(false);
-  //max indexes
-  const maxIndexes = React.useRef({});
+  //const [mounted, setMounted] = useState(false);
 
   //useeffect to get resource if required
   useEffect(() => {
@@ -51,64 +49,9 @@ export default function EditContentPage(props) {
       const data = response.docs[0];
       let tmpValues = cloneDeep(values);
 
-      //order objects inside arrays
-      const entr = Object.entries(data);
-      for (let i = 0; i < entr.length; i++) {
-        //check if value is array of obj
-        if (Array.isArray(entr[i][1])) {
-          if (entr[i][1].length === 0) continue;
-          if (entr[i][1][0].constructor === Object) {
-            for (let j = 0; j < entr[i][1].length; j++) {
-              if (editFields[resource][entr[i][0]][0] === undefined) continue;
-              const target = { ...editFields[resource][entr[i][0]][0] };
-              Object.assign(target, entr[i][1][j]);
-              entr[i][1][j] = target;
-            }
-          } else {
-            for (let j = 0; j < entr[i][1].length; j++) {
-              if (
-                editFields[resource][entr[i][0]] === undefined ||
-                editFields[resource][entr[i][0]][0] === undefined
-              )
-                continue;
+      tmpValues = sortObject(data, tmpValues);
 
-              entr[i][1][j] = entr[i][1][j];
-            }
-          }
-        }
-      }
-
-      //order main obj
-      Object.assign(tmpValues, data);
-
-      //delete non-requested keys
-      const keys = Object.keys(tmpValues);
-      const requestedKeys = Object.keys(editFields[resource]);
-      console.log({ keys, requestedKeys });
-      for (let i = 0; i < keys.length; i++) {
-        if (!requestedKeys.includes(keys[i])) {
-          delete tmpValues[keys[i]];
-        } else {
-          if (editFields[resource][keys[i]].constructor === Object) {
-          }
-          //remove undesidered keys for objects inside arrays
-          else if (
-            Array.isArray(editFields[resource][keys[i]]) &&
-            editFields[resource][keys[i]][0].constructor === Object
-          ) {
-            const objKeys = Object.keys(editFields[resource][keys[i]][0]);
-            const valObjKeys = Object.keys(tmpValues[keys[i]][0]);
-            for (let k = 0; k < tmpValues[keys[i]].length; k++) {
-              for (let j = 0; j < valObjKeys.length; j++) {
-                if (!objKeys.includes(valObjKeys[j])) {
-                  delete tmpValues[keys[i]][k][valObjKeys[j]];
-                }
-              }
-            }
-          }
-        }
-      }
-
+      //this function evaluate if a field should be disabled or not
       const evaluateSpecifiers = async () => {
         if (editFieldsSpecifier[resource] === undefined) {
           setDisabledFields({});
@@ -117,7 +60,12 @@ export default function EditContentPage(props) {
           for (let i = 0; i < keys.length; i++) {
             const _key = keys[i];
 
-            tmpValues = maintainEmptyElement(tmpValues, [_key]);
+            tmpValues = maintainEmptyElement(
+              tmpValues,
+              [_key],
+              editFields,
+              resource
+            );
           }
 
           setValues(tmpValues);
@@ -149,7 +97,12 @@ export default function EditContentPage(props) {
           const _key = keys[i];
 
           if (disabled[_key] === undefined || disabled[_key] === false) {
-            tmpValues = maintainEmptyElement(tmpValues, [_key]);
+            tmpValues = maintainEmptyElement(
+              tmpValues,
+              [_key],
+              editFields,
+              resource
+            );
           }
         }
 
@@ -166,7 +119,6 @@ export default function EditContentPage(props) {
     const fst = { _id: id };
     const qs = { filter: JSON.stringify(fst) };
     fetchData(qs);
-    setMounted(true);
   }, []);
 
   //handle changes
@@ -189,6 +141,8 @@ export default function EditContentPage(props) {
       tmpVals = maintainEmptyElement(
         tmpVals,
         path.slice(0, lastIndexNumber),
+        editFields,
+        resource,
         item
       );
     }
@@ -214,7 +168,13 @@ export default function EditContentPage(props) {
     const removed = tmpPtr.splice(path[i], 1);
 
     const item = typeof removed[0] === "number" ? NaN : "";
-    val = maintainEmptyElement(val, path.slice(0, i), item);
+    val = maintainEmptyElement(
+      val,
+      path.slice(0, i),
+      editFields,
+      resource,
+      item
+    );
 
     //save removed element into appropriate structure
     //do this only when array is on first layer of object
@@ -241,82 +201,6 @@ export default function EditContentPage(props) {
     }
 
     setValues(val);
-  };
-
-  const maintainEmptyElement = (original, path, item = undefined) => {
-    let tmp = cloneDeep(original);
-    let tmpPtr = tmp;
-    let editFldTmp = cloneDeep(editFields[resource]);
-    const tmpPath = [...path];
-
-    //get more nested array
-    for (let i = 0; i < tmpPath.length; i++) {
-      if (path[i] === undefined) break;
-      tmpPtr = tmpPtr[path[i]];
-    }
-
-    //get the appropriate item, if possible
-    for (let i = 0; i < tmpPath.length; i++) {
-      if (path[i] === undefined) break;
-      if (editFldTmp === undefined) break;
-      //ignore indexes for addFldTmp
-      if (typeof path[i] === "number") editFldTmp = editFldTmp[0];
-      else editFldTmp = editFldTmp[path[i]];
-    }
-
-    //non array case
-    if (!Array.isArray(editFldTmp)) return tmp;
-
-    //add item according to addfield dictionary
-    if (editFldTmp !== undefined) {
-      //0-length array
-      if (tmpPtr.length === 0) {
-        if (editFldTmp[0].constructor === Object) {
-          tmpPtr.push({
-            ...editFldTmp[0],
-          });
-        } else {
-          tmpPtr.push("");
-        }
-      }
-      //else 0-length array
-      else {
-        if (tmpPtr[0].constructor === Object) {
-          //check if there are no default elements in array
-          if (tmpPtr.filter((e) => isDefault(e)).length === 0) {
-            tmpPtr.push({
-              ...editFldTmp[0],
-            });
-          }
-        } else {
-          if (!tmpPtr.includes("")) {
-            tmpPtr.push("");
-          }
-        }
-      }
-    }
-
-    //add item according to params
-    if (item !== undefined && editFldTmp === undefined) {
-      if (tmpPtr.length === 0) {
-        if (item.constructor === Object) {
-          tmpPtr.push({ ...item });
-        } else {
-          tmpPtr.push(item);
-        }
-      }
-      //else 0-length array
-      else {
-        if (tmpPtr.filter((e) => isDefault(e)).length === 0) {
-          if (item.constructor === Object) {
-            tmpPtr.push({ ...item });
-          } else {
-            tmpPtr.push(item);
-          }
-        }
-      }
-    }
-    return tmp;
   };
 
   const submit = async (e) => {

@@ -1,17 +1,10 @@
-import React, { useEffect } from "react";
-import locale from "../../common/locale";
-import { pages, aliasPages } from "../../config";
-import { get_generic } from "../../services/http_operations";
+import React from "react";
+import { aliasPages } from "../../config";
 
 import { Table } from "react-bootstrap";
 import ActionManager from "../actionsManager/actionsManager";
 
 export default function ContentTable(props) {
-  /* useEffect(() => {
-    //console.log(props);
-    //use effect body
-  }, [props]);*/
-
   if (props.header === undefined || props.resources === undefined)
     return <div>Loading</div>;
   if (props.header.includes("actions") && props.actions === undefined)

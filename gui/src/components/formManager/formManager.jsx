@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import locale from "../../common/locale";
 import { nonDefaultLength } from "../../services/misc_functions";
 import { Button, Form, Accordion, Container, Row, Col } from "react-bootstrap";
@@ -20,7 +20,7 @@ export const FormManager = (props) => {
   )
     return "Loading";
 
-  console.log({
+  /*console.log({
     values: props.values,
     resource: props.resource,
     disabledFields: props.disabledFields,
@@ -29,7 +29,7 @@ export const FormManager = (props) => {
     backFunction: props.backFunction,
     handleChangesCallback: props.handleChangesCallback,
     arrayDeleteCallback: props.arrayDeleteCallback,
-  });
+  });*/
   //Numeric for row component
   const NumericFormRow = (key) => {
     return (
@@ -597,6 +597,7 @@ export const FormManager = (props) => {
                                         );
                                       } else if (typeof e === "string")
                                         return "TODO string";
+                                      return "Unknown data type";
                                     })
                                   )}
                                 </Accordion.Body>
@@ -605,6 +606,7 @@ export const FormManager = (props) => {
                           </Row>
                         );
                       }
+                      return "Unknown data type";
                     })
                   )}
                 </Row>
@@ -666,6 +668,7 @@ export const FormManager = (props) => {
       <Button variant="primary" type="submit" key={"submit"}>
         {locale().submit}
       </Button>
+      &nbsp;&nbsp;&nbsp;
       <Button variant="secondary" key={"cancel"} onClick={props.backFunction}>
         {locale().cancel}
       </Button>

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import locale from "../../common/locale";
 import { viewFields } from "../../config";
 import { NavLink } from "react-router-dom";
 
@@ -23,15 +22,13 @@ fontawesome.library.add(faEye, faPencilAlt, faCopy);
 
 function ActionContent(props) {
   const toShow = {};
-  console.log({ props });
-  viewFields[props.resType].map((k) => {
-    console.log(k.constructor === Object);
+  viewFields[props.resType].forEach((k) => {
     if (k.constructor === Object) {
-      Object.keys(k).map((subK) => {
+      Object.keys(k).forEach((subK) => {
         if (Array.isArray(props.resource[subK])) {
           toShow[subK] = props.resource[subK].map((e) => {
             const row = {};
-            k[subK].map((f) => {
+            k[subK].forEach((f) => {
               row[f] = e[f];
             });
             return row;
@@ -47,14 +44,13 @@ function ActionContent(props) {
     }
   });
 
-  console.log({ toShow });
   //render accordion with table when field is array of object
   return UnrollView(toShow);
 }
 
 function UnrollView(item) {
   return (
-    <Accordion defaultActiveKey={0} size="lg">
+    <Accordion defaultActiveKey={0} size={"lg"}>
       {React.Children.toArray(
         Object.entries(item).map(([key, value], i) => {
           return (
@@ -145,7 +141,11 @@ export default function ActionManager(props) {
     res !== undefined ? (
       <Popover
         id="popover-positioned-left"
-        style={{ width: 20 + "vw", minWidth: 400 + "px" }}
+        style={{
+          width: 20 + "vw",
+          minWidth:
+            /Mobi/i.test(window.navigator.userAgent) == true ? 275 : 400 + "px",
+        }}
       >
         <Popover.Header as="h3">View Resource</Popover.Header>
         <Popover.Body>
@@ -200,7 +200,7 @@ export default function ActionManager(props) {
             try {
               const response = await delete_generic(props.resType, props.id);
 
-              if (response.response.status == 200) {
+              if (response.response.status === 200) {
                 props.removeSingle(props.id);
               }
             } catch (error) {
@@ -244,7 +244,7 @@ export default function ActionManager(props) {
   }
   if (props.action === "duplicate") {
     return (
-      <NavLink to={`/add/` + props.resType + "/" + "?from=" + props.id}>
+      <NavLink to={`/add/` + props.resType + "/?from=" + props.id}>
         <Button variant="link" size="sm">
           <i
             className="fa fa-copy"
