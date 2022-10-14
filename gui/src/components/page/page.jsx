@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Button } from "react-bootstrap";
-import locale from "../../common/locale";
 import { pages, pageActions, addFields } from "../../config";
 import { get_generic } from "../../services/http_operations";
 import ContentTable from "../contentTable/contentTable";
@@ -40,7 +39,6 @@ export default function Page(params) {
       try {
         const response = await get_generic(page, qs);
 
-        //console.log(response);
         // set state with the result
         setHeader(pages[page]);
         setResource(response.docs);

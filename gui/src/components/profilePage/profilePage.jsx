@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
 import { Button, Form, Container, Row, Col } from "react-bootstrap";
 import locale from "../../common/locale";
 import { put_generic } from "../../services/http_operations";
@@ -57,7 +56,7 @@ export default function ProfilePage(params) {
       setMsg(locale().pass_not_match);
       return;
     }
-    if (password == "" || passwordConfirm === "") {
+    if (password === "" || passwordConfirm === "") {
       setMsg(locale().pass_not_null);
       return;
     }
@@ -69,7 +68,6 @@ export default function ProfilePage(params) {
           { password: password },
           username
         );
-        console.log({ response });
 
         setPassword("");
         setPasswordConfirm("");
@@ -85,7 +83,7 @@ export default function ProfilePage(params) {
   return (
     <div className="page">
       <header className="page-header">
-        {locale().welcome}&nbsp;<b>username</b>:&nbsp;
+        {locale().welcome}&nbsp;<b>{username}</b>:&nbsp;
         {locale().profile_page_desc}
       </header>
       <main className="page-content">
