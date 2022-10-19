@@ -20,7 +20,7 @@ const VisibilityTypes = require('../types/visibilityTypes.js');
 // Test the /GET route
 describe('/GET dataset', () => {  
     it('it should GET all the measurements as pd dataframe', async () => {
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const feature = await factory.createFeature("test-feature", owner);
         const tag1 = await factory.createTag("test-tag-1", owner);
         const tag2 = await factory.createTag("test-tag-2", owner);
@@ -29,14 +29,14 @@ describe('/GET dataset', () => {
         const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(1));
         const measurement2 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(2));
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(3));
-        const res = await chai.request(server).keepOpen().get('/v1/datasets').set("Authorization", await factory.getUserToken(owner));
+        const res = await chai.request(server).keepOpen().get('/v1/datasets').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/dataframe');
         res.should.have.status(200);
         res.body[0].id.should.be.a('array');
         res.body[0].id.length.should.be.eql(3);
     });
 
     it('it should GET all the measurements as CSV', async () => {
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const feature = await factory.createFeature("test-feature", owner);
         const tag1 = await factory.createTag("test-tag-1", owner);
         const tag2 = await factory.createTag("test-tag-2", owner);
@@ -52,7 +52,7 @@ describe('/GET dataset', () => {
     });
 
     it('it should GET all the measurements as CSV+', async () => {
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const feature = await factory.createFeature("test-feature", owner);
         const tag1 = await factory.createTag("test-tag-1", owner);
         const tag2 = await factory.createTag("test-tag-2", owner);
@@ -68,7 +68,7 @@ describe('/GET dataset', () => {
     });
 
     it('it should GET measurements paginated', async () => {
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const feature = await factory.createFeature("test-feature", owner);
         const tag1 = await factory.createTag("test-tag-1", owner);
         const tag2 = await factory.createTag("test-tag-2", owner);
@@ -78,14 +78,14 @@ describe('/GET dataset', () => {
         const measurement2 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(2));
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(3));
         const measurement4 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(4));
-        const res = await chai.request(server).keepOpen().get('/v1/datasets?limit=2&page=1').set("Authorization", await factory.getUserToken(owner));
+        const res = await chai.request(server).keepOpen().get('/v1/datasets?limit=2&page=1').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/dataframe');;
         res.should.have.status(200);
         res.body[0].id.should.be.a('array');
         res.body[0].id.length.should.be.eql(2);
     });
 
     it('it should GET measurements only of a specific tag', async () => {
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const feature = await factory.createFeature("test-feature", owner);
         const tag1 = await factory.createTag("test-tag-1", owner);
         const tag2 = await factory.createTag("test-tag-2", owner);
@@ -96,18 +96,18 @@ describe('/GET dataset', () => {
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(3));
         const measurement4 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(4));
         const measurement5 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(5));
-        let res = await chai.request(server).keepOpen().get('/v1/datasets?filter={"tags":"test-tag-1"}').set("Authorization", await factory.getUserToken(owner));
+        let res = await chai.request(server).keepOpen().get('/v1/datasets?filter={"tags":"test-tag-1"}').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/dataframe');;
         res.should.have.status(200);
         res.body[0].id.should.be.a('array');
         res.body[0].id.length.should.be.eql(4);
-        res = await chai.request(server).keepOpen().get('/v1/datasets?filter={"tags":"test-tag-2"}').set("Authorization", await factory.getUserToken(owner));
+        res = await chai.request(server).keepOpen().get('/v1/datasets?filter={"tags":"test-tag-2"}').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/dataframe');;
         res.should.have.status(200);
         res.body[0].id.should.be.a('array');
         res.body[0].id.length.should.be.eql(2);
     });
 
     it('it should GET the same feature as id and filter', async () => {
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const feature = await factory.createFeature("test-feature", owner);
         const tag1 = await factory.createTag("test-tag-1", owner);
         const tag2 = await factory.createTag("test-tag-2", owner);
@@ -116,14 +116,14 @@ describe('/GET dataset', () => {
         const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(1));
         const measurement2 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(2));
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(3));
-        const res = await chai.request(server).keepOpen().get('/v1/datasets?filter={"feature":"'+feature._id+'"}').set("Authorization", await factory.getUserToken(owner));
+        const res = await chai.request(server).keepOpen().get('/v1/datasets?filter={"feature":"'+feature._id+'"}').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/dataframe');;
         res.should.have.status(200);
         res.body[0].id.should.be.a('array');
         res.body[0].id.length.should.be.eql(3);
     });
 
     it('it should GET measurements only of a specific dataupload tag as pd Dataframe', async () => {
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
         const thing = await factory.createThing("test-thing-1", owner);
@@ -136,18 +136,18 @@ describe('/GET dataset', () => {
         const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag2], factory.createSamples(3));
         const measurement4 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(4));
         const measurement5 = await factory.createMeasurement(owner, feature, device, thing, [tag1], factory.createSamples(5));
-        let res = await chai.request(server).keepOpen().get('/v1/datasets/'+dataupload1._id).set("Authorization", await factory.getUserToken(owner));
+        let res = await chai.request(server).keepOpen().get('/v1/datasets/'+dataupload1._id).set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/dataframe');;
         res.should.have.status(200);
         res.body[0].id.should.be.a('array');
         res.body[0].id.length.should.be.eql(3);
-        res = await chai.request(server).keepOpen().get('/v1/datasets/'+dataupload2._id).set("Authorization", await factory.getUserToken(owner));
+        res = await chai.request(server).keepOpen().get('/v1/datasets/'+dataupload2._id).set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/dataframe');;
         res.should.have.status(200);
         res.body[0].id.should.be.a('array');
         res.body[0].id.length.should.be.eql(2);
     });
 
     it('it should GET measurements only of a specific dataupload tag as CSV', async () => {
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
         const thing = await factory.createThing("test-thing-1", owner);
@@ -171,7 +171,7 @@ describe('/GET dataset', () => {
     });
 
     it('it should GET measurements only of a specific dataupload tag as CSV+', async () => {
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
         const thing = await factory.createThing("test-thing-1", owner);
@@ -195,7 +195,7 @@ describe('/GET dataset', () => {
     });
 
     it('it should GET info of the dataupload', async () => {
-        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
         const feature = await factory.createFeature("test-feature", owner);
         const dataupload = await factory.createDataupload("test-dataupload", owner,Date.now(),1500,"test-result",Date.now());
         let res = await chai.request(server).keepOpen().get('/v1/datasets/'+dataupload._id+'/info').set("Authorization", await factory.getUserToken(owner));
