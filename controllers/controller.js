@@ -15,7 +15,7 @@ exports.getResource = async function (req, res, field, model, select) {
     }
 };
 
-exports.getResourceDataset = async function (req, res, sort, select, model) {
+exports.getResourceDataset = async function (req, res, sort, select, model, restrictions) {
     try {
         const query = req.query;
         if (!query.sort) query.sort = sort;
@@ -34,7 +34,6 @@ exports.getResourceDataset = async function (req, res, sort, select, model) {
         if (req.headers.accept == 'text/csv+') {//only with feature specified
             fil = JSON.stringify(filterDataset);//need to be a string not an object            
             if (fil.includes('{"feature":')) {
-                restriction = {};
                 let featureId = null;
                 if (filterDataset.hasOwnProperty('feature')) {
                     featureId = filterDataset.feature;
@@ -47,7 +46,7 @@ exports.getResourceDataset = async function (req, res, sort, select, model) {
                     const Feature = mongoose.dbs[req.tenant.database].model('Feature');
 
                     const item = await persistence.get(featureId, null, Feature, select);
-                    let list = await persistence.getList(filterDataset, query.sort, select, query.page, query.limit, restriction, model);
+                    let list = await persistence.getList(filterDataset, query.sort, select, query.page, query.limit, restrictions, model);
 
                     res.header('Content-Type', 'text/csv');
 
@@ -62,9 +61,8 @@ exports.getResourceDataset = async function (req, res, sort, select, model) {
             else { req.headers.accept = 'text/csv' }
         }
         if (req.headers.accept == 'text/csv') {
-            restriction = {};
             filterDataset = JSON.stringify(filterDataset);//need to be a string not an object
-            let list = await persistence.getList(filterDataset, query.sort, select, query.page, query.limit, restriction, model);
+            let list = await persistence.getList(filterDataset, query.sort, select, query.page, query.limit, restrictions, model);
 
             res.header('Content-Type', 'text/csv');
             let csvresultlibrary = '';
