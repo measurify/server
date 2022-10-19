@@ -122,9 +122,8 @@ exports.jsonToCSVPlus = function (jsonData, columnsname) {
     if (!process.env.CSV_VECTOR_END) process.env.CSV_VECTOR_END = '';
     if (!process.env.CSV_VECTOR_DELIMITER) process.env.CSV_VECTOR_DELIMITER = ';'
     jsonData = JSON.stringify(jsonData);
-    const json =
-        typeof jsonData !== "object" ? JSON.parse(jsonData) : jsonData;
-    columnsname = columnsname.map(x => `"${x}"`).join(",");
+    const json = typeof jsonData !== "object" ? JSON.parse(jsonData) : jsonData;
+    columnsname = columnsname.join(process.env.CSV_DELIMITER);
 
     let str = process.env.CSV_VECTOR_START +
         `${Object.keys(json.docs[0])//csv header
@@ -132,9 +131,9 @@ exports.jsonToCSVPlus = function (jsonData, columnsname) {
                 if (value == "samples") {
                     return columnsname;
                 }
-                else return `"${value}"`
+                else return `${value}`
             })
-            .join(process.env.CSV_DELIMITER)}` + process.env.CSV_DELIMITER + "\"deltatime\"" + "\n";
+            .join(process.env.CSV_DELIMITER)}` + process.env.CSV_DELIMITER + "deltatime" + "\n";
     currentRow = "\n";//string for samples with more values
     json.docs.forEach(doc => {//loop for each sample
         str +=//single sample
@@ -143,15 +142,15 @@ exports.jsonToCSVPlus = function (jsonData, columnsname) {
                     if (isArray(value))//for array values e.g. tags 
                     {
                         if (value.length == 0) {//default empty
-                            currentRow += `"[]"` + process.env.CSV_DELIMITER;
-                            return `"[]"`;
+                            currentRow += `[]` + process.env.CSV_DELIMITER;
+                            return `[]`;
                         }
                         if (isObject(value[0])) {
                             return value.map((x) => {
                                 delta = 0;//inizialization and default = 0
                                 if (x.delta != null) delta = x.delta;  //add as a column                            
                                 // if it's an object containing values:
-                                return x.values.map(x => `"${x}"`).join(process.env.CSV_DELIMITER) + process.env.CSV_DELIMITER + "\"" + delta + "\"";//mappa i valori di values separandoli con una virgola. 
+                                return x.values.map(x => `${x}`).join(process.env.CSV_DELIMITER) + process.env.CSV_DELIMITER + delta ;//mappa i valori di values separandoli con una virgola. 
                             }
                             ).join(currentRow);
                         }
@@ -161,8 +160,8 @@ exports.jsonToCSVPlus = function (jsonData, columnsname) {
                         }//for tags
                     }
                     else {
-                        currentRow += `"${value}"` + process.env.CSV_DELIMITER;
-                        return `"${value}"`
+                        currentRow += `${value}` + process.env.CSV_DELIMITER;
+                        return `${value}`
                     }
                 }).join(process.env.CSV_DELIMITER)}` + "\n";
         currentRow = "\n";
@@ -173,14 +172,21 @@ exports.jsonToCSVPlus = function (jsonData, columnsname) {
 
 exports.jsonToCSV = function (jsonData) {
     if (!process.env.CSV_DELIMITER) process.env.CSV_DELIMITER = ',';
-    jsonData = JSON.stringify(jsonData);
-    const json = typeof jsonData !== "object" ? JSON.parse(jsonData) : jsonData;
-    const { Parser, transforms: { unwind } } = require('json2csv');
-    const fields = ["visibility", "tags", "_id", "startDate", "endDate", "thing", "feature", "device", { label: 'values', value: 'samples.values' }, { label: 'deltatime', value: 'samples.delta', default: 0 }];
-    const transforms = [unwind({ paths: ['samples'] })];
-    const json2csvParser = new Parser({ fields, transforms, delimiter: process.env.CSV_DELIMITER });
-    const csv = json2csvParser.parse(json.docs);
+    if (!process.env.CSV_VECTOR_DELIMITER) process.env.CSV_VECTOR_DELIMITER = ';';
+    jsonData = JSON.stringify(jsonData.docs);
+    jsonData = typeof jsonData !== "object" ? JSON.parse(jsonData) : jsonData;
+    if (!jsonData.length) throw new Error('Not found any element')
+    const keys = Object.keys(jsonData[0]);
+    let csv = keys.join(process.env.CSV_DELIMITER) + "\n";//header
+    jsonData.forEach(doc => { let arr = []; keys.forEach(key => arr.push(key == "samples" ? (!doc[key].length ? "[]" : sampleValues(doc[key][0])) : (isArray(doc[key]) && !doc[key].length || key == "location" ? "[]" : doc[key]))); csv += arr.join(process.env.CSV_DELIMITER) + "\n"; })
     return csv;
+}
+
+const sampleValues = function (sample) {
+    let sampleText = "[";
+    sampleText += sample.values.toString();
+    sampleText += "]";
+    return sampleText;
 }
 
 exports.json2CSVHistory = function (jsonHistory, protocol) {
@@ -192,14 +198,14 @@ exports.json2CSVHistory = function (jsonHistory, protocol) {
     protocol = typeof protocol !== "object" ? JSON.parse(protocol) : protocol;
     let topics = {}
     for (value of protocol) { for (el of value.fields) { header.push(el.name); topics[el.name] = el.type } };
-    let csv = header.join(process.env.CSV_DELIMITER) + " \n ";
+    let csv = header.join(process.env.CSV_DELIMITER) + "\n";
     for (value2 of jsonHistory) {
         let line = [value2.step];
         for (el2 of header) {
             if (el2 != "step") {
                 let topic = value2.fields.find(element => element.name == el2);
-                if(!topic){line.push(null);}
-                else{if (topics.topic == "vector")line.push(topic.value);else line.push(topic.value[0]);}
+                if (!topic) { line.push(null); }
+                else { if (topics.topic == "vector") line.push(topic.value); else line.push(topic.value[0]); }
             }
         }
         csv += line.join(process.env.CSV_DELIMITER) + "\n";
@@ -207,4 +213,28 @@ exports.json2CSVHistory = function (jsonHistory, protocol) {
     csv = extractData.transposeCsv(csv);
     csv = csv.replace(/\r|\"/g, "");
     return csv;
+}
+
+exports.getInPdDataframe = async function (filter, sort, select, page, limit, model) {
+    if (!page) page = '1';
+    if (!limit) limit = '10';
+    if (!filter) filter = '{}';
+    if (!sort) sort = '{ "timestamp": "desc" }';
+    if (!select) select = {};
+    const list = await model.aggregate(
+        [
+            { $match: filter },
+            { $skip: (parseInt(page) - 1) * parseInt(limit) },
+            { $limit: parseInt(limit) },
+            { $unwind: "$samples" },
+            {
+                $group: {
+                    _id: "$feature", "visibility": { $push: "$visibility" }, "tags": { $push: "$tags" }, "id": { $push: "$_id" }, "startDate": { $push: "$startDate" },
+                    "endDate": { $push: "$endDate" }, "thing": { $push: "$thing" }, "device": { $push: "$device" }, "samples": { $push: "$samples.values" }
+                }
+            }
+        ]
+    )
+    //list.push({"page":page,"limit":limit}); //for the pagination    
+    return list;
 }

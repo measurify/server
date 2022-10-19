@@ -72,7 +72,7 @@ exports.getResourceDataset = async function (req, res, sort, select, model) {
             return res.status(200).send(csvresultlibrary);
         }
         //else no accept headers parameters or else
-        let list = await persistence.getDataset(filterDataset, query.sort, select, query.page, query.limit, model);
+        let list = await conversion.getInPdDataframe(filterDataset, query.sort, select, query.page, query.limit, model);
         return res.status(200).json(list);
     }
     catch (err) {
@@ -98,7 +98,7 @@ exports.getResourceList = async function (req, res, sort, select, model, restric
         if (req.headers.accept == 'text/csv') {
             res.header('Content-Type', 'text/csv');
             csvresultlibrary = conversion.jsonToCSV(list);
-            return res.status(200).json(csvresultlibrary);
+            return res.status(200).send(csvresultlibrary);
         }
         else return res.status(200).json(list);
     }
