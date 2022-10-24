@@ -19,10 +19,11 @@ export const layout = "vertical";
 //dictionary of pages: key is the route for the API REST, value is an array that contains the fields shown to users
 //action is a special field that will enable actions for each row || still required, future version may have it removed
 export const pages = {};
-/*pages["users"] = ["username", "type", "actions"];
-pages["tags"] = ["_id", "actions"];
+
+/*pages["tags"] = ["_id", "actions"];
 pages["features"] = ["_id", "actions"];
 pages["devices"] = ["_id", "tags", "actions"];*/
+pages["users"] = ["username", "type", "actions"];
 pages["protocols"] = ["_id", "description", "actions"];
 pages["experiments"] = ["_id", "description", "protocol", "actions"];
 
@@ -35,21 +36,22 @@ export const aliasPages = {};
 //actions dictionary: key is the page, value is an array that contains actions || working actions arae "view" | "edit" | "delete"
 export const pageActions = {};
 /*pageActions["features"] = ["view", "edit", "duplicate", "delete"];
-pageActions["users"] = ["view", "delete"];
 pageActions["tags"] = ["view", "edit", "delete"];
 pageActions["devices"] = ["view", "edit", "delete"];*/
+pageActions["users"] = ["view", "delete"];
 pageActions["protocols"] = ["view", "delete"];
 pageActions["experiments"] = ["view", "delete"];
 
 //view dictionary: key is the page, value is an array that contains the fields shown to the user with "view" action
 export const viewFields = {};
-/*viewFields["users"] = ["username", "type", "actions", "fieldmask", "status"];
+/*
 viewFields["features"] = [
   { items: ["name", "type", "unit", "dimension"] },
   "tags",
 ];
 viewFields["tags"] = ["tags"];
 viewFields["devices"] = ["_id", "features", "tags", "scripts"];*/
+viewFields["users"] = ["username", "type", "actions", "fieldmask", "status"];
 viewFields["protocols"] = ["_id", "description", "metadata"];
 viewFields["experiments"] = ["_id", "description", "protocol", "metadata"];
 
@@ -96,13 +98,14 @@ addFields["features"] = {
   items: [{ name: "", type: "", unit: "", dimension: NaN }],
   tags: [""],
 };
-addFields["users"] = { username: "", password: "", type: "" };
+
 
 addFields["devices"] = {
   _id: "",
   features: [""],
 };
 */
+addFields["users"] = { username: "", password: "", type: "" };
 addFields["protocols"] = {
   _id: "",
   description: "",
@@ -143,9 +146,10 @@ export const editFieldsSpecifier = {};
 export const addTypes = {};
 /*addTypes["tags"] = ["form", "file"];
 addTypes["features"] = ["form", "file"];
-addTypes["users"] = ["form", "file"];
+
 addTypes["devices"] = ["form", "file"];*/
 addTypes["tenants"] = ["form"];
+addTypes["users"] = ["form", "file"];
 addTypes["protocols"] = ["form", "file"];
 addTypes["experiments"] = ["form", "file"];
 
