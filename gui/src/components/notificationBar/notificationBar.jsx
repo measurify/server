@@ -17,7 +17,7 @@ export default function NotificationBar(props) {
   const [highlight, setHighlight] = useState(false);
 
   let layoutRef = React.useRef();
-  const myContext = useContext(AppContext);
+  const myNotifications = useContext(AppContext).notifications;
   oldNotifications.current = 0;
 
   const handleClose = () => setShow(false);
@@ -32,30 +32,32 @@ export default function NotificationBar(props) {
   };*/
 
   useEffect(() => {
-    if (oldNotifications.current < myContext.notifications.length) {
-      oldNotifications.current = myContext.notifications.length;
+    if (oldNotifications.current < myNotifications.notifications.length) {
+      oldNotifications.current = myNotifications.notifications.length;
 
       setHighlight(true);
       setTimeout(() => {
         setHighlight(false);
       }, 600);
     }
-  }, [myContext.notifications]);
+  }, [myNotifications.notifications]);
 
   //mobile view only allowed to be vertical
-  if (/Mobi/i.test(window.navigator.userAgent) == true) {
+  if (/Mobi/i.test(window.navigator.userAgent) === true) {
     layoutRef.current = "vertical";
   } else {
     layoutRef.current = layout;
   }
-  const errorNot = myContext.notifications.filter((e) => e.name === "error");
+  const errorNot = myNotifications.notifications.filter(
+    (e) => e.name === "error"
+  );
 
   return (
     <div
       className="notificationBar"
       style={
         layoutRef.current === "vertical" &&
-        /Mobi/i.test(window.navigator.userAgent) == false
+        /Mobi/i.test(window.navigator.userAgent) === false
           ? { height: 100 + "vh" }
           : {}
       }
@@ -76,7 +78,7 @@ export default function NotificationBar(props) {
           bg={errorNot.length > 0 ? "danger" : "success"}
           className={`element${highlight ? " highlight" : ""}`}
         >
-          {myContext.notifications.length}
+          {myNotifications.notifications.length}
         </Badge>
         <span className="visually-hidden">Unread notifications</span>
       </Button>
@@ -99,7 +101,7 @@ export default function NotificationBar(props) {
             {locale().notifications}
             &nbsp;
             <Badge pill bg={errorNot.length > 0 ? "danger" : "success"}>
-              {myContext.notifications.length}
+              {myNotifications.notifications.length}
             </Badge>
             &nbsp;&nbsp;&nbsp;
             <Button variant="outline-secondary" onClick={() => handleClose()}>
@@ -114,17 +116,17 @@ export default function NotificationBar(props) {
               height: 100 + "%",
             }}
           >
-            {myContext.notifications.length !== 0 && (
+            {myNotifications.notifications.length !== 0 && (
               <Button
                 variant="warning"
-                onClick={() => myContext.ClearNotifications()}
+                onClick={() => myNotifications.ClearNotifications()}
               >
                 {locale().clear_all}
               </Button>
             )}
 
             <ToastContainer>
-              {myContext.notifications.map((notification, index) => {
+              {myNotifications.notifications.map((notification, index) => {
                 let type;
                 if (notification.name === "info") type = "success";
                 if (notification.name === "error") type = "danger";
@@ -135,7 +137,7 @@ export default function NotificationBar(props) {
                     bg={type}
                     animation={true}
                     onClose={() => {
-                      myContext.RemoveNotification(index);
+                      myNotifications.RemoveNotification(index);
                     }}
                   >
                     <Toast.Header>

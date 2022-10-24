@@ -197,7 +197,6 @@ export async function post_generic(resource_type, body, token = undefined) {
       Authorization: token,
     },
   };
-  console.log({ header: options, body: body, token: token });
   return new Promise((resolve, reject) => {
     instance
       .post(url_string, body, options)

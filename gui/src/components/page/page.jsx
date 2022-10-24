@@ -4,14 +4,12 @@ import { Button } from "react-bootstrap";
 import { pages, pageActions, addFields } from "../../config";
 import { get_generic } from "../../services/http_operations";
 import ContentTable from "../contentTable/contentTable";
-
 import { useParams, useSearchParams } from "react-router-dom";
 import { Pagination } from "react-bootstrap";
 import "./page.scss";
 
 import fontawesome from "@fortawesome/fontawesome";
 import { faPlusCircle } from "@fortawesome/fontawesome-free-solid";
-
 fontawesome.library.add(faPlusCircle);
 
 export default function Page(params) {
@@ -165,6 +163,7 @@ export default function Page(params) {
     <div className="page">
       <header className="page-header">
         {page}
+
         {addFields[page] !== undefined && (
           <NavLink to={`/add/` + page + "/"} key={page + "_add_navlink"}>
             <Button variant="link" size="sm" key={page + "button"}>
