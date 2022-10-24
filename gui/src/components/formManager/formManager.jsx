@@ -24,7 +24,7 @@ export const FormManager = (props) => {
     props.arrayDeleteCallback === undefined
   )
     return "Loading";
-
+  /*
   console.log({
     values: props.values,
     resource: props.resource,
@@ -37,7 +37,7 @@ export const FormManager = (props) => {
     fetchedData: myFetched.data,
     fetchedTypes: fetchedPageTypes,
   });
-
+*/
   //Numeric for row component
   const NumericFormRow = (key) => {
     return (
@@ -824,16 +824,8 @@ export const FormManager = (props) => {
         {props.functionalFields[props.resource] !== undefined &&
           React.Children.toArray(
             Object.entries(props.values).map(([key, value]) => {
-              console.log({ key, value });
               //enum type defined by config
               //check if all the required resources are defined
-              console.log(
-                fetchedPageTypes[props.resource] !== undefined &&
-                  fetchedPageTypes[props.resource][key] !== undefined &&
-                  myFetched.types !== undefined &&
-                  myFetched.types[fetchedPageTypes[props.resource][key]] !==
-                    undefined
-              );
 
               if (
                 fetchedPageTypes[props.resource] !== undefined &&
