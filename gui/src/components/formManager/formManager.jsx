@@ -25,7 +25,7 @@ export const FormManager = (props) => {
   )
     return "Loading";
 
-  /*console.log({
+  console.log({
     values: props.values,
     resource: props.resource,
     disabledFields: props.disabledFields,
@@ -35,7 +35,8 @@ export const FormManager = (props) => {
     handleChangesCallback: props.handleChangesCallback,
     arrayDeleteCallback: props.arrayDeleteCallback,
     fetchedData: myFetched.data,
-  });*/
+    fetchedTypes: fetchedPageTypes,
+  });
 
   //Numeric for row component
   const NumericFormRow = (key) => {
@@ -823,8 +824,16 @@ export const FormManager = (props) => {
         {props.functionalFields[props.resource] !== undefined &&
           React.Children.toArray(
             Object.entries(props.values).map(([key, value]) => {
+              console.log({ key, value });
               //enum type defined by config
               //check if all the required resources are defined
+              console.log(
+                fetchedPageTypes[props.resource] !== undefined &&
+                  fetchedPageTypes[props.resource][key] !== undefined &&
+                  myFetched.types !== undefined &&
+                  myFetched.types[fetchedPageTypes[props.resource][key]] !==
+                    undefined
+              );
 
               if (
                 fetchedPageTypes[props.resource] !== undefined &&
@@ -857,8 +866,10 @@ export const FormManager = (props) => {
               //input field for fetched data
 
               if (
+                fetchedPageData[props.resource] !== undefined &&
+                fetchedPageData[props.resource][key] !== undefined &&
                 myFetched.data[fetchedPageData[props.resource][key]] !==
-                undefined
+                  undefined
               ) {
                 return FetchedFormRow(
                   key,
