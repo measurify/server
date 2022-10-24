@@ -39,7 +39,7 @@ const experimentSchema = new mongoose.Schema({
     metadata: [ fieldSchema ],
     history: [ historySchema ], 
     tags: { type: [String], ref:'Tag' },
-    visibility: {type: String, enum: VisibilityTypes, default: VisibilityTypes.public },
+    visibility: {type: String, enum: VisibilityTypes, default: VisibilityTypes.private },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });
