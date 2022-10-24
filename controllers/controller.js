@@ -24,7 +24,7 @@ exports.getResourceDataset = async function (req, res, sort, select, model,restr
         if (!query.page)query.page = 1;
         if (!query.limit) query.limit = await model.countDocuments(filterDataset);
         let featureId=null;
-        if(!filterDataset.feature)req.headers.accept = 'text/csv'; else featureId=filterDataset.feature;
+        if(req.headers.accept==='text/csv+'||req.headers.accept==='text/dataframe'){if(!filterDataset.feature)req.headers.accept = 'text/csv'; else featureId=filterDataset.feature};
         let itemsList = await persistence.getList(JSON.stringify(filterDataset), query.sort, select, query.page, query.limit, restrictions, model);
         switch (req.headers.accept) {
             case 'text/csv+'://only with feature specified
@@ -44,7 +44,7 @@ exports.getResourceDataset = async function (req, res, sort, select, model,restr
                 return res.status(200).send(csvresultlibrary);
             
             case 'text/dataframe':
-                let list = await conversion.getInPdDataframe(filterDataset, query.sort, select, query.page, query.limit, model);
+                let list = await conversion.getInPdDataframe(filterDataset, query.sort, select, query.page, query.limit, model,restrictions);
                 return res.status(200).json(list);
 
             case 'application/json':
