@@ -3,7 +3,6 @@ const broker = require('../commons/broker.js');
 const tenancy = require('../commons/tenancy.js');
 const factory = require('../commons/factory.js');
 const bcrypt = require('bcryptjs');
-const { getResourceDataset } = require('../controllers/controller.js');
 
 exports.get = async function (id, field, model, select) {
     try {
@@ -16,30 +15,6 @@ exports.get = async function (id, field, model, select) {
     }
     catch (err) { return null; }
 };
-
-exports.getDataset = async function (filter, sort, select, page, limit, model) {
-    if (!page) page = '1';
-    if (!limit) limit = '10';
-    if (!filter) filter = '{}';
-    if (!sort) sort = '{ "timestamp": "desc" }';
-    if (!select) select = {};
-    const list = await model.aggregate(
-        [
-            { $match: filter },
-            { $skip: (parseInt(page) - 1) * parseInt(limit) },
-            { $limit: parseInt(limit) },
-            { $unwind: "$samples" },
-            {
-                $group: {
-                    _id: "$feature", "visibility": { $push: "$visibility" }, "tags": { $push: "$tags" }, "id": { $push: "$_id" }, "startDate": { $push: "$startDate" },
-                    "endDate": { $push: "$endDate" }, "thing": { $push: "$thing" }, "device": { $push: "$device" }, "samples": { $push: "$samples.values" }
-                }
-            }
-        ]
-    )
-    //list.push({"page":page,"limit":limit}); //for the pagination    
-    return list;
-}
 
 exports.getPipe = function (req, res, filter, sort, select, restriction, model) {
     if (!filter) filter = '{}';

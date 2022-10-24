@@ -13,11 +13,11 @@ const dataset = require('../commons/dataset.js');
 
 exports.get = async (req, res) => {
     const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
-    const select = await checker.whatCanSee(req, res, Measurement);   
+    const select = await checker.whatCanSee(req, res, Measurement);    
     const restriction_1 = await checker.whatCanRead(req, res);
     const restriction_2 = await checker.whichRights(req, res, Measurement);
-    const restrictions = { ...restriction_1, ...restriction_2 }; 
-    return await controller.getResourceDataset(req, res, '{ "timestamp": "desc" }', select, Measurement, restrictions);
+    const restrictions = { ...restriction_1, ...restriction_2 };
+    return await controller.getResourceDataset(req, res, '{ "timestamp": "desc" }', select, Measurement,restrictions);
 };
 
 exports.post = async (req, res, next, fileData, descriptionData, filename) => {
