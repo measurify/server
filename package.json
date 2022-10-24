@@ -78,7 +78,8 @@
     "socket.io-client": "^4.5.1",
     "summary-statistics": "^1.0.0",
     "underscore": "^1.13.4",
-    "ws": "^8.8.1"
+    "ws": "^8.8.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "chai": "^4.3.6",
