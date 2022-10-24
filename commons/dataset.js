@@ -1065,3 +1065,41 @@ exports.checkCommonElements = async function (
   }
   return true;
 };
+
+exports.prepareFilterDataset = async function (idFile, filter) {
+  if (!filter) filter = '{}';  
+  filter = JSON.parse(filter);
+  if (idFile) {//not null
+      filter["tags"]= idFile ;      
+  }
+  return filter;
+}
+
+/*
+
+{
+  feature: "",
+  tags:""
+}
+
+{
+  $or: [{
+    feature:""    
+  },{
+    tags:""
+  }]}
+
+
+{
+  $and:[ {
+    feature:""
+  }]{
+    tags:""
+  }
+}
+
+
+
+*/
+
+
