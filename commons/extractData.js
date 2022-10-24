@@ -7,12 +7,15 @@ const conversion = require("./conversion.js");
 const csvtranspose = require('csv-transpose');
 const { sep } = require("path");
 const { file } = require("../types/itemTypes.js");
+const XLSX = require("xlsx");
 
 exports.dataExtractor = async function (req, res, next, modelName) {
     if (!req.busboy) return errors.manage(res, errors.empty_file, "not found any data");
     let fileData = "";
     let errorOccurred = false;
     let namefile = null;
+    const buffers = [];
+    let workbook = null;
     req.busboy.on("file", (fieldName, file, filename) => {
         if (!errorOccurred) {
             if (!namefile) namefile = filename.filename;
@@ -22,14 +25,35 @@ exports.dataExtractor = async function (req, res, next, modelName) {
                 return errors.manage(res, errors.fieldName_error, fieldName + " is not file");
             }
             file.on("data", (data) => {
-                if (!errorOccurred) fileData += data.toString();
+                if (!errorOccurred) { fileData += data.toString(); if (namefile.toLowerCase().endsWith('.xlsx')) { buffers.push(data) } }
             });
+            file.on('end', () => {
+                if (namefile.toLowerCase().endsWith('.xlsx')) {
+                    let buffer = Buffer.concat(buffers)
+                    workbook = XLSX.read(buffer, {
+                        type: 'buffer',
+                    })
+                }
+            })
         }
     });
     req.busboy.on("finish", async () => {
         if (fileData == "") return errors.manage(res, errors.empty_file, "file data not found");
-        if (!errorOccurred) {
-            if (namefile.toLowerCase().endsWith('.csv')){
+        if (!errorOccurred) {            
+            if (namefile.toLowerCase().endsWith('.csv')||namefile.toLowerCase().endsWith('.xlsx')) {
+                if (namefile.toLowerCase().endsWith('.xlsx')) {
+                    try {
+                        const csvExcelProducts = XLSX.utils.sheet_to_csv(workbook.Sheets[workbook.SheetNames[0]], {
+                            raw: false,
+                            header: 1,
+                            dateNF: 'yyyy-mm-dd',
+                            blankrows: false,
+                        })
+                        fileData=csvExcelProducts;
+                    } catch (err) {
+                        return errors.manage(res, errors.wrong_xlsx, err);
+                    }
+                }
                 let transpose = false;
                 if (req.method === 'PUT' && modelName === "Experiment") { transpose = true; }
                 let fileText = readFile(req, fileData, modelName, transpose);

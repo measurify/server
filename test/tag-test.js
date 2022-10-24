@@ -178,6 +178,22 @@ describe('/POST tag from file', () => {
         res.body.tags[1]._id.should.be.eql("tag_test_2");        
         res.body.tags[2]._id.should.be.eql("tag_test_3");
     });   
+
+    it('it should POST tags from file xlsx', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);        
+        const testFile = './test/test/Tag_test_Excel.xlsx';        
+        
+        const res = await chai.request(server).keepOpen().post('/v1/tags/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('tags');
+        res.body.tags.length.should.be.eql(2);
+        res.body.errors.length.should.be.eql(0);        
+        res.body.tags[0].should.have.property('_id');
+        res.body.tags[1].should.have.property('_id');
+        res.body.tags[0]._id.should.be.eql("tag1");
+        res.body.tags[1]._id.should.be.eql("tag2"); 
+    });   
 });
 
 // Test the /DELETE route
