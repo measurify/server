@@ -39,8 +39,8 @@ exports.dataExtractor = async function (req, res, next, modelName) {
     });
     req.busboy.on("finish", async () => {
         if (fileData == "") return errors.manage(res, errors.empty_file, "file data not found");
-        if (!errorOccurred) {            
-            if (namefile.toLowerCase().endsWith('.csv')||namefile.toLowerCase().endsWith('.xlsx')) {
+        if (!errorOccurred) {
+            if (namefile.toLowerCase().endsWith('.csv') || namefile.toLowerCase().endsWith('.xlsx')) {
                 if (namefile.toLowerCase().endsWith('.xlsx')) {
                     try {
                         const csvExcelProducts = XLSX.utils.sheet_to_csv(workbook.Sheets[workbook.SheetNames[0]], {
@@ -49,7 +49,7 @@ exports.dataExtractor = async function (req, res, next, modelName) {
                             dateNF: 'yyyy-mm-dd',
                             blankrows: false,
                         })
-                        fileData=csvExcelProducts;
+                        fileData = csvExcelProducts;
                     } catch (err) {
                         return errors.manage(res, errors.wrong_xlsx, err);
                     }
@@ -74,8 +74,8 @@ exports.dataExtractor = async function (req, res, next, modelName) {
                 const controller = require('../controllers/' + controllerName + 'Controller');
                 return controller.post(req, res);
             }
-            else{//.txt .JSON ecc
-                try{req.body=JSON.parse(fileData);}catch(error){return errors.manage(res, errors.post_request_error, "data not in JSON. "+error);}                
+            else {//.txt .JSON ecc
+                try { req.body = JSON.parse(fileData); } catch (error) { return errors.manage(res, errors.post_request_error, "data not in JSON. " + error); }
                 let controllerName = modelName.toLowerCase();
                 const controller = require('../controllers/' + controllerName + 'Controller');
                 return controller.post(req, res);
@@ -97,6 +97,10 @@ const readFile = function (req, fileData, modelName, transpose) {
     fileText.schema = model.schema;
     if (!process.env.CSV_DELIMITER) process.env.CSV_DELIMITER = ',';
     fileText.header = data[0].split(process.env.CSV_DELIMITER).map(el => el.replace(/^\s+|\s+$/g, ""));
+    fileText.header = fileText.header.map(element => {
+        if(element.toLowerCase()=="step")return element.toLowerCase();
+        return element;
+      });
     data.shift();
     fileText.data = data;
     return fileText;
@@ -117,11 +121,13 @@ const addHistory = function (req, res, fileText, modelName) {
     for (let element of data) {
         let obj = { "fields": [] };
         arr = element.split(process.env.CSV_DELIMITER).map(el => el.replace(/^\s+|\s+$/g, ""));
-        for (let el in arr) {
-            if (fileText.header[el] === "step" || fileText.header[el] === "Step" || fileText.header[el] === "timestamp") { obj[fileText.header[el].toLowerCase()] = arr[el] }
-            else { if (arr[el]) { obj.fields.push({ "name": fileText.header[el], "value": arr[el] }) } }
+        if (arr[fileText.header.indexOf("step")].replace(/\s/g, '')) {
+            for (let el in arr) {
+                if (fileText.header[el].toLowerCase() === "step" || fileText.header[el].toLowerCase() === "timestamp") { obj[fileText.header[el].toLowerCase()] = arr[el] }
+                else { if (arr[el]) { obj.fields.push({ "name": fileText.header[el], "value": arr[el] }) } }
+            }
+            body.history.add.push(obj);
         }
-        body.history.add.push(obj);
     }
     req.body = body;
     let controllerName = modelName.toLowerCase();
