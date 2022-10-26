@@ -70,7 +70,9 @@ export default function AddPage(props) {
   const [contentPlain, setContentPlain] = useState(null);
 
   const context = useContext(AppContext);
-  const myFetched = context.fetched;
+  let myFetched;
+  if (context !== undefined) myFetched = context.fetched;
+  else myFetched = {};
 
   /////////////FETCH REQUIRED RESOURCES
   const fetchData = async (res) => {

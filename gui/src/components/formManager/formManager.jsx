@@ -11,7 +11,9 @@ import { fetchedPageTypes, fetchedPageData } from "../../config";
 export const FormManager = (props) => {
   //return if something is undefined
   const context = useContext(AppContext);
-  const myFetched = context.fetched;
+  let myFetched;
+  if (context !== undefined) myFetched = context.fetched;
+  else myFetched = {};
 
   if (
     props.values === undefined ||
@@ -127,8 +129,8 @@ export const FormManager = (props) => {
   const FetchedFormRow = (key, alias) => {
     let options;
     if (
-      myFetched.data[key] !== undefined ||
-      myFetched.data[alias] !== undefined
+      myFetched !== {} &&
+      (myFetched.data[key] !== undefined || myFetched.data[alias] !== undefined)
     ) {
       options = myFetched.data[alias !== undefined ? alias : key];
     }
@@ -283,7 +285,7 @@ export const FormManager = (props) => {
   //strings array form row component
   const ArrayStringFormRow = (key) => {
     let options;
-    if (myFetched.data[key] !== undefined) {
+    if (myFetched !== {} && myFetched.data[key] !== undefined) {
       options = myFetched.data[key];
     }
 
