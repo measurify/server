@@ -124,7 +124,7 @@ const addHistory = function (req, res, fileText, modelName) {
         if (arr[fileText.header.indexOf("step")].replace(/\s/g, '')) {
             for (let el in arr) {
                 if (fileText.header[el].toLowerCase() === "step" || fileText.header[el].toLowerCase() === "timestamp") { obj[fileText.header[el].toLowerCase()] = arr[el] }
-                else { if (arr[el]) { obj.fields.push({ "name": fileText.header[el], "value": arr[el] }) } }
+                else { if (arr[el]&&arr[el]!=="[]") { obj.fields.push({ "name": fileText.header[el], "value": arr[el] }) } }
             }
             body.history.add.push(obj);
         }
