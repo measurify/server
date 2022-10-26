@@ -240,14 +240,13 @@ exports.createExperimentHistory = async function (protocol, steps, start) {
   return history;
 }
 
-exports.createExperiment = async function (name, description, owner, anonymization, state, startDate, endDate, place, protocol, metadata, history, tags,manager, visibility, tenant) {
+exports.createExperiment = async function (name, description, owner, state, startDate, endDate, place, protocol, metadata, history, tags,manager, visibility, tenant) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
   const Experiment = mongoose.dbs[tenant.database].model("Experiment");
   const req = {
     _id: name,
-    description: description,
-    anonymization: anonymization || true,
+    description: description,    
     state: state || ExperimentStateTypes.ongoing,
     startDate: startDate || Date.now(),
     endDate: endDate || Date.now(),
