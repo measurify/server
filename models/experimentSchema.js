@@ -28,7 +28,6 @@ const placeSchema = new mongoose.Schema({
 const experimentSchema = new mongoose.Schema({ 
     _id: { type: String, required: "Please, supply an _id" },
     description: { type: String },
-    anonymization: { type: Boolean, default: false },
     state: { type: String, enum: ExperimentStateTypes, default: ExperimentStateTypes.ongoing },
     startDate: { type: Date },
     endDate: { type: Date },

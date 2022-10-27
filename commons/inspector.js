@@ -210,11 +210,14 @@ exports.checkHistory = function (history_element, protocol) {
           process.env.CSV_VECTOR_DELIMITER = ";";
         field.value = field.value[0]
           .slice(1, -1)
-          .split(process.env.CSV_VECTOR_DELIMITER)
-          .map(function (item) {
+          .split(process.env.CSV_VECTOR_DELIMITER);
+
+          field.value=field.value.map(function (item) {
+          if (item != "") {
             if (!isNaN(item)) return parseInt(item, 10);
             else return item;
-          });
+          }else return null;
+        });
         coherent = true;
       }
     }

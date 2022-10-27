@@ -324,7 +324,7 @@ describe('/PUT protocol', () => {
     it('it should not PUT a protocol _id of a protocol already used in an experiment', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, true, "completed", null, null, null, protocol);        
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, "completed", null, null, null, protocol);        
         const request = { _id: "new-test-protocol-1" };
         const res = await chai.request(server).keepOpen().put('/v1/protocols/' + protocol._id).set("Authorization", await factory.getUserToken(user)).send(request);
         res.should.have.status(errors.already_used.status);
@@ -449,7 +449,7 @@ describe('/DELETE protocol', () => {
     it('it should not DELETE a protocol already used in a experiment', async () => {  
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user); 
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, true, "completed", null, null, null, protocol);        
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, "completed", null, null, null, protocol);        
         const protocols_before = await before.Protocol.find();
         protocols_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/protocols/' + protocol._id).set("Authorization", await factory.getUserToken(user));
