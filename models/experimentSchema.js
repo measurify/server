@@ -8,7 +8,7 @@ const inspector = require("../commons/inspector.js");
 
 const fieldSchema = new mongoose.Schema({ 
     name: { type: String, required: "Please, supply a name" },
-    value: {type: [Object]} },
+    value: {type: Object} },
     { _id: false }  
 );
 

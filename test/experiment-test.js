@@ -677,7 +677,7 @@ describe('/PUT experiment', () => {
         res.body.should.have.property('metadata');
         res.body.metadata.length.should.be.eql(2);
         res.body.metadata[1].name.should.be.eql(metadata_to_add.name);
-        res.body.metadata[1].value[0].should.be.eql(metadata_to_add.value);
+        res.body.metadata[1].value.should.be.eql(metadata_to_add.value);
     });
 
     it('it should PUT a experiment list of metadata to update an item', async () => {
@@ -692,7 +692,7 @@ describe('/PUT experiment', () => {
         res.body.should.have.property('metadata');
         res.body.metadata.length.should.be.eql(2);
         res.body.metadata[1].name.should.be.eql(metadata_to_update.name);
-        res.body.metadata[1].value[0].should.be.eql(99999);
+        res.body.metadata[1].value.should.be.eql(99999);
     });
 
     it('it should not PUT a experiment list of metadata to update an item with a wrong name', async () => {
@@ -794,9 +794,9 @@ describe('/PUT experiment', () => {
         res2.body.should.be.a('object');
         res2.body.should.have.property('history');
         res2.body.history.length.should.be.eql(6);
-        res2.body.history[3].fields[0].value[0].should.be.eql(history_element_to_add[0].fields[0].value);
-        res2.body.history[4].fields[0].value[0].should.be.eql(history_element_to_add[1].fields[0].value);
-        res2.body.history[5].fields[0].value[0].should.be.eql(history_element_to_add[2].fields[0].value);
+        res2.body.history[3].fields[0].value.should.be.eql(history_element_to_add[0].fields[0].value);
+        res2.body.history[4].fields[0].value.should.be.eql(history_element_to_add[1].fields[0].value);
+        res2.body.history[5].fields[0].value.should.be.eql(history_element_to_add[2].fields[0].value);
         const expectedReport={ success: [], ignored: [3, 4, 5], overridden: [] }
         res2.body.report.should.be.eql(expectedReport);
     });
@@ -816,9 +816,9 @@ describe('/PUT experiment', () => {
         res2.body.should.be.a('object');
         res2.body.should.have.property('history');
         res2.body.history.length.should.be.eql(6);
-        res2.body.history[3].fields[0].value[0].should.be.eql(history_element_to_add2[0].fields[0].value);
-        res2.body.history[4].fields[0].value[0].should.be.eql(history_element_to_add2[1].fields[0].value);
-        res2.body.history[5].fields[0].value[0].should.be.eql(history_element_to_add2[2].fields[0].value);
+        res2.body.history[3].fields[0].value.should.be.eql(history_element_to_add2[0].fields[0].value);
+        res2.body.history[4].fields[0].value.should.be.eql(history_element_to_add2[1].fields[0].value);
+        res2.body.history[5].fields[0].value.should.be.eql(history_element_to_add2[2].fields[0].value);
         const expectedReport={ success: [], ignored: [], overridden: [3, 4, 5] };
         res2.body.report.should.be.eql(expectedReport);
     });
