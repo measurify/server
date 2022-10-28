@@ -62,7 +62,7 @@ viewFields["users"] = ["username", "type", "actions", "fieldmask", "status"];
 viewFields["tags"] = ["tags"];
 viewFields["things"] = ["_id", "visibility", "tags"];
 viewFields["devices"] = ["_id", "features", "tags", "scripts"];*/
-viewFields["protocols"] = ["_id", "description", "metadata"];
+viewFields["protocols"] = ["_id", "description", "metadata", "topics"];
 viewFields["experiments"] = ["_id", "description", "protocol", "metadata"];
 /*viewFields["measurements"] = [
   "thing",
