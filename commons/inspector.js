@@ -112,52 +112,40 @@ exports.checkMetadata = function (metadata, protocol) {
   const protocol_metadata = protocol.metadata.find((element) => {
     if (element.name === metadata.name) return true;
   });
-  if (!protocol_metadata)
-    return "metadata " + metadata.name + " not found in protocol";
-  if (
-    Array.isArray(metadata.value) &&
-    protocol_metadata.type == MetadataTypes.vector
-  )
-    return true;
-  if (
-    metadata.value.length == 1 &&
-    typeof metadata.value[0] == "string" &&
-    protocol_metadata.type == MetadataTypes.text
-  )
-    return true;
-  if (
-    metadata.value.length == 1 &&
-    typeof metadata.value[0] == "number" &&
-    protocol_metadata.type == MetadataTypes.scalar
-  )
-    return true;
-  if (
-    metadata.value.length == 1 &&
-    typeof metadata.value[0] == "string" &&
-    protocol_metadata.type == MetadataTypes.scalar
-  ) {
-    if (!isNaN(metadata.value[0])) {
-      metadata.value[0] = Number(metadata.value[0]);
-      return true;
-    }
+  if (!protocol_metadata)return "metadata " + metadata.name + " not found in protocol";
+  switch (protocol_metadata.type) {
+
+    case MetadataTypes.vector:
+      if (Array.isArray(metadata.value)) return true;
+      if (typeof metadata.value == "string" &&
+        metadata.value.startsWith("[") && metadata.value.endsWith("]")) {
+        if (!process.env.CSV_VECTOR_DELIMITER) process.env.CSV_VECTOR_DELIMITER = ";";
+        metadata.value = metadata.value.slice(1, -1).split(process.env.CSV_VECTOR_DELIMITER)
+          .map(function (item) {
+            let value = parseFloat(item);
+            if (value !== NaN) return value;
+            else return item;
+          });
+        return true;
+      }
+      break;
+
+    case MetadataTypes.text:
+      if (typeof metadata.value == "string") return true;
+      break;
+
+    case MetadataTypes.scalar:
+      if (typeof metadata.value == "number") return true;
+      if (typeof metadata.value == "string") {
+        let value = parseFloat(metadata.value);
+        if (!isNaN(value)) {
+          metadata.value = value;
+          return true;
+        }
+      }
+      break;
   }
-  if (
-    typeof metadata.value[0] == "string" &&
-    protocol_metadata.type == MetadataTypes.vector &&
-    metadata.value[0].startsWith("[") &&
-    metadata.value[0].endsWith("]")
-  ) {
-    if (!process.env.CSV_VECTOR_DELIMITER)
-      process.env.CSV_VECTOR_DELIMITER = ";";
-    metadata.value = metadata.value[0]
-      .slice(1, -1)
-      .split(process.env.CSV_VECTOR_DELIMITER)
-      .map(function (item) {
-        if (!isNaN(item)) return parseInt(item, 10);
-        else return item;
-      });
-    return true;
-  }
+
   return (
     "metadata value " +
     metadata.value +
@@ -178,48 +166,37 @@ exports.checkHistory = function (history_element, protocol) {
 
     let coherent = false;
 
-    if (field.value.length > 1) {
-      if (protocol_field.type == TopicFieldTypes.vector) coherent = true;
-    } else {
-      if (
-        typeof field.value[0] == "string" &&
-        protocol_field.type == TopicFieldTypes.text
-      )
-        coherent = true;
-      if (
-        typeof field.value[0] == "number" &&
-        protocol_field.type == TopicFieldTypes.scalar
-      )
-        coherent = true;
-      if (
-        typeof field.value[0] == "string" &&
-        protocol_field.type == TopicFieldTypes.scalar
-      ) {
-        if (!isNaN(field.value[0])) {
-          field.value[0] = Number(field.value[0]);
-          coherent = true;
-        }
-      }
-      if (
-        typeof field.value[0] == "string" &&
-        protocol_field.type == TopicFieldTypes.vector &&
-        field.value[0].startsWith("[") &&
-        field.value[0].endsWith("]")
-      ) {
-        if (!process.env.CSV_VECTOR_DELIMITER)
-          process.env.CSV_VECTOR_DELIMITER = ";";
-        field.value = field.value[0]
-          .slice(1, -1)
-          .split(process.env.CSV_VECTOR_DELIMITER);
+    switch (protocol_field.type) {
 
-          field.value=field.value.map(function (item) {
-          if (item != "") {
-            if (!isNaN(item)) return parseInt(item, 10);
-            else return item;
-          }else return null;
-        });
-        coherent = true;
-      }
+      case TopicFieldTypes.vector:
+        if (Array.isArray(field.value)) coherent = true;;
+        if (typeof field.value == "string" &&
+          field.value.startsWith("[") && field.value.endsWith("]")) {
+          if (!process.env.CSV_VECTOR_DELIMITER) process.env.CSV_VECTOR_DELIMITER = ";";
+          field.value = field.value.slice(1, -1).split(process.env.CSV_VECTOR_DELIMITER)
+            .map(function (item) {
+              let value = parseFloat(item);
+              if (value !== NaN) return value;
+              else return item;
+            });
+          coherent = true;;
+        }
+        break;
+
+      case TopicFieldTypes.text:
+        if (typeof field.value == "string") coherent = true;;
+        break;
+
+      case TopicFieldTypes.scalar:
+        if (typeof field.value == "number") coherent = true;;
+        if (typeof field.value == "string") {
+          let value = parseFloat(field.value);
+          if (!isNaN(value)) {
+            field.value = value;
+            coherent = true;
+          }
+        }
+        break;
     }
 
     if (coherent == false)

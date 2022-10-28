@@ -193,6 +193,7 @@ const sampleValues = function (sample) {
 
 exports.json2CSVHistory = function (jsonHistory, protocol) {
     if (!process.env.CSV_DELIMITER) process.env.CSV_DELIMITER = ',';
+    if (!process.env.CSV_VECTOR_DELIMITER) process.env.CSV_VECTOR_DELIMITER = ';';
     let header = ["step"];
     jsonHistory = JSON.stringify(jsonHistory);
     jsonHistory = typeof jsonHistory !== "object" ? JSON.parse(jsonHistory) : jsonHistory;
@@ -207,7 +208,7 @@ exports.json2CSVHistory = function (jsonHistory, protocol) {
             if (el2 != "step") {
                 let topic = value2.fields.find(element => element.name == el2);
                 if (!topic) { line.push(null); }
-                else { if (topics.topic == "vector") line.push(topic.value); else line.push(topic.value[0]); }
+                else { if (topics[topic.name] == "vector") line.push("["+topic.value.toString().replace(/,/g,process.env.CSV_VECTOR_DELIMITER)+"]"); else line.push(topic.value); }
             }
         }
         csv += line.join(process.env.CSV_DELIMITER) + "\n";
