@@ -888,6 +888,7 @@ exports.checkCommonElements = async function (
   descriptionDataCleaned,
   force
 ) {
+  let featureInfo=null;
   //check if feature exists and has the same number of items
   if (descriptionDataCleaned.commonElements.hasOwnProperty("feature")) {
     //feature fixed
