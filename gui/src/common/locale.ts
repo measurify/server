@@ -26,6 +26,10 @@ interface ILocalization {
   tenant_suggestion: string;
   add_tenant: string;
 
+  //geolocalization messages
+  geo_update: string;
+  geo_failed: string;
+
   //homepage
   welcome_hp: string;
   left_bar_descr_hp: string;
@@ -52,6 +56,7 @@ interface ILocalization {
   logout: string;
   repeat: string;
   close: string;
+  remove: string;
 
   ///Errors
   login_error: string;
@@ -60,7 +65,7 @@ interface ILocalization {
 }
 
 export default function locale() {
-  let tkn = localStorage.getItem("diten-language");
+  let tkn = localStorage.getItem("language");
   if (languages.length === 0) {
     return localization_en as ILocalization;
   }

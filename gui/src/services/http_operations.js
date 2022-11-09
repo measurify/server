@@ -38,18 +38,15 @@ export function login(username, password, tenant) {
     instance
       .post(url_string, body, options)
       .then((response) => {
-        localStorage.setItem("diten-token", response.data.token);
+        localStorage.setItem("token", response.data.token);
         localStorage.setItem(
-          "diten-token-expiration-time",
+          "token-expiration-time",
           response.data.token_expiration_time
         );
-        localStorage.setItem("diten-username", response.data.user.username);
-        localStorage.setItem("diten-user-role", response.data.user.type);
-        localStorage.setItem("diten-user-tenant", tenant);
-        localStorage.setItem(
-          "diten-login-time",
-          new Date().getTime().toString()
-        );
+        localStorage.setItem("username", response.data.user.username);
+        localStorage.setItem("user-role", response.data.user.type);
+        localStorage.setItem("user-tenant", tenant);
+        localStorage.setItem("login-time", new Date().getTime().toString());
 
         resolve(response);
       })
@@ -75,64 +72,16 @@ export function refreshToken() {
     instance
       .put(url_string, {}, options)
       .then((response) => {
-        localStorage.setItem("diten-token", response.data.token);
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("login-time", new Date().getTime().toString());
         localStorage.setItem(
-          "diten-login-time",
-          new Date().getTime().toString()
-        );
-        localStorage.setItem(
-          "diten-token-expiration-time",
+          "token-expiration-time",
           response.data.token_expiration_time
         );
         resolve(response);
       })
       .catch((error) => {
         reject(error);
-      });
-  });
-}
-
-//this function post a single thing inside the DB
-export function postThing(thingId, pt_options = {}) {
-  const body = { _id: thingId };
-  return new Promise((resolve, reject) => {
-    post_generic("things", body, pt_options)
-      .then((response) => {
-        resolve(response);
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
-}
-
-// This function checks if a thing (i.e., trip) is already in the DB
-// If not in, create one
-export function checkThingAlreadyIn(thingId) {
-  const url = api_url + "/things/" + thingId;
-  const options = {
-    headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-cache",
-      "cache-control": "no-cache",
-      Authorization: GetToken(),
-    },
-  };
-  return new Promise((resolve, reject) => {
-    instance
-      .get(url, options)
-      .then((request) => {
-        //thing found in database
-        if (request.status === 200) resolve({ found: true });
-      })
-      .catch((error) => {
-        //thing not found in database
-        if (error.response.status === 404) {
-          resolve({ found: false });
-        }
-        /*else {
-          reject(false);
-        }*/
       });
   });
 }
@@ -197,7 +146,6 @@ export async function post_generic(resource_type, body, token = undefined) {
       Authorization: token,
     },
   };
-  console.log({ header: options, body: body, token: token });
   return new Promise((resolve, reject) => {
     instance
       .post(url_string, body, options)
@@ -407,5 +355,44 @@ export async function get_generic(resource_type, qs = {}, token) {
 
 //return the login token from the localstorage
 function GetToken() {
-  return localStorage.getItem("diten-token");
+  return localStorage.getItem("token");
+}
+
+//get location from bigDataCloud APIs
+export function getBigDataCloudLocation(latitude, longitude) {
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const url =
+    "https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=" +
+    latitude +
+    "&longitude=" +
+    longitude +
+    "&localityLanguage=it";
+  console.log("GET location: " + url);
+  return new Promise((resolve, reject) => {
+    instance
+      .get(url, options)
+      .then((res) => {
+        //set response into localStorage (it will be cleared on logout)
+        localStorage.setItem("continent", res.data.continent);
+        localStorage.setItem("continentCode", res.data.continentCode);
+        localStorage.setItem("countryName", res.data.countryName);
+        localStorage.setItem("countryCode", res.data.countryCode);
+        localStorage.setItem(
+          "principalSubdivision",
+          res.data.principalSubdivision
+        );
+        localStorage.setItem("city", res.data.city);
+        localStorage.setItem("locality", res.data.locality);
+
+        resolve(res);
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
 }

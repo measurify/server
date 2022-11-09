@@ -42,9 +42,9 @@ export default function ProfilePage(params) {
   }
 
   useEffect(() => {
-    const username = localStorage.getItem("diten-username");
-    const role = localStorage.getItem("diten-user-role");
-    const tenant = localStorage.getItem("diten-user-tenant");
+    const username = localStorage.getItem("username");
+    const role = localStorage.getItem("user-role");
+    const tenant = localStorage.getItem("user-tenant");
     setUsername(username !== null ? username : "");
     setRole(role !== null ? role : "");
     setTenant(tenant !== null && tenant !== "" ? tenant : "-");

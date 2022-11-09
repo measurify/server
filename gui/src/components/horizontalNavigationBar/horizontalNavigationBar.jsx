@@ -47,9 +47,9 @@ let tenant = React.createRef();
 export default function HorizontalNavigationBar() {
   const [isOpened, setIsOpened] = useState(false);
 
-  const usr = localStorage.getItem("diten-username");
-  const rl = localStorage.getItem("diten-user-role");
-  const tn = localStorage.getItem("diten-user-tenant");
+  const usr = localStorage.getItem("username");
+  const rl = localStorage.getItem("user-role");
+  const tn = localStorage.getItem("user-tenant");
 
   username.current = usr !== null ? usr : "";
   role.current = rl !== null ? rl : "";
@@ -59,7 +59,7 @@ export default function HorizontalNavigationBar() {
   useEffect(() => {
     //convert duration time in string format to milliseconds
     function DurationToMilliSeconds() {
-      let exp = localStorage.getItem("diten-token-expiration-time");
+      let exp = localStorage.getItem("token-expiration-time");
 
       if (exp === null) return 300;
       if (exp.endsWith("h")) {
@@ -87,7 +87,7 @@ export default function HorizontalNavigationBar() {
       else {
         //check if login time is already defined, if it's null get it from localstorage or current time (refresh case)
         if (loginTime.current === null) {
-          const retryLoginTime = localStorage.getItem("diten-login-time");
+          const retryLoginTime = localStorage.getItem("login-time");
           //if localstorage containst login time, use it and store it into state
           if (retryLoginTime !== null) {
             loginTime.current = retryLoginTime;
@@ -180,7 +180,7 @@ export default function HorizontalNavigationBar() {
           <Container fluid>
             <Row style={{ padding: 0 }}>
               <Col>
-                <NavLink to="/home" className="nav-wrap">
+                <NavLink to="/add/measurements" className="nav-wrap">
                   {website_name}
                 </NavLink>
               </Col>

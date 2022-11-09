@@ -21,6 +21,10 @@ const localization_en = {
   tenant_suggestion: "Insert your tenant",
   add_tenant: "Add tenant",
 
+  //geolocalization messages
+  geo_update: "Position updated",
+  geo_failed: "It was not possible to update the position",
+
   //Homepage
   welcome_hp: "Welcome to the Administration dashboard!",
   left_bar_descr_hp:
@@ -51,6 +55,7 @@ const localization_en = {
   logout: "Logout",
   repeat: "Repeat",
   close: "Close",
+  remove: "Remove",
 
   ///Errors
   login_error: "Wrong login!",

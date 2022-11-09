@@ -31,6 +31,10 @@ const localization_it = {
   github_page_hp: "Pagina Github di Measurify",
   github_issue_page_hp: "Segnala bug o problemi",
 
+  //geolocalization messages
+  geo_update: "Posizione aggiornata",
+  geo_failed: "Non è stato possibile aggiornare la posizione",
+
   //profile page
   profile_page_desc:
     "questa è la pagina in cui puoi visionare il tuo profilo o modificare la password",
@@ -52,6 +56,7 @@ const localization_it = {
   logout: "Esci",
   repeat: "Ripeti",
   close: "Chiudi",
+  remove: "Rimuovi",
 
   ///Errori
   login_error: "Login errata!",

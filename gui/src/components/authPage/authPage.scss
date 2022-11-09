@@ -2,12 +2,11 @@
   //justify-content: center;
   //align-items: center;
   background-color: #ecfaff;
-  //background-image: url("../../assets/img/background-login.png");
-  background-repeat: no-repeat;
-  background-size: 70% 100%;
   flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
   max-width: 100%;
   overflow: auto;
   min-height: 100vh;
@@ -16,27 +15,22 @@
     color: #123651;
   }
   .title-wrapper {
-    position: absolute;
+    //position: absolute;
     margin: 30px;
     background-color: rgba(255, 255, 255, 0.5);
     -webkit-backdrop-filter: blur(2px);
     backdrop-filter: blur(2px);
-    top: 5%;
-    left: 2%;
+    box-shadow: 5px 5px 5px rgb(0, 0, 0, 0.2);
+    padding: 10px;
+    //top: 5%;
+    //left: 2%;
 
     //align-self: center;
   }
-  .input-checkbox {
-    -ms-transform: scale(4); /* IE */
-    -moz-transform: scale(4); /* FF */
-    -webkit-transform: scale(4); /* Safari and Chrome */
-    -o-transform: scale(4); /* Opera */
-    transform: scale(4);
-    margin-left: 8px;
-  }
+
   .title-section {
     //align-self: center;
-    font-size: 84px;
+    font-size: 42px;
     font-style: normal;
     font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
     font-stretch: ultra-expanded;
@@ -44,7 +38,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-right: 10px;
+    //padding: 10px;
     text-transform: uppercase;
   }
   .subtitle-section {
@@ -60,16 +54,16 @@
     padding-right: 10px;
     //text-transform: uppercase;
   }
-  .login-section {
+  form {
     background-color: rgba(255, 255, 255, 0.5);
     -webkit-backdrop-filter: blur(2px);
     backdrop-filter: blur(2px);
 
-    //box-shadow: 0 2px 4px rgb(0 0 0 / 10%), 0 8px 16px rgb(0 0 0 / 10%);
-    position: absolute;
-    padding-left: 10px;
-    top: 20%;
-    right: 2%;
+    box-shadow: 5px 5px 5px rgb(0, 0, 0, 0.2);
+    //position: absolute;
+    padding: 10px;
+    //top: 20%;
+    //right: 2%;
     align-items: center;
     min-width: 30%;
   }

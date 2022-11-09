@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { addFields, addTypes } from "../../config";
 import {
   post_generic,
@@ -21,6 +21,8 @@ import {
   maintainEmptyElement,
   maintainEmptyElements,
 } from "../../services/objects_manipulation";
+import AppContext from "../../context";
+import { fetchedPageTypes, fetchedPageData } from "../../config";
 
 const cloneDeep = require("clone-deep");
 
@@ -66,6 +68,31 @@ export default function AddPage(props) {
   const [contentHeader, setContentHeader] = useState(null);
   const [contentBody, setContentBody] = useState(null);
   const [contentPlain, setContentPlain] = useState(null);
+
+  const context = useContext(AppContext);
+  let myFetched;
+  if (context !== undefined) myFetched = context.fetched;
+  else myFetched = {};
+
+  /////////////FETCH REQUIRED RESOURCES
+  const fetchData = async (res) => {
+    if (myFetched.data[res] !== undefined) return;
+    // get the data from the api
+    try {
+      const response = await get_generic(res, { limit: 100 });
+      myFetched.UpdateData(
+        response.docs.map((e) => e._id),
+        res
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    if (fetchedPageData[resource] !== undefined) {
+      Object.values(fetchedPageData[resource]).forEach((e) => fetchData(e));
+    }
+  }, []);
 
   //useeffect to get resource if required
   useEffect(() => {

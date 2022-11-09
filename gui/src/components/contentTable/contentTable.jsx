@@ -81,8 +81,28 @@ export default function ContentTable(props) {
                         );
                       }
                       if (row[e] === undefined) return;
-                      if (Array.isArray(row[e]))
+                      if (Array.isArray(row[e])) {
+                        if (
+                          row[e][0] !== undefined &&
+                          row[e][0].constructor === Object
+                        ) {
+                          const str =
+                            "[ " +
+                            row[e]
+                              .map((el) => Object.values(el).join(" - "))
+                              .join(" -- ") +
+                            " ]";
+                          return (
+                            <td>
+                              {str.length <= 100
+                                ? str
+                                : str.slice(0, 97) + "..."}
+                            </td>
+                          );
+                        }
                         return <td>{"[ " + row[e].join(" , ") + " ]"}</td>;
+                      }
+
                       return <td>{row[e]}</td>;
                     })
                   )}

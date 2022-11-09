@@ -34,9 +34,7 @@ const AuthPageComp = () => {
   return (
     <div className="auth-page">
       <div className="title-wrapper">
-        <div className="title-section">Measurify</div>
-        <br />
-        <div className="subtitle-section">From the edge to cloud and back</div>
+        <div className="title-section">Pensaci Prima</div>
       </div>
       {languages.length > 1 && (
         <div className="language-wrapper">
@@ -46,60 +44,39 @@ const AuthPageComp = () => {
 
       <br />
       <br />
-      <div className="login-section">
+      <Form onSubmit={submitForm} className="rounded p-4 p-sm-3">
         <h4>{locale().login}</h4>
-        <Form onSubmit={submitForm}>
-          <Form.Group className="mb-3" controlId="username">
-            <Form.Label>{locale().username}</Form.Label>
-            <Form.Control
-              ref={userRef}
-              type="text"
-              placeholder={locale().username_suggestion}
-            />
-          </Form.Group>
+        <Form.Group className="mb-3" controlId="username">
+          <Form.Label>{locale().username}</Form.Label>
+          <Form.Control
+            ref={userRef}
+            type="text"
+            placeholder={locale().username_suggestion}
+          />
+        </Form.Group>
 
-          <Form.Group className="mb-3" controlId="formBasicPassword">
-            <Form.Label>{locale().password}</Form.Label>
-            <Form.Control
-              type="password"
-              ref={pswRef}
-              placeholder={locale().password_suggestion}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="tenant">
-            <Form.Label>{locale().tenant}</Form.Label>
-            <Form.Control
-              type="text"
-              ref={tenantRef}
-              placeholder={locale().tenant_suggestion}
-            />
-          </Form.Group>
-          <Button variant="success" type="submit">
-            {locale().submit}
-          </Button>
-        </Form>
-        <br />
-        <div style={{ color: "red" }}>{msg}</div>
-        <br />
-        <div className="form-row row">
-          <NavLink to={`/add/tenants`}>
-            <Button variant="outline-success" size="sm">
-              {locale().add_tenant}
-              <i
-                className="fa fa-plus-circle"
-                aria-hidden="true"
-                title={"Add"}
-                style={{
-                  width: 30 + "px",
-                  height: 30 + "px",
-                  marginRight: 10 + "px",
-                  opacity: 0.85,
-                }}
-              ></i>
-            </Button>
-          </NavLink>
-        </div>
-      </div>
+        <Form.Group className="mb-3" controlId="formBasicPassword">
+          <Form.Label>{locale().password}</Form.Label>
+          <Form.Control
+            type="password"
+            ref={pswRef}
+            placeholder={locale().password_suggestion}
+          />
+        </Form.Group>
+        <Form.Group className="mb-3" controlId="tenant">
+          <Form.Label>{locale().tenant}</Form.Label>
+          <Form.Control
+            type="text"
+            ref={tenantRef}
+            placeholder={locale().tenant_suggestion}
+          />
+        </Form.Group>
+        <Button variant="primary" type="submit">
+          {locale().submit}
+        </Button>
+      </Form>
+      <br />
+      <div style={{ color: "red" }}>{msg}</div>
     </div>
   );
 };
