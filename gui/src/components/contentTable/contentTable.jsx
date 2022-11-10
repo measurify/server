@@ -3,12 +3,14 @@ import { aliasPages } from "../../config";
 
 import { Table } from "react-bootstrap";
 import ActionManager from "../actionsManager/actionsManager";
+import { canDo } from "../../services/userRolesManagement";
 
 export default function ContentTable(props) {
   if (props.header === undefined || props.resources === undefined)
     return <div>Loading</div>;
   if (props.header.includes("actions") && props.actions === undefined)
     return <div>Loading</div>;
+
   return (
     <div>
       <Table responsive striped bordered hover>
@@ -45,7 +47,8 @@ export default function ContentTable(props) {
                             ) : (
                               ""
                             )}
-                            {props.actions.includes("edit") ? (
+                            {props.actions.includes("edit") &&
+                            canDo(props.userRole, props.resType, "update") ? (
                               <ActionManager
                                 resType={props.resType}
                                 action="edit"
@@ -56,7 +59,8 @@ export default function ContentTable(props) {
                             ) : (
                               ""
                             )}
-                            {props.actions.includes("duplicate") ? (
+                            {props.actions.includes("duplicate") &&
+                            canDo(props.userRole, props.resType, "create") ? (
                               <ActionManager
                                 resType={props.resType}
                                 action="duplicate"
@@ -66,7 +70,8 @@ export default function ContentTable(props) {
                             ) : (
                               ""
                             )}
-                            {props.actions.includes("delete") ? (
+                            {props.actions.includes("delete") &&
+                            canDo(props.userRole, props.resType, "delete") ? (
                               <ActionManager
                                 resType={props.resType}
                                 action="delete"

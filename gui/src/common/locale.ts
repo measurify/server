@@ -60,7 +60,7 @@ interface ILocalization {
 }
 
 export default function locale() {
-  let tkn = localStorage.getItem("diten-language");
+  let tkn = localStorage.getItem("language");
   if (languages.length === 0) {
     return localization_en as ILocalization;
   }

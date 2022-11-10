@@ -38,18 +38,15 @@ export function login(username, password, tenant) {
     instance
       .post(url_string, body, options)
       .then((response) => {
-        localStorage.setItem("diten-token", response.data.token);
+        localStorage.setItem("token", response.data.token);
         localStorage.setItem(
-          "diten-token-expiration-time",
+          "token-expiration-time",
           response.data.token_expiration_time
         );
-        localStorage.setItem("diten-username", response.data.user.username);
-        localStorage.setItem("diten-user-role", response.data.user.type);
-        localStorage.setItem("diten-user-tenant", tenant);
-        localStorage.setItem(
-          "diten-login-time",
-          new Date().getTime().toString()
-        );
+        localStorage.setItem("username", response.data.user.username);
+        localStorage.setItem("user-role", response.data.user.type);
+        localStorage.setItem("user-tenant", tenant);
+        localStorage.setItem("login-time", new Date().getTime().toString());
 
         resolve(response);
       })
@@ -75,13 +72,10 @@ export function refreshToken() {
     instance
       .put(url_string, {}, options)
       .then((response) => {
-        localStorage.setItem("diten-token", response.data.token);
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("login-time", new Date().getTime().toString());
         localStorage.setItem(
-          "diten-login-time",
-          new Date().getTime().toString()
-        );
-        localStorage.setItem(
-          "diten-token-expiration-time",
+          "token-expiration-time",
           response.data.token_expiration_time
         );
         resolve(response);
@@ -406,5 +400,5 @@ export async function get_generic(resource_type, qs = {}, token) {
 
 //return the login token from the localstorage
 function GetToken() {
-  return localStorage.getItem("diten-token");
+  return localStorage.getItem("token");
 }

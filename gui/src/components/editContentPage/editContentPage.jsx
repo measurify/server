@@ -318,7 +318,7 @@ export default function EditContentPage(props) {
   return (
     <div className="page">
       <header className="page-header">
-        Edit &nbsp;<b>{resource}</b>&nbsp;of id:&nbsp;<b>{id}</b>&nbsp;from:
+        Edit &nbsp;<b>{resource}</b>&nbsp;of id:&nbsp;<b>{id}</b>&nbsp;
       </header>
       <main className="page-content">
         <FormManager

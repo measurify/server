@@ -53,7 +53,7 @@ function App() {
   const [data, setData] = useState<Object>({});
 
   let layoutRef = React.useRef<string | null>();
-  const tkn = localStorage.getItem("diten-token");
+  const tkn = localStorage.getItem("token");
 
   ////////////////NOTIFICATION MANAGEMENT FRAGMENT
   //function to push a new notification at the beginning of the list

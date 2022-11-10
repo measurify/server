@@ -8,9 +8,12 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { Pagination } from "react-bootstrap";
 import "./page.scss";
 
+import { canDo } from "../../services/userRolesManagement";
 import fontawesome from "@fortawesome/fontawesome";
 import { faPlusCircle } from "@fortawesome/fontawesome-free-solid";
 fontawesome.library.add(faPlusCircle);
+
+let role = React.createRef();
 
 export default function Page(params) {
   const { page } = useParams();
@@ -29,6 +32,10 @@ export default function Page(params) {
   const [nextPage, setNextPage] = useState();
 
   const [totalPages, setTotalPages] = useState();
+
+  const rl = localStorage.getItem("user-role");
+
+  role.current = rl !== null ? rl : "";
 
   useEffect(() => {
     // declare the async data fetching function
@@ -164,7 +171,7 @@ export default function Page(params) {
       <header className="page-header">
         {page}
 
-        {addFields[page] !== undefined && (
+        {addFields[page] !== undefined && canDo(role.current, page, "create") && (
           <NavLink to={`/add/` + page + "/"} key={page + "_add_navlink"}>
             <Button variant="link" size="sm" key={page + "button"}>
               <i
@@ -186,6 +193,7 @@ export default function Page(params) {
       <main className="page-content">
         <ContentTable
           resType={page}
+          userRole={role.current}
           header={header}
           resources={resource}
           actions={actions}

@@ -2,7 +2,7 @@ import { isFeatureInUse, alwaysTrue } from "./services/validations";
 
 //url of APIs
 export const api_url = "https://hi-drive.measurify.org:8080/v1";
-//export const api_url = "https://localhost:8080/v1";
+//export const api_url = "https://localhost/v1";
 
 //name of this dashboard, shown to users
 export const website_name = "Admin Dashboard";
@@ -43,7 +43,7 @@ export const aliasPages = {};
 
 //actions dictionary: key is the page, value is an array that contains actions || working actions arae "view" | "edit" | "delete"
 export const pageActions = {};
-//pageActions["features"] = ["view", "edit", "duplicate", "delete"];
+///pageActions["features"] = ["view", "edit", "duplicate", "delete"];
 pageActions["users"] = ["view", "delete"];
 //pageActions["things"] = ["view", "delete"];
 //pageActions["tags"] = ["view", "edit", "delete"];
@@ -62,7 +62,7 @@ viewFields["users"] = ["username", "type", "actions", "fieldmask", "status"];
 viewFields["tags"] = ["tags"];
 viewFields["things"] = ["_id", "visibility", "tags"];
 viewFields["devices"] = ["_id", "features", "tags", "scripts"];*/
-viewFields["protocols"] = ["_id", "description", "metadata", "topics"];
+viewFields["protocols"] = ["_id", "description", "metadata"];
 viewFields["experiments"] = ["_id", "description", "protocol", "metadata"];
 /*viewFields["measurements"] = [
   "thing",
@@ -89,11 +89,9 @@ export const editFields = {};
 };
 editFields["tags"] = {
   tags: [""],
-};*/
-
+};
 editFields["devices"] = { visibility: "", tags: [""] };
-editFields["measurements"] = { tags: [""] };
-
+editFields["measurements"] = { tags: [""] };*/
 //add dictionary: key is the page, value is an array that contains the fields that can will be used to post the entity
 //fields should be specified in the same format of the objet that will be represented:
 // - key:"" for an string field,
@@ -120,13 +118,14 @@ addFields["features"] = {
   items: [{ name: "", type: "", unit: "", dimension: NaN, range: [""] }],
   tags: [""],
 };
+
+
 addFields["devices"] = {
   _id: "",
   features: [""],
 };
 */
 addFields["users"] = { username: "", password: "", type: "" };
-
 addFields["protocols"] = {
   _id: "",
   description: "",
@@ -158,17 +157,17 @@ addFields["experiments"] = {
   thing: "",
   device: "",
   tags: [""],
-};
-*/
+};*/
+
 //edit fields specifiers dictionary
 //this dictionary allow to specify particular behaviour for input fields, that can be managed by a specific function
 // type can be "disable" -> policy is applied to fields to be disabled, true when field should be disabled
 //
 export const editFieldsSpecifier = {};
-editFieldsSpecifier["features"] = {
+/*editFieldsSpecifier["features"] = {
   _id: { type: "disable", policy: isFeatureInUse },
   items: { type: "disable", policy: isFeatureInUse },
-};
+};*/
 
 //dictionary to select the way to post entity/ies, it's an array which can contain "form", "file", or both
 export const addTypes = {};
@@ -214,10 +213,6 @@ fetchedPageTypes["measurements"] = {
 fetchedPageTypes["issues"] = {
   type: "IssueTypes",
   status: "IssueStatusType",
-};
-fetchedPageTypes["constraints"] = {
-  type1: "ConstraintTypes",
-  type2: "ConstraintTypes",
 };*/
 fetchedPageTypes["protocols"] = {
   metadata: { type: "MetadataTypes" },
@@ -227,6 +222,10 @@ fetchedPageTypes["experiments"] = {
   visibility: "VisibilityTypes",
   state: "ExperimentStateTypes",
 };
+/*fetchedPageTypes["constraints"] = {
+  type1: "ConstraintTypes",
+  type2: "ConstraintTypes",
+};*/
 
 //dictionary for fetched data
 //data is fetched on the according resource route and matched with fields following this dictionary
@@ -240,5 +239,4 @@ fetchedPageData["measurements"] = {
   device: "devices",
   thing: "things",
   tags: "tags",
-};
-*/
+};*/
