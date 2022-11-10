@@ -11,6 +11,7 @@ const cache = require('../commons/cache.js');
 
 exports.Fieldmask = null;
 exports.User = null;
+exports.Role = null;
 exports.Group = null;
 exports.Tag = null;
 exports.Log = null;
@@ -40,6 +41,7 @@ before(async () => {
 
     this.Fieldmask = mongoose.dbs[process.env.DEFAULT_TENANT_DATABASE].model('Fieldmask');
     this.User = mongoose.dbs[process.env.DEFAULT_TENANT_DATABASE].model('User');
+    this.Role = mongoose.dbs[process.env.DEFAULT_TENANT_DATABASE].model('Role');
     this.Group = mongoose.dbs[process.env.DEFAULT_TENANT_DATABASE].model('Group');
     this.Tag = mongoose.dbs[process.env.DEFAULT_TENANT_DATABASE].model('Tag');
     this.Computation = mongoose.dbs[process.env.DEFAULT_TENANT_DATABASE].model('Computation');

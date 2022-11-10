@@ -64,6 +64,10 @@ router.use('/' + process.env.VERSION + '/scripts', passport.authenticate('jwt-to
 const rightsRoute = require('./routes/rightRoute');
 router.use('/' + process.env.VERSION + '/rights', passport.authenticate('jwt-token', {session: false}), rightsRoute);
 
+// role
+const rolesRoute = require('./routes/roleRoute');
+router.use('/' + process.env.VERSION + '/roles', passport.authenticate('jwt-token', {session: false}), rolesRoute);
+
 // subscription
 const subscriptionsRoute = require('./routes/subscriptionRoute');
 router.use('/' + process.env.VERSION + '/subscriptions', passport.authenticate('jwt-token', {session: false}), subscriptionsRoute);

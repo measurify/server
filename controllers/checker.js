@@ -72,6 +72,26 @@ exports.isOwned = async function(req, res) {
     return true;
 }
 
+exports.canOperate = async function(req, res, entity) {
+    const Role = mongoose.dbs[req.tenant.database].model('Role');
+    const role = await Role.findById(req.user.type);
+    if(!authorizator.canOperate(req.user,role,req.method,entity,req.resource)) return errors.manage(res, errors.restricted_access_operation, "You cannot do "+req.method.toLowerCase()+" operation on the resource "+entity);
+    return true;
+}
+
+exports.whatCanOperate = async function(req, res, entity) {
+    const Role = mongoose.dbs[req.tenant.database].model('Role');
+    const role = await Role.findById(req.user.type);
+    return authorizator.whatCanOperate(req.user,role,req.method,entity);
+}
+
+exports.canDeleteMeasurementList = async function(req, res, entity) {
+    const Role = mongoose.dbs[req.tenant.database].model('Role');
+    const role = await Role.findById(req.user.type);
+    if(!authorizator.canDeleteMeasurementList(req.user,role,req.method,entity)) return errors.manage(res, errors.restricted_access_delete);
+    return true;
+} 
+/*OLD
 exports.canCreate = async function(req, res) {
     if(!authorizator.canCreate(req.user)) return errors.manage(res, errors.restricted_access_create, "You cannot create new resources");
     return true;
@@ -100,7 +120,7 @@ exports.canDeleteList = async function(req, res) {
 exports.whatCanRead = async function(req, res) {
     return authorizator.whatCanRead(req.user);
 } 
-
+*/
 exports.isValid = async function(req, res, type, field) {
     const value = req.body[field];
     if(!value) return true;
@@ -165,10 +185,11 @@ exports.hasRightsToCreate = async function(req, res, fields) {
 exports.readJustOwned = async function(req, res) {
     return authorizator.readJustOwned(req.user);
 } 
-
+/*OLD
 exports.whatCanDelete = async function(req, res) {
     return authorizator.whatCanDelete(req.user);
 } 
+*/
 exports.changeUsernameWithId = async function(req,list) {
     const User = mongoose.dbs[req.tenant.database].model('User');
     return await Promise.all(list.map(async function (e) {

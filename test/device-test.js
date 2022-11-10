@@ -238,7 +238,7 @@ describe('/POST device from file', () => {
         const feature2 = await factory.createFeature("feature2", user);
         const feature3 = await factory.createFeature("feature3", user);
         const feature4 = await factory.createFeature("feature4", user);
-        const testFile = './test/test/Device_test.csv';
+        const testFile = './test/dummies/Device_test.csv';
         const res = await chai.request(server).keepOpen().post('/v1/devices/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -478,9 +478,9 @@ describe('/PUT device', () => {
         const device = await factory.createDevice("test-device-1", user, [feature]);
         const request = { period: '25s' };
         const res = await chai.request(server).keepOpen().put('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user)).send(request);
-        res.should.have.status(errors.restricted_access_modify.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_modify.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should not PUT a device of another provider', async () => {
@@ -490,9 +490,9 @@ describe('/PUT device', () => {
         const device = await factory.createDevice("test-device-1", user_1, [feature]);
         const request = { period: '25s' };
         const res = await chai.request(server).keepOpen().put('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user_2)).send(request);
-        res.should.have.status(errors.restricted_access_modify.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_modify.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should not PUT a device without any field', async () => {

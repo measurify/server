@@ -14,7 +14,8 @@ const dataset = require('../commons/dataset.js');
 exports.get = async (req, res) => {
     const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
     const select = await checker.whatCanSee(req, res, Measurement);    
-    const restriction_1 = await checker.whatCanRead(req, res);
+    //const restriction_1 = await checker.whatCanRead(req, res);    
+    const restriction_1 = await checker.whatCanOperate(req, res,"Measurement");
     const restriction_2 = await checker.whichRights(req, res, Measurement);
     const restrictions = { ...restriction_1, ...restriction_2 };
     return await controller.getResourceDataset(req, res, '{ "timestamp": "desc" }', select, Measurement,restrictions);
@@ -83,12 +84,15 @@ exports.delete = async (req, res) => {
     const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
     let result = await checker.isAvailable(req, res, Dataupload); if (result != true) return result;
     result = await checker.isOwned(req, res); if (result != true) return result;
-    result = await checker.canDelete(req, res); if (result != true) return result;
+    //result = await checker.canDelete(req, res); if (result != true) return result;
+    result = await checker.canOperate(req, res,"Measurement"); if (result != true) return result;
     result = await checker.hasRights(req, res, Dataupload); if (result != true) return result;
 
 
-    result = await checker.canDeleteList(req, res); if (result != true) return result;
-    const restriction_1 = await checker.whatCanDelete(req, res);
+    //result = await checker.canDeleteList(req, res); if (result != true) return result;
+    result = await checker.canDeleteMeasurementList(req, res,"Measurement");  if (result != true) return result;
+    //const restriction_1 = await checker.whatCanDelete(req, res);
+    const restriction_1 = await checker.whatCanOperate(req, res,"Measurement");
     const restriction_2 = await checker.whichRights(req, res, Measurement);
     const restrictions = { ...restriction_1, ...restriction_2 };
     filter = { "tags": req.params.id };
@@ -104,7 +108,8 @@ exports.getoneDataupload = async (req, res) => {
     const Dataupload = mongoose.dbs[req.tenant.database].model('Dataupload');
     const select = await checker.whatCanSee(req, res, Dataupload);
     let result = await checker.isAvailable(req, res, Dataupload); if (result != true) return result;
-    result = await checker.canRead(req, res); if (result != true) return result;
+    //result = await checker.canRead(req, res); if (result != true) return result;
+    result = await checker.canOperate(req, res,"Measurement"); if (result != true) return result;
     result = await checker.hasRights(req, res, Dataupload); if (result != true) return result;
     return await controller.getResource(req, res, null, Dataupload, select);
 };

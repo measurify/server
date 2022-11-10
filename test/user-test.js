@@ -160,7 +160,7 @@ describe("/POST users", () => {
     res.body.message.should.be.a("string");
     res.should.have.status(errors.post_request_error.status);
     res.body.message.should.contain(errors.post_request_error.message);
-    res.body.details.should.contain("Path `type` is required");
+    res.body.details.should.contain("Please, supply a user role");
   });
 
   it("it should not POST a user with a fake type", async () => {
@@ -181,7 +181,7 @@ describe("/POST users", () => {
     res.body.message.should.be.a("string");
     res.should.have.status(errors.post_request_error.status);
     res.body.message.should.contain(errors.post_request_error.message);
-    res.body.details.should.contain("is not a valid enum value for path");
+    res.body.details.should.contain("ValidationError: type: Role not existent");
   });
 
   it("it should POST a user", async () => {
@@ -297,7 +297,7 @@ describe("/POST users", () => {
 describe('/POST user from file', () => {
   it('it should POST users from file csv', async () => {   
     const user = await factory.createUser("test-username-0", "test-password-0", UserRoles.admin);   
-      const testFile = './test/test/User_test.csv';      
+      const testFile = './test/dummies/User_test.csv';      
       const res = await chai.request(server).keepOpen().post('/v1/users/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
       res.should.have.status(200);
       res.body.should.be.a('object');

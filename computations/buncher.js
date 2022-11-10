@@ -15,7 +15,10 @@ function Buncher(computation, user, runner, page_size, tenant) {
     const Measurement = mongoose.dbs[tenant.database].model('Measurement');
     
     this.init = async function() {
-        this.restriction = await authorization.whatCanRead(this.user);
+        const Role = mongoose.dbs[tenant.database].model('Role');
+        const role = await Role.findById(this.user.type);
+        //this.restriction = await authorization.whatCanRead(this.user);        
+        this.restriction = await authorization.whatCanOperate(this.user,role,"GET","Measurement");
         this.size = await persistence.getSize(this.computation.filter, this.restriction, Measurement);
         this.pages = Math.ceil(this.size / this.page_size);
     }

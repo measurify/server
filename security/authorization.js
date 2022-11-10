@@ -1,6 +1,8 @@
-
+const mongoose = require('mongoose');
 const UserRoles = require('../types/userRoles.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
+const CrudTypes = require('../types/crudTypes.js');
+const RoleCrudTypes = require('../types/roleCrudTypes.js'); 
 const persistence = require('../commons/persistence.js');
 const { equalScalarDependencies } = require('mathjs');
 
@@ -49,6 +51,41 @@ exports.isNotUsed = async function(resource, model, field) {
     return true;
 } 
 
+exports.canOperate = function(user,role,method,entity,resource) {
+    let roleEntity=role.actions.filter(action=>action.entity.toLowerCase()==entity.toLowerCase())
+    let permission=undefined;
+    if(roleEntity.length){if(roleEntity[0].crud[CrudTypes[method]]!==undefined)permission=roleEntity[0].crud[CrudTypes[method]]};
+    if(permission===undefined)permission=role.default[CrudTypes[method]];
+    if(method=="POST")return permission;
+    if(permission==RoleCrudTypes.all)return true;
+    if(permission==RoleCrudTypes.owned)return this.isOwner(resource, user); 
+    if (!resource.visibility) resource.visibility = VisibilityTypes.private;
+    if(permission==RoleCrudTypes.public_and_owned)return this.isOwner(resource, user)||resource.visibility == VisibilityTypes.public;
+    return false;
+}
+
+exports.whatCanOperate = function(user,role,method,entity) { //read,delete 
+    let result = {};
+    let roleEntity=role.actions.filter(action=>action.entity.toLowerCase()==entity.toLowerCase())
+    let permission=undefined;
+    if(roleEntity.length){if(roleEntity[0].crud[CrudTypes[method]]!==undefined)permission=roleEntity[0].crud[CrudTypes[method]]};
+    if(permission===undefined)permission=role.default[CrudTypes[method]];
+    if(permission==RoleCrudTypes.all)return result;
+    if(permission==RoleCrudTypes.owned)return result={ $and: [  { owner: user._id } ] };    
+    if(permission==RoleCrudTypes.public_and_owned)return result={ $or: [  { owner: user._id }, { visibility: VisibilityTypes.public } ] };
+    return result= { $and: [  { owner: user._id }, { visibility: VisibilityTypes.public },{ visibility: VisibilityTypes.private } ] }//none
+
+    //OLD
+    //if (this.isSupplier(user)) result = { $and: [  { owner: user._id }, { visibility: VisibilityTypes.public },{ visibility: VisibilityTypes.private } ] };//can't see anything
+    //if (this.isAdministrator(user)) return result;
+    //if (this.isAnalyst(user)) return result;
+    //if (this.isProvider(user)) result = { $or: [  { owner: user._id }, { visibility: VisibilityTypes.public } ] };
+    //if (this.isProvider(user)) result = { $or: [  { owner: user._id }, { $and: [{ visibility: {$exists: true} , visibility: VisibilityTypes.public }] } ] };
+    //if (this.isProvider(user)) result = { pincopallo: {$exists: false} };
+    //return result;
+} 
+
+/*OLD
 exports.canCreate = function(user) {
     if (this.isAdministrator(user)) return true;
     if (this.isProvider(user)) return true;
@@ -85,8 +122,22 @@ exports.canDeleteList = function(user) {
     if (this.isProvider(user)) return true;
     if (this.isAnalyst(user)) return false;
     return false;
-} 
+}*/ 
 
+exports.canDeleteMeasurementList = function(user,role,method,entity) {
+    if(method!="DELETE")return false;//Delete
+    let roleEntity=role.actions.filter(action=>action.entity.toLowerCase()==entity.toLowerCase())
+    let permission=undefined;
+    if(roleEntity.length){if(roleEntity[0].crud[CrudTypes[method]]!==undefined)permission=roleEntity[0].crud[CrudTypes[method]]};
+    if(permission===undefined)permission=role.default[CrudTypes[method]];    
+    if(permission==RoleCrudTypes.all)return true;
+    if(permission==RoleCrudTypes.owned)return true; 
+    //if (!resource.visibility) resource.visibility = VisibilityTypes.private;
+    if(permission==RoleCrudTypes.public_and_owned)return true;//||resource.visibility == VisibilityTypes.public;
+    return false;
+}
+
+/*OLD
 exports.whatCanRead = function(user) {
     let result = {};
     if (this.isSupplier(user)) result = { $and: [  { owner: user._id }, { visibility: VisibilityTypes.public },{ visibility: VisibilityTypes.private } ] };//can't see anything
@@ -97,7 +148,7 @@ exports.whatCanRead = function(user) {
     //if (this.isProvider(user)) result = { pincopallo: {$exists: false} };
     return result;
 } 
-
+*/
 exports.whichRights = function(user, rights, where) {
     let result = {};
     if (this.isAdministrator(user)) return result;
@@ -162,10 +213,11 @@ exports.readJustOwned = function(user) {
     if (this.isAdministrator(user)) return null;
     return { owner: user._id };
 } 
-
+/*OLD
 exports.whatCanDelete = function(user) {
     if (this.isAdministrator(user)) return null;
     if (this.isSupplier(user)) return { $and: [  { owner: user._id }, { visibility: VisibilityTypes.public },{ visibility: VisibilityTypes.private } ] };
     if (this.isProvider(user)) return { owner: user._id };
     return null;
 } 
+*/

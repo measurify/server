@@ -14,31 +14,43 @@ const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
 const before = require('./before-test.js');
+const RoleCrudTypes = require('../types/roleCrudTypes.js');
 
 // Test the /GET route
-describe('/GET thing', () => {
-    it('it should GET all the things', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        await factory.createThing("test-thing-1", user, [], null, [], null, null);
-        await factory.createThing("test-thing-2", user, [], null, [], null, null);
-        const res = await chai.request(server).keepOpen().get('/v1/things').set("Authorization", await factory.getUserToken(user));
+describe('/GET role', () => {
+    it('it should GET all the default roles', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const res = await chai.request(server).keepOpen().get('/v1/roles').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
-        res.body.docs.length.should.be.eql(2);
+        res.body.docs.length.should.be.eql(4);        
     });
 
-    it('it should GET a specific thing', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const thing = await factory.createThing("test-thing-2", user, [], null, []);
-        const res = await chai.request(server).keepOpen().get('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user));
+    it('it should GET all the default roles + custom roles', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const crud1 = await factory.createCrud(true,RoleCrudTypes.all,RoleCrudTypes.all,RoleCrudTypes.all);
+        const crud2 = await factory.createCrud(false,RoleCrudTypes.public_and_owned,RoleCrudTypes.public_and_owned,RoleCrudTypes.owned);
+        const role1= await factory.createRole("test-role-1", crud1);
+        const role2=await factory.createRole("test-role-2", crud2);    
+        const res = await chai.request(server).keepOpen().get('/v1/roles').set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.docs.should.be.a('array');
+        res.body.docs.length.should.be.eql(6);     
+    });
+
+    it('it should GET a specific role', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const crud1 = await factory.createCrud(true,RoleCrudTypes.all,RoleCrudTypes.all,RoleCrudTypes.all);
+        const role1= await factory.createRole("test-role-1", crud1);
+        const res = await chai.request(server).keepOpen().get('/v1/roles/' + role1._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
-        res.body._id.should.eql(thing._id.toString());
+        res.body._id.should.eql(role1._id.toString());
     });
 
-    it('it should not GET a fake thing', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const res = await chai.request(server).keepOpen().get('/v1/things/fake-thing').set("Authorization", await factory.getUserToken(user));
+    it('it should not GET a fake role', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const res = await chai.request(server).keepOpen().get('/v1/roles/fake-role').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
@@ -46,54 +58,55 @@ describe('/GET thing', () => {
 });
 
 // Test the /POST route
-describe('/POST thing', () => {
-    it('it should not POST a thing without _id field', async () => {      
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const thing = {}
-        const res = await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
+describe('/POST role', () => {
+    it('it should not POST a role without _id field', async () => {      
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const role = {}
+        const res = await chai.request(server).keepOpen().post('/v1/roles').set("Authorization", await factory.getUserToken(user)).send(role);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.post_request_error.message);
     });
 
-    it('it should not POST a thing with a fake tag', async () => {      
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const thing = { _id: "test-thing-2", tags: ["fake-tag"] };
-        const res = await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
+    it('it should not POST a role without default field', async () => {      
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const role = {_id:"test-role-1"}
+        const res = await chai.request(server).keepOpen().post('/v1/roles').set("Authorization", await factory.getUserToken(user)).send(role);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.post_request_error.message);
-        res.body.details.should.contain('Tag not existent');
     });
 
-    it('it should not POST a device with a fake relation', async () => {      
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const thing = { _id: "test-thing-2", relations: [ 'fake-Thing'] };
-        const res = await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
+    it('it should not POST a role with a fake default action', async () => {      
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const role = { _id: "test-role-1", default: "fake-default" };
+        const res = await chai.request(server).keepOpen().post('/v1/roles').set("Authorization", await factory.getUserToken(user)).send(role);
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.post_request_error.message);
-        res.body.details.should.contain('Relation not existent');
+        res.body.details.should.contain('ValidationError: default: Cast to Embedded failed for value "fake-default" (type string) at path "default"');
     });
-
-    it('it should POST a thing', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const thing = { _id: "test-thing-1" }
-        const res = await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
+    
+    it('it should POST a role', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const crud1 = await factory.createCrud(true,RoleCrudTypes.all,RoleCrudTypes.all,RoleCrudTypes.all);
+        const role = { _id: "test-role-1" ,default:crud1}
+        const res = await chai.request(server).keepOpen().post('/v1/roles').set("Authorization", await factory.getUserToken(user)).send(role);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
-        res.body._id.should.be.eql(thing._id);
+        res.body._id.should.be.eql(role._id);
     });
 
-    it('it should not POST a thing with already existant _id field', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const thing = { _id: "test-thing-1" };
-        await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
-        const res = await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing)
+    it('it should not POST a role with already existant _id field', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const crud1 = await factory.createCrud(true,RoleCrudTypes.all,RoleCrudTypes.all,RoleCrudTypes.all);
+        const role = { _id: "test-role-1" ,default:crud1};
+        await chai.request(server).keepOpen().post('/v1/roles').set("Authorization", await factory.getUserToken(user)).send(role);
+        const res = await chai.request(server).keepOpen().post('/v1/roles').set("Authorization", await factory.getUserToken(user)).send(role)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -101,78 +114,82 @@ describe('/POST thing', () => {
         res.body.details.should.contain('duplicate key');
     });
 
-    it('it should GET the thing posted before', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const thing = { _id: "test-thing-1" };
-        await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
-        const res = await chai.request(server).keepOpen().get('/v1/things').set("Authorization", await factory.getUserToken(user));
+    it('it should GET the role posted before', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const crud1 = await factory.createCrud(true,RoleCrudTypes.all,RoleCrudTypes.all,RoleCrudTypes.all);
+        const role = { _id: "test-role-1" ,default:crud1};
+        await chai.request(server).keepOpen().post('/v1/roles').set("Authorization", await factory.getUserToken(user)).send(role);
+        const res = await chai.request(server).keepOpen().get('/v1/roles').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
-        res.body.docs.length.should.be.eql(1);
-        res.body.docs[0]._id.should.be.eql("test-thing-1");
+        res.body.docs.length.should.be.eql(5);       
     });
 
-    it('it should POST a list of thing', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const things = [{ _id: "test-thing-3" },
-        { _id: "test-thing-4" }];
-        const res = await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(things)
+    it('it should POST a list of role', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);        
+        const crud1 = await factory.createCrud(true,RoleCrudTypes.all,RoleCrudTypes.all,RoleCrudTypes.all);
+        const roles = [{ _id: "test-role-3" ,default:crud1},
+        { _id: "test-role-4",default:crud1 }];
+        const res = await chai.request(server).keepOpen().post('/v1/roles').set("Authorization", await factory.getUserToken(user)).send(roles)
         res.should.have.status(200);
         res.body.should.be.a('object');
-        res.body.things[0]._id.should.be.eql(things[0]._id);
-        res.body.things[1]._id.should.be.eql(things[1]._id);
+        res.body.roles.length.should.be.eql(2);  
+        res.body.roles[0]._id.should.be.eql(roles[0]._id);
+        res.body.roles[1]._id.should.be.eql(roles[1]._id);
     });
 
-    it('it should POST only not existing things from a list', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        let things = [{ _id: "test-thing-1" },
-                        { _id: "test-thing-3" },
-                        { _id: "test-thing-4" }];
-        await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(things);
-        things = [{ _id: "test-thing-1" },
-                        { _id: "test-thing-2" },
-                        { _id: "test-thing-3" },
-                        { _id: "test-thing-4" },
-                        { _id: "test-thing-5" }];
-        const res = await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(things);
+    it('it should POST only not existing roles from a list', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const crud1 = await factory.createCrud(true,RoleCrudTypes.all,RoleCrudTypes.all,RoleCrudTypes.all);
+        let roles = [{ _id: "test-role-1",default:crud1 },
+                        { _id: "test-role-3",default:crud1 },
+                        { _id: "test-role-4" ,default:crud1}];
+        await chai.request(server).keepOpen().post('/v1/roles').set("Authorization", await factory.getUserToken(user)).send(roles);
+        roles = [{ _id: "test-role-1",default:crud1 },
+                        { _id: "test-role-2",default:crud1 },
+                        { _id: "test-role-3",default:crud1 },
+                        { _id: "test-role-4",default:crud1 },
+                        { _id: "test-role-5",default:crud1 }];
+        const res = await chai.request(server).keepOpen().post('/v1/roles').set("Authorization", await factory.getUserToken(user)).send(roles);
         res.should.have.status(202);
         res.body.should.be.a('object');
-        res.body.things.length.should.be.eql(2);
+        res.body.roles.length.should.be.eql(2);
         res.body.errors.length.should.be.eql(3);
-        res.body.errors[0].should.contain(things[0]._id);
-        res.body.errors[1].should.contain(things[2]._id);
-        res.body.errors[2].should.contain(things[3]._id);
-        res.body.things[0]._id.should.be.eql(things[1]._id);
-        res.body.things[1]._id.should.be.eql(things[4]._id);
+        res.body.errors[0].should.contain(roles[0]._id);
+        res.body.errors[1].should.contain(roles[2]._id);
+        res.body.errors[2].should.contain(roles[3]._id);
+        res.body.roles[0]._id.should.be.eql(roles[1]._id);
+        res.body.roles[1]._id.should.be.eql(roles[4]._id);
     });
 
-    it('it should POST a thing with tags', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const tag = await factory.createTag("test-tag-2", user);
-        const thing = { _id: "test-thing-2", tags: [tag] };
-        const res = await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing)
+    it('it should POST a thing with action', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const crud1 = await factory.createCrud(true,RoleCrudTypes.all,RoleCrudTypes.all,RoleCrudTypes.all);
+        const crud2 = await factory.createCrud(true,RoleCrudTypes.none,RoleCrudTypes.none,RoleCrudTypes.none);
+        const action= {entity:"Feature",crud:crud2};
+        const role = { _id: "test-role-1" ,default:crud1,actions:[action]}
+        const res = await chai.request(server).keepOpen().post('/v1/roles').set("Authorization", await factory.getUserToken(user)).send(role);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
-        res.body._id.should.be.eql(thing._id);
-        res.body.tags.length.should.be.eql(1);
+        res.body._id.should.be.eql(role._id);
     });
 
-    it('it should POST a thing with relations', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const tag = await factory.createTag("test-tag-2", user);
-        const relation1 = await factory.createThing("relation-1", user);
-        const relation2 = await factory.createThing("relation-2", user);
-        const thing = { _id: "test-thing-2", relations: [relation1, relation2] };
-        const res = await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user)).send(thing);
+    it('it should POST a thing with multiple action', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const crud1 = await factory.createCrud(true,RoleCrudTypes.all,RoleCrudTypes.all,RoleCrudTypes.all);
+        const crud2 = await factory.createCrud(true,RoleCrudTypes.none,RoleCrudTypes.none,RoleCrudTypes.none);
+        const action1= {entity:"Feature",crud:crud2};
+        const action2= {entity:"Thing",crud:crud2};
+        const role = { _id: "test-role-1" ,default:crud1,actions:[action1,action2]}
+        const res = await chai.request(server).keepOpen().post('/v1/roles').set("Authorization", await factory.getUserToken(user)).send(role);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
-        res.body._id.should.be.eql(thing._id);
-        res.body.relations.length.should.be.eql(2);
+        res.body._id.should.be.eql(role._id);
     });
 });
- 
+ /*
 // Test the /POST file route
 describe('/POST thing from file', () => {
     it('it should POST things from file csv', async () => {
@@ -191,68 +208,58 @@ describe('/POST thing from file', () => {
         res.body.things[0]._id.should.be.eql("thing_test_1");
         res.body.things[1]._id.should.be.eql("thing_test_2");        
         res.body.things[2]._id.should.be.eql("thing_test_3");
-    });   
+    });  
 });
-
+ */
 // Test the /DELETE route
-describe('/DELETE thing', () => {
-    it('it should DELETE a thing', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const thing = await factory.createThing("test-thing-1", user, [], null, []);
-        const things_before = await before.Thing.find();
-        things_before.length.should.be.eql(1);
-        const res = await chai.request(server).keepOpen().delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user));
+describe('/DELETE role', () => {
+    it('it should DELETE a role', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const crud1 = await factory.createCrud(true,RoleCrudTypes.all,RoleCrudTypes.all,RoleCrudTypes.all);
+        const crud2 = await factory.createCrud(false,RoleCrudTypes.public_and_owned,RoleCrudTypes.public_and_owned,RoleCrudTypes.owned);
+        const role1= await factory.createRole("test-role-1", crud1);
+        const role2=await factory.createRole("test-role-2", crud2);            
+        const roles_before = await before.Role.find();
+        roles_before.length.should.be.eql(6);
+        const res = await chai.request(server).keepOpen().delete('/v1/roles/' + role1._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
-        const things_after = await before.Thing.find();
-        things_after.length.should.be.eql(0);
+        const roles_after = await before.Role.find();
+        roles_after.length.should.be.eql(5);
     });
 
-    it('it should not DELETE a fake thing', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const thing = await factory.createThing("test-thing-2", user, [], null, []);
-        const things_before = await before.Thing.find();
-        things_before.length.should.be.eql(1);
-        const res = await chai.request(server).keepOpen().delete('/v1/things/fake_thing').set("Authorization", await factory.getUserToken(user));
+    it('it should not DELETE a fake role', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const crud1 = await factory.createCrud(true,RoleCrudTypes.all,RoleCrudTypes.all,RoleCrudTypes.all);
+        const crud2 = await factory.createCrud(false,RoleCrudTypes.public_and_owned,RoleCrudTypes.public_and_owned,RoleCrudTypes.owned);
+        const role1= await factory.createRole("test-role-1", crud1);
+        const role2=await factory.createRole("test-role-2", crud2);
+        const roles_before = await before.Role.find();
+        roles_before.length.should.be.eql(6);
+        const res = await chai.request(server).keepOpen().delete('/v1/roles/fake_role').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
-        const things_after = await before.Thing.find();
-        things_after.length.should.be.eql(1);
+        const roles_after = await before.Role.find();
+        roles_after.length.should.be.eql(6);
     });
 
-    it('it should not DELETE a thing already used in a measurement', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const feature = await factory.createFeature("test-feature-2", user);
-        const tag = await factory.createTag("test-tag", user);
-        const device = await factory.createDevice("test-device-2", user, [feature]);
-        const thing = await factory.createThing("test-thing-2", user);
-        const measurement = await factory.createMeasurement(user, feature, device, thing, [tag]);
-        const things_before = await before.Thing.find();
-        things_before.length.should.be.eql(1);
-        const res = await chai.request(server).keepOpen().delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user));
+    it('it should not DELETE a role already used in a user', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.admin);
+        const crud1 = await factory.createCrud(true,RoleCrudTypes.all,RoleCrudTypes.all,RoleCrudTypes.all);
+        const role1= await factory.createRole("test-role-1", crud1);        
+        const user2 = await factory.createUser("test-username-2", "test-password-2", role1._id);
+        const roles_before = await before.Role.find();
+        roles_before.length.should.be.eql(5);
+        const res = await chai.request(server).keepOpen().delete('/v1/roles/' + role1._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.already_used.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.already_used.message);
-        const things_after = await before.Thing.find();
-        things_after.length.should.be.eql(1);
-    });
-
-    it('it should not DELETE a thing already used as a relation', async () => {
-        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        const relation = await factory.createThing("test-relation-1", user);
-        const thing = await factory.createThing("test-thing-1", user, null, null, [relation]);
-        const things_before = await before.Thing.find();
-        things_before.length.should.be.eql(2);
-        const res = await chai.request(server).keepOpen().delete('/v1/things/' + relation._id).set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.already_used.status);
-        res.body.should.be.a('object');
-        res.body.message.should.contain(errors.already_used.message);
-        const things_after = await before.Thing.find();
-        things_after.length.should.be.eql(2);
-    });
+        const roles_after = await before.Role.find();
+        roles_after.length.should.be.eql(5);
+    });    
 });
-
+/*
 // Test the /PUT route
 describe('/PUT thing', () => {
     
@@ -397,3 +404,4 @@ describe('/PUT thing', () => {
         res.body.details.should.contain('Request field cannot be updated ');
     });
 });
+*/

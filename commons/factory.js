@@ -16,6 +16,7 @@ const bcrypt = require("bcryptjs");
 const UserStatusTypes = require("../types/userStatusTypes");
 const IssueStatusTypes = require("../types/issueStatusTypes");
 const MetadataTypes = require('../types/metadataTypes.js');
+const RoleCrudTypes = require('../types/roleCrudTypes.js');
 const { index } = require("mathjs");
 
 function sha(content) {
@@ -98,17 +99,95 @@ exports.createUser = async function (username, password, type, fieldmask, email,
   };
   let user = new User(req);
   await user.save();
-  
+
   return await User.findById(user._id);
+};
+
+exports.createRole = async function (name, defaultAction, action, description, tenant) {
+  const Tenant = mongoose.dbs["catalog"].model("Tenant");
+  if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
+  const Role = mongoose.dbs[tenant.database].model("Role");
+  let role = await Role.findOne({ _id: name });
+  if (!role) {
+    const req = {
+      _id: name,
+      default: defaultAction,
+      action: action,
+      description: description
+    };
+    role = new Role(req);
+    await role.save();
+  }
+  return role._doc;
+};
+
+exports.createCrud = async function (create,read,update,deleteAction) {
+  const body = {
+    create: create,
+    read: read,
+    update: update,
+    delete: deleteAction
+  }
+  return body;
+};
+
+exports.createDefaultRoles = async function (tenant) {
+  const Tenant = mongoose.dbs["catalog"].model("Tenant");
+  if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
+  const Role = mongoose.dbs[tenant.database].model("Role");
+  const body = [{
+    _id: "admin",
+    default: {
+      create: true,
+      read: RoleCrudTypes.all,
+      update: RoleCrudTypes.all,
+      delete: RoleCrudTypes.all
+    }
+  },
+  {
+    _id: "provider",
+    default: {
+      create: true,
+      read: RoleCrudTypes.public_and_owned,
+      update: RoleCrudTypes.owned,
+      delete: RoleCrudTypes.owned
+    }
+  },
+  {
+    _id: "supplier",
+    default: {
+      create: true,
+      read: RoleCrudTypes.none,
+      update: RoleCrudTypes.none,
+      delete: RoleCrudTypes.none
+    }
+  },
+  {
+    _id: "analyst",
+    default: {
+      create: false,
+      read: RoleCrudTypes.all,
+      update: RoleCrudTypes.none,
+      delete: RoleCrudTypes.none
+    }
+  }
+  ];
+  let roleDocs = []
+  body.map(async (req) => {
+    const role = new Role(req);
+    await role.save();
+    roleDocs.push(role._doc)
+  });
+  return roleDocs;
 };
 
 exports.createGroup = async function (
   name,
   owner,
   tags,
-  description,  
+  description,
   visibility,
-  tenant, 
+  tenant,
   users
 ) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
@@ -118,9 +197,9 @@ exports.createGroup = async function (
     _id: name,
     owner: owner,
     tags: tags,
-    description: description,    
+    description: description,
     visibility: visibility || VisibilityTypes.private,
-    users:users||[]
+    users: users || []
   };
   const group = new Group(req);
   await group.save();
@@ -170,25 +249,28 @@ exports.createFeature = async function (name, owner, items, tags, visibility, te
 
 
 exports.createMetadata = async function (name, description, type) {
-  metadata = { name: name || "metadata-name-" + this.uuid(), 
-               description: description || "description metadata " + this.uuid(), 
-               type: type || MetadataTypes.scalar
-             }
+  metadata = {
+    name: name || "metadata-name-" + this.uuid(),
+    description: description || "description metadata " + this.uuid(),
+    type: type || MetadataTypes.scalar
+  }
   return metadata;
 }
 
 exports.createField = async function (name, description, type) {
-  field = { name: name || "field-name-" + this.uuid(), 
-            description: description || "description field " + this.uuid(), 
-            type: type || TopicFieldTypes.scalar
-          }
+  field = {
+    name: name || "field-name-" + this.uuid(),
+    description: description || "description field " + this.uuid(),
+    type: type || TopicFieldTypes.scalar
+  }
   return field;
 }
 exports.createTopic = async function (name, description, fields) {
-  topic = { name: name || "topic-name-" + this.uuid(), 
-            description: description || "description topic " + this.uuid(), 
-            fields: fields || [ await this.createField(), await this.createField() ]
-          }
+  topic = {
+    name: name || "topic-name-" + this.uuid(),
+    description: description || "description topic " + this.uuid(),
+    fields: fields || [await this.createField(), await this.createField()]
+  }
   return topic;
 }
 
@@ -200,8 +282,8 @@ exports.createProtocol = async function (name, description, owner, metadata, top
     _id: name,
     description: description,
     owner: owner,
-    metadata: metadata || [ await this.createMetadata(), await this.createMetadata() ],
-    topics: topics || [ await this.createTopic(), await this.createTopic() ],
+    metadata: metadata || [await this.createMetadata(), await this.createMetadata()],
+    topics: topics || [await this.createTopic(), await this.createTopic()],
     tags: tags,
     visibility: visibility,
   };
@@ -214,8 +296,8 @@ exports.createExperimentMetadata = async function (protocol) {
   const metadata = [];
   for (let protocol_metadata of protocol.metadata) {
     value = this.random(100);
-    if(protocol_metadata.type === MetadataTypes.vector) value = [this.random(100), this.random(100), this.random(100)];
-    if(protocol_metadata.type === MetadataTypes.text) value = "random_text_" + this.uuid();     
+    if (protocol_metadata.type === MetadataTypes.vector) value = [this.random(100), this.random(100), this.random(100)];
+    if (protocol_metadata.type === MetadataTypes.text) value = "random_text_" + this.uuid();
     experiment_metadata = { name: protocol_metadata.name, value: value }
     metadata.push(experiment_metadata);
   }
@@ -223,39 +305,39 @@ exports.createExperimentMetadata = async function (protocol) {
 }
 
 exports.createExperimentHistory = async function (protocol, steps, start) {
-  if(!start) start = 0;
+  if (!start) start = 0;
   const history = [];
-  for(let step=0; step<steps; step++) {
+  for (let step = 0; step < steps; step++) {
     const protocol_fields = [];
     for (let protocol_topic of protocol.topics) protocol_fields.push(...protocol_topic.fields)
     fields = [];
     for (let field of protocol_fields) {
       value = this.random(100);
-      if(field.type === TopicFieldTypes.vector) value = [this.random(100), this.random(100), this.random(100)];
-      if(field.type === TopicFieldTypes.text) value = "random_text_" + this.uuid(); 
-      fields.push({name: field.name, value: value})
+      if (field.type === TopicFieldTypes.vector) value = [this.random(100), this.random(100), this.random(100)];
+      if (field.type === TopicFieldTypes.text) value = "random_text_" + this.uuid();
+      fields.push({ name: field.name, value: value })
     }
-    history.push({ step: step+start, timestamp: Date.now(), fields: fields })     
+    history.push({ step: step + start, timestamp: Date.now(), fields: fields })
   }
   return history;
 }
 
-exports.createExperiment = async function (name, description, owner, state, startDate, endDate, place, protocol, metadata, history, tags,manager, visibility, tenant) {
+exports.createExperiment = async function (name, description, owner, state, startDate, endDate, place, protocol, metadata, history, tags, manager, visibility, tenant) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
   const Experiment = mongoose.dbs[tenant.database].model("Experiment");
   const req = {
     _id: name,
-    description: description,    
+    description: description,
     state: state || ExperimentStateTypes.ongoing,
     startDate: startDate || Date.now(),
     endDate: endDate || Date.now(),
     owner: owner,
-    place: place || [{ name:"Place", location:{type: "Point", coordinates: [12.123456, 13.1345678] }}],
+    place: place || [{ name: "Place", location: { type: "Point", coordinates: [12.123456, 13.1345678] } }],
     protocol: protocol,
     metadata: metadata || await this.createExperimentMetadata(protocol),
     history: history || await this.createExperimentHistory(protocol, 3),
-    manager:manager|| "manager1",
+    manager: manager || "manager1",
     tags: tags,
     visibility: visibility,
   };
@@ -264,7 +346,7 @@ exports.createExperiment = async function (name, description, owner, state, star
   return experiment._doc;
 };
 
-exports.createDevice = async function (name, owner, features, tags, scripts, visibility, tenant ) {
+exports.createDevice = async function (name, owner, features, tags, scripts, visibility, tenant) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
   const Device = mongoose.dbs[tenant.database].model("Device");
@@ -336,22 +418,22 @@ exports.createConstraint = async function (
   return constraint._doc;
 };
 
-exports.createDataupload = async function(name, owner, timestamp, size, results, lastmod, tenant,visibility) {
-    const Tenant = mongoose.dbs['catalog'].model('Tenant');
-    if(!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-    const Dataupload = mongoose.dbs[tenant.database].model('Dataupload');
-    const req = { 
-        _id: name,
-        owner: owner,
-        timestamp: timestamp,
-        size: size,
-        results: results,
-        lastmod: lastmod ,
-        visibility: visibility
-    }
-    const dataupload = new Dataupload(req);
-    await dataupload.save();
-    return dataupload._doc;
+exports.createDataupload = async function (name, owner, timestamp, size, results, lastmod, tenant, visibility) {
+  const Tenant = mongoose.dbs['catalog'].model('Tenant');
+  if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
+  const Dataupload = mongoose.dbs[tenant.database].model('Dataupload');
+  const req = {
+    _id: name,
+    owner: owner,
+    timestamp: timestamp,
+    size: size,
+    results: results,
+    lastmod: lastmod,
+    visibility: visibility
+  }
+  const dataupload = new Dataupload(req);
+  await dataupload.save();
+  return dataupload._doc;
 };
 
 exports.createThing = async function (
@@ -439,7 +521,7 @@ exports.createRight = async function (
     user: user,
     owner: owner,
     tags: tags,
-    group:group
+    group: group
   };
   const right = new Right(req);
   await right.save();

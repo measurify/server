@@ -230,7 +230,7 @@ describe('/POST right from file', () => {
         const feature = await factory.createFeature("feature1", user);        
         const device = await factory.createDevice("device1", user, [feature]);        
         const thing = await factory.createThing("thing1", user);
-        const testFile = './test/test/Rights_test.csv';
+        const testFile = './test/dummies/Rights_test.csv';
         const res = await chai.request(server).keepOpen().post('/v1/rights/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);        
         res.body.should.be.a('object');

@@ -44,10 +44,10 @@ describe('Access create feature', () => {
         const user_analyst = await factory.createUser("test-username-1", "test-password-1", UserRoles.analyst);
         const request = { _id: "feature-name-text", items: [{ name: "item-name-1", unit: "item-unit-1" }] }
         const res = await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user_analyst)).send(request);
-        res.should.have.status(errors.restricted_access_create.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.be.eql(errors.restricted_access_create.message);
+        res.body.message.should.be.eql(errors.restricted_access_operation.message);
     });
 });
 
@@ -171,9 +171,9 @@ describe('Access read a feature', () => {
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const feature_private = await factory.createFeature("test-feature-1-private", owner, null, [], VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().get('/v1/features/' + feature_private._id).set("Authorization", await factory.getUserToken(user_provider));
-        res.should.have.status(errors.restricted_access_read.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_read.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should get a public/private feature as provider and owner', async () => {
@@ -225,9 +225,9 @@ describe('Access modify features', () => {
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
         let res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user_analyst)).send(modification);
-        res.should.have.status(errors.restricted_access_modify.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_modify.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should not modify a feature as provider not owner', async () => {
@@ -237,9 +237,9 @@ describe('Access modify features', () => {
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
         let res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user_provider)).send(modification);
-        res.should.have.status(errors.restricted_access_modify.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_modify.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 });
 
@@ -487,7 +487,7 @@ describe('Access features with rights', () => {
         const right_1 = await factory.createRight("right-test-1", feature_owned, "Feature", user_provider, owner, []);
         const right_2 = await factory.createRight("right-test-2", feature_owned, "Feature", user_analyst, owner, []);
         let res = await chai.request(server).keepOpen().get('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user_provider));
-        res.should.have.status(errors.restricted_access_read.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.be.eql(errors.restricted_access.message);
@@ -524,7 +524,7 @@ describe('Delete features with rights', () => {
         const feature_owned = await factory.createFeature("test-feature-2", owner, null, [], VisibilityTypes.public);
         const right = await factory.createRight("right-test-1", feature_owned, "Feature", user_provider, owner, []);
         let res = await chai.request(server).keepOpen().delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user_provider));
-        res.should.have.status(errors.restricted_access_read.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.be.eql(errors.restricted_access.message);
@@ -551,7 +551,7 @@ describe('Modify features with rights', () => {
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
         let res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user_provider)).send(modification);
-        res.should.have.status(errors.restricted_access_read.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.be.eql(errors.restricted_access.message);

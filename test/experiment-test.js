@@ -615,7 +615,7 @@ describe('/POST experiment', () => {
             fields: [{ name: "field2", description: "field description 2", type: "scalar" }]
         }]
         const protocol = await factory.createProtocol("Test1", "test-protoco-description-1", user, metadata, topics);
-        const testFile = './test/test/testExperiment.csv';
+        const testFile = './test/dummies/testExperiment.csv';
 
         const res = await chai.request(server).keepOpen().post('/v1/experiments/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -944,9 +944,9 @@ describe('/PUT experiment', () => {
         const tag = await factory.createTag("test-tag-1", user, [], VisibilityTypes.public);
         const request = { tags: { add: ['test-tag-1'], remove: [] } };
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user)).send(request);
-        res.should.have.status(errors.restricted_access_modify.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_modify.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should not PUT a experiment of another provider', async () => {
@@ -957,9 +957,9 @@ describe('/PUT experiment', () => {
         const tag = await factory.createTag("test-tag-1", user_1, [], VisibilityTypes.public);
         const request = { tags: { add: ['test-tag-1'], remove: [] } };
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_2)).send(request);
-        res.should.have.status(errors.restricted_access_modify.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_modify.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should not PUT a experiment without any field', async () => {
@@ -1004,7 +1004,7 @@ describe('/PUT CSV file experiment', () => {
         const metadatavalue = [{ name: "metadata1", value: 43 },
         { name: "metadata2", value: 5 }];
         const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol, metadatavalue,[]);
-        const testFile = './test/test/testExp1_step1_2.csv';
+        const testFile = './test/dummies/testExp1_step1_2.csv';
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id + '/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -1027,11 +1027,11 @@ describe('/PUT CSV file experiment', () => {
             fields: [{ name: "field2", description: "field description 2", type: "scalar" }]
         }]
         const protocol = await factory.createProtocol("Test1", "test-protoco-description-1", user, metadata, topics);
-        const testFile = './test/test/testExperiment.csv';
+        const testFile = './test/dummies/testExperiment.csv';
 
         const res = await chai.request(server).keepOpen().post('/v1/experiments/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
 
-        const testFile2 = './test/test/testExp1_step1_2.csv';
+        const testFile2 = './test/dummies/testExp1_step1_2.csv';
         const res2 = await chai.request(server).keepOpen().put('/v1/experiments/' + 'testExp1' + '/file').attach('file', testFile2).set("Authorization", await factory.getUserToken(user));
         res2.should.have.status(200);
         res2.body.should.be.a('object');        
