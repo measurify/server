@@ -9,7 +9,7 @@ const localization_en = {
   welcome: "Welcome back",
   role: "Role",
   session_expire_in: "Session will expire in ",
-  tools: "Tools",
+  resources: "Resources",
   notifications: "Notifications",
   file_content: "File content",
 

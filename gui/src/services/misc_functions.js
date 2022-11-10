@@ -133,3 +133,8 @@ export const areEqual = (obj1, obj2) => {
   }
   return false;
 };
+
+//capitalize the first letter of a string
+export function capitalize(s) {
+  return s && s[0].toUpperCase() + s.slice(1);
+}

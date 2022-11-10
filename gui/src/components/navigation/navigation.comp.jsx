@@ -23,6 +23,7 @@ import {
 import { pages, languages, website_name } from "../../config";
 import { LanguageSelector } from "../languageSelector/languageSelector";
 import { canDo } from "../../services/userRolesManagement";
+import { capitalize } from "../../services/misc_functions";
 fontawesome.library.add(
   faTimes,
   faBars,
@@ -222,7 +223,7 @@ export default function Navigation() {
             )}
           </div>
 
-          <div className="app-nav-text">{locale().tools}</div>
+          <div className="app-nav-text">{locale().resources}</div>
           <hr />
           {Object.keys(pages).map((k) => {
             //check if user can access to the page
@@ -237,7 +238,7 @@ export default function Navigation() {
                 key={k}
                 onClick={() => setIsOpened(false)}
               >
-                {k}
+                {capitalize(k)}
               </NavLink>
             );
           })}

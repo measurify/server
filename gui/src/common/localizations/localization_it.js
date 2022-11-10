@@ -8,7 +8,7 @@ const localization_it = {
   welcome: "Bentornato",
   role: "Ruolo",
   session_expire_in: "La sessione scadrà in ",
-  tools: "Strumenti",
+  resources: "Risorse",
   notifications: "Notifiche",
   file_content: "Contenuto del file",
 
