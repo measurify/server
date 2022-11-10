@@ -16,6 +16,7 @@ const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
 const before = require('./before-test.js');
 const ExperimentStateTypes = require("../types/experimentStateTypes.js");
+const RoleCrudTypes = require('../types/roleCrudTypes.js');
 
 // CREATE
 describe('Access create experiments', () => {
@@ -757,7 +758,7 @@ describe('Access experiments with rights', () => {
     it('it should get correctly the experiments with the right roles and the rights on multiple provider', async () => {
         const user_admin = await factory.createUser("test-username-user-1", "test-password-user-1", UserRoles.admin);
         const user_provider1 = await factory.createUser("test-username-user-2", "test-password-user-2", UserRoles.provider);
-        const user_provider2 = await factory.createUser("test-username-user-3", "test-password-user-3", UserRoles.provider);        
+        const user_provider2 = await factory.createUser("test-username-user-3", "test-password-user-3", UserRoles.provider);
         const user_provider3 = await factory.createUser("test-username-user-4", "test-password-user-4", UserRoles.provider);
         const metadata = [{ name: "metadata-name-1", description: "description metadata 1", type: "scalar" },
         { name: "metadata-name-2", description: "description metadata 1", type: "text" },
@@ -779,7 +780,7 @@ describe('Access experiments with rights', () => {
         const experiment_public_B = await factory.createExperiment("test-experiment-B-public", "test-protocol-description", user_provider1, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
         const experiment_private_C = await factory.createExperiment("test-experiment-C-private", "test-protocol-description", user_provider1, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         const experiment_private_D = await factory.createExperiment("test-experiment-D-private", "test-protocol-description", user_provider2, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
-        
+
         //User provider 1
         let res = await chai.request(server).keepOpen().get('/v1/experiments/').set("Authorization", await factory.getUserToken(user_provider1));
         res.should.have.status(200);
@@ -787,15 +788,15 @@ describe('Access experiments with rights', () => {
         res.body.docs.length.should.be.eql(3);
         res.body.docs[0]._id.should.be.eql(experiment_private_C._id);
         res.body.docs[1]._id.should.be.eql(experiment_public_B._id);
-        res.body.docs[2]._id.should.be.eql(experiment_public_A._id); 
-        
+        res.body.docs[2]._id.should.be.eql(experiment_public_A._id);
+
         const tag1 = await factory.createTag("test-tag-1", user_admin);
         const tag2 = await factory.createTag("test-tag-1", user_admin);
         const tag3 = await factory.createTag("test-tag-1", user_admin);
         const modification1 = { tags: { add: [tag1._id] } };
         const modification2 = { tags: { add: [tag2._id] } };
         const modification3 = { tags: { add: [tag3._id] } };
-        
+
         res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment_public_A._id).set("Authorization", await factory.getUserToken(user_provider1)).send(modification1);
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -810,13 +811,13 @@ describe('Access experiments with rights', () => {
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.tags[0].should.be.eq(tag1._id);
-        
+
         res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment_private_D._id).set("Authorization", await factory.getUserToken(user_provider1)).send(modification1);
         res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.be.eql(errors.restricted_access_operation.message);
-        
+
         //user provider 2
         res = await chai.request(server).keepOpen().get('/v1/experiments/').set("Authorization", await factory.getUserToken(user_provider2));
         res.should.have.status(200);
@@ -825,30 +826,30 @@ describe('Access experiments with rights', () => {
         res.body.docs[0]._id.should.be.eql(experiment_private_D._id);
         res.body.docs[1]._id.should.be.eql(experiment_public_B._id);
         res.body.docs[2]._id.should.be.eql(experiment_public_A._id);
-        
+
         res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment_public_A._id).set("Authorization", await factory.getUserToken(user_provider2)).send(modification2);
         res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.be.eql(errors.restricted_access_operation.message);
-        
+
         res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment_public_B._id).set("Authorization", await factory.getUserToken(user_provider2)).send(modification2);
         res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.be.eql(errors.restricted_access_operation.message);
-        
+
         res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment_private_C._id).set("Authorization", await factory.getUserToken(user_provider2)).send(modification2);
         res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.be.eql(errors.restricted_access_operation.message);
-        
+
         res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment_private_D._id).set("Authorization", await factory.getUserToken(user_provider2)).send(modification2);
         res.should.have.status(200);
         res.body.should.be.a('object');
-        res.body.tags[0].should.be.eq(tag1._id); 
-        
+        res.body.tags[0].should.be.eq(tag1._id);
+
         //user provider 3
         res = await chai.request(server).keepOpen().get('/v1/experiments/').set("Authorization", await factory.getUserToken(user_provider3));
         res.should.have.status(200);
@@ -868,7 +869,7 @@ describe('Access experiments with rights', () => {
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.be.eql(errors.restricted_access_operation.message);
-        
+
         res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment_private_C._id).set("Authorization", await factory.getUserToken(user_provider3)).send(modification3);
         res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
@@ -880,26 +881,26 @@ describe('Access experiments with rights', () => {
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.be.eql(errors.restricted_access_operation.message);
-        
+
         //const right_1 = await factory.createRight("right-test-1", experiment_private_2, "Experiment", user_provider, owner, []);
-       /*
-        
-        const right_2 = await factory.createRight("right-test-2", experiment_private_1, "Experiment", user_provider, owner, []);
-        const right_3 = await factory.createRight("right-test-3", experiment_public_1, "Experiment", user_provider, owner, []);
-        const right_4 = await factory.createRight("right-test-4", experiment_public_2, "Experiment", user_provider, owner, []);
-        res = await chai.request(server).keepOpen().get('/v1/experiments/').set("Authorization", await factory.getUserToken(user_admin));
-        res.should.have.status(200);
-        res.body.docs.should.be.a('array');
-        res.body.docs.length.should.be.eql(8);
-        res = await chai.request(server).keepOpen().get('/v1/experiments/').set("Authorization", await factory.getUserToken(user_provider));
-        res.should.have.status(200);
-        res.body.docs.should.be.a('array');
-        res.body.docs.length.should.be.eql(3);
-        res = await chai.request(server).keepOpen().get('/v1/experiments/').set("Authorization", await factory.getUserToken(owner));
-        res.should.have.status(200);
-        res.body.docs.should.be.a('array');
-        res.body.docs.length.should.be.eql(7);
-        */
+        /*
+         
+         const right_2 = await factory.createRight("right-test-2", experiment_private_1, "Experiment", user_provider, owner, []);
+         const right_3 = await factory.createRight("right-test-3", experiment_public_1, "Experiment", user_provider, owner, []);
+         const right_4 = await factory.createRight("right-test-4", experiment_public_2, "Experiment", user_provider, owner, []);
+         res = await chai.request(server).keepOpen().get('/v1/experiments/').set("Authorization", await factory.getUserToken(user_admin));
+         res.should.have.status(200);
+         res.body.docs.should.be.a('array');
+         res.body.docs.length.should.be.eql(8);
+         res = await chai.request(server).keepOpen().get('/v1/experiments/').set("Authorization", await factory.getUserToken(user_provider));
+         res.should.have.status(200);
+         res.body.docs.should.be.a('array');
+         res.body.docs.length.should.be.eql(3);
+         res = await chai.request(server).keepOpen().get('/v1/experiments/').set("Authorization", await factory.getUserToken(owner));
+         res.should.have.status(200);
+         res.body.docs.should.be.a('array');
+         res.body.docs.length.should.be.eql(7);
+         */
     });
 
     it('it should not read a experiment without rights', async () => {
@@ -992,8 +993,8 @@ describe('Delete experiments with rights', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description",user_provider,  ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_owned = await factory.createExperiment("test-experiment-2","test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description", user_provider, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_owned = await factory.createExperiment("test-experiment-2", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
         const right = await factory.createRight("right-test-1", experiment_owned, "Experiment", user_provider, owner, []);
         let res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(errors.restricted_access_operation.status);
@@ -1021,7 +1022,7 @@ describe('Delete experiments with rights', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description",user_provider,  ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description", user_provider, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
         const right = await factory.createRight("right-test-1", experiment, "Experiment", user_provider, owner, []);
         let res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(200);
@@ -1049,8 +1050,8 @@ describe('Modify experiments with rights', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description",user_provider,  ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_owned = await factory.createExperiment("test-experiment-2", "test-protocol-description",owner,  ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description", user_provider, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_owned = await factory.createExperiment("test-experiment-2", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
         const right = await factory.createRight("right-test-1", experiment_owned, "Experiment", user_provider, owner, []);
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
@@ -1080,7 +1081,7 @@ describe('Modify experiments with rights', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description",user_provider,  ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description", user_provider, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
         const right = await factory.createRight("right-test-1", experiment, "Experiment", user_provider, owner, []);
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
@@ -1109,7 +1110,7 @@ describe('Create a a experiment with rights', () => {
             { name: "field-5", description: "field description 5", type: "text" },
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
-        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);        
+        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
         const tag = await factory.createTag("test-tag-1", owner);
         const tag_other = await factory.createTag("test-tag-2", owner);
         const right = await factory.createRight("right-test-1", tag_other, "Tag", provider, owner, []);
@@ -1156,8 +1157,8 @@ describe('Create a a experiment with rights', () => {
             { name: "field-5", description: "field description 5", type: "text" },
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
-        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);        
-        
+        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
+
         const tag = await factory.createTag("test-tag-1", owner);
         const right = await factory.createRight("right-test-1", tag, "Tag", provider, owner, []);
         const request = {
@@ -1182,5 +1183,227 @@ describe('Create a a experiment with rights', () => {
         res.should.have.status(200);
         res.body.should.be.a('object');
     });
-
 });
+
+// ROLE CHECK 
+/*
+describe('Custom role check for experiment', () => {
+    it('it should create an experiment as different custom roles', async () => {
+        const user_admin = await factory.createUser("test-username-admin", "test-password-1", UserRoles.admin);
+        const crudAll = await factory.createCrud(true,RoleCrudTypes.all,RoleCrudTypes.all,RoleCrudTypes.all);
+        const crudPO = await factory.createCrud(true,RoleCrudTypes.public_and_owned,RoleCrudTypes.public_and_owned,RoleCrudTypes.public_and_owned);
+        const crudOwned = await factory.createCrud(true,RoleCrudTypes.owned,RoleCrudTypes.owned,RoleCrudTypes.owned);
+        const crudNone = await factory.createCrud(true,RoleCrudTypes.none,RoleCrudTypes.none,RoleCrudTypes.none);
+        
+        const action1= {entity:"Experiment",crud:crudAll};
+        const action2= {entity:"Experiment",crud:crudPO};
+        const action3= {entity:"Experiment",crud:crudOwned};
+        const action4= {entity:"Experiment",crud:crudNone};
+
+        const role1= await factory.createRole("test-role-1", crudNone,[action1]);
+        const role2=await factory.createRole("test-role-2", crudNone,[action2]);
+        const role3= await factory.createRole("test-role-3", crudNone,[action3]);
+        const role4=await factory.createRole("test-role-4", crudNone,[action4]);
+        const user1 = await factory.createUser("test-username-1", "test-password-1", role1._id);
+        const user2 = await factory.createUser("test-username-2", "test-password-2", role2._id);
+        const user3 = await factory.createUser("test-username-3", "test-password-3", role3._id);
+        const user4 = await factory.createUser("test-username-4", "test-password-4", role4._id);
+       
+        //protocol create
+        const metadata = [{ name: "metadata-name-1", description: "description metadata 1", type: "scalar" },
+        { name: "metadata-name-2", description: "description metadata 1", type: "text" },
+        { name: "metadata-name-3", description: "description metadata 1", type: "vector" }]
+        const topics = [{
+            name: "topic name 1", description: "topic description 1",
+            fields: [{ name: "field-1", description: "field description 1", type: "scalar" },
+            { name: "field-2", description: "field description 1", type: "text" },
+            { name: "field-3", description: "field description 1", type: "vector" }]
+        },
+        {
+            name: "topic name 2", description: "topic description 1",
+            fields: [{ name: "field-4", description: "field description 4", type: "scalar" },
+            { name: "field-5", description: "field description 5", type: "text" },
+            { name: "field-6", description: "field description 6", type: "vector" }]
+        }]
+        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user_admin, metadata, topics,[],VisibilityTypes.public);
+        
+        //experiment  create  public
+        const experiment_public = {
+            _id: "test-experiment-1",
+            description: "experiment description",
+            state: ExperimentStateTypes.completed,
+            protocol: protocol._id,
+            metadata: [{ name: "metadata-name-1", value: 43 },
+            { name: "metadata-name-2", value: "my string" },
+            { name: "metadata-name-3", value: [765, 545] }],
+            history: [{
+                step: 1, timestamp: Date.now(), fields: [{ name: "field-1", value: 32 },
+                { name: "field-2", value: "my string" },
+                { name: "field-3", value: [2, 3] },
+                { name: "field-4", value: 45 },
+                { name: "field-5", value: "my string 2" },
+                { name: "field-6", value: [32, 543] }]
+            }],
+            tags: [],
+            visibility:VisibilityTypes.public
+        }
+
+        //experiment  create private  
+        const experiment_private = {
+            _id: "test-experiment-2",
+            description: "experiment description",
+            state: ExperimentStateTypes.completed,
+            protocol: protocol._id,
+            metadata: [{ name: "metadata-name-1", value: 43 },
+            { name: "metadata-name-2", value: "my string" },
+            { name: "metadata-name-3", value: [765, 545] }],
+            history: [{
+                step: 1, timestamp: Date.now(), fields: [{ name: "field-1", value: 32 },
+                { name: "field-2", value: "my string" },
+                { name: "field-3", value: [2, 3] },
+                { name: "field-4", value: 45 },
+                { name: "field-5", value: "my string 2" },
+                { name: "field-6", value: [32, 543] }]
+            }],
+            tags: [],
+            visibility:VisibilityTypes.private
+        }
+        //USER ALL
+        let res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user1)).send(experiment_public);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body._id.should.be.eql(experiment_public._id);
+
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user1));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        
+        //USER PUBLIC AND OWNED
+        res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user2)).send(experiment_public);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body._id.should.be.eql(experiment_public._id);
+
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user2));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        console.log("pippo")
+        //other user experiment public
+        res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user1)).send(experiment_public);
+        res.should.have.status(200);
+        console.log("n")
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user2));
+        console.log(res)
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        console.log("m")
+        //NOT other user experiment private
+        res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user1)).send(experiment_private);
+        res.should.have.status(200);
+
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_private._id).set("Authorization", await factory.getUserToken(user2));
+        res.should.have.status(errors.restricted_access_operation.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.restricted_access_operation.message);
+
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user1));
+        res.should.have.status(200);
+        console.log("a")
+        //user1 (all) can delete other user public experiment
+        res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user2)).send(experiment_public);
+        res.should.have.status(200);
+
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user1));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+
+        //user1 (all) can delete other user private experiment
+        res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user2)).send(experiment_private);
+        res.should.have.status(200);
+
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_private._id).set("Authorization", await factory.getUserToken(user1));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+
+        //USER OWNED
+        res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user3)).send(experiment_public);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body._id.should.be.eql(experiment_public._id);
+
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user3));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        console.log("b")
+        //NOT other user experiment public
+        res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user1)).send(experiment_public);
+        res.should.have.status(200);
+
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user3));
+        res.should.have.status(errors.restricted_access_operation.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.restricted_access_operation.message);
+
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user1));
+        res.should.have.status(200);
+
+        //NOT other user experiment private
+        res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user1)).send(experiment_private);
+        res.should.have.status(200);
+
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_private._id).set("Authorization", await factory.getUserToken(user3));
+        res.should.have.status(errors.restricted_access_operation.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.restricted_access_operation.message);
+
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user1));
+        res.should.have.status(200);
+        console.log("c")
+        //USER NONE
+        res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user4)).send(experiment_public);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body._id.should.be.eql(experiment_public._id);
+
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user4));
+        res.should.have.status(errors.restricted_access_operation.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.restricted_access_operation.message);
+
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user1));
+        res.should.have.status(200);
+
+        //NOT other user experiment public
+        res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user1)).send(experiment_public);
+        res.should.have.status(200);
+
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user4));
+        res.should.have.status(errors.restricted_access_operation.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.restricted_access_operation.message);
+        console.log("d")
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user1));
+        res.should.have.status(200);
+
+        //NOT other user experiment private
+        res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user1)).send(experiment_private);
+        res.should.have.status(200);
+
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_private._id).set("Authorization", await factory.getUserToken(user4));
+        res.should.have.status(errors.restricted_access_operation.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.restricted_access_operation.message);
+
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user1));
+        res.should.have.status(200);
+
+
+
+        
+    });
+});
+*/
