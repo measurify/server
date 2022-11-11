@@ -214,7 +214,7 @@ export const FormManager = (props) => {
               <option>{locale().select + " " + key}</option>
               {React.Children.toArray(
                 Object.entries(val).map(([k, v]) => {
-                  return <option value={k}>{v}</option>;
+                  return <option value={v}>{v}</option>;
                 })
               )}
             </Form.Select>
