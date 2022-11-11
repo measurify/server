@@ -49,5 +49,16 @@ actionSchema.path('entity').validate({
     }
 });
 
+// validate default
+roleSchema.path('default').validate({
+    validator: async function (value) {
+        if(!(value.create===false||value.create===true))throw new Error('Role validation failed: default doesn\'t have create action');
+        if(!value.read)throw new Error('Role validation failed: default doesn\'t have read action');
+        if(!value.update)throw new Error('Role validation failed: default doesn\'t have update action');
+        if(!value.delete)throw new Error('Role validation failed: default doesn\'t have delete action');
+        return true;
+    }
+});
+
 
 module.exports = roleSchema;

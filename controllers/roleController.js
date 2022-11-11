@@ -44,26 +44,16 @@ exports.post = async (req, res) => {
     return await controller.postResource(req, res, Role);
 };
 
-exports.put = async (req, res) => { /*
-    const Device = mongoose.dbs[req.tenant.database].model('Device');
-    const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
-    const Feature = mongoose.dbs[req.tenant.database].model('Feature');
-    const Thing = mongoose.dbs[req.tenant.database].model('Thing');
-    const Tag = mongoose.dbs[req.tenant.database].model('Tag');
-    const fields = ['_id','visibility', 'tags', 'description'];
-    let result = await checker.isAvailable(req, res, Tag); if (result != true) return result;
+exports.put = async (req, res) => { 
+    const Role = mongoose.dbs[req.tenant.database].model('Role');
+    const User = mongoose.dbs[req.tenant.database].model('User');
+    const fields = ['default', 'actions','description'];
+    let result = await checker.isAvailable(req, res, Role); if (result != true) return result;
+    result = await checker.isAdminitrator(req, res); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
-    //result = await checker.canModify(req, res); if (result != true) return result;
-     result = await checker.canOperate(req, res,"Role"); if (result != true) return result;
-    result = await checker.hasRights(req, res, Tag); if (result != true) return result;
-    result = await checker.isValid(req, res, VisibilityTypes, 'visibility'); if (result != true) return result;
-    if(req.body._id)result = await checker.isNotUsed(req, res, Device, 'tags'); if (result != true) return result;
-    if(req.body._id)result = await checker.isNotUsed(req, res, Measurement, 'tags'); if (result != true) return result;
-    if(req.body._id)result = await checker.isNotUsed(req, res, Feature, 'tags'); if (result != true) return result;
-    if(req.body._id)result = await checker.isNotUsed(req, res, Thing, 'tags'); if (result != true) return result;
-    if(req.body._id)result = await checker.isNotUsed(req, res, Tag, 'tags'); if (result != true) return result;
-    return await controller.updateResource(req, res, fields, Tag);*/
-};
+    result = await checker.isNotUsed(req, res, User, 'type'); if (result != true) return result; 
+    return await controller.updateResource(req, res, fields, Role);
+};  
 
 exports.delete = async (req, res) => {
     const User = mongoose.dbs[req.tenant.database].model('User');
@@ -73,4 +63,3 @@ exports.delete = async (req, res) => {
     result = await checker.isNotUsed(req, res, User, 'type'); if (result != true) return result; 
     return await controller.deleteResource(req, res, Role);
 };
-

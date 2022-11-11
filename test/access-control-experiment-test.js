@@ -1186,7 +1186,6 @@ describe('Create a a experiment with rights', () => {
 });
 
 // ROLE CHECK 
-/*
 describe('Custom role check for experiment', () => {
     it('it should create an experiment as different custom roles', async () => {
         const user_admin = await factory.createUser("test-username-admin", "test-password-1", UserRoles.admin);
@@ -1274,7 +1273,7 @@ describe('Custom role check for experiment', () => {
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
         res.body._id.should.be.eql(experiment_public._id);
-
+        
         res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user1));
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -1289,79 +1288,78 @@ describe('Custom role check for experiment', () => {
         res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user2));
         res.should.have.status(200);
         res.body.should.be.a('object');
-        console.log("pippo")
+        
         //other user experiment public
         res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user1)).send(experiment_public);
-        res.should.have.status(200);
-        console.log("n")
+        res.should.have.status(200);        
+
         res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user2));
-        console.log(res)
         res.should.have.status(200);
         res.body.should.be.a('object');
-        console.log("m")
+        
         //NOT other user experiment private
         res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user1)).send(experiment_private);
         res.should.have.status(200);
-
+        
         res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_private._id).set("Authorization", await factory.getUserToken(user2));
         res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_operation.message);
-
-        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user1));
+        res.body.message.should.contain(errors.restricted_access_operation.message);        
+        
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_private._id).set("Authorization", await factory.getUserToken(user1));
         res.should.have.status(200);
-        console.log("a")
+        
         //user1 (all) can delete other user public experiment
         res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user2)).send(experiment_public);
         res.should.have.status(200);
-
+        
         res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user1));
         res.should.have.status(200);
         res.body.should.be.a('object');
-
+        
         //user1 (all) can delete other user private experiment
         res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user2)).send(experiment_private);
         res.should.have.status(200);
-
+        
         res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_private._id).set("Authorization", await factory.getUserToken(user1));
         res.should.have.status(200);
         res.body.should.be.a('object');
-
+        
         //USER OWNED
         res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user3)).send(experiment_public);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
         res.body._id.should.be.eql(experiment_public._id);
-
+        
         res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user3));
         res.should.have.status(200);
         res.body.should.be.a('object');
-        console.log("b")
+        
         //NOT other user experiment public
         res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user1)).send(experiment_public);
         res.should.have.status(200);
-
+        
         res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user3));
         res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.restricted_access_operation.message);
-
+        
         res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user1));
         res.should.have.status(200);
 
         //NOT other user experiment private
         res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user1)).send(experiment_private);
         res.should.have.status(200);
-
+        
         res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_private._id).set("Authorization", await factory.getUserToken(user3));
         res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.restricted_access_operation.message);
-
-        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user1));
+        
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_private._id).set("Authorization", await factory.getUserToken(user1));
         res.should.have.status(200);
-        console.log("c")
+        
         //USER NONE
         res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user4)).send(experiment_public);
         res.should.have.status(200);
@@ -1385,7 +1383,7 @@ describe('Custom role check for experiment', () => {
         res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.restricted_access_operation.message);
-        console.log("d")
+        
         res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user1));
         res.should.have.status(200);
 
@@ -1398,7 +1396,7 @@ describe('Custom role check for experiment', () => {
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.restricted_access_operation.message);
 
-        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user1));
+        res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment_private._id).set("Authorization", await factory.getUserToken(user1));
         res.should.have.status(200);
 
 
@@ -1406,4 +1404,3 @@ describe('Custom role check for experiment', () => {
         
     });
 });
-*/

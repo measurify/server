@@ -103,7 +103,7 @@ exports.createUser = async function (username, password, type, fieldmask, email,
   return await User.findById(user._id);
 };
 
-exports.createRole = async function (name, defaultAction, action, description, tenant) {
+exports.createRole = async function (name, defaultAction, actions, description, tenant) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
   const Role = mongoose.dbs[tenant.database].model("Role");
@@ -112,7 +112,7 @@ exports.createRole = async function (name, defaultAction, action, description, t
     const req = {
       _id: name,
       default: defaultAction,
-      action: action,
+      actions: actions,
       description: description
     };
     role = new Role(req);
@@ -1128,4 +1128,46 @@ exports.createDemoContent = async function (tenant) {
       tenant
     )
   );
+};
+
+//check if two objects (arrays, variables or objects) are equal
+exports.areEqual = function areEqual(obj1, obj2) {
+  //undefined check
+  if (obj1 === undefined || obj2 === undefined) return false;
+  //single value and ref check
+  if (obj1 === obj2) return true;
+  if (typeof obj1 !== typeof obj2) return false;
+  //one is array, other isn't
+  if (
+    (Array.isArray(obj1) && !Array.isArray(obj2)) ||
+    (!Array.isArray(obj1) && Array.isArray(obj2))
+  )
+    return false;
+  //both are array
+  if (Array.isArray(obj1) && Array.isArray(obj2)) {
+    //different length => not equal
+    if (obj1.length !== obj2.length) return false;
+    for (let i = 0; i < obj1.length; i++) {
+      if (!areEqual(obj1[i], obj2[i])) return false;
+    }
+    return true;
+  }
+  //one is object, other isn't
+  if (
+    (obj1.constructor === Object && obj2.constructor !== Object) ||
+    (obj1.constructor !== Object && obj2.constructor === Object)
+  )
+    return false;
+  //both are object
+  if (obj1.constructor === Object && obj2.constructor === Object) {
+    const k1 = Object.keys(obj1);
+    const k2 = Object.keys(obj2);
+    if (k1.length !== k2.length) return false;
+    if (!areEqual(k1, k2)) return false;
+    const v1 = Object.values(obj1);
+    const v2 = Object.values(obj2);
+    if (!areEqual(v1, v2)) return false;
+    return true;
+  }
+  return false;
 };

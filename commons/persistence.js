@@ -93,7 +93,7 @@ exports.delete = async function (id, model) {
     return result;
 }
 
-exports.update = async function (body, fields, resource, model, tenant, query,res) {
+exports.update = async function (body, fields, resource, model, tenant, query, res) {
 
     for (let field in body) if (!fields.includes(field)) throw 'Request field cannot be updated (' + field + ')';
 
@@ -127,13 +127,14 @@ exports.update = async function (body, fields, resource, model, tenant, query,re
                 else if (result) throw result;
 
                 // Array of embedded resources
+                identifier = 'name';
                 if (model.modelName == 'Experiment' && field == 'history') identifier = 'step'
-                else identifier = 'name';
+                if (model.modelName == 'Role' && field == 'actions') identifier = 'entity'
                 if ((body[field].add && body[field].add.length > 0 && typeof body[field].add[0] == 'object') ||
                     (body[field].remove && body[field].remove.length > 0) ||
                     (body[field].update && body[field].update.length > 0 && typeof body[field].update[0] == 'object')) {
-                    [result,report] = await modifyEmbeddedResourceList(body[field], resource, field, identifier, model, query);
-                    
+                    [result, report] = await modifyEmbeddedResourceList(body[field], resource, field, identifier, model, query);
+
                 }
                 if (result == true) break;
                 else if (result) throw result;
@@ -145,6 +146,14 @@ exports.update = async function (body, fields, resource, model, tenant, query,re
                 if (field_type) result = await modifyCategoricalValueList(body[field], field_type, resource, field);
                 if (result == true) break;
                 else if (result) throw result;
+
+                // Object passed directly
+                if (field == "default" && typeof resource[field] == 'object') {                    
+                    if (factory.areEqual(resource[field]._doc, body[field])) {
+                        throw 'Same default field'
+                    }
+                    else { resource[field] = body[field]; break; }
+                }
 
                 // Other lists? TBD
                 throw 'Cannot manage the field (' + field + ')';
@@ -158,7 +167,7 @@ exports.update = async function (body, fields, resource, model, tenant, query,re
     if (old_id) resource.isNew = true;
     resource = await resource.save({ update: true });
     if (old_id) await model.findOneAndDelete({ _id: old_id });
-    if(report)resource._doc.report=report;
+    if (report) resource._doc.report = report;
     return resource;
 }
 
@@ -222,7 +231,7 @@ const modifyCategoricalValueList = async function (list, type, resource, field) 
 
 const modifyEmbeddedResourceList = async function (list, resource, field, identifier, model, query) {
     if (!identifier) identifier = 'name'
-    let report=null;
+    let report = null;
     if (model.modelName == 'Experiment') { report = { success: [], ignored: [], overridden: [] } }
     if (list.remove) {
         for (let value of list.remove) { if (!resource[field].some(element => element[identifier] === value)) throw 'Embedded resource to be removed from list not found: ' + value; };
@@ -230,7 +239,7 @@ const modifyEmbeddedResourceList = async function (list, resource, field, identi
     }
     if (list.add) {
         for (let value of list.add) {
-            if (!resource[field].some(element => element[identifier] == value[identifier])) { resource[field].push(value); if (report&& field == 'history') report.success.push(value[identifier]); }
+            if (!resource[field].some(element => element[identifier] == value[identifier])) { resource[field].push(value); if (report && field == 'history') report.success.push(value[identifier]); }
             else {
                 if (model.modelName == 'Experiment' && field == 'history') {
                     if (query.override === "true") {
@@ -238,7 +247,7 @@ const modifyEmbeddedResourceList = async function (list, resource, field, identi
                         resource[field].push(value);
                         report.overridden.push(value[identifier]);
                     }
-                    else report.ignored.push(value[identifier]);                    
+                    else report.ignored.push(value[identifier]);
                 }
             }
         }
@@ -252,5 +261,5 @@ const modifyEmbeddedResourceList = async function (list, resource, field, identi
         });
     }
     resource[field] = [...new Set(resource[field])];
-    return [true,report];
+    return [true, report];
 }
