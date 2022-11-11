@@ -69,7 +69,7 @@ exports.put = async (req, res) => {
 exports.delete = async (req, res) => {
     const Group = mongoose.dbs[req.tenant.database].model('Group');
     let result = await checker.isAvailable(req, res, Group); if (result != true) return result;
-    result = await checker.isOwned(req, res); if (result != true) return result;
+    //result = await checker.isOwned(req, res); if (result != true) return result;
     //result = await checker.canDelete(req, res); if (result != true) return result;
     result = await checker.canOperate(req, res,"Group"); if (result != true) return result;
     result = await checker.hasRights(req, res, Group); if (result != true) return result;

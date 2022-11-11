@@ -65,7 +65,8 @@ exports.delete = async (req, res) => {
     const Device = mongoose.dbs[req.tenant.database].model('Device');
     const Feature = mongoose.dbs[req.tenant.database].model('Feature');
     let result = await checker.isAvailable(req, res, Feature); if (result != true) return result;
-    result = await checker.isOwned(req, res); if (result != true) return result;
+    //result = await checker.isOwned(req, res); if (result != true) return result;
+    result = await checker.canOperate(req, res,"Feature"); if (result != true) return result;
     result = await checker.isNotUsed(req, res, Measurement, 'feature'); if (result != true) return result;
     result = await checker.isNotUsed(req, res, Device, 'features'); if (result != true) return result;
     result = await checker.hasRights(req, res, Feature); if (result != true) return result;

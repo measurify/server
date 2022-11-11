@@ -70,7 +70,7 @@ exports.delete = async (req, res) => {
     const Thing = mongoose.dbs[req.tenant.database].model('Thing');
     const Measurement = mongoose.dbs[req.tenant.database].model('Measurement');
     let result = await checker.isAvailable(req, res, Thing); if (result != true) return result;
-    result = await checker.isOwned(req, res); if (result != true) return result;
+    //result = await checker.isOwned(req, res); if (result != true) return result;
     result = await checker.isNotUsed(req, res, Measurement, 'thing'); if (result != true) return result;
     result = await checker.isNotUsed(req, res, Thing, 'relations'); if (result != true) return result;
     //result = await checker.canDelete(req, res); if (result != true) return result;

@@ -426,9 +426,9 @@ describe('/DELETE protocol', () => {
         const protocols_before = await before.Protocol.find();
         protocols_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/protocols/' + protocol._id).set("Authorization", await factory.getUserToken(user2));
-        res.should.have.status(errors.not_yours.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.not_yours.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
         const protocols_after = await before.Protocol.find();
         protocols_after.length.should.be.eql(1);
     });

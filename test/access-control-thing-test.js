@@ -260,9 +260,9 @@ describe('Access delete things', () => {
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing = await factory.createThing("test-thing-public", owner, [], null, [], VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_analyst));
-        res.should.have.status(errors.not_yours.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.not_yours.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should not delete a thing as provider not owner', async () => {      
@@ -270,9 +270,9 @@ describe('Access delete things', () => {
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing = await factory.createThing("test-thing-public", owner, [], null, [], VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_provider));
-        res.should.have.status(errors.not_yours.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.not_yours.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 }); 
 

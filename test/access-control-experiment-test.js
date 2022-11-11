@@ -634,9 +634,9 @@ describe('Access delete experiments', () => {
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
         const experiment = await factory.createExperiment("test-experiment-private", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_analyst));
-        res.should.have.status(errors.not_yours.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.not_yours.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should not delete a experiment as provider not owner', async () => {
@@ -660,9 +660,9 @@ describe('Access delete experiments', () => {
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
         const experiment = await factory.createExperiment("test-experiment-private", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_provider));
-        res.should.have.status(errors.not_yours.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.not_yours.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 });
 

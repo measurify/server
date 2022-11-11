@@ -68,7 +68,7 @@ describe('/POST device', () => {
         res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Please, supply an _id');
     });
-
+    /*CHANGED
     it('it should not POST a device without features field', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = { _id: "test-device-1", owner: user }
@@ -79,7 +79,7 @@ describe('/POST device', () => {
         res.body.message.should.contain(errors.post_request_error.message);
         res.body.details.should.contain('Please, supply at least one feature');
     });
-
+    */
     it('it should not POST a device with a fake feature', async () => {      
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const device = { _id: "test-device-2", owner: user, features: ["fake-feature"] }
@@ -305,9 +305,9 @@ describe('/DELETE device', () => {
         const devices_before = await before.Device.find();
         devices_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/devices/' + device._id).set("Authorization", await factory.getUserToken(user2));
-        res.should.have.status(errors.not_yours.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.not_yours.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
         const devices_after = await before.Device.find();
         devices_after.length.should.be.eql(1);
     });

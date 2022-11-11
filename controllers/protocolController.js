@@ -62,7 +62,8 @@ exports.delete = async (req, res) => {
     const Protocol = mongoose.dbs[req.tenant.database].model('Protocol');
     const Experiment = mongoose.dbs[req.tenant.database].model('Experiment');
     let result = await checker.isAvailable(req, res, Protocol); if (result != true) return result;
-    result = await checker.isOwned(req, res); if (result != true) return result;
+    //result = await checker.isOwned(req, res); if (result != true) return result;
+    result = await checker.canOperate(req, res,"Protocol"); if (result != true) return result;
     result = await checker.isNotUsed(req, res, Experiment, 'protocol'); if (result != true) return result;
     result = await checker.hasRights(req, res, Protocol); if (result != true) return result;
     return await controller.deleteResource(req, res, Protocol);
