@@ -4969,7 +4969,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"_id\": \"car-test\"\r\n}"
+							"raw": "{\r\n  \"_id\": \"thing-test\"\r\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/things/",
