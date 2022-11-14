@@ -57,6 +57,7 @@ before(async () => {
     this.PasswordReset = mongoose.dbs[process.env.DEFAULT_TENANT_DATABASE].model('PasswordReset');
     this.Protocol = mongoose.dbs[process.env.DEFAULT_TENANT_DATABASE].model('Protocol');
     this.Experiment = mongoose.dbs[process.env.DEFAULT_TENANT_DATABASE].model('Experiment');
+    this.Timesample = mongoose.dbs[process.env.DEFAULT_TENANT_DATABASE].model('Timesample');
     this.Tenant = mongoose.dbs['catalog'].model('Tenant');
 });
 
