@@ -128,12 +128,12 @@ exports.createRole = async function (name, defaultAction, actions, description, 
 };
 
 exports.createCrud = async function (create,read,update,deleteAction) {
-  const body = {
-    create: create,
-    read: read,
-    update: update,
-    delete: deleteAction
-  }
+  const body = {}
+  if(create)body.create= create;
+  if(read)body.read= read;
+  if(update)body.update= update;
+  if(deleteAction)body.delete= deleteAction;
+  
   return body;
 };
 
