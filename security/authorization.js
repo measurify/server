@@ -36,9 +36,9 @@ exports.isHim = function(resource, user) {
     return resource._id.equals(user._id); 
 }
 
-exports.isAvailable = async function(id, field, model,req) {
+exports.isAvailable = async function(id, field, model, req) {
     let item = await persistence.get(id, field, model);
-    if(!item && model.modelName == 'User') {item = await persistence.get(id, 'username', model);if(item)req.params.id=item._id} 
+    if(!item && model.modelName == 'User') { item = await persistence.get(id, 'username', model); if(item) req.params.id = item._id } 
     if(!item) return null; 
     return item;
 }

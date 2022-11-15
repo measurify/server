@@ -24,78 +24,44 @@ function areSameDimension(value, item) {
 function areSameTypes(values, feature) {
   for (let [i, value] of values.entries()) {
     if (!areSameDimension(value, feature.items[i])) {
-      if (!Array.isArray(value)) {
-        size = 0;
-      } else if (!Array.isArray(value[0])) {
-        size = 1;
-      } else {
-        size = 2;
-      }
-      return (
-        "No match between sample value size and feature items dimension  (" +
-        size +
-        " != " +
-        feature.items[i].dimension +
-        "). Item no. " +
-        i +
-        ", value: " +
-        value +
-        " [" +
-        feature._id +
-        "]"
-      ); // Franz xxx
+      if (!Array.isArray(value)) size = 0;
+      else if (!Array.isArray(value[0])) size = 1;
+      else size = 2;
+      return ("No match between sample value size and feature items dimension  (" + size + " != " + feature.items[i].dimension + "). Item no. " + i + ", value: " + value + " [" + feature._id + "]"); 
     }
-    if (
-      (isNumber(value) && !shouldBeNumber(feature.items[i])) ||
-      (!isNumber(value) && shouldBeNumber(feature.items[i]))
-    )
-      return (
-        "No match between sample value type and feature items type  (" +
-        value +
-        " not of type " +
-        feature.items[i].type +
-        "). Item no. " +
-        i +
-        ", value: " +
-        value
-      ); // Franz xxx
-
+    if ((isNumber(value) && !shouldBeNumber(feature.items[i])) ||
+        (!isNumber(value) && shouldBeNumber(feature.items[i])))
+      return ("No match between sample value type and feature items type  (" + value + " not of type " + feature.items[i].type + "). Item no. " + i + ", value: " + value );
     if (feature.items[i].type == ItemTypes.enum) {
       if (!feature.items[i].range.includes(value))
-        return (
-          "No match between sample value type and feature items type  (" +
-          value +
-          " not in range " +
-          feature.items[i].range +
-          "). Item no. " +
-          i +
-          ", value: " +
-          value
-        );
+        return ("No match between sample value type and feature items type  (" + value + " not in range " + feature.items[i].range + "). Item no. " + i + ", value: " + value );
     }
   }
   return true;
 }
 
-exports.areCoherent = function (measurement, feature) {
+exports.areCoherent = function (resource, feature) {
   const lenght = feature.items.length;
-  for (let [i, sample] of measurement.samples.entries()) {
-    let values = sample.values;
-    //if(feature.items.length!=1 && values.length==1 && values.isMongooseArray)
-    //    values = values[0];
-    if (values.length != lenght)
-      return (
-        "No match between sample values size and feature items size  (" +
-        values.length +
-        " != " +
-        lenght +
-        "). Item no. " +
-        i
-      ); //Franz XXX
+  if(resource.constructor.modelName == 'Measurement') {
+    measurement = resource;
+    for (let [i, sample] of measurement.samples.entries()) {
+      let values = sample.values;
+      if (values.length != lenght) return ("No match between sample values size and feature items size  (" + values.length + " != " + lenght + "). Item no. " + i); 
+      let result = areSameTypes(values, feature);
+      if (result != true) return result;
+    }
+    return true;
+  }
+  else if(resource.constructor.modelName == 'Timesample') {
+    timesample = resource;
+    let values = timesample.values;
+    if (!values || values.length == 0) throw new Error("ValidationError: values");
+    if (values.length != lenght) return ("No match between timesample values size and feature items size  (" + values.length + " != " + lenght + ")"); 
     let result = areSameTypes(values, feature);
     if (result != true) return result;
+    return true;
   }
-  return true;
+  return ("It is not possible to check coherence of a resource of type " + resource.constructor.modelName); 
 };
 
 exports.hasSamples = function (measurement) {

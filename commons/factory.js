@@ -23,6 +23,12 @@ function sha(content) {
   return crypto.createHash("sha256").update(content).digest("hex");
 }
 
+exports.addDays = function (date, days) {
+  const new_date = new Date(date)
+  new_date.setDate(new_date.getDate() + days)
+  return new_date
+}
+
 exports.uuid = function () {
   return crypto.randomBytes(16).toString("hex");
 };
@@ -90,7 +96,7 @@ exports.createUser = async function (username, password, type, fieldmask, email,
     password = bcrypt.hashSync(password, 8);
   }
   const User = mongoose.dbs[tenant.database].model("User");
-  const req = {
+  const req = { 
     username: username,
     password: password,
     fieldmask: fieldmask,
@@ -436,15 +442,7 @@ exports.createDataupload = async function (name, owner, timestamp, size, results
   return dataupload._doc;
 };
 
-exports.createThing = async function (
-  name,
-  owner,
-  tags,
-  metadata,
-  relations,
-  visibility,
-  tenant
-) {
+exports.createThing = async function (name, owner, tags, metadata, relations, visibility, tenant) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
   const Thing = mongoose.dbs[tenant.database].model("Thing");
@@ -460,7 +458,6 @@ exports.createThing = async function (
   await thing.save();
   return thing._doc;
 };
-
 
 exports.createScript = async function (
   name,
@@ -573,45 +570,48 @@ exports.createFieldmask = async function (
   return fieldmask._doc;
 };
 
-exports.createMeasurement = async function (
-  owner,
-  feature,
-  device,
-  thing,
-  tags,
-  samples,
-  startdate,
-  enddate,
-  location,
-  visibility,
-  experiment,
-  tenant
-) {
+exports.createMeasurement = async function (owner, feature, device, thing, tags, samples, startdate, enddate, location, visibility, experiment, tenant) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
-
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
+  if(samples == undefined) samples = [{ values: [10.4], delta: 200 }];
   const Measurement = mongoose.dbs[tenant.database].model("Measurement");
-  const req = {
-    owner: owner,
-    startDate: startdate || Date.now(),
-    endDate: enddate || Date.now(),
-    location: location || {
-      type: "Point",
-      coordinates: [12.123456, 13.1345678],
-    },
-    thing: thing,
-    feature: feature,
-    device: device,
-    samples: samples || [{ values: [10.4], delta: 200 }],
-    tags: tags,
-    visibility: visibility,
-    experiment: experiment
+  const req = { owner: owner,
+                startDate: startdate || Date.now(),
+                endDate: enddate || Date.now(),
+                location: location || { type: "Point", coordinates: [12.123456, 13.1345678] },
+                thing: thing,
+                feature: feature,
+                device: device,
+                samples: samples,
+                tags: tags,
+                visibility: visibility,
+                experiment: experiment
   };
   const id = sha(JSON.stringify(req));
   req._id = id;
   const measurement = new Measurement(req);
   await measurement.save();
   return measurement._doc;
+};
+
+exports.createTimesample = async function (owner, values, timestamp, measurement, tenant) {
+  const Tenant = mongoose.dbs["catalog"].model("Tenant");
+  if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
+  if(!measurement) {
+      const Measurement = mongoose.dbs[tenant.database].model("Measurement");
+      const feature = await this.createFeature(this.uuid(), owner);
+      const device = await this.createDevice(this.uuid(), owner, [feature]);
+      const thing = await this.createThing(this.uuid(), owner);
+      measurement = await factory.createMeasurement(owner, feature, device, thing, [], []);
+  }
+  const Timesample = mongoose.dbs[tenant.database].model("Timesample");
+  const req = { measurement: measurement,
+                values: values || [1], 
+                timestamp: timestamp || Date.now()
+  }
+  const timesample = new Timesample(req);
+  await timesample.save();
+  return await Timesample.findById(timesample._id);
 };
 
 exports.createComputation = async function (

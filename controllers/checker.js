@@ -17,6 +17,18 @@ exports.isTenantAvailable = async function(req, res) {
     }
 }
 
+exports.isRelated = async function(req, res, id, field, model) {
+    try {
+        const item = await authorizator.isAvailable(id, null, model, req);
+        if(item[field] != req.resource._id) return errors.manage(res, errors.resource_not_found, id);
+        return true;
+    }
+    catch (err) { 
+        if(err.name == 'CastError') return errors.manage(res, errors.resource_not_found);
+        else return errors.manage(res, errors.generic_request_error, err); 
+    }
+}
+
 exports.isAvailable = async function(req, res, model) {
     try {
         const item = await authorizator.isAvailable(req.params.id, null, model,req);
@@ -154,6 +166,11 @@ exports.whichRights = async function(req, res, model) {
         return authorizator.whichRights(req.user, rights, 'inside');
     }
 } 
+
+exports.ofResource = async function(req, res, field) {
+  if(!req.query.filter) req.query.filter = '{ "' + field + '" : "' + req.resource._id + '" }';
+  else req.query.filter = '{ "$and": [{ "' + field + '" : "' + req.resource._id + '" },' + req.query.filter + ']}';
+}
 
 exports.hasRights = async function(req, res, model) {
     const Right = mongoose.dbs[req.tenant.database].model('Right');
