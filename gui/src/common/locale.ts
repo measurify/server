@@ -38,6 +38,8 @@ interface ILocalization {
   profile_page_desc: string;
   pass_change_confirm: string;
   pass_not_match: string;
+  old_pass_empty: string;
+  old_pass_wrong: string;
   pass_not_null: string;
   password_changed: string;
 
@@ -57,6 +59,7 @@ interface ILocalization {
   login_error: string;
   unauthorised_user: string;
   session_expired: string;
+  no_file: string;
 }
 
 export default function locale() {

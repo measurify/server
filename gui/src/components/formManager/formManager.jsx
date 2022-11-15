@@ -421,35 +421,46 @@ export const FormManager = (props) => {
             props.values[key].map((obj, index) => {
               return (
                 <Row>
-                  <Col sm={1}>
-                    <Button
-                      disabled={
-                        props.disabledFields[key] !== undefined
-                          ? props.disabledFields[key]
-                          : false
-                      }
-                      variant="link"
-                      size="sm"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        props.arrayDeleteCallback([key, index]);
-                      }}
-                    >
-                      <i
-                        className="fa fa-times"
-                        aria-hidden="true"
-                        title="Remove element"
-                        style={{
-                          width: 30 + "px",
-                          height: 30 + "px",
-                          marginRight: 10 + "px",
-                          opacity: 0.85,
+                  {key !== "metadata" && (
+                    <Col sm={1}>
+                      <Button
+                        disabled={
+                          props.disabledFields[key] !== undefined
+                            ? props.disabledFields[key]
+                            : false
+                        }
+                        variant="link"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          props.arrayDeleteCallback([key, index]);
                         }}
-                      ></i>
-                    </Button>
-                  </Col>
+                      >
+                        <i
+                          className="fa fa-times"
+                          aria-hidden="true"
+                          title="Remove element"
+                          style={{
+                            width: 30 + "px",
+                            height: 30 + "px",
+                            marginRight: 10 + "px",
+                            opacity: 0.85,
+                          }}
+                        ></i>
+                      </Button>
+                    </Col>
+                  )}
+
                   {React.Children.toArray(
                     Object.entries(obj).map(([k, value]) => {
+                      const disabled =
+                        props.disabledFields[key] !== undefined
+                          ? props.disabledFields[key][k] !== undefined
+                            ? props.disabledFields[key][k]
+                            : props.disabledFields[key] === true
+                            ? true
+                            : false
+                          : false;
                       if (typeof value === "number") {
                         return (
                           <Col sm={2}>
@@ -464,11 +475,7 @@ export const FormManager = (props) => {
                                   );
                                 }}
                                 key={key + k + index + ""}
-                                disabled={
-                                  props.disabledFields[key] !== undefined
-                                    ? props.disabledFields[key]
-                                    : false
-                                }
+                                disabled={disabled}
                                 value={
                                   isNaN(props.values[key][index][k])
                                     ? ""
@@ -505,11 +512,7 @@ export const FormManager = (props) => {
                                   ]);
                                 }}
                                 value={props.values[key][index][k]}
-                                disabled={
-                                  props.disabledFields[key] !== undefined
-                                    ? props.disabledFields[key]
-                                    : false
-                                }
+                                disabled={disabled}
                               >
                                 <option>{locale().select + " " + k}</option>
                                 {React.Children.toArray(
@@ -533,11 +536,7 @@ export const FormManager = (props) => {
                             <Form.Group className="mb-3">
                               <Form.Control
                                 type="text"
-                                disabled={
-                                  props.disabledFields[key] !== undefined
-                                    ? props.disabledFields[key]
-                                    : false
-                                }
+                                disabled={disabled}
                                 onChange={(e) => {
                                   e.preventDefault();
                                   props.handleChangesCallback(e.target.value, [
@@ -625,16 +624,7 @@ export const FormManager = (props) => {
                                                     <Form.Group className="mb-3">
                                                       <Form.Control
                                                         type="text"
-                                                        disabled={
-                                                          props.disabledFields[
-                                                            key
-                                                          ] !== undefined
-                                                            ? props
-                                                                .disabledFields[
-                                                                key
-                                                              ]
-                                                            : false
-                                                        }
+                                                        disabled={disabled}
                                                         onChange={(e) => {
                                                           e.preventDefault();
                                                           props.handleChangesCallback(
@@ -667,12 +657,7 @@ export const FormManager = (props) => {
                                           <Row>
                                             <Col sm={1}>
                                               <Button
-                                                disabled={
-                                                  props.disabledFields[key] !==
-                                                  undefined
-                                                    ? props.disabledFields[key]
-                                                    : false
-                                                }
+                                                disabled={disabled}
                                                 variant="link"
                                                 size="sm"
                                                 onClick={(e) => {
@@ -702,12 +687,7 @@ export const FormManager = (props) => {
                                             <Col sm={3}>
                                               <Form.Control
                                                 type="number"
-                                                disabled={
-                                                  props.disabledFields[k] !==
-                                                  undefined
-                                                    ? props.disabledFields[k]
-                                                    : false
-                                                }
+                                                disabled={disabled}
                                                 key={"" + key + index + k + idx}
                                                 onChange={(e) => {
                                                   e.preventDefault();
@@ -732,12 +712,7 @@ export const FormManager = (props) => {
                                           <Row>
                                             <Col sm={1}>
                                               <Button
-                                                disabled={
-                                                  props.disabledFields[key] !==
-                                                  undefined
-                                                    ? props.disabledFields[key]
-                                                    : false
-                                                }
+                                                disabled={disabled}
                                                 variant="link"
                                                 size="sm"
                                                 onClick={(e) => {

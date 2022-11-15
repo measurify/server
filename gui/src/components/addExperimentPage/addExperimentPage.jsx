@@ -56,10 +56,13 @@ export default function AddExperimentPage(props) {
   const [postType, setPostType] = useState("form");
   //message for user
   const [msg, setMsg] = useState("");
+  const [isError, setIsError] = useState(false);
   //values
   const [values, setValues] = useState(cloneDeep(addFields[resource]));
   //disabled
-  const [disabledFields, setDisabledFields] = useState({});
+  const [disabledFields, setDisabledFields] = useState({
+    metadata: { name: true },
+  });
 
   //protocols
   const [protocols, setProtocols] = useState();
@@ -137,7 +140,11 @@ export default function AddExperimentPage(props) {
     setValues(val);
   };
   //handle way selector to post new entity
-  const handleTypeSelect = (eventKey) => setPostType(eventKey);
+  const handleTypeSelect = (eventKey) => {
+    setPostType(eventKey);
+    setMsg("");
+    setIsError(false);
+  };
 
   //handle changes to selected protocols
   const handleProtocolChange = async (e) => {
@@ -153,19 +160,19 @@ export default function AddExperimentPage(props) {
       if (protocol.metadata[i].type === "scalar") {
         metadata.push({
           name: protocol.metadata[i].name,
-          value: NaN,
+          value: 0,
         });
       }
       if (protocol.metadata[i].type === "text") {
         metadata.push({
           name: protocol.metadata[i].name,
-          value: "",
+          value: protocol.metadata[i].name + "_Name",
         });
       }
       if (protocol.metadata[i].type === "vector") {
         metadata.push({
           name: protocol.metadata[i].name,
-          value: [NaN],
+          value: [0],
         });
       }
     }
@@ -195,6 +202,21 @@ export default function AddExperimentPage(props) {
 
     let tmpValues = cloneDeep(body);
     removeDefaultElements(tmpValues);
+    if (tmpValues["protocol"] === undefined) {
+      setMsg("Please, select a protocol");
+      setIsError(true);
+      return;
+    }
+    if (tmpValues["_id"] === "") {
+      setMsg("Please, define an _id");
+      setIsError(true);
+      return;
+    }
+    if (tmpValues["state"] === "") {
+      setMsg("Please, select a state");
+      setIsError(true);
+      return;
+    }
 
     let res;
     try {
@@ -205,6 +227,7 @@ export default function AddExperimentPage(props) {
       );
       res = resp.response;
       setMsg(res.statusText);
+      setIsError(false);
     } catch (error) {
       console.log(error);
       res = error.error.response;
@@ -214,12 +237,16 @@ export default function AddExperimentPage(props) {
           " : " +
           error.error.response.data.details
       );
+      setIsError(true);
     }
 
     if (res.status === 200) {
-      if (window.confirm("Back to resource page?") === true) {
-        if (resource === "tenants") navigate("/");
-        else navigate("/" + resource);
+      if (
+        window.confirm(
+          "Experiment successufully posted! Back to resource page?"
+        ) === true
+      ) {
+        navigate("/" + resource);
       } else {
       }
     }
@@ -233,6 +260,11 @@ export default function AddExperimentPage(props) {
   const postFile = async (e) => {
     e.preventDefault();
     let res;
+    if (file === undefined) {
+      setMsg(locale().no_file);
+      setIsError(true);
+      return;
+    }
     if (file.name.endsWith(".csv")) {
       const formData = new FormData();
       formData.append("file", file);
@@ -242,6 +274,7 @@ export default function AddExperimentPage(props) {
 
         res = resp.response;
         setMsg(res.statusText);
+        setIsError(false);
       } catch (error) {
         console.log(error);
 
@@ -252,6 +285,7 @@ export default function AddExperimentPage(props) {
             " : " +
             error.error.response.data.details
         );
+        setIsError(true);
       }
     }
     if (file.name.endsWith(".json")) {
@@ -259,6 +293,7 @@ export default function AddExperimentPage(props) {
         const resp = await post_generic(resource, contentPlain, undefined);
         res = resp.response;
         setMsg(res.statusText);
+        setIsError(false);
       } catch (error) {
         console.log(error);
         res = error.error.response;
@@ -268,11 +303,16 @@ export default function AddExperimentPage(props) {
             " : " +
             error.error.response.data.details
         );
+        setIsError(true);
       }
     }
 
     if (res.status === 200) {
-      if (window.confirm("Back to resource page?") === true) {
+      if (
+        window.confirm(
+          "Experiment successufully posted! Back to resource page?"
+        ) === true
+      ) {
         navigate("/" + resource);
       } else {
       }
@@ -344,7 +384,14 @@ export default function AddExperimentPage(props) {
 
               <br />
 
-              <font style={{ marginLeft: 5 + "px" }}>{msg}</font>
+              <font
+                style={{
+                  marginLeft: 5 + "px",
+                  color: isError ? "red" : "black",
+                }}
+              >
+                {msg}
+              </font>
             </div>
           )}
           {postType === "file" && (
@@ -360,7 +407,14 @@ export default function AddExperimentPage(props) {
                 contentHeader={contentHeader}
                 contentBody={contentBody}
               />
-              <font style={{ marginLeft: 5 + "px" }}>{msg}</font>
+              <font
+                style={{
+                  marginLeft: 5 + "px",
+                  color: isError ? "red" : "black",
+                }}
+              >
+                {msg}
+              </font>
             </div>
           )}
         </div>

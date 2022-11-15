@@ -164,6 +164,7 @@ function App() {
             paddingLeft: 0,
             paddingRight: 0,
             height: 100 + "vh",
+            width: 99 + "vw",
           }}
         >
           {layoutRef.current === "horizontal" ? (

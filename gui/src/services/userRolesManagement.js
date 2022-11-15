@@ -23,7 +23,7 @@ export const canDo = (userRole, resource, action) => {
     if (userRole === "admin") return true;
     if (userRole === "provider") {
       if (resource === "users") return false;
-      if (resource === "protocols") return true;
+      if (resource === "protocols") return false;
       if (resource === "experiments") return true;
     }
     if (userRole === "supplier") {
@@ -33,7 +33,7 @@ export const canDo = (userRole, resource, action) => {
     }
     if (userRole === "analyst") {
       if (resource === "users") return false;
-      if (resource === "protocols") return true;
+      if (resource === "protocols") return false;
       if (resource === "experiments") return true;
     }
   }

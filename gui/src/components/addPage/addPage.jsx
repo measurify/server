@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
+import locale from "../../common/locale";
 import { addFields, addTypes } from "../../config";
 import {
   post_generic,
@@ -60,6 +61,8 @@ export default function AddPage(props) {
   const [postType, setPostType] = useState("form");
   //message for user
   const [msg, setMsg] = useState("");
+  const [isError, setIsError] = useState(false);
+
   //deep copy addOption dictionary without any references
   const [values, setValues] = useState(cloneDeep(addFields[resource]));
 
@@ -161,7 +164,11 @@ export default function AddPage(props) {
     setValues(val);
   };
   //handle way selector to post new entity
-  const handleTypeSelect = (eventKey) => setPostType(eventKey);
+  const handleTypeSelect = (eventKey) => {
+    setPostType(eventKey);
+    setMsg("");
+    setIsError(false);
+  };
 
   const back = (e) => {
     e.preventDefault();
@@ -190,6 +197,7 @@ export default function AddPage(props) {
       );
       res = resp.response;
       setMsg(res.statusText);
+      setIsError(false);
     } catch (error) {
       console.log(error);
       res = error.error.response;
@@ -199,6 +207,7 @@ export default function AddPage(props) {
           " : " +
           error.error.response.data.details
       );
+      setIsError(true);
     }
 
     if (res.status === 200) {
@@ -213,6 +222,11 @@ export default function AddPage(props) {
   const postFile = async (e) => {
     e.preventDefault();
     let res;
+    if (file === undefined) {
+      setMsg(locale().no_file);
+      setIsError(true);
+      return;
+    }
     if (file.name.endsWith(".csv")) {
       const formData = new FormData();
       formData.append("file", file);
@@ -222,6 +236,7 @@ export default function AddPage(props) {
 
         res = resp.response;
         setMsg(res.statusText);
+        setIsError(false);
       } catch (error) {
         console.log(error);
 
@@ -232,6 +247,7 @@ export default function AddPage(props) {
             " : " +
             error.error.response.data.details
         );
+        setIsError(true);
       }
     }
     if (file.name.endsWith(".json")) {
@@ -239,6 +255,7 @@ export default function AddPage(props) {
         const resp = await post_generic(resource, contentPlain, undefined);
         res = resp.response;
         setMsg(res.statusText);
+        setIsError(false);
       } catch (error) {
         console.log(error);
         res = error.error.response;
@@ -248,6 +265,7 @@ export default function AddPage(props) {
             " : " +
             error.error.response.data.details
         );
+        setIsError(true);
       }
     }
 
@@ -310,7 +328,14 @@ export default function AddPage(props) {
               />
 
               <br />
-              <font style={{ marginLeft: 5 + "px" }}>{msg}</font>
+              <font
+                style={{
+                  marginLeft: 5 + "px",
+                  color: isError ? "red" : "black",
+                }}
+              >
+                {msg}
+              </font>
             </div>
           )}
           {postType === "file" && (
@@ -326,7 +351,14 @@ export default function AddPage(props) {
                 contentHeader={contentHeader}
                 contentBody={contentBody}
               />
-              <font style={{ marginLeft: 5 + "px" }}>{msg}</font>
+              <font
+                style={{
+                  marginLeft: 5 + "px",
+                  color: isError ? "red" : "black",
+                }}
+              >
+                {msg}
+              </font>
             </div>
           )}
         </div>

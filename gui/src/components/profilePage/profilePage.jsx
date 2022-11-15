@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, Container, Row, Col } from "react-bootstrap";
 import locale from "../../common/locale";
-import { put_generic } from "../../services/http_operations";
+import { put_generic, login } from "../../services/http_operations";
 import "../page/page.scss";
 
 export default function ProfilePage(params) {
@@ -9,6 +9,7 @@ export default function ProfilePage(params) {
   const [username, setUsername] = useState("");
   const [role, setRole] = useState("");
   const [tenant, setTenant] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [msg, setMsg] = useState("");
@@ -52,12 +53,21 @@ export default function ProfilePage(params) {
 
   const submitPassword = async (e) => {
     e.preventDefault();
+    if (oldPassword === "") {
+      setMsg(locale().old_pass_empty);
+    }
     if (password !== passwordConfirm) {
       setMsg(locale().pass_not_match);
       return;
     }
     if (password === "" || passwordConfirm === "") {
       setMsg(locale().pass_not_null);
+      return;
+    }
+    try {
+      await login(username, oldPassword, tenant, false);
+    } catch (error) {
+      setMsg(locale().old_pass_wrong);
       return;
     }
     const result = window.confirm(locale().pass_change_confirm);
@@ -119,6 +129,19 @@ export default function ProfilePage(params) {
           <Row>
             <Col>
               <Form onSubmit={submitPassword}>
+                <Row>
+                  <Form.Group className="mb-3">
+                    <Form.Control
+                      type={"password"}
+                      onChange={(e) => {
+                        e.preventDefault();
+                        setOldPassword(e.target.value);
+                      }}
+                      value={oldPassword}
+                      placeholder={locale().enter + " old password"}
+                    />
+                  </Form.Group>
+                </Row>
                 <Row>
                   <Form.Group className="mb-3">
                     <Form.Control

@@ -21,7 +21,14 @@ const AuthPageComp = () => {
     const user = userRef.current.value;
     const psw = pswRef.current.value;
     const tenant = tenantRef.current.value;
-
+    if (user === "") {
+      setMsg("Please, insert your username");
+      return;
+    }
+    if (psw === "") {
+      setMsg("Please, insert your password");
+      return;
+    }
     try {
       await login(user, psw, tenant);
       window.location.replace("/");

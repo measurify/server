@@ -18,7 +18,7 @@ export let notificationManager = {
 };
 
 //login
-export function login(username, password, tenant) {
+export function login(username, password, tenant, saveToken = true) {
   const body = {
     username: `${username}`,
     password: `${password}`,
@@ -38,16 +38,17 @@ export function login(username, password, tenant) {
     instance
       .post(url_string, body, options)
       .then((response) => {
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem(
-          "token-expiration-time",
-          response.data.token_expiration_time
-        );
-        localStorage.setItem("username", response.data.user.username);
-        localStorage.setItem("user-role", response.data.user.type);
-        localStorage.setItem("user-tenant", tenant);
-        localStorage.setItem("login-time", new Date().getTime().toString());
-
+        if (saveToken === true) {
+          localStorage.setItem("token", response.data.token);
+          localStorage.setItem(
+            "token-expiration-time",
+            response.data.token_expiration_time
+          );
+          localStorage.setItem("username", response.data.user.username);
+          localStorage.setItem("user-role", response.data.user.type);
+          localStorage.setItem("user-tenant", tenant);
+          localStorage.setItem("login-time", new Date().getTime().toString());
+        }
         resolve(response);
       })
       .catch((error) => {

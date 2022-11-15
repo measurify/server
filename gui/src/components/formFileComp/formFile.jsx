@@ -55,6 +55,7 @@ export const FormFile = (props) => {
             }
             if (file.name.endsWith(".json")) {
               const content = fileReader.result;
+
               props.setContentPlain(content);
             }
           };

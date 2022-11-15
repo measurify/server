@@ -37,6 +37,8 @@ const localization_en = {
   pass_change_confirm: "Password will be changed, do you confirm?",
   pass_not_match:
     "Provided password and the confirmation do not match. Please insert them again",
+  old_pass_empty: "Please. enter old password",
+  old_pass_wrong: "The old password is wrong",
   pass_not_null: "Password cannot be empty",
   password_changed: "Password changed",
 
@@ -56,6 +58,7 @@ const localization_en = {
   login_error: "Wrong login!",
   unauthorised_user: "You are not allowed to use this page",
   session_expired: "Session expired",
+  no_file: "Please, select a file",
 };
 
 export default localization_en;
