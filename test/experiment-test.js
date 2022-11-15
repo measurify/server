@@ -1014,6 +1014,29 @@ describe('/PUT CSV file experiment', () => {
         res.body.report.should.be.eql(expectedReport);
     });
 
+    it('it should not PUT experiment history from csv file without steps', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const metadata = [{ name: "metadata1", description: "description metadata 1", type: "scalar" },
+        { name: "metadata2", description: "description metadata 1", type: "scalar" }]
+        const topics = [{
+            name: "topics1", description: "topic description 1",
+            fields: [{ name: "field1", description: "field description 1", type: "scalar" }]
+        },
+        {
+            name: "topics2", description: "topic description 1",
+            fields: [{ name: "field2", description: "field description 2", type: "scalar" }]
+        }]
+        const protocol = await factory.createProtocol("Test1", "test-protocol-description-1", user, metadata, topics);
+        const metadatavalue = [{ name: "metadata1", value: 43 },
+        { name: "metadata2", value: 5 }];
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol, metadatavalue,[]);
+        const testFile = './test/test/testExp1_step_empty.csv';
+        const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id + '/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(errors.file_history_empty.status);
+        res.body.should.be.a('object');
+        res.body.message.should.contain(errors.file_history_empty.message);        
+    });
+
     it('it should POST and PUT experiment history from csv file', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const metadata = [{ name: "metadata1", description: "description metadata 1", type: "scalar" },

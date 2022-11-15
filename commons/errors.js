@@ -48,7 +48,8 @@ exports.thing_not_found_description          = { status: 400, value: 45, message
 exports.device_not_found_description         = { status: 400, value: 46, message: 'device in the description file not found on database'}; 
 exports.max_one_file                         = { status: 400, value: 47, message: 'max one file'}; 
 exports.wrong_header                         = { status: 400, value: 48, message: 'wrong header'}; 
-exports.wrong_xlsx                           = { status: 400, value: 48, message: 'wrong xlsx file'}; 
+exports.wrong_xlsx                           = { status: 400, value: 49, message: 'wrong xlsx file'}; 
+exports.file_history_empty                   = { status: 400, value: 50, message: 'the file doesn\'t have history steps'}; 
 
 
 
