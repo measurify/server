@@ -244,3 +244,17 @@ fetchedPageData["measurements"] = {
   thing: "things",
   tags: "tags",
 };*/
+
+export const guidelines = {};
+guidelines["protocols"] = {
+  _id: "Please, enter protocol's name.",
+  description: "Please, enter a short protocol's description.",
+};
+guidelines["experiments"] = {
+  _id: "Please, enter experiment's name.",
+  state: "Please, enter 0 for ongoing experiment, 1 for finished experiment.",
+  description: "Please, enter a short experiment's description.",
+  manager: "Please, enter the experiment's company name (as a short Acronym).",
+  startDate: "Please, use yyyy/mm/dd format.",
+  endDate: "Please, use yyyy/mm/dd format.",
+};

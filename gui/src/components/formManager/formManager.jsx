@@ -1,12 +1,12 @@
 import React, { useContext, useEffect } from "react";
 import locale from "../../common/locale";
-import { nonDefaultLength } from "../../services/misc_functions";
+import { nonDefaultLength, capitalize } from "../../services/misc_functions";
 import { Button, Form, Accordion, Container, Row, Col } from "react-bootstrap";
 
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import AppContext from "../../context";
-import { fetchedPageTypes, fetchedPageData } from "../../config";
+import { fetchedPageTypes, fetchedPageData, guidelines } from "../../config";
 
 export const FormManager = (props) => {
   //return if something is undefined
@@ -78,12 +78,12 @@ export const FormManager = (props) => {
               }
               placeholder={locale().enter + " " + key}
             />
-            {key === "state" && (
-              <Form.Text className="text-muted">
-                Please, enter 0 for ongoing experiment, 1 for finished
-                experiment.
-              </Form.Text>
-            )}
+            {guidelines[props.resource] !== undefined &&
+              guidelines[props.resource][key] !== undefined && (
+                <Form.Text className="text-muted">
+                  {guidelines[props.resource][key]}
+                </Form.Text>
+              )}
           </Form.Group>
         </Col>
       </Row>
@@ -126,11 +126,12 @@ export const FormManager = (props) => {
               value={props.values[key]}
               placeholder={locale().enter + " " + key}
             />
-            {(key === "startDate" || key === "endDate") && (
-              <Form.Text className="text-muted">
-                Please, use yyyy/mm/dd format.
-              </Form.Text>
-            )}
+            {guidelines[props.resource] !== undefined &&
+              guidelines[props.resource][key] !== undefined && (
+                <Form.Text className="text-muted">
+                  {guidelines[props.resource][key]}
+                </Form.Text>
+              )}
           </Form.Group>
         </Col>
       </Row>
@@ -428,6 +429,30 @@ export const FormManager = (props) => {
           <b>{key}</b>
         </Col>
         <Col>
+          <Row
+            style={{
+              borderBottomStyle: "solid",
+              borderBottomWidth: 1 + "px",
+              marginBottom: 5 + "px",
+            }}
+          >
+            {key !== "metadata" && (
+              <Col sm={1}>
+                <b>
+                  <i>Remove</i>
+                </b>
+              </Col>
+            )}
+            {Object.keys(props.values[key][0]).map((k) => {
+              return (
+                <Col sm={2}>
+                  <b>
+                    <i>{capitalize(key) + " " + k}</i>
+                  </b>
+                </Col>
+              );
+            })}
+          </Row>
           {React.Children.toArray(
             props.values[key].map((obj, index) => {
               return (
@@ -510,7 +535,7 @@ export const FormManager = (props) => {
                         ] !== undefined
                       ) {
                         return (
-                          <Col sm={3}>
+                          <Col sm={2}>
                             <Form.Group className="mb-3">
                               <Form.Select
                                 aria-label="Default select"
@@ -543,7 +568,7 @@ export const FormManager = (props) => {
                       //input field is a string
                       if (typeof value === "string") {
                         return (
-                          <Col sm={3}>
+                          <Col sm={2}>
                             <Form.Group className="mb-3">
                               <Form.Control
                                 type="text"
@@ -559,6 +584,14 @@ export const FormManager = (props) => {
                                 value={props.values[key][index][k]}
                                 placeholder={locale().enter + " " + k}
                               />
+                              {key === "metadata" &&
+                                k === "name" &&
+                                props.values[key][index][k] === "Country" && (
+                                  <Form.Text className="text-muted">
+                                    Please, enter 2-letter country code (i.e.,
+                                    It, De, Fr, etc...).
+                                  </Form.Text>
+                                )}
                             </Form.Group>
                           </Col>
                         );
@@ -631,7 +664,7 @@ export const FormManager = (props) => {
                                             {React.Children.toArray(
                                               entr.map(([_k, _v]) => {
                                                 return (
-                                                  <Col sm={3}>
+                                                  <Col sm={2}>
                                                     <Form.Group className="mb-3">
                                                       <Form.Control
                                                         type="text"
