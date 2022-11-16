@@ -149,7 +149,11 @@ addFields["protocols"] = {
 addFields["experiments"] = {
   _id: "",
   description: "",
-  state: "",
+  state: NaN,
+  startDate: "",
+  endDate: "",
+  manager: "",
+  place: [{ name: "" }],
 };
 
 //NOTE: measurements page works differently, so keep it empty

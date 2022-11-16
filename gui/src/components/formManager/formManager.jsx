@@ -78,6 +78,12 @@ export const FormManager = (props) => {
               }
               placeholder={locale().enter + " " + key}
             />
+            {key === "state" && (
+              <Form.Text className="text-muted">
+                Please, enter 0 for ongoing experiment, 1 for finished
+                experiment.
+              </Form.Text>
+            )}
           </Form.Group>
         </Col>
       </Row>
@@ -120,6 +126,11 @@ export const FormManager = (props) => {
               value={props.values[key]}
               placeholder={locale().enter + " " + key}
             />
+            {(key === "startDate" || key === "endDate") && (
+              <Form.Text className="text-muted">
+                Please, use yyyy/mm/dd format.
+              </Form.Text>
+            )}
           </Form.Group>
         </Col>
       </Row>
