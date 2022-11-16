@@ -16,7 +16,7 @@ const before = require('./before-test.js');
 const VisibilityTypes = require('../types/visibilityTypes.js');
 const MetadataTypes = require('../types/metadataTypes.js');
 const TopicFieldTypes = require('../types/topicFieldTypes.js');
-const ExperimentStateTypes = require("../types/experimentStateTypes.js");
+//const ExperimentStateTypes = require("../types/experimentStateTypes.js");
 
 // Test the /GET route
 
@@ -24,8 +24,8 @@ describe('/GET experiment', () => {
     it('it should GET all the experiments', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
-        await factory.createExperiment("test-experiment-2", "test-protoco-description-2", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
+        await factory.createExperiment("test-experiment-2", "test-protoco-description-2", user, 0, null, null, null, protocol);
         const res = await chai.request(server).keepOpen().get('/v1/experiments').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
@@ -35,7 +35,7 @@ describe('/GET experiment', () => {
     it('it should GET a specific experiment', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment", "test-protoco-description", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment", "test-protoco-description", user, 0, null, null, null, protocol);
         const res = await chai.request(server).keepOpen().get('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -53,7 +53,7 @@ describe('/GET experiment', () => {
     it('it should GET a history of an experiment in csv', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment", "test-protoco-description", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment", "test-protoco-description", user, 0, null, null, null, protocol);
         const res = await chai.request(server).keepOpen().get('/v1/experiments/' + experiment._id+'/history').set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('string');
@@ -98,7 +98,7 @@ describe('/POST experiment', () => {
         const experiment = {
             _id: "experiment name",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 43 },
             { name: "metadata-name-2", value: "my string" },
@@ -146,7 +146,7 @@ describe('/POST experiment', () => {
         const experiment = {
             _id: "experiment name",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 43 },
             { name: "metadata-name-2", value: "my string" },
@@ -190,7 +190,7 @@ describe('/POST experiment', () => {
         const experiment = {
             _id: "experiment name",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 43 },
             { name: "metadata-name-2", value: "my string" },
@@ -234,7 +234,7 @@ describe('/POST experiment', () => {
         const experiment = {
             _id: "experiment name",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 43 },
             { name: "metadata-name-2", value: "my string" },
@@ -294,7 +294,7 @@ describe('/POST experiment', () => {
         const experiment = {
             _id: "experiment name",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 43 },
             { name: "metadata-fakename", value: "my string" },
@@ -354,7 +354,7 @@ describe('/POST experiment', () => {
         const experiment = {
             _id: "experiment name",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 43 },
             { name: "metadata-name-2", value: "my string" },
@@ -414,7 +414,7 @@ describe('/POST experiment', () => {
         const experiment = {
             _id: "experiment name",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: [23, 78] },
             { name: "metadata-name-2", value: "my string" },
@@ -474,7 +474,7 @@ describe('/POST experiment', () => {
         const experiment = {
             _id: "experiment name",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 23 },
             { name: "metadata-name-2", value: "my string" },
@@ -534,7 +534,7 @@ describe('/POST experiment', () => {
         const experiment = {
             _id: "experiment name",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 43 },
             { name: "metadata-name-2", value: "my string" },
@@ -579,7 +579,7 @@ describe('/POST experiment', () => {
         const experiment = {
             _id: "experiment name",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 43 },
             { name: "metadata-name-2", value: "my string" },
@@ -637,7 +637,7 @@ describe('/PUT experiment', () => {
         const tag_3 = await factory.createTag("test-tag-3", user, [], VisibilityTypes.public);
         const tag_4 = await factory.createTag("test-tag-4", user, [], VisibilityTypes.public);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [tag_1._id, tag_2._id]);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol, null, null, [tag_1._id, tag_2._id]);
         const request = { tags: { add: [tag_3._id, tag_4._id], remove: [tag_1._id] } };
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user)).send(request);
         res.should.have.status(200);
@@ -649,7 +649,7 @@ describe('/PUT experiment', () => {
     it('it should PUT a experiment list of metadata to remove an item', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const metadata_to_remove = experiment.metadata[1]
         const metadata_to_leave = experiment.metadata[0]
         const request = { metadata: { remove: [metadata_to_remove.name] } };
@@ -664,7 +664,7 @@ describe('/PUT experiment', () => {
     it('it should PUT a experiment list of metadata to add an item', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const metadata_to_remove = experiment.metadata[1]
         const metadata_to_leave = experiment.metadata[0]
         let request = { metadata: { remove: [metadata_to_remove.name] } };
@@ -683,7 +683,7 @@ describe('/PUT experiment', () => {
     it('it should PUT a experiment list of metadata to update an item', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const metadata_to_update = experiment.metadata[1]
         const request = { metadata: { update: [{ name: metadata_to_update.name, new: { name: metadata_to_update.name, value: 99999 } }] } }
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user)).send(request);
@@ -698,7 +698,7 @@ describe('/PUT experiment', () => {
     it('it should not PUT a experiment list of metadata to update an item with a wrong name', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const metadata_to_update = experiment.metadata[1]
         const request = { metadata: { update: [{ name: metadata_to_update.name, new: { name: "fake_name", value: 99999 } }] } }
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user)).send(request);
@@ -710,7 +710,7 @@ describe('/PUT experiment', () => {
     it('it should not PUT a experiment list of metadata to update an item with a wrong value', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const metadata_to_update = experiment.metadata[1]
         const request = { metadata: { update: [{ name: metadata_to_update.name, new: { name: metadata_to_update.name, value: "fake-value" } }] } }
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user)).send(request);
@@ -722,7 +722,7 @@ describe('/PUT experiment', () => {
     it('it should PUT a experiment list of metadata to add an wrong item', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const metadata_to_remove = experiment.metadata[1]
         const metadata_to_leave = experiment.metadata[0]
         let request = { metadata: { remove: [metadata_to_remove.name] } };
@@ -738,7 +738,7 @@ describe('/PUT experiment', () => {
     it('it should PUT a experiment list of metadata to add an wrong value', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const metadata_to_remove = experiment.metadata[1]
         const metadata_to_leave = experiment.metadata[0]
         let request = { metadata: { remove: [metadata_to_remove.name] } };
@@ -754,7 +754,7 @@ describe('/PUT experiment', () => {
     it('it should PUT experiment history to remove an item', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const history_element_to_remove = experiment.history[1]
         const history_element_to_leave = experiment.history[0]
         const request = { history: { remove: [history_element_to_remove.step] } };
@@ -769,7 +769,7 @@ describe('/PUT experiment', () => {
     it('it should PUT experiment history to add an item', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const history_element_to_add = await factory.createExperimentHistory(protocol, 3, experiment.history.length)
         request = { history: { add: history_element_to_add } };
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user)).send(request);
@@ -782,7 +782,7 @@ describe('/PUT experiment', () => {
     it('it should PUT NOT change history of a duplicate step without override', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const history_element_to_add = await factory.createExperimentHistory(protocol, 3, experiment.history.length)
         request = { history: { add: history_element_to_add } };
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user)).send(request);
@@ -804,7 +804,7 @@ describe('/PUT experiment', () => {
     it('it should PUT change history of a duplicate step with override', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const history_element_to_add = await factory.createExperimentHistory(protocol, 3, experiment.history.length)
         request = { history: { add: history_element_to_add } };
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user)).send(request);
@@ -826,7 +826,7 @@ describe('/PUT experiment', () => {
     it('it should PUT experiment history to update an item', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const history_element_to_update = experiment.history[2]
         const history_element_updated = await factory.createExperimentHistory(protocol, 1, 2)
         const request = { history: { update: [{ step: history_element_to_update.step, new: history_element_updated[0] }] } }
@@ -841,7 +841,7 @@ describe('/PUT experiment', () => {
     it('it should not PUT experiment history to update an item with a wrong step', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const history_element_to_update = experiment.history[2]
         const history_element_updated = await factory.createExperimentHistory(protocol, 1, 2)
         const request = { history: { update: [{ step: 77, new: history_element_updated[0] }] } }
@@ -854,7 +854,7 @@ describe('/PUT experiment', () => {
     it('it should not PUT experiment history to update an item with a wrong name', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const history_element_to_update = experiment.history[2]
         const history_element_updated = await factory.createExperimentHistory(protocol, 1, 2)
         history_element_updated[0].fields[0].name = "fake_name";
@@ -868,7 +868,7 @@ describe('/PUT experiment', () => {
     it('it should not PUT experiment history to update an item with a wrong value', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const history_element_to_update = experiment.history[2]
         const history_element_updated = await factory.createExperimentHistory(protocol, 1, 2)
         history_element_updated[0].fields[0].value = "fake_value";
@@ -882,7 +882,7 @@ describe('/PUT experiment', () => {
     it('it should PUT a experiment _id', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const request = { _id: "new-test-experiment-1" };
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user)).send(request);
         res.should.have.status(200);
@@ -894,7 +894,7 @@ describe('/PUT experiment', () => {
     it('it should not PUT a experiment _id of a experiment already used in a measurement', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, "completed", null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 1, null, null, null, protocol);
         const feature = await factory.createFeature("test-feature-2", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
         const tag = await factory.createTag("test-tag", user);
@@ -914,7 +914,7 @@ describe('/PUT experiment', () => {
         const tag_3 = await factory.createTag("test-tag-3", user, [], VisibilityTypes.public);
         const tag_4 = await factory.createTag("test-tag-4", user, [], VisibilityTypes.public);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, ['test-tag-1', 'test-tag-2']);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol, null, null, ['test-tag-1', 'test-tag-2']);
         const request = { _id: "new-test-experiment-1", tags: { add: ['test-tag-3', 'test-tag-4'], remove: ['test-tag-1'] } };
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user)).send(request);
         res.should.have.status(200);
@@ -929,7 +929,7 @@ describe('/PUT experiment', () => {
         const user_1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user_2 = await factory.createUser("test-username-2", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user_1);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user_1, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user_1, 0, null, null, null, protocol);
         const request = { owner: user_2._id };
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_1)).send(request);
         res.should.have.status(errors.incorrect_info.status);
@@ -940,7 +940,7 @@ describe('/PUT experiment', () => {
     it('it should not PUT a experiment as analyst', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.analyst);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const tag = await factory.createTag("test-tag-1", user, [], VisibilityTypes.public);
         const request = { tags: { add: ['test-tag-1'], remove: [] } };
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user)).send(request);
@@ -953,7 +953,7 @@ describe('/PUT experiment', () => {
         const user_1 = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user_2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user_1);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user_1, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user_1, 0, null, null, null, protocol);
         const tag = await factory.createTag("test-tag-1", user_1, [], VisibilityTypes.public);
         const request = { tags: { add: ['test-tag-1'], remove: [] } };
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_2)).send(request);
@@ -965,7 +965,7 @@ describe('/PUT experiment', () => {
     it('it should not PUT a experiment without any field', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const request = {};
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user)).send(request);
         res.should.have.status(errors.missing_info.status);
@@ -976,7 +976,7 @@ describe('/PUT experiment', () => {
     it('it should not PUT a fake experiment', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const tag = await factory.createTag("test-tag-1", user, [], VisibilityTypes.public);
         const request = { tags: { add: ['test-tag-1'], remove: [] } };
         const res = await chai.request(server).keepOpen().put('/v1/experiments/fake_protocol').set("Authorization", await factory.getUserToken(user)).send(request);
@@ -1003,7 +1003,7 @@ describe('/PUT CSV file experiment', () => {
         const protocol = await factory.createProtocol("Test1", "test-protocol-description-1", user, metadata, topics);
         const metadatavalue = [{ name: "metadata1", value: 43 },
         { name: "metadata2", value: 5 }];
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol, metadatavalue,[]);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description-1", user, 0, null, null, null, protocol, metadatavalue,[]);
         const testFile = './test/test/testExp1_step1_2.csv';
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id + '/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -1029,7 +1029,7 @@ describe('/PUT CSV file experiment', () => {
         const protocol = await factory.createProtocol("Test1", "test-protocol-description-1", user, metadata, topics);
         const metadatavalue = [{ name: "metadata1", value: 43 },
         { name: "metadata2", value: 5 }];
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol, metadatavalue,[]);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description-1", user, 0, null, null, null, protocol, metadatavalue,[]);
         const testFile = './test/test/testExp1_step_empty.csv';
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id + '/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.file_history_empty.status);
@@ -1072,7 +1072,7 @@ describe('/DELETE experiment', () => {
     it('it should DELETE a experiment', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const experiments_before = await before.Experiment.find();
         experiments_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user));
@@ -1086,7 +1086,7 @@ describe('/DELETE experiment', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user2 = await factory.createUser("test-username-2", "test-password-2", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const experiments_before = await before.Experiment.find();
         experiments_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user2));
@@ -1100,7 +1100,7 @@ describe('/DELETE experiment', () => {
     it('it should not DELETE a fake experiment', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, ExperimentStateTypes.ongoing, null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
         const experiments_before = await before.Experiment.find();
         experiments_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/experiments/fake_protocol').set("Authorization", await factory.getUserToken(user));
@@ -1114,7 +1114,7 @@ describe('/DELETE experiment', () => {
     it('it should not DELETE a experiment already used in a measurement', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, "completed", null, null, null, protocol);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 1, null, null, null, protocol);
         const feature = await factory.createFeature("test-feature-2", user);
         const device = await factory.createDevice("test-device-2", user, [feature]);
         const tag = await factory.createTag("test-tag", user);

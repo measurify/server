@@ -220,7 +220,7 @@ fetchedPageTypes["protocols"] = {
 };
 fetchedPageTypes["experiments"] = {
   visibility: "VisibilityTypes",
-  state: "ExperimentStateTypes",
+  //state: "ExperimentStateTypes",
 };
 /*fetchedPageTypes["constraints"] = {
   type1: "ConstraintTypes",
