@@ -42,8 +42,7 @@ exports.count = async (req, res) => {
 exports.getone = async (req, res) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   const select = await checker.whatCanSee(req, res, Measurement);
-  let result = await checker.isAvailable(req, res, Measurement);
-  if (result != true) return result;
+  let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
   //result = await checker.canRead(req, res);if (result != true) return result;
   result = await checker.canOperate(req, res,"Measurement"); if (result != true) return result;  
   result = await checker.hasRights(req, res, Measurement);if (result != true) return result;  
