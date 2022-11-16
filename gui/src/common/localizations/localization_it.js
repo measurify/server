@@ -60,6 +60,7 @@ const localization_it = {
   unauthorised_user: "Non sei abilitato a utilizzare questa pagina",
   session_expired: "Sessione scaduta",
   no_file: "Si prega di selezionare un file",
+  duplicate_error: "Nel database è già presente una risorsa con",
 };
 
 export default localization_it;

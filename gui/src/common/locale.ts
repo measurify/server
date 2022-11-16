@@ -60,6 +60,7 @@ interface ILocalization {
   unauthorised_user: string;
   session_expired: string;
   no_file: string;
+  duplicate_error: string;
 }
 
 export default function locale() {

@@ -201,12 +201,23 @@ export default function AddPage(props) {
     } catch (error) {
       console.log(error);
       res = error.error.response;
+      console.log({
+        message: error.error.response.data.message,
+        details: error.error.response.data.details,
+      });
+
+      let det = "";
+      if (error.error.response.data.details.includes("duplicate key")) {
+        det =
+          locale().duplicate_error +
+          " " +
+          error.error.response.data.details.slice(
+            error.error.response.data.details.indexOf("{") + 1,
+            -1
+          );
+      }
       //add details
-      setMsg(
-        error.error.response.data.message +
-          " : " +
-          error.error.response.data.details
-      );
+      setMsg(error.error.response.data.message + " : " + det);
       setIsError(true);
     }
 

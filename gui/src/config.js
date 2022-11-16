@@ -251,7 +251,7 @@ guidelines["protocols"] = {
   description: "Please, enter a short protocol's description.",
 };
 guidelines["experiments"] = {
-  _id: "Please, enter experiment's name.",
+  _id: "Please, enter experiment's name (N.B. don't use the # character in experiment's name).",
   state: "Please, enter 0 for ongoing experiment, 1 for finished experiment.",
   description: "Please, enter a short experiment's description.",
   manager: "Please, enter the experiment's company name (as a short Acronym).",

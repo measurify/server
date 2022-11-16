@@ -59,6 +59,7 @@ const localization_en = {
   unauthorised_user: "You are not allowed to use this page",
   session_expired: "Session expired",
   no_file: "Please, select a file",
+  duplicate_error: "The database already contains a resource with",
 };
 
 export default localization_en;

@@ -59,7 +59,7 @@ export const FormManager = (props) => {
         >
           <b>{key}</b>
         </Col>
-        <Col sm={4}>
+        <Col sm={6}>
           <Form.Group className="mb-3">
             <Form.Control
               type="number"
@@ -109,7 +109,7 @@ export const FormManager = (props) => {
           <b>{key}</b>
         </Col>
 
-        <Col sm={4}>
+        <Col sm={6}>
           <Form.Group className="mb-3">
             <Form.Control
               type={key === "password" ? "password" : "text"}
@@ -164,7 +164,7 @@ export const FormManager = (props) => {
           <b>{key}</b>
         </Col>
 
-        <Col sm={4}>
+        <Col sm={6}>
           <Form.Group className="mb-3">
             <Autocomplete
               id={key}
@@ -207,7 +207,7 @@ export const FormManager = (props) => {
         >
           <b>{key}</b>
         </Col>
-        <Col sm={4}>
+        <Col sm={6}>
           <Form.Group className="mb-3">
             <Form.Select
               aria-label="Default select"
@@ -254,7 +254,7 @@ export const FormManager = (props) => {
         >
           <b>{k}</b>
         </Col>
-        <Col sm={4}>
+        <Col sm={6}>
           {React.Children.toArray(
             props.values[k].map((value, index) => {
               return (
@@ -350,7 +350,7 @@ export const FormManager = (props) => {
                       ></i>
                     </Button>
                   </Col>
-                  <Col sm={4}>
+                  <Col sm={6}>
                     <Form.Group className="mb-3">
                       {myFetched.data[key] !== undefined ? (
                         <Autocomplete
@@ -445,7 +445,7 @@ export const FormManager = (props) => {
             )}
             {Object.keys(props.values[key][0]).map((k) => {
               return (
-                <Col sm={2}>
+                <Col sm={4}>
                   <b>
                     <i>{capitalize(key) + " " + k}</i>
                   </b>
@@ -499,7 +499,7 @@ export const FormManager = (props) => {
                           : false;
                       if (typeof value === "number") {
                         return (
-                          <Col sm={2}>
+                          <Col sm={4}>
                             <Form.Group className="mb-3">
                               <Form.Control
                                 type="number"
@@ -535,7 +535,7 @@ export const FormManager = (props) => {
                         ] !== undefined
                       ) {
                         return (
-                          <Col sm={2}>
+                          <Col sm={4}>
                             <Form.Group className="mb-3">
                               <Form.Select
                                 aria-label="Default select"
@@ -568,7 +568,7 @@ export const FormManager = (props) => {
                       //input field is a string
                       if (typeof value === "string") {
                         return (
-                          <Col sm={2}>
+                          <Col sm={4}>
                             <Form.Group className="mb-3">
                               <Form.Control
                                 type="text"
@@ -664,7 +664,7 @@ export const FormManager = (props) => {
                                             {React.Children.toArray(
                                               entr.map(([_k, _v]) => {
                                                 return (
-                                                  <Col sm={2}>
+                                                  <Col sm={4}>
                                                     <Form.Group className="mb-3">
                                                       <Form.Control
                                                         type="text"
@@ -728,7 +728,7 @@ export const FormManager = (props) => {
                                                 ></i>
                                               </Button>
                                             </Col>
-                                            <Col sm={3}>
+                                            <Col sm={4}>
                                               <Form.Control
                                                 type="number"
                                                 disabled={disabled}
@@ -783,7 +783,7 @@ export const FormManager = (props) => {
                                                 ></i>
                                               </Button>
                                             </Col>
-                                            <Col sm={3}>
+                                            <Col sm={4}>
                                               <Form.Control
                                                 type="text"
                                                 disabled={
