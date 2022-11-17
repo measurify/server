@@ -63,7 +63,17 @@ viewFields["tags"] = ["tags"];
 viewFields["things"] = ["_id", "visibility", "tags"];
 viewFields["devices"] = ["_id", "features", "tags", "scripts"];*/
 viewFields["protocols"] = ["_id", "description", "metadata"];
-viewFields["experiments"] = ["_id", "description", "protocol", "metadata"];
+viewFields["experiments"] = [
+  "_id",
+  "description",
+  "state",
+  "startDate",
+  "endDate",
+  "manager",
+  "place",
+  "protocol",
+  "metadata",
+];
 /*viewFields["measurements"] = [
   "thing",
   "feature",
