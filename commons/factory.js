@@ -254,20 +254,22 @@ exports.createFeature = async function (name, owner, items, tags, visibility, te
 };
 
 
-exports.createMetadata = async function (name, description, type) {
+exports.createMetadata = async function (name, description, type, range) {
   metadata = {
     name: name || "metadata-name-" + this.uuid(),
     description: description || "description metadata " + this.uuid(),
-    type: type || MetadataTypes.scalar
+    type: type || MetadataTypes.scalar,
+    range:range||[]
   }
   return metadata;
 }
 
-exports.createField = async function (name, description, type) {
+exports.createField = async function (name, description, type, range) {
   field = {
     name: name || "field-name-" + this.uuid(),
     description: description || "description field " + this.uuid(),
-    type: type || TopicFieldTypes.scalar
+    type: type || TopicFieldTypes.scalar,
+    range:range||[]
   }
   return field;
 }
