@@ -246,6 +246,10 @@ export default function AddExperimentPage(props) {
             -1
           );
       }
+      //default case: show details from error message
+      else {
+        det = error.error.response.data.details;
+      }
       //add details
       setMsg(error.error.response.data.message + " : " + det);
       setIsError(true);
