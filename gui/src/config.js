@@ -1,7 +1,7 @@
 import { isFeatureInUse, alwaysTrue } from "./services/validations";
 
 //url of APIs
-export const api_url = "https://hi-drive.measurify.org:8080/v1";
+export const api_url = "https://hi-drive.measurify.org/v1";
 //export const api_url = "https://localhost/v1";
 
 //name of this dashboard, shown to users
