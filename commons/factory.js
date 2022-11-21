@@ -179,11 +179,11 @@ exports.createDefaultRoles = async function (tenant) {
   }
   ];
   let roleDocs = []
-  body.map(async (req) => {
-    const role = new Role(req);
+  for(let i=0;i<body.length;i++){
+    let role = new Role(body[i]);
     await role.save();
     roleDocs.push(role._doc)
-  });
+  };
   return roleDocs;
 };
 
