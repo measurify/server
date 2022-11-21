@@ -32,7 +32,7 @@ Clone code
 Connect to the containeraized database
 
     cd init
-    sudo nano **\init\variable.env** 
+    sudo nano variable.env 
 
     search for "DATABASE" variable and set the varlue as
     DATABASE=mongodb://database:27017/measurify-catalog
@@ -158,8 +158,6 @@ Install Certbot
     sudo apt-get update
     sudo apt-get install software-properties-common
     sudo add-apt-repository universe
-    sudo add-apt-repository ppa:certbot/certbot
-    sudo apt-get update
     sudo apt-get install certbot
 
 Use Certbot (modify in order to provide your domain)
@@ -170,7 +168,7 @@ Use Certbot (modify in order to provide your domain)
 Copy certificates
 
     sudo cp /etc/letsencrypt/live/{{url}}/fullchain.pem ~/measurify/resources/fullchain.pem
-    sudo cp /etc/letsencrypt/live/{{url}}/privkey.pem ~/measurify/resources/key.pem
+    sudo cp /etc/letsencrypt/live/{{url}}/privkey.pem ~/measurify/resources/privkey.pem
 
 Update certificates
 
