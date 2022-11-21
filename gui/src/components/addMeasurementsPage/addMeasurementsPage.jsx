@@ -19,7 +19,7 @@ import { fetchedPageData } from "../../config";
 
 import fontawesome from "@fortawesome/fontawesome";
 import { faMapPin } from "@fortawesome/fontawesome-free-solid";
-import { SamplesForm } from "./samplesForm";
+import { ControlloForm } from "./controlloForm";
 fontawesome.library.add(faMapPin);
 
 const cloneDeep = require("clone-deep");
@@ -56,6 +56,7 @@ export default function AddMeasurementsPage(props) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [samples, setSamples] = useState([]);
   const [items, setItems] = useState([]);
+  const [values, setValues] = useState({});
   //addr msg
   const [addrMsg, setAddrMsg] = useState("");
 
@@ -103,12 +104,29 @@ export default function AddMeasurementsPage(props) {
         const res = await get_generic("features", qs);
         const feature = res.docs[0];
 
+        const addr = getAddress();
         const items = feature.items;
 
-        const samples = [];
-        let tmp = addSample(samples, items);
-        tmp = updateAddress(tmp);
-        setSamples(tmp);
+        //tmp = updateAddress(tmp);
+
+        //values structure
+        const val = {
+          indirizzo: addr,
+          note: "",
+          data: Date.now(),
+          veicolo: "",
+          persone: [
+            {
+              età: NaN,
+              genere: "",
+              nazionalità: "",
+              risultato: "",
+              _sostanza: [{ sostanza: "", livello: "" }],
+            },
+          ],
+        };
+        setValues(val);
+        //setSamples(tmp);
         setItems(items);
       } catch (error) {
         console.log(error);
@@ -125,22 +143,22 @@ export default function AddMeasurementsPage(props) {
 
   //handle changes
   const handleChanges = (val, path) => {
-    let tmpSamples = cloneDeep(samples);
-    let samplesPtr = tmpSamples;
+    let tmpValues = cloneDeep(values);
+    let valuesPtr = tmpValues;
     let i;
     let lastIndexNumber = -1;
     for (i = 0; i < path.length - 1; i++) {
-      samplesPtr = samplesPtr[path[i]];
+      valuesPtr = valuesPtr[path[i]];
       if (typeof path[i] === "number") lastIndexNumber = i;
     }
     if (typeof path[i] === "number") lastIndexNumber = i;
-    samplesPtr[path[i]] = val;
+    valuesPtr[path[i]] = val;
     //check if an array is present
-    setSamples(tmpSamples);
+    setValues(tmpValues);
   };
 
-  const handleDeleteSample = (path) => {
-    let val = cloneDeep(samples);
+  const handleRemoveItemArray = (path) => {
+    let val = cloneDeep(values);
 
     let tmpPtr = val;
 
@@ -154,49 +172,49 @@ export default function AddMeasurementsPage(props) {
     }
 
     tmpPtr.splice(path[i], 1);
-    setSamples(val);
+    setValues(val);
   };
-  const addSample = (samples, items) => {
-    const values = [];
-    const tmpSample = cloneDeep(samples);
-    if (tmpSample.length > 0) {
-      tmpSample.push({ ...tmpSample[tmpSample.length - 1] });
-    } else {
-      items.forEach((item) => {
-        if (item.type === "number") {
-          if (item.dimension === 0)
-            values.push({ name: item.name, value: NaN, type: item.type });
-          else values.push([{ name: item.name, value: NaN, type: item.type }]);
-        } else if (item.type === "text") {
-          if (item.dimension === 0) {
-            values.push({ name: item.name, value: "", type: item.type });
-          } else {
-            values.push([{ name: item.name, value: "", type: item.type }]);
-          }
-        } else if (item.type === "enum") {
-          if (item.dimension === 0)
-            values.push({
-              name: item.name,
-              value: "",
-              enumValues: item.range,
-              type: item.type,
-            });
-          else
-            values.push([
-              {
-                name: item.name,
-                value: "",
-                enumValues: item.range,
-                type: item.type,
-              },
-            ]);
-        }
+  const addItemArray = (path) => {
+    const tmpValues = cloneDeep(values);
+    let tmpPtr = tmpValues;
+
+    let lastKey = null;
+    for (let i = 0; i < path.length - 1; i++) {
+      tmpPtr = tmpPtr[path[i]];
+      lastKey = path[i];
+    }
+    if (lastKey === "_sostanza") {
+      tmpPtr.push({ sostanza: "", livello: "" });
+    }
+    if (lastKey === "persone") {
+      tmpPtr.push({
+        età: NaN,
+        genere: "",
+        nazionalità: "",
+        risultato: "",
+        _sostanza: [{ sostanza: "", livello: "" }],
       });
-      tmpSample.push({ values: values });
     }
 
-    setSamples(tmpSample);
-    return tmpSample;
+    setValues(tmpValues);
+  };
+
+  //unroll the data structure into arrays
+  const UnrollValues = (obj, vals, smpls) => {
+    const tmpVals = [...vals];
+    let last = true;
+    if (obj.constructor === Object) {
+      Object.values(obj).forEach((v) => {
+        if (Array.isArray(v)) {
+          last = false;
+          v.forEach((e) => UnrollValues(e, tmpVals, smpls));
+        } else {
+          tmpVals.push(v);
+        }
+      });
+    }
+    if (last === true) smpls.push(tmpVals);
+    return smpls;
   };
 
   //post the body for forms
@@ -204,22 +222,22 @@ export default function AddMeasurementsPage(props) {
     e.preventDefault();
     //deep clone formValues
     let token = undefined;
-    let body = cloneDeep(formValues);
-    let tmpSamples = samples.map((sample) => {
-      return { values: sample.values.map((v) => v.value) };
+
+    const vals = UnrollValues(values, [], []);
+    const smpls = vals.map((e) => {
+      return { values: e };
     });
+    let body = {};
+    body["feature"] = _feature;
+    body["tags"] = _tags;
+    body["thing"] = _thing;
+    body["device"] = _device;
+    body["samples"] = smpls;
+
     if (body.token !== undefined) {
       token = body.token;
       delete body.token;
     }
-    removeDefaultElements(body);
-    body["feature"] = _feature;
-    body["samples"] = tmpSamples;
-    body["tags"] = _tags;
-    body["feature"] = _feature;
-    body["thing"] = _thing;
-    body["device"] = _device;
-    //let tmpformValues = cloneDeep(body);
 
     let res;
     try {
@@ -238,11 +256,9 @@ export default function AddMeasurementsPage(props) {
     }
 
     if (res.status === 200) {
-      if (window.confirm("Back to resource page?") === true) {
-        if (resource === "tenants") navigate("/");
-        else navigate("/" + resource);
-      } else {
-      }
+      window.alert("Controllo successivamente caricato");
+
+      navigate("/add/measurements");
     }
   };
 
@@ -263,8 +279,8 @@ export default function AddMeasurementsPage(props) {
           await getBigDataCloudLocation(latitude, longitude);
 
           //update all the address
-          const tmp = updateAddress();
-          setSamples(tmp);
+          const val = updateAddress();
+          setValues(val);
           setAddrMsg(locale().geo_update);
         } catch (error) {
           console.log("Error while connecting to Geolocalization APIs");
@@ -278,20 +294,15 @@ export default function AddMeasurementsPage(props) {
     }
   };
 
-  const updateAddress = (smpls = undefined) => {
-    let tmpSample = smpls !== undefined ? smpls : cloneDeep(samples);
-    tmpSample = tmpSample.map((sample) => {
-      sample.values = sample.values.map((value) => {
-        const tmp = { ...value };
-        if (tmp.name === "address" || tmp.name === "indirizzo") {
-          tmp.value = getAddress();
-        }
-        return tmp;
-      });
-      const newSample = { values: sample.values };
-      return newSample;
-    });
-    return tmpSample;
+  const updateAddress = () => {
+    let tmpValues = cloneDeep(values);
+    if (tmpValues["indirizzo"] !== undefined) {
+      tmpValues["indirizzo"] = getAddress();
+    }
+    if (tmpValues["address"] !== undefined) {
+      tmpValues["address"] = getAddress();
+    }
+    return tmpValues;
   };
 
   const getAddress = (complete = false, short = false) => {
@@ -336,19 +347,18 @@ export default function AddMeasurementsPage(props) {
   return (
     <div className="page">
       <header className="page-header">
-        Add resource &nbsp;
-        <b>{resource}</b>
+        Aggiungi&nbsp;<b>Controllo</b>
       </header>
       <main>
-        <SamplesForm
-          samples={samples}
+        <ControlloForm
+          values={values}
           items={items}
           submitFunction={postBody}
           backFunction={back}
           getAddress={getAddress}
           msg={msg}
-          handleAddSample={addSample}
-          handleDeleteSample={handleDeleteSample}
+          handleAddItemArray={addItemArray}
+          handleRemoveItemArray={handleRemoveItemArray}
           handleChanges={handleChanges}
           refreshLocation={refreshLocation}
           addrMsg={addrMsg}

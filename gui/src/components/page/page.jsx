@@ -4,6 +4,7 @@ import { Button } from "react-bootstrap";
 import { pages, pageActions, addFields } from "../../config";
 import { get_generic } from "../../services/http_operations";
 import ContentTable from "../contentTable/contentTable";
+import ContentCards from "../contentCards/contentCards";
 import { useParams, useSearchParams } from "react-router-dom";
 import { Pagination } from "react-bootstrap";
 import "./page.scss";
@@ -184,7 +185,7 @@ export default function Page(params) {
         )}
       </header>
       <main className="page-content">
-        <ContentTable
+        <ContentCards
           resType={page}
           header={header}
           resources={resource}

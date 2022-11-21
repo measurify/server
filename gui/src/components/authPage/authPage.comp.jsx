@@ -11,6 +11,9 @@ const userRef = React.createRef();
 const pswRef = React.createRef();
 const tenantRef = React.createRef();
 
+const _tenant = "think-before-tenant";
+//const _tenant = "";
+
 const AuthPageComp = () => {
   //const { location, replace } = useHistory();
   const [msg, setMsg] = useState("");
@@ -20,7 +23,7 @@ const AuthPageComp = () => {
 
     const user = userRef.current.value;
     const psw = pswRef.current.value;
-    const tenant = tenantRef.current.value;
+    const tenant = _tenant;
 
     try {
       await login(user, psw, tenant);
@@ -61,14 +64,6 @@ const AuthPageComp = () => {
             type="password"
             ref={pswRef}
             placeholder={locale().password_suggestion}
-          />
-        </Form.Group>
-        <Form.Group className="mb-3" controlId="tenant">
-          <Form.Label>{locale().tenant}</Form.Label>
-          <Form.Control
-            type="text"
-            ref={tenantRef}
-            placeholder={locale().tenant_suggestion}
           />
         </Form.Group>
         <Button variant="primary" type="submit">

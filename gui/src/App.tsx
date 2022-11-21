@@ -26,7 +26,6 @@ import {
   get_generic,
   getBigDataCloudLocation,
 } from "./services/http_operations";
-import MobilePlaceholderPage from "./components/mobilePlaceholderPage/mobilePlaceholderPage";
 import EditContentPage from "./components/editContentPage/editContentPage";
 import AddPage from "./components/addPage/addPage";
 import AddExperimentPage from "./components/addExperimentPage/addExperimentPage";
@@ -167,13 +166,6 @@ function App() {
   };
   ///////////////END FETCHED TYPES MANAGEMENT FRAGMENT
 
-  //mobile view only allowed to be vertical
-  if (/Mobi/i.test(window.navigator.userAgent) == true) {
-    layoutRef.current = "vertical";
-  } else {
-    layoutRef.current = layout;
-  }
-
   //not logged => show auth page
   if (tkn === null)
     return (
@@ -206,30 +198,15 @@ function App() {
             height: 100 + "vh",
           }}
         >
-          {layoutRef.current === "horizontal" ? (
-            <Row style={{ padding: 0 }}>
-              <HorizontalNavigationBar />
-            </Row>
-          ) : (
-            ""
-          )}
           <Row
             style={{
               padding: 0,
             }}
           >
-            {layoutRef.current === "vertical" ? (
-              <Col md="auto" style={{ padding: 0, minWidth: 250 + "px" }}>
-                <Navigation />
-              </Col>
-            ) : (
-              ""
-            )}
-            {/Mobi/i.test(window.navigator.userAgent) == true && (
-              <Col md="auto" style={{ padding: 0 }}>
-                <NotificationBar />
-              </Col>
-            )}
+            <Col md="auto" style={{ padding: 0, minWidth: 250 + "px" }}>
+              <Navigation />
+            </Col>
+
             <Col style={{ paddingLeft: 0, paddingRight: 0 }}>
               <Routes>
                 <Route
@@ -261,12 +238,6 @@ function App() {
                 <Route path="*" element={<Navigate to="/404" replace />} />
               </Routes>
             </Col>
-            {layoutRef.current === "vertical" &&
-              /Mobi/i.test(window.navigator.userAgent) == false && (
-                <Col md="auto" style={{ paddingLeft: 0, paddingRight: 0 }}>
-                  <NotificationBar />
-                </Col>
-              )}
           </Row>
         </Container>
       </Router>
