@@ -130,11 +130,9 @@ measurementSchema.path("owner").validate({
 
 // check samples
 measurementSchema.pre("save", async function () {
-  if (!inspector.hasSamples(this))
-    throw new Error("No samples specified for this measurement");
+  //if (!inspector.hasSamples(this)) throw new Error("No samples specified for this measurement");
   let removes = [];
-  for (let sample of this.samples)
-    if (!inspector.hasValues(sample)) removes.push(sample);
+  for (let sample of this.samples) if (!inspector.hasValues(sample)) removes.push(sample);
   this.samples.remove(removes);
 });
 

@@ -46,7 +46,7 @@ describe('/POST self', () => {
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.post_request_error.message);
-        res.body.details.should.contain("Path `type` is required")
+        res.body.details.should.contain("Please, supply a user role")
     });
 
     it('it should not POST a user without tenant field', async () => {
@@ -66,7 +66,7 @@ describe('/POST self', () => {
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.post_request_error.message);
-        res.body.details.should.contain("is not a valid enum value for path")
+        res.body.details.should.contain("ValidationError: type: Role not existent")
     });
     
     it('it should not POST a user without email field', async () => {

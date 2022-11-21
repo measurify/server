@@ -197,7 +197,7 @@ describe('/POST group', () => {
 describe('/POST group from file', () => {
     it('it should POST groups from file csv with user by _id', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);        
-        const testFile = './test/test/Group_test.csv';        
+        const testFile = './test/dummies/Group_test.csv';        
         
         const res = await chai.request(server).keepOpen().post('/v1/groups/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -217,7 +217,7 @@ describe('/POST group from file', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const user1 = await factory.createUser("user_test_1", "test-password-1", UserRoles.provider);
         const user2 = await factory.createUser("user_test_2", "test-password-2", UserRoles.provider);        
-        const testFile = './test/test/Group_test_username.csv';        
+        const testFile = './test/dummies/Group_test_username.csv';        
         
         const res = await chai.request(server).keepOpen().post('/v1/groups/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);

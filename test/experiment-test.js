@@ -125,6 +125,144 @@ describe('/POST experiment', () => {
         res.body.history[0].fields.length.should.be.eql(6);
     });
 
+    it('it should POST an experiment with range values: scalar inside range and outside range', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const metadata = [{ name: "metadata-name-1", description: "description metadata 1", type: "scalar" , range:[2,5]}]
+        const topics = [{
+            name: "topic name 1", description: "topic description 1",
+            fields: [{ name: "field-1", description: "field description 1", type: "scalar" , range:[2,5]}]
+        }]
+        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user, metadata, topics);
+        const experiment1 = {
+            _id: "experiment name",
+            description: "experiment description",
+            state: 1,
+            protocol: protocol._id,
+            metadata: [{ name: "metadata-name-1", value: 3 }],
+            history: [{
+                step: 1, timestamp: Date.now(), fields: [{ name: "field-1", value: 3 }]
+            }],
+            tags: []
+        }
+        let res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user)).send(experiment1)
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body.should.have.property('metadata');
+        res.body.should.have.property('history');
+        res.body._id.should.be.eql(experiment1._id);
+        res.body.metadata.length.should.be.eql(1);
+        res.body.history.length.should.be.eql(1);
+        res.body.history[0].fields.length.should.be.eql(1);
+        
+        //under min value
+        const experiment2 = {
+            _id: "experiment name",
+            description: "experiment description",
+            state: 1,
+            protocol: protocol._id,
+            metadata: [{ name: "metadata-name-1", value: 0 }],
+            history: [{
+                step: 1, timestamp: Date.now(), fields: [{ name: "field-1", value: 3 }]
+            }],
+            tags: []
+        }
+        res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user)).send(experiment2);        
+        res.should.have.status(errors.post_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.post_request_error.message);
+        res.body.details.should.contain('metadata metadata-name-1 value 0 is not coherent with protocol range minimum value: 2');
+
+        //over max value
+        const experiment3 = {
+            _id: "experiment name",
+            description: "experiment description",
+            state: 1,
+            protocol: protocol._id,
+            metadata: [{ name: "metadata-name-1", value: 10 }],
+            history: [{
+                step: 1, timestamp: Date.now(), fields: [{ name: "field-1", value: 3 }]
+            }],
+            tags: []
+        }
+        res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user)).send(experiment3)
+        res.should.have.status(errors.post_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.post_request_error.message);
+        res.body.details.should.contain('metadata metadata-name-1 value 10 is not coherent with protocol range maximum value: 5');
+    });
+
+    it('it should POST and NOT POST an experiment with range enumerable values ', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const metadata = [{ name: "metadata-name-1", description: "description metadata 1", type: "enum" , range:["enum-test-1","enum-test-2"]}]
+        const topics = [{
+            name: "topic name 1", description: "topic description 1",
+            fields: [{ name: "field-1", description: "field description 1", type: "enum" , range:["enum-test-1","enum-test-2"]}]
+        }]
+        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user, metadata, topics);
+        const experiment1 = {
+            _id: "experiment name",
+            description: "experiment description",
+            state: 1,
+            protocol: protocol._id,
+            metadata: [{ name: "metadata-name-1", value: "enum-test-1" }],
+            history: [{
+                step: 1, timestamp: Date.now(), fields: [{ name: "field-1", value: "enum-test-2" }]
+            }],
+            tags: []
+        }
+        let res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user)).send(experiment1)
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body.should.have.property('metadata');
+        res.body.should.have.property('history');
+        res.body._id.should.be.eql(experiment1._id);
+        res.body.metadata.length.should.be.eql(1);
+        res.body.history.length.should.be.eql(1);
+        res.body.history[0].fields.length.should.be.eql(1);
+        
+        //NOT an enumerable metadata value
+        const experiment2 = {
+            _id: "experiment name",
+            description: "experiment description",
+            state: 1,
+            protocol: protocol._id,
+            metadata: [{ name: "metadata-name-1", value: "enum-fake-test" }],
+            history: [{
+                step: 1, timestamp: Date.now(), fields: [{ name: "field-1", value: "enum-test-1" }]
+            }],
+            tags: []
+        }
+        res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user)).send(experiment2);        
+        res.should.have.status(errors.post_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.post_request_error.message);        
+        res.body.details.should.contain('metadata metadata-name-1 value enum-fake-test is not inside the range of enum values');
+
+        //NOT an enumerable history value
+        const experiment3 = {
+            _id: "experiment name",
+            description: "experiment description",
+            state: 1,
+            protocol: protocol._id,
+            metadata: [{ name: "metadata-name-1", value: "enum-test-1" }],
+            history: [{
+                step: 1, timestamp: Date.now(), fields: [{ name: "field-1", value: "enum-fake-test" }]
+            }],
+            tags: []
+        }
+        res = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user)).send(experiment3)
+        res.should.have.status(errors.post_request_error.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.post_request_error.message);
+        res.body.details.should.contain('field field-1 value enum-fake-test is not inside the range of enum values');
+    });
+
     it('it should not POST a experiment with a duplicate metadata name', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const metadata = [{ name: "metadata-name-1", description: "description metadata 1", type: "scalar" },
@@ -615,7 +753,7 @@ describe('/POST experiment', () => {
             fields: [{ name: "field2", description: "field description 2", type: "scalar" }]
         }]
         const protocol = await factory.createProtocol("Test1", "test-protoco-description-1", user, metadata, topics);
-        const testFile = './test/test/testExperiment.csv';
+        const testFile = './test/dummies/testExperiment.csv';
 
         const res = await chai.request(server).keepOpen().post('/v1/experiments/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -944,9 +1082,9 @@ describe('/PUT experiment', () => {
         const tag = await factory.createTag("test-tag-1", user, [], VisibilityTypes.public);
         const request = { tags: { add: ['test-tag-1'], remove: [] } };
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user)).send(request);
-        res.should.have.status(errors.restricted_access_modify.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_modify.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should not PUT a experiment of another provider', async () => {
@@ -957,9 +1095,9 @@ describe('/PUT experiment', () => {
         const tag = await factory.createTag("test-tag-1", user_1, [], VisibilityTypes.public);
         const request = { tags: { add: ['test-tag-1'], remove: [] } };
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_2)).send(request);
-        res.should.have.status(errors.restricted_access_modify.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_modify.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should not PUT a experiment without any field', async () => {
@@ -1004,7 +1142,7 @@ describe('/PUT CSV file experiment', () => {
         const metadatavalue = [{ name: "metadata1", value: 43 },
         { name: "metadata2", value: 5 }];
         const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description-1", user, 0, null, null, null, protocol, metadatavalue,[]);
-        const testFile = './test/test/testExp1_step1_2.csv';
+        const testFile = './test/dummies/testExp1_step1_2.csv';
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id + '/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -1030,7 +1168,7 @@ describe('/PUT CSV file experiment', () => {
         const metadatavalue = [{ name: "metadata1", value: 43 },
         { name: "metadata2", value: 5 }];
         const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description-1", user, 0, null, null, null, protocol, metadatavalue,[]);
-        const testFile = './test/test/testExp1_step_empty.csv';
+        const testFile = './test/dummies/testExp1_step_empty.csv';
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id + '/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.file_history_empty.status);
         res.body.should.be.a('object');
@@ -1050,11 +1188,11 @@ describe('/PUT CSV file experiment', () => {
             fields: [{ name: "field2", description: "field description 2", type: "scalar" }]
         }]
         const protocol = await factory.createProtocol("Test1", "test-protoco-description-1", user, metadata, topics);
-        const testFile = './test/test/testExperiment.csv';
+        const testFile = './test/dummies/testExperiment.csv';
 
         const res = await chai.request(server).keepOpen().post('/v1/experiments/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
 
-        const testFile2 = './test/test/testExp1_step1_2.csv';
+        const testFile2 = './test/dummies/testExp1_step1_2.csv';
         const res2 = await chai.request(server).keepOpen().put('/v1/experiments/' + 'testExp1' + '/file').attach('file', testFile2).set("Authorization", await factory.getUserToken(user));
         res2.should.have.status(200);
         res2.body.should.be.a('object');        
@@ -1090,9 +1228,9 @@ describe('/DELETE experiment', () => {
         const experiments_before = await before.Experiment.find();
         experiments_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user2));
-        res.should.have.status(errors.not_yours.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.not_yours.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
         const experiments_after = await before.Experiment.find();
         experiments_after.length.should.be.eql(1);
     });

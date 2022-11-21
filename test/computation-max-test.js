@@ -121,7 +121,7 @@ describe('POST computation', () => {
         const computation = { _id: "test-computation", code: "max", feature: feature._id, items: ["item-name-1"] };
         let res = await chai.request(server).keepOpen().post('/v1/computations').set("Authorization", await factory.getUserToken(owner)).send(computation);
         res.should.have.status(200);
-        res.body.should.be.a('object');
+        res.body.should.be.a('object');        
         res.body.status.should.be.eql("running");
         while(res.body.status == "running") res = await chai.request(server).keepOpen().get('/v1/computations/' + computation._id).set("Authorization", await factory.getUserToken(owner)); 
         res.should.have.status(200);

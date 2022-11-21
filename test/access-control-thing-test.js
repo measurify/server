@@ -42,10 +42,10 @@ describe('Access create things', () => {
         const user_analyst = await factory.createUser("test-username-1", "test-password-1", UserRoles.analyst);
         const thing = { _id: "test-thing-1" }
         const res = await chai.request(server).keepOpen().post('/v1/things').set("Authorization", await factory.getUserToken(user_analyst)).send(thing);
-        res.should.have.status(errors.restricted_access_create.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.be.eql(errors.restricted_access_create.message);
+        res.body.message.should.be.eql(errors.restricted_access_operation.message);
     });
 });
 
@@ -164,9 +164,9 @@ describe('Access read a thing', () => {
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing_private = await factory.createThing("test-thing-public", owner, [], null, [], VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().get('/v1/things/' + thing_private._id).set("Authorization", await factory.getUserToken(user_provider));
-        res.should.have.status(errors.restricted_access_read.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_read.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should get a public/private thing as provider and owner', async () => {      
@@ -218,9 +218,9 @@ describe('Access modify things', () => {
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
         let res = await chai.request(server).keepOpen().put('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_analyst)).send(modification);
-        res.should.have.status(errors.restricted_access_modify.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_modify.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should not modify a thing as provider not owner', async () => {      
@@ -230,9 +230,9 @@ describe('Access modify things', () => {
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
         let res = await chai.request(server).keepOpen().put('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_provider)).send(modification);
-        res.should.have.status(errors.restricted_access_modify.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_modify.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 });
 
@@ -260,9 +260,9 @@ describe('Access delete things', () => {
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing = await factory.createThing("test-thing-public", owner, [], null, [], VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_analyst));
-        res.should.have.status(errors.not_yours.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.not_yours.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should not delete a thing as provider not owner', async () => {      
@@ -270,9 +270,9 @@ describe('Access delete things', () => {
         const owner = await factory.createUser("test-username-owner", "test-password-owner", UserRoles.provider);
         const thing = await factory.createThing("test-thing-public", owner, [], null, [], VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_provider));
-        res.should.have.status(errors.not_yours.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.not_yours.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 }); 
 
@@ -338,7 +338,7 @@ describe('Access things with rights', () => {
         const right_1 = await factory.createRight("right-test-1", thing_owned, "Thing", user_provider, owner, []);
         const right_2 = await factory.createRight("right-test-2", thing_owned, "Thing", user_analyst, owner, []);
         let res = await chai.request(server).keepOpen().get('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_provider));
-        res.should.have.status(errors.restricted_access_read.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.be.eql(errors.restricted_access.message);
@@ -375,7 +375,7 @@ describe('Delete things with rights', () => {
         const thing_owned = await factory.createThing("test-thing-2", owner, [], null, null, VisibilityTypes.public);
         const right = await factory.createRight("right-test-1", thing_owned, "Thing", user_provider, owner, []);
         let res = await chai.request(server).keepOpen().delete('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_provider));
-        res.should.have.status(errors.restricted_access_read.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.be.eql(errors.restricted_access.message);
@@ -402,7 +402,7 @@ describe('Modify things with rights', () => {
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
         let res = await chai.request(server).keepOpen().put('/v1/things/' + thing._id).set("Authorization", await factory.getUserToken(user_provider)).send(modification);
-        res.should.have.status(errors.restricted_access_read.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.be.eql(errors.restricted_access.message);

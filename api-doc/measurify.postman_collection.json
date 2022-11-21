@@ -2720,7 +2720,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"_id\": \"experiment id\",\n    \"description\": \"experiment description\",\n   \"state\": \"completed\",\n    \"startDate\": \"2022-05-30T07:15:17.396Z\",\n    \"endDate\": \"2022-09-15T18:15:17.396Z\",\n    \"protocol\": \"{{protocol}}\",\n    \"metadata\": [\n        { \"name\": \"metadata-name-1\", \"value\": 10 },\n        { \"name\": \"metadata-name-2\", \"value\": \"value 2\" },\n        { \"name\": \"metadata-name-3\", \"value\": 55 },\n        { \"name\": \"metadata-name-4\", \"value\": [34, 25, 45] }\n    ],\n    \"history\": [\n        {\n            \"step\": 1,\n            \"timestamp\": \"2022-09-15T18:15:17.396Z\",\n            \"fields\": [\n                { \"name\": \"field-1\", \"value\": 55 },\n                { \"name\": \"field-2\", \"value\": \"text value\" },\n                { \"name\": \"field-3\", \"value\": [21, 32, 432] },\n                { \"name\": \"field-4\", \"value\": 13 },\n                { \"name\": \"field-5\", \"value\": \"another text value\" },\n                { \"name\": \"field-6\", \"value\": [324, 432, 432]  }\n            ]\n        },\n        {\n            \"step\": 2,\n            \"timestamp\": \"2022-12-15T18:15:17.396Z\",\n            \"fields\": [\n                { \"name\": \"field-1\", \"value\": 65 },\n                { \"name\": \"field-2\", \"value\": \"text value 2\" },\n                { \"name\": \"field-3\", \"value\": [3, 56] },\n                { \"name\": \"field-4\", \"value\": 33 },\n                { \"name\": \"field-5\", \"value\": \"another text value 2\" },\n                { \"name\": \"field-6\", \"value\": [543, 534, 5656]  }\n            ]\n        }\n    ]\n}\n"
+							"raw": "{\n    \"_id\": \"experiment id\",\n    \"description\": \"experiment description\",\n    \"anonymization\": true,\n    \"state\": \"completed\",\n    \"startDate\": \"2022-05-30T07:15:17.396Z\",\n    \"endDate\": \"2022-09-15T18:15:17.396Z\",\n    \"protocol\": \"{{protocol}}\",\n    \"metadata\": [\n        { \"name\": \"metadata-name-1\", \"value\": 10 },\n        { \"name\": \"metadata-name-2\", \"value\": \"value 2\" },\n        { \"name\": \"metadata-name-3\", \"value\": 55 },\n        { \"name\": \"metadata-name-4\", \"value\": [34, 25, 45] }\n    ],\n    \"history\": [\n        {\n            \"step\": 1,\n            \"timestamp\": \"2022-09-15T18:15:17.396Z\",\n            \"fields\": [\n                { \"name\": \"field-1\", \"value\": 55 },\n                { \"name\": \"field-2\", \"value\": \"text value\" },\n                { \"name\": \"field-3\", \"value\": [21, 32, 432] },\n                { \"name\": \"field-4\", \"value\": 13 },\n                { \"name\": \"field-5\", \"value\": \"another text value\" },\n                { \"name\": \"field-6\", \"value\": [324, 432, 432]  }\n            ]\n        },\n        {\n            \"step\": 2,\n            \"timestamp\": \"2022-12-15T18:15:17.396Z\",\n            \"fields\": [\n                { \"name\": \"field-1\", \"value\": 65 },\n                { \"name\": \"field-2\", \"value\": \"text value 2\" },\n                { \"name\": \"field-3\", \"value\": [3, 56] },\n                { \"name\": \"field-4\", \"value\": 33 },\n                { \"name\": \"field-5\", \"value\": \"another text value 2\" },\n                { \"name\": \"field-6\", \"value\": [543, 534, 5656]  }\n            ]\n        }\n    ]\n}\n"
 						},
 						"url": {
 							"raw": "{{url}}/v1/experiments",
@@ -4880,6 +4880,590 @@
 							"path": [
 								"v1",
 								"measurements"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "TIMESERIES",
+			"item": [
+				{
+					"name": "LOGIN as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a thing",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"thing\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"_id\": \"thing-test\"\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/things/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"things",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a feature",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"feature\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"_id\": \"feature-test\",\n    \"items\": [\n    \t{\n        \t\"name\": \"item-1\",\n            \"unit\": \"unit-1\",\n            \"type\": \"number\",\n            \"dimension\": 0\n        },\n        {\n        \t\"name\": \"item-2\",\n            \"unit\": \"unit-2\",\n            \"type\": \"number\",\n            \"dimension\": 1\n        }\n    ]\n}\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/features",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"features"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a device",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"device\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"_id\": \"device-test\",\r\n    \"features\": [ \"feature-test\"]\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/devices/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"devices",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a measurement",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var current_timestamp = new Date();",
+									"postman.setEnvironmentVariable(\"current_timestamp\", current_timestamp.toISOString());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"pm.environment.set('measurement', data._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"thing\": \"thing-test\",\r\n\t\"feature\": \"feature-test\",\r\n\t\"device\": \"device-test\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/measurements",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a timesample",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var timestamp = new Date();",
+									"postman.setEnvironmentVariable(\"timestamp\", timestamp.toISOString());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"pm.environment.set('timesample', data._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"timestamp\": \"{{timestamp}}\",\r\n    \"values\": [80, [10,5]]\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/measurements/{{measurement}}/timeserie",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements",
+								"{{measurement}}",
+								"timeserie"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a list of timesamples",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var timestamp = new Date();",
+									"",
+									"const timestamp_1 = new Date(timestamp)",
+									"timestamp_1.setDate(timestamp_1.getDate() + 12)",
+									"postman.setEnvironmentVariable(\"timestamp_1\", timestamp_1.toISOString());",
+									"",
+									"const timestamp_2 = new Date(timestamp)",
+									"timestamp_2.setDate(timestamp_2.getDate() + 10)",
+									"postman.setEnvironmentVariable(\"timestamp_2\", timestamp_2.toISOString());",
+									"",
+									"const timestamp_3 = new Date(timestamp)",
+									"timestamp_3.setDate(timestamp_3.getDate() + 8)",
+									"postman.setEnvironmentVariable(\"timestamp_3\", timestamp_3.toISOString());",
+									"",
+									"const timestamp_4 = new Date(timestamp)",
+									"timestamp_4.setDate(timestamp_4.getDate() + 6)",
+									"postman.setEnvironmentVariable(\"timestamp_4\", timestamp_4.toISOString());",
+									"",
+									"const timestamp_5 = new Date(timestamp)",
+									"timestamp_5.setDate(timestamp_5.getDate() + 4)",
+									"postman.setEnvironmentVariable(\"timestamp_5\", timestamp_5.toISOString());",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n\t    \"timestamp\": \"{{timestamp_1}}\",\r\n        \"values\": [180, [10,5]]\r\n    },\r\n    {\r\n\t    \"timestamp\": \"{{timestamp_2}}\",\r\n        \"values\": [280, [10,5]]\r\n    },\r\n    {\r\n    \t\"timestamp\": \"{{timestamp_3}}\",\r\n        \"values\": [380, [10,5]]\r\n    },\r\n    {\r\n    \t\"timestamp\": \"{{timestamp_4}}\",\r\n        \"values\": [480, [10,5]]\r\n    },\r\n    {\r\n    \t\"timestamp\": \"{{timestamp_5}}\",\r\n        \"values\": [580, [10,5]]\r\n    }\r\n]\r\n\r\n\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/measurements/{{measurement}}/timeserie",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements",
+								"{{measurement}}",
+								"timeserie"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET a timeseries",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var timestamp = new Date();",
+									"postman.setEnvironmentVariable(\"timestamp\", timestamp.toISOString());"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"pm.environment.set('timesample', data.docs[0]._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"timestamp\": \"{{timestamp}}\",\r\n    \"values\": [80, [10,5]]\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{url}}/v1/measurements/{{measurement}}/timeserie",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements",
+								"{{measurement}}",
+								"timeserie"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET a filterd timeseries",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var timestamp = new Date();",
+									"",
+									"const timestamp_start = new Date(timestamp)",
+									"timestamp_start.setDate(timestamp_start.getDate() + 5)",
+									"postman.setEnvironmentVariable(\"timestamp_start\", timestamp_start);",
+									"",
+									"const timestamp_end = new Date(timestamp)",
+									"timestamp_end.setDate(timestamp_end.getDate() + 11)",
+									"postman.setEnvironmentVariable(\"timestamp_end\", timestamp_end);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/v1/measurements/{{measurement}}/timeserie?filter={\"timestamp\":{\"$gte\":\"{{timestamp_start}}\", \"$lt\":\"{{timestamp_end}}\"}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements",
+								"{{measurement}}",
+								"timeserie"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "{\"timestamp\":{\"$gte\":\"{{timestamp_start}}\", \"$lt\":\"{{timestamp_end}}\"}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE a timesample",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/v1/measurements/{{measurement}}/timeserie/{{timesample}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements",
+								"{{measurement}}",
+								"timeserie",
+								"{{timesample}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE a timeserie",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/v1/measurements/{{measurement}}/timeserie",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements",
+								"{{measurement}}",
+								"timeserie"
 							]
 						}
 					},

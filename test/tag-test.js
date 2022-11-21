@@ -163,7 +163,7 @@ describe('/POST tag', () => {
 describe('/POST tag from file', () => {
     it('it should POST tags from file csv', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);        
-        const testFile = './test/test/Tag_test.csv';        
+        const testFile = './test/dummies/Tag_test.csv';        
         
         const res = await chai.request(server).keepOpen().post('/v1/tags/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -181,7 +181,7 @@ describe('/POST tag from file', () => {
 
     it('it should POST tags from file xlsx', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);        
-        const testFile = './test/test/Tag_test_Excel.xlsx';        
+        const testFile = './test/dummies/Tag_test_Excel.xlsx';        
         
         const res = await chai.request(server).keepOpen().post('/v1/tags/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -405,9 +405,9 @@ describe('/PUT tag', () => {
         const tag = await factory.createTag("test-tag-1", user, [], VisibilityTypes.public);
         const request = { description: 'second' };
         const res = await chai.request(server).keepOpen().put('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user)).send(request);
-        res.should.have.status(errors.restricted_access_modify.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_modify.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should not PUT a tag of another provider', async () => {
@@ -416,9 +416,9 @@ describe('/PUT tag', () => {
         const tag = await factory.createTag("test-tag-1", user_1, [], VisibilityTypes.public);
         const request = { description: 'second' };
         const res = await chai.request(server).keepOpen().put('/v1/tags/' + tag._id).set("Authorization", await factory.getUserToken(user_2)).send(request);
-        res.should.have.status(errors.restricted_access_modify.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_modify.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should not PUT a tag without any field', async () => {

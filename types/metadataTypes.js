@@ -1,7 +1,8 @@
 const MetadataTypes = Object.freeze({
     scalar: "scalar", 
     text: "text",
-    vector: "vector"
+    vector: "vector",
+    enum: "enum"
 });
 
 module.exports = MetadataTypes;

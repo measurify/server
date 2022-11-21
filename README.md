@@ -6,20 +6,48 @@ Measurify Cloud API Server is designed, developed and maintained by **[Elios Lab
 
 In order to support the IoT developer community, Measeurify Cloud API Server is released open source under **MIT licence**.
 
-## Quick start (on Docker)
+## Quick start (on Ubuntu 20.04 using Docker)
 
-Clone code and run the container
+[Install Docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04)
+
+    sudo apt update
+    sudo apt install apt-transport-https ca-certificates curl software-properties-common
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+    apt-cache policy docker-ce
+    sudo apt install docker-ce
+    sudo systemctl status docker
+
+[Install Docker Compose](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04)
+
+    sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+    docker-compose --version
+
+Clone code
 
     git clone https://github.com/measurify/server.git measurify
-
     cd measurify
+
+Connect to the containeraized database
+
+    cd init
+    sudo nano variable.env 
+
+    search for "DATABASE" variable and set the varlue as
+    DATABASE=mongodb://database:27017/measurify-catalog
+    
+    cd ..
+
+Run containers
+
     sudo docker-compose up -d
 
-to see logs:
+To see logs:
 
     sudo docker logs measurify
 
-to update the server:
+To update the server:
 
     sudo docker kill $(sudo docker ps -q)
     sudo docker system prune -a
@@ -27,7 +55,7 @@ to update the server:
     sudo git pull
     sudo docker-compose up -d --build
 
-to get info:
+To get info:
 
     sudo docker exec -it measurify pm2 show measurify
 
@@ -90,11 +118,7 @@ _npm run build-win_ and _npm run build-mac_ are batch instructions to build and 
 
 ## Deploy
 
-The Measurify API Sever is developed using [Node JS](https://nodejs.org/en/) and [MongoDB](https://www.mongodb.com/). The following steps show how to deploy a server on Ubuntu 18.04, using Docker. However it can be adapted also for MacOS or Windows operating systems.
-
-[Install Docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-16-04)
-[Install Docker Compose](https://www.digitalocean.com/community/tutorials/how-to-install-docker-compose-on-ubuntu-16-04)
-
+The Measurify API Sever is developed using [Node JS](https://nodejs.org/en/) and [MongoDB](https://www.mongodb.com/). 
 There is a configuration file **\init\variable.env** which can be edited in order to specify several features:
 
     VERSION=v1
@@ -134,8 +158,6 @@ Install Certbot
     sudo apt-get update
     sudo apt-get install software-properties-common
     sudo add-apt-repository universe
-    sudo add-apt-repository ppa:certbot/certbot
-    sudo apt-get update
     sudo apt-get install certbot
 
 Use Certbot (modify in order to provide your domain)
@@ -146,7 +168,7 @@ Use Certbot (modify in order to provide your domain)
 Copy certificates
 
     sudo cp /etc/letsencrypt/live/{{url}}/fullchain.pem ~/measurify/resources/fullchain.pem
-    sudo cp /etc/letsencrypt/live/{{url}}/privkey.pem ~/measurify/resources/key.pem
+    sudo cp /etc/letsencrypt/live/{{url}}/privkey.pem ~/measurify/resources/privkey.pem
 
 Update certificates
 

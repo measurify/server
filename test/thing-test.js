@@ -177,7 +177,7 @@ describe('/POST thing', () => {
 describe('/POST thing from file', () => {
     it('it should POST things from file csv', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);        
-        const testFile = './test/test/Thing_test.csv';        
+        const testFile = './test/dummies/Thing_test.csv';        
         
         const res = await chai.request(server).keepOpen().post('/v1/things/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);

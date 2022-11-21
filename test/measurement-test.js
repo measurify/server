@@ -26,47 +26,16 @@ describe("/GET measurements", () => {
   });
 
   it("it should GET all the measurements", async () => {
-    const owner = await factory.createUser(
-      "test-username-1",
-      "test-password-1",
-      UserRoles.provider
-    );
+    const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
     const feature = await factory.createFeature("test-feature", owner);
     const tag1 = await factory.createTag("test-tag-1", owner);
     const tag2 = await factory.createTag("test-tag-2", owner);
-    const device = await factory.createDevice("test-device-1", owner, [
-      feature,
-    ]);
+    const device = await factory.createDevice("test-device-1", owner, [feature]);
     const thing = await factory.createThing("test-thing-1", owner);
-    const measurement1 = await factory.createMeasurement(
-      owner,
-      feature,
-      device,
-      thing,
-      [tag1, tag2],
-      factory.createSamples(1)
-    );
-    const measurement2 = await factory.createMeasurement(
-      owner,
-      feature,
-      device,
-      thing,
-      [tag1, tag2],
-      factory.createSamples(2)
-    );
-    const measurement3 = await factory.createMeasurement(
-      owner,
-      feature,
-      device,
-      thing,
-      [tag1, tag2],
-      factory.createSamples(3)
-    );
-    const res = await chai
-      .request(server)
-      .keepOpen()
-      .get("/v1/measurements")
-      .set("Authorization", await factory.getUserToken(owner));
+    const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(1));
+    const measurement2 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(2));
+    const measurement3 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2], factory.createSamples(3));
+    const res = await chai.request(server).keepOpen().get("/v1/measurements").set("Authorization", await factory.getUserToken(owner));
     res.should.have.status(200);
     res.body.docs.should.be.a("array");
     res.body.docs.length.should.be.eql(3);
@@ -992,6 +961,7 @@ describe("/POST measurement", () => {
     );
   });
 
+  /*
   it("it should not POST a measurement with a empty", async () => {
     const user = await factory.createUser(
       "test-username-1",
@@ -1025,10 +995,9 @@ describe("/POST measurement", () => {
     res.body.message.should.be.a("string");
     res.should.have.status(errors.post_request_error.status);
     res.body.message.should.contain(errors.post_request_error.message);
-    res.body.details.should.contain(
-      "No samples specified for this measurement"
-    );
+    res.body.details.should.contain("No samples specified for this measurement");
   });
+  */
 
   it("it should POST a measurement with samples of several items", async () => {
     const user = await factory.createUser(
@@ -1149,12 +1118,7 @@ describe("/POST measurement", () => {
         { values: [10.6, 23, 12, 10], delta: 260 },
       ],
     };
-    const res = await chai
-      .request(server)
-      .keepOpen()
-      .post("/v1/measurements")
-      .set("Authorization", await factory.getUserToken(user))
-      .send(measurement);
+    const res = await chai.request(server).keepOpen().post("/v1/measurements").set("Authorization", await factory.getUserToken(user)).send(measurement);
     res.should.have.status(200);
     res.body.should.be.a("object");
     res.body.should.have.property("_id");
@@ -1654,8 +1618,8 @@ describe('/POST file CSV route', () => {
       const device1 = await factory.createDevice("test-device-1", user, [feature]);
       const device2 = await factory.createDevice("test-device-2", user, [feature]);
       const thing1 = await factory.createThing("test-thing-1", user);
-      const testFile = './test/test/test-file1.txt';
-      const testDescription = './test/test/test-description.txt';
+      const testFile = './test/dummies/test-file1.txt';
+      const testDescription = './test/dummies/test-description.txt';
       
       const res = await chai.request(server).keepOpen().post('/v1/measurements/file').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
       res.should.have.status(200);
@@ -1675,8 +1639,8 @@ describe('/POST file CSV route', () => {
       const device1 = await factory.createDevice("test-device-1", user, [feature]);
       const device2 = await factory.createDevice("test-device-2", user, [feature]);
       const thing1 = await factory.createThing("test-thing-1", user);
-      const testFile = './test/test/test-file2.txt';
-      const testDescription = './test/test/test-description.txt';
+      const testFile = './test/dummies/test-file2.txt';
+      const testDescription = './test/dummies/test-description.txt';
       
       const res = await chai.request(server).keepOpen().post('/v1/measurements/file').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
       res.should.have.status(202);
@@ -1704,8 +1668,8 @@ describe('/POST file CSV route', () => {
       const device1 = await factory.createDevice("test-device-1", user, [feature]);
       const device2 = await factory.createDevice("test-device-2", user, [feature]);
       const thing1 = await factory.createThing("test-thing-1", user);
-      const testFile = './test/test/test-file2.txt';
-      const testDescription = './test/test/test-description.txt';
+      const testFile = './test/dummies/test-file2.txt';
+      const testDescription = './test/dummies/test-description.txt';
       
       const res = await chai.request(server).keepOpen().post('/v1/measurements/file?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
       res.should.have.status(202);
@@ -1733,8 +1697,8 @@ describe('/POST file CSV route', () => {
       const device1 = await factory.createDevice("test-device-1", user, [feature]);
       const device2 = await factory.createDevice("test-device-2", user, [feature]);
       const thing1 = await factory.createThing("test-thing-1", user);
-      const testFile = './test/test/test-file2.txt';
-      const testDescription = './test/test/test-fake-description.txt';
+      const testFile = './test/dummies/test-file2.txt';
+      const testDescription = './test/dummies/test-fake-description.txt';
       
       const res = await chai.request(server).keepOpen().post('/v1/measurements/file?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
       res.should.have.status(errors.description_not_json.status);
@@ -1752,8 +1716,8 @@ describe('/POST file CSV route', () => {
       const device1 = await factory.createDevice("test-device-1", user, [feature]);
       const device2 = await factory.createDevice("test-device-2", user, [feature]);
       const thing1 = await factory.createThing("test-thing-1", user);
-      const testFile = './test/test/test-file1-multiple-features.txt';
-      const testDescription = './test/test/test-description-multiple-features.txt';
+      const testFile = './test/dummies/test-file1-multiple-features.txt';
+      const testDescription = './test/dummies/test-description-multiple-features.txt';
       
       const res = await chai.request(server).keepOpen().post('/v1/measurements/file').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
       res.should.have.status(200);
@@ -1772,8 +1736,8 @@ describe('/POST file CSV route', () => {
       const device1 = await factory.createDevice("test-device-1", user, [feature]);
       const device2 = await factory.createDevice("test-device-2", user, [feature]);
       const thing1 = await factory.createThing("test-thing-1", user);
-      const testFile = './test/test/test-file2-multiple-features.txt';
-      const testDescription = './test/test/test-description-multiple-features.txt';
+      const testFile = './test/dummies/test-file2-multiple-features.txt';
+      const testDescription = './test/dummies/test-description-multiple-features.txt';
       
       const res = await chai.request(server).keepOpen().post('/v1/measurements/file').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
       res.should.have.status(202);
@@ -1801,8 +1765,8 @@ describe('/POST file CSV route', () => {
       const device1 = await factory.createDevice("test-device-1", user, [feature]);
       const device2 = await factory.createDevice("test-device-2", user, [feature]);
       const thing1 = await factory.createThing("test-thing-1", user);
-      const testFile = './test/test/test-file2-multiple-features.txt';
-      const testDescription = './test/test/test-description-multiple-features.txt';
+      const testFile = './test/dummies/test-file2-multiple-features.txt';
+      const testDescription = './test/dummies/test-description-multiple-features.txt';
       
       const res = await chai.request(server).keepOpen().post('/v1/measurements/file?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
       res.should.have.status(202);
@@ -1830,8 +1794,8 @@ describe('/POST file CSV route', () => {
     const device1 = await factory.createDevice("test-device-1", user, [feature]);
     const device2 = await factory.createDevice("test-device-2", user, [feature]);
     const thing1 = await factory.createThing("test-thing-1", user);
-    const testFile = './test/test/test-file2-multiple-features-no-header.txt';
-    const testDescription = './test/test/test-description-multiple-features.txt';
+    const testFile = './test/dummies/test-file2-multiple-features-no-header.txt';
+    const testDescription = './test/dummies/test-description-multiple-features.txt';
     
     const res = await chai.request(server).keepOpen().post('/v1/measurements/file?force=true&header=false').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
     res.should.have.status(202);
@@ -1859,8 +1823,8 @@ describe('/POST file CSV route', () => {
       const device1 = await factory.createDevice("test-device-1", user, [feature]);
       const device2 = await factory.createDevice("test-device-2", user, [feature]);
       const thing1 = await factory.createThing("test-thing-1", user);
-      const testFile = './test/test/test-file2-multiple-features.txt';
-      const testDescription = './test/test/test-fake-description.txt';
+      const testFile = './test/dummies/test-file2-multiple-features.txt';
+      const testDescription = './test/dummies/test-fake-description.txt';
       
       const res = await chai.request(server).keepOpen().post('/v1/measurements/file?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
       res.should.have.status(errors.description_not_json.status);

@@ -487,9 +487,9 @@ describe("/PUT issue", () => {
       .put("/v1/issues/" + issue._id)
       .set("Authorization", await factory.getUserToken(user))
       .send(request);
-    res.should.have.status(errors.restricted_access_modify.status);
+    res.should.have.status(errors.restricted_access_operation.status);
     res.body.should.be.a("object");
-    res.body.message.should.contain(errors.restricted_access_modify.message);
+    res.body.message.should.contain(errors.restricted_access_operation.message);
   });
 
   it("it should not PUT a issue of another provider", async () => {
@@ -521,9 +521,9 @@ describe("/PUT issue", () => {
       .put("/v1/issues/" + issue._id)
       .set("Authorization", await factory.getUserToken(user_2))
       .send(request);
-    res.should.have.status(errors.restricted_access_modify.status);
+    res.should.have.status(errors.restricted_access_operation.status);
     res.body.should.be.a("object");
-    res.body.message.should.contain(errors.restricted_access_modify.message);
+    res.body.message.should.contain(errors.restricted_access_operation.message);
   });
 
   it("it should not PUT a issue without any field", async () => {

@@ -111,7 +111,8 @@ exports.datauploadCheckAndCreate = async function (
   //datauploads check
 
   //check rights
-  let result = await checker.canCreate(req, res);
+  //let result = await checker.canCreate(req, res); 
+  let result = await checker.canOperate(req, res,"Dataupload"); 
   if (result != true)
     return [errors.manage(res, errors.restricted_access_create), null];
   result = await checker.hasRightsToCreate(req, res, [

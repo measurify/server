@@ -77,7 +77,7 @@ experimentSchema.path("protocol").validate({
 // validate tags
 experimentSchema.path('tags').validate({
     validator: async function (values) {
-        Tag = this.model('Tag');        
+        let Tag = this.model('Tag');        
         for(let i=0; i<values.length; i++) {
             let tag = await Tag.findById(values[i]);
             if(!tag) throw new Error('Experiment validation failed: Tag not existent (' + values[i] + ')');
