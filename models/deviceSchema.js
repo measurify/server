@@ -32,6 +32,7 @@ deviceSchema.plugin(paginate);
 deviceSchema.plugin(require('mongoose-autopopulate'));
 
 // validate features
+/*
 deviceSchema.path('features').validate({
     validator: function (value) {
         if(!value) return false;
@@ -40,6 +41,7 @@ deviceSchema.path('features').validate({
     },
     message: 'Please, supply at least one feature'
 });
+*/
 
 deviceSchema.path('features').validate({
     validator: async function (value) {

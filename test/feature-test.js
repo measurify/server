@@ -190,7 +190,7 @@ describe('/POST feature from file', () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const tag1 = await factory.createTag("tag1", user);
         const tag2 = await factory.createTag("tag2", user);
-        const testFile = './test/test/feature_test.csv';        
+        const testFile = './test/dummies/feature_test.csv';        
         
         const res = await chai.request(server).keepOpen().post('/v1/features/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -221,7 +221,7 @@ describe('/POST feature from file', () => {
         const tag1 = await factory.createTag("tag1", user);
         const tag2 = await factory.createTag("tag2", user);
         const tag3 = await factory.createTag("tag3", user);
-        const testFile = './test/test/MultiFeatureTags.csv';
+        const testFile = './test/dummies/MultiFeatureTags.csv';
         
         
         const res = await chai.request(server).keepOpen().post('/v1/features/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
@@ -337,9 +337,9 @@ describe('/PUT feature', () => {
         const tag = await factory.createTag("test-tag-1", user, [], VisibilityTypes.public);
         const request = { tags: { add: ['test-tag-1'], remove: [] } };
         const res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user)).send(request);
-        res.should.have.status(errors.restricted_access_modify.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_modify.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should not PUT a feature of another provider', async () => {
@@ -349,9 +349,9 @@ describe('/PUT feature', () => {
         const tag = await factory.createTag("test-tag-1", user_1, [], VisibilityTypes.public);        
         const request = { tags: { add: ['test-tag-1'], remove: [] } };
         const res = await chai.request(server).keepOpen().put('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user_2)).send(request);
-        res.should.have.status(errors.restricted_access_modify.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_modify.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should not PUT a feature without any field', async () => {
@@ -491,9 +491,9 @@ describe('/DELETE feature', () => {
         const features_before = await before.Feature.find();
         features_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/features/' + feature._id).set("Authorization", await factory.getUserToken(user2));
-        res.should.have.status(errors.not_yours.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.not_yours.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
         const features_after = await before.Feature.find();
         features_after.length.should.be.eql(1);
     });

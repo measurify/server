@@ -17,6 +17,18 @@ exports.isTenantAvailable = async function(req, res) {
     }
 }
 
+exports.isRelated = async function(req, res, id, field, model) {
+    try {
+        const item = await authorizator.isAvailable(id, null, model, req);
+        if(item[field] != req.resource._id) return errors.manage(res, errors.resource_not_found, id);
+        return true;
+    }
+    catch (err) { 
+        if(err.name == 'CastError') return errors.manage(res, errors.resource_not_found);
+        else return errors.manage(res, errors.generic_request_error, err); 
+    }
+}
+
 exports.isAvailable = async function(req, res, model) {
     try {
         const item = await authorizator.isAvailable(req.params.id, null, model,req);
@@ -72,6 +84,27 @@ exports.isOwned = async function(req, res) {
     return true;
 }
 
+exports.canOperate = async function(req, res, entity,method) {
+    const Role = mongoose.dbs[req.tenant.database].model('Role');
+    const role = await Role.findById(req.user.type);
+    if(!method)method=req.method;
+    if(!authorizator.canOperate(req.user,role,req.method,entity,req.resource)) return errors.manage(res, errors.restricted_access_operation, "You cannot do "+req.method.toLowerCase()+" operation on the resource "+entity);
+    return true;
+}
+
+exports.whatCanOperate = async function(req, res, entity) {
+    const Role = mongoose.dbs[req.tenant.database].model('Role');
+    const role = await Role.findById(req.user.type);
+    return authorizator.whatCanOperate(req.user,role,req.method,entity);
+}
+
+exports.canDeleteMeasurementList = async function(req, res, entity) {
+    const Role = mongoose.dbs[req.tenant.database].model('Role');
+    const role = await Role.findById(req.user.type);
+    if(!authorizator.canDeleteMeasurementList(req.user,role,req.method,entity)) return errors.manage(res, errors.restricted_access_delete);
+    return true;
+} 
+/*OLD
 exports.canCreate = async function(req, res) {
     if(!authorizator.canCreate(req.user)) return errors.manage(res, errors.restricted_access_create, "You cannot create new resources");
     return true;
@@ -100,7 +133,7 @@ exports.canDeleteList = async function(req, res) {
 exports.whatCanRead = async function(req, res) {
     return authorizator.whatCanRead(req.user);
 } 
-
+*/
 exports.isValid = async function(req, res, type, field) {
     const value = req.body[field];
     if(!value) return true;
@@ -135,6 +168,11 @@ exports.whichRights = async function(req, res, model) {
     }
 } 
 
+exports.ofResource = async function(req, res, field) {
+  if(!req.query.filter) req.query.filter = '{ "' + field + '" : "' + req.resource._id + '" }';
+  else req.query.filter = '{ "$and": [{ "' + field + '" : "' + req.resource._id + '" },' + req.query.filter + ']}';
+}
+
 exports.hasRights = async function(req, res, model) {
     const Right = mongoose.dbs[req.tenant.database].model('Right');
     const item = await authorizator.isAvailable(req.params.id, null, model);
@@ -165,10 +203,11 @@ exports.hasRightsToCreate = async function(req, res, fields) {
 exports.readJustOwned = async function(req, res) {
     return authorizator.readJustOwned(req.user);
 } 
-
+/*OLD
 exports.whatCanDelete = async function(req, res) {
     return authorizator.whatCanDelete(req.user);
 } 
+*/
 exports.changeUsernameWithId = async function(req,list) {
     const User = mongoose.dbs[req.tenant.database].model('User');
     return await Promise.all(list.map(async function (e) {

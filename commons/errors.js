@@ -49,6 +49,7 @@ exports.device_not_found_description         = { status: 400, value: 46, message
 exports.max_one_file                         = { status: 400, value: 47, message: 'max one file'}; 
 exports.wrong_header                         = { status: 400, value: 48, message: 'wrong header'}; 
 exports.wrong_xlsx                           = { status: 400, value: 48, message: 'wrong xlsx file'}; 
+exports.restricted_access_operation          = { status: 403, value: 49, message: 'You cannot do this operation on the resource' };
 
 
 

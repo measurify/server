@@ -1,6 +1,6 @@
 {
   "name": "measurify-server",
-  "version": "0.4.000",
+  "version": "0.5.0",
   "description": "Measurify Cloud API Server",
   "main": "server.js",
   "host": "localhost",

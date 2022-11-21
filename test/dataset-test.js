@@ -170,8 +170,8 @@ describe('/POST dataset', () => {
         const device1 = await factory.createDevice("test-device-1", user, [feature]);
         const device2 = await factory.createDevice("test-device-2", user, [feature]);
         const thing1 = await factory.createThing("test-thing-1", user);
-        const testFile = './test/test/test-file1.txt';
-        const testDescription = './test/test/test-description.txt';
+        const testFile = './test/dummies/test-file1.txt';
+        const testDescription = './test/dummies/test-description.txt';
         const res = await chai.request(server).keepOpen().post('/v1/datasets').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -189,8 +189,8 @@ describe('/POST dataset', () => {
         const device1 = await factory.createDevice("test-device-1", user, [feature]);
         const device2 = await factory.createDevice("test-device-2", user, [feature]);
         const thing1 = await factory.createThing("test-thing-1", user);
-        const testFile = './test/test/test-file2.txt';
-        const testDescription = './test/test/test-description.txt';
+        const testFile = './test/dummies/test-file2.txt';
+        const testDescription = './test/dummies/test-description.txt';
         const res = await chai.request(server).keepOpen().post('/v1/datasets').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(202);
         res.body.should.be.a('object');
@@ -217,8 +217,8 @@ describe('/POST dataset', () => {
         const device1 = await factory.createDevice("test-device-1", user, [feature]);
         const device2 = await factory.createDevice("test-device-2", user, [feature]);
         const thing1 = await factory.createThing("test-thing-1", user);
-        const testFile = './test/test/test-file2.txt';
-        const testDescription = './test/test/test-description.txt';
+        const testFile = './test/dummies/test-file2.txt';
+        const testDescription = './test/dummies/test-description.txt';
         const res = await chai.request(server).keepOpen().post('/v1/datasets?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(202);
         res.body.should.be.a('object');
@@ -245,8 +245,8 @@ describe('/POST dataset', () => {
         const device1 = await factory.createDevice("test-device-1", user, [feature]);
         const device2 = await factory.createDevice("test-device-2", user, [feature]);
         const thing1 = await factory.createThing("test-thing-1", user);
-        const testFile = './test/test/test-file2.txt';
-        const testDescription = './test/test/test-fake-description.txt';
+        const testFile = './test/dummies/test-file2.txt';
+        const testDescription = './test/dummies/test-fake-description.txt';
         const res = await chai.request(server).keepOpen().post('/v1/datasets?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.description_not_json.status);
         res.body.should.be.a('object');
@@ -263,8 +263,8 @@ describe('/POST dataset', () => {
         const device1 = await factory.createDevice("test-device-1", user, [feature]);
         const device2 = await factory.createDevice("test-device-2", user, [feature]);
         const thing1 = await factory.createThing("test-thing-1", user);
-        const testFile = './test/test/test-file1-multiple-features.txt';
-        const testDescription = './test/test/test-description-multiple-features.txt';
+        const testFile = './test/dummies/test-file1-multiple-features.txt';
+        const testDescription = './test/dummies/test-description-multiple-features.txt';
         const res = await chai.request(server).keepOpen().post('/v1/datasets').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -282,8 +282,8 @@ describe('/POST dataset', () => {
         const device1 = await factory.createDevice("test-device-1", user, [feature]);
         const device2 = await factory.createDevice("test-device-2", user, [feature]);
         const thing1 = await factory.createThing("test-thing-1", user);
-        const testFile = './test/test/test-file2-multiple-features.txt';
-        const testDescription = './test/test/test-description-multiple-features.txt';
+        const testFile = './test/dummies/test-file2-multiple-features.txt';
+        const testDescription = './test/dummies/test-description-multiple-features.txt';
         const res = await chai.request(server).keepOpen().post('/v1/datasets').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(202);
         res.body.should.be.a('object');
@@ -310,8 +310,8 @@ describe('/POST dataset', () => {
         const device1 = await factory.createDevice("test-device-1", user, [feature]);
         const device2 = await factory.createDevice("test-device-2", user, [feature]);
         const thing1 = await factory.createThing("test-thing-1", user);
-        const testFile = './test/test/test-file2-multiple-features.txt';
-        const testDescription = './test/test/test-description-multiple-features.txt';
+        const testFile = './test/dummies/test-file2-multiple-features.txt';
+        const testDescription = './test/dummies/test-description-multiple-features.txt';
         const res = await chai.request(server).keepOpen().post('/v1/datasets?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(202);
         res.body.should.be.a('object');
@@ -338,8 +338,8 @@ describe('/POST dataset', () => {
         const device1 = await factory.createDevice("test-device-1", user, [feature]);
         const device2 = await factory.createDevice("test-device-2", user, [feature]);
         const thing1 = await factory.createThing("test-thing-1", user);
-        const testFile = './test/test/test-file2-multiple-features-no-header.txt';
-        const testDescription = './test/test/test-description-multiple-features.txt';
+        const testFile = './test/dummies/test-file2-multiple-features-no-header.txt';
+        const testDescription = './test/dummies/test-description-multiple-features.txt';
         const res = await chai.request(server).keepOpen().post('/v1/datasets?force=true&header=false').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(202);
         res.body.should.be.a('object');
@@ -366,8 +366,8 @@ describe('/POST dataset', () => {
         const device1 = await factory.createDevice("test-device-1", user, [feature]);
         const device2 = await factory.createDevice("test-device-2", user, [feature]);
         const thing1 = await factory.createThing("test-thing-1", user);
-        const testFile = './test/test/test-file2-multiple-features.txt';
-        const testDescription = './test/test/test-fake-description.txt';
+        const testFile = './test/dummies/test-file2-multiple-features.txt';
+        const testDescription = './test/dummies/test-fake-description.txt';
         const res = await chai.request(server).keepOpen().post('/v1/datasets?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(errors.description_not_json.status);
         res.body.should.be.a('object');

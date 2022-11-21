@@ -103,10 +103,10 @@ describe("Access create measurement", () => {
       .post("/v1/measurements")
       .set("Authorization", await factory.getUserToken(user_analyst))
       .send(measurement);
-    res.should.have.status(errors.restricted_access_create.status);
+    res.should.have.status(errors.restricted_access_operation.status);
     res.body.should.be.a("object");
     res.body.message.should.be.a("string");
-    res.body.message.should.be.eql(errors.restricted_access_create.message);
+    res.body.message.should.be.eql(errors.restricted_access_operation.message);
   });
 });
 
@@ -966,9 +966,9 @@ describe("Access read a measurement", () => {
       .keepOpen()
       .get("/v1/measurements/" + measurement_private._id)
       .set("Authorization", await factory.getUserToken(user_provider));
-    res.should.have.status(errors.restricted_access_read.status);
+    res.should.have.status(errors.restricted_access_operation.status);
     res.body.should.be.a("object");
-    res.body.message.should.contain(errors.restricted_access_read.message);
+    res.body.message.should.contain(errors.restricted_access_operation.message);
   });
 
   it("it should get a public/private measurement as provider and owner", async () => {
@@ -1129,9 +1129,9 @@ describe("Access modify measurement", () => {
       .put("/v1/measurements/" + measurement._id)
       .set("Authorization", await factory.getUserToken(user_analyst))
       .send(modification);
-    res.should.have.status(errors.restricted_access_modify.status);
+    res.should.have.status(errors.restricted_access_operation.status);
     res.body.should.be.a("object");
-    res.body.message.should.contain(errors.restricted_access_modify.message);
+    res.body.message.should.contain(errors.restricted_access_operation.message);
   });
 
   it("it should not modify a measurement as provider not owner", async () => {
@@ -1170,9 +1170,9 @@ describe("Access modify measurement", () => {
       .put("/v1/measurements/" + measurement._id)
       .set("Authorization", await factory.getUserToken(user_provider))
       .send(modification);
-    res.should.have.status(errors.restricted_access_modify.status);
+    res.should.have.status(errors.restricted_access_operation.status);
     res.body.should.be.a("object");
-    res.body.message.should.contain(errors.restricted_access_modify.message);
+    res.body.message.should.contain(errors.restricted_access_operation.message);
   });
 });
 
@@ -1295,9 +1295,9 @@ describe("Access delete measurement", () => {
       .delete("/v1/measurements/" + measurement._id)
       .set("Authorization", await factory.getUserToken(user_analyst))
       .send(modification);
-    res.should.have.status(errors.restricted_access_delete.status);
+    res.should.have.status(errors.restricted_access_operation.status);
     res.body.should.be.a("object");
-    res.body.message.should.contain(errors.restricted_access_delete.message);
+    res.body.message.should.contain(errors.restricted_access_operation.message);
   });
 
   it("it should not delete a measurement as provider not owner", async () => {
@@ -1336,9 +1336,9 @@ describe("Access delete measurement", () => {
       .delete("/v1/measurements/" + measurement._id)
       .set("Authorization", await factory.getUserToken(user_provider))
       .send(modification);
-    res.should.have.status(errors.restricted_access_delete.status);
+    res.should.have.status(errors.restricted_access_operation.status);
     res.body.should.be.a("object");
-    res.body.message.should.contain(errors.restricted_access_delete.message);
+    res.body.message.should.contain(errors.restricted_access_operation.message);
   });
 });
 
@@ -3821,10 +3821,10 @@ describe("Access a single measurements with rights", () => {
       .keepOpen()
       .get("/v1/measurements/" + measurement._id)
       .set("Authorization", await factory.getUserToken(provider));
-    res.should.have.status(errors.restricted_access_read.status);
+    res.should.have.status(errors.restricted_access_operation.status);
     res.body.should.be.a("object");
     res.body.message.should.be.a("string");
-    res.body.message.should.be.eql(errors.restricted_access_read.message);
+    res.body.message.should.be.eql(errors.restricted_access_operation.message);
   });
 
   it("it should access a measurements with rights on device", async () => {
@@ -4939,10 +4939,10 @@ describe("Delete measurement with rights", () => {
       .keepOpen()
       .delete("/v1/measurements/" + measurement._id)
       .set("Authorization", await factory.getUserToken(analyst));
-    res.should.have.status(errors.restricted_access_delete.status);
+    res.should.have.status(errors.restricted_access_operation.status);
     res.body.should.be.a("object");
     res.body.message.should.be.a("string");
-    res.body.message.should.be.eql(errors.restricted_access_delete.message);
+    res.body.message.should.be.eql(errors.restricted_access_operation.message);
   });
 });
 

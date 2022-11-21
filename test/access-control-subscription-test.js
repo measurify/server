@@ -47,10 +47,10 @@ const admin = await factory.createUser("test-username-1", "test-password-1", Use
         const thing = await factory.createThing("test-thing-1", owner);
         const subscription = { token: "subscription-id", thing: thing._id, tags: [] };
         const res = await chai.request(server).keepOpen().post('/v1/subscriptions').set("Authorization", await factory.getUserToken(owner)).send(subscription);
-        res.should.have.status(errors.restricted_access_create.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.be.eql(errors.restricted_access_create.message);
+        res.body.message.should.be.eql(errors.restricted_access_operation.message);
     });
 
     it('it should not create a subscription as provider without rights on thing', async () => {      
@@ -190,9 +190,9 @@ const user_admin = await factory.createUser("test-username-user1", "test-passwor
         const thing = await factory.createThing("test-thing-1", owner);
         const subscription = await factory.createSubscription("test-subscription-1", owner, null, thing, []);
         let res = await chai.request(server).keepOpen().get('/v1/subscriptions/' + subscription._id).set("Authorization", await factory.getUserToken(user_provider));
-        res.should.have.status(errors.restricted_access_read.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_read.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should get a subscription as provider owner', async () => {      
@@ -243,9 +243,9 @@ const user = await factory.createUser("test-username-user", "test-password-user"
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
         let res = await chai.request(server).keepOpen().put('/v1/subscriptions/' + subscription._id).set("Authorization", await factory.getUserToken(user)).send(modification);
-        res.should.have.status(errors.restricted_access_modify.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_modify.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 });
 
@@ -276,9 +276,9 @@ const user = await factory.createUser("test-username-user", "test-password-user"
         const thing = await factory.createThing("test-thing-1", owner);
         const subscription = await factory.createSubscription("test-subscription-1", owner, null, thing, []);
         let res = await chai.request(server).keepOpen().delete('/v1/subscriptions/' + subscription._id).set("Authorization", await factory.getUserToken(user));
-        res.should.have.status(errors.restricted_access_delete.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_delete.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 });
 

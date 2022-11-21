@@ -164,7 +164,7 @@ describe('/POST protocol', () => {
 
     it('it should POST protocol loaded from JSON file', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);                
-        const testFile = './test/test/testProtocol.json';
+        const testFile = './test/dummies/testProtocol.json';
 
         const res = await chai.request(server).keepOpen().post('/v1/protocols/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);        
@@ -180,7 +180,7 @@ describe('/POST protocol', () => {
 
     it('it should POST protocol 1 loaded from CSV file', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);                
-        const testFile = './test/test/testProtocol.csv';
+        const testFile = './test/dummies/testProtocol.csv';
 
         const res = await chai.request(server).keepOpen().post('/v1/protocols/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -195,7 +195,7 @@ describe('/POST protocol', () => {
 
     it('it should POST protocol 2 loaded from CSV file', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);                
-        const testFile = './test/test/testProtocol2.csv';
+        const testFile = './test/dummies/testProtocol2.csv';
 
         const res = await chai.request(server).keepOpen().post('/v1/protocols/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -210,7 +210,7 @@ describe('/POST protocol', () => {
 
     it('it should POST protocol 3 loaded from CSV file', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);                
-        const testFile = './test/test/testProtocol3.csv';
+        const testFile = './test/dummies/testProtocol3.csv';
 
         const res = await chai.request(server).keepOpen().post('/v1/protocols/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -227,7 +227,7 @@ describe('/POST protocol', () => {
 
     it('it should POST protocol 4 loaded from CSV file', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);                
-        const testFile = './test/test/testProtocol4.csv';
+        const testFile = './test/dummies/testProtocol4.csv';
 
         const res = await chai.request(server).keepOpen().post('/v1/protocols/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -366,9 +366,9 @@ describe('/PUT protocol', () => {
         const tag = await factory.createTag("test-tag-1", user, [], VisibilityTypes.public);
         const request = { tags: { add: ['test-tag-1'], remove: [] } };
         const res = await chai.request(server).keepOpen().put('/v1/protocols/' + protocol._id).set("Authorization", await factory.getUserToken(user)).send(request);
-        res.should.have.status(errors.restricted_access_modify.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_modify.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should not PUT a protocol of another provider', async () => {
@@ -378,9 +378,9 @@ describe('/PUT protocol', () => {
         const tag = await factory.createTag("test-tag-1", user_1, [], VisibilityTypes.public);        
         const request = { tags: { add: ['test-tag-1'], remove: [] } };
         const res = await chai.request(server).keepOpen().put('/v1/protocols/' + protocol._id).set("Authorization", await factory.getUserToken(user_2)).send(request);
-        res.should.have.status(errors.restricted_access_modify.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.restricted_access_modify.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
     });
 
     it('it should not PUT a protocol without any field', async () => {
@@ -426,9 +426,9 @@ describe('/DELETE protocol', () => {
         const protocols_before = await before.Protocol.find();
         protocols_before.length.should.be.eql(1);
         const res = await chai.request(server).keepOpen().delete('/v1/protocols/' + protocol._id).set("Authorization", await factory.getUserToken(user2));
-        res.should.have.status(errors.not_yours.status);
+        res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
-        res.body.message.should.contain(errors.not_yours.message);
+        res.body.message.should.contain(errors.restricted_access_operation.message);
         const protocols_after = await before.Protocol.find();
         protocols_after.length.should.be.eql(1);
     });

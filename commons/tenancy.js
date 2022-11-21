@@ -17,10 +17,20 @@ const init = async function(tenant, username, password) {
         const model_schema = require('../models/' + models[i]);
         const model_name = models[i].substring(0, 1).toUpperCase() + models[i].substring(1, models[i].length - 9);
         await mongoose.dbs[tenant.database].model(model_name, model_schema);
-    };  
+    };   
+    //add default role to backward compatibility
+    const Role = mongoose.dbs[tenant.database].model('Role');  
+    let adminRole= await Role.findById("admin");
+    if(!adminRole) await factory.createDefaultRoles(tenant);
+    //check
+    //adminRole= await Role.findById("admin");
+    //let providerRole= await Role.findById("provider");
+    //let analystRole= await Role.findById("analyst");
+    //let supplierRole= await Role.findById("supplier"); 
     const User = mongoose.dbs[tenant.database].model('User'); 
     let user = await User.findOne();
-    if(!user) await factory.createUser(username, password, UserRoles.admin, null, tenant.email, tenant);      
+    if(!user) await factory.createUser(username, password, UserRoles.admin, null, tenant.email, tenant);
+      
 };
 
 const create = async function(id) {
