@@ -20,7 +20,7 @@ exports.csv2json = function (owner, header, data, schema, modelName) {//items ov
                 if (schema.paths[key].instance == 'Array') {
                     if (!result[key]) result[key] = [];//not found, create it   
                     if (!arr[header.indexOf(key)]) continue;//blank element
-                    result[key].push(...cleanFunction(arr[header.indexOf(key)]));
+                    result[key].push(...cleanFunction(arr[header.indexOf(key)],modelName));
                 }
                 else if (header.indexOf("_id") == -1 || arr[header.indexOf("_id")]) result[key] = arr[header.indexOf(key)];//not Array elements can't be splitted in more lines
             }
@@ -95,11 +95,15 @@ exports.csv2json = function (owner, header, data, schema, modelName) {//items ov
     return results;
 };
 
-const cleanFunction = function (arr) {
-    let array = arr.split(/[[\];, ]/);
-    array = array.filter(function (el) {
-        return el != "";
-    });
+const cleanFunction = function (arr,modelName) {
+    let array=null;
+    if (modelName == "Timesample") { array = JSON.parse(arr.replace(/;/g, ',')) }
+    else {
+        array = arr.split(/[[\];, ]/);
+        array = array.filter(function (el) {
+            return el != "";
+        });
+    }
     return array;
 }
 
@@ -124,7 +128,7 @@ exports.jsonToCSVPlus = function (jsonData, columnsname) {
     if (!jsonData.docs.length) throw new Error('Not found any element')
     jsonData = JSON.stringify(jsonData);
     const json = typeof jsonData !== "object" ? JSON.parse(jsonData) : jsonData;
-    
+
     columnsname = columnsname.join(process.env.CSV_DELIMITER);
 
     let str = process.env.CSV_VECTOR_START +
@@ -152,7 +156,7 @@ exports.jsonToCSVPlus = function (jsonData, columnsname) {
                                 delta = 0;//inizialization and default = 0
                                 if (x.delta != null) delta = x.delta;  //add as a column                            
                                 // if it's an object containing values:
-                                return x.values.map(x =>{if(isArray(x)){return "["+x.join(process.env.CSV_VECTOR_DELIMITER)+"]"}else{ return x.toString()}}).join(process.env.CSV_DELIMITER) + process.env.CSV_DELIMITER + delta ;//mappa i valori di values separandoli con una virgola. 
+                                return x.values.map(x => { if (isArray(x)) { return "[" + x.join(process.env.CSV_VECTOR_DELIMITER) + "]" } else { return x.toString() } }).join(process.env.CSV_DELIMITER) + process.env.CSV_DELIMITER + delta;//mappa i valori di values separandoli con una virgola. 
                             }
                             ).join(currentRow);
                         }
@@ -208,7 +212,7 @@ exports.json2CSVHistory = function (jsonHistory, protocol) {
             if (el2 != "step") {
                 let topic = value2.fields.find(element => element.name == el2);
                 if (!topic) { line.push(null); }
-                else { if (topics[topic.name] == "vector") line.push("["+topic.value.toString().replace(/,/g,process.env.CSV_VECTOR_DELIMITER)+"]"); else line.push(topic.value); }
+                else { if (topics[topic.name] == "vector") line.push("[" + topic.value.toString().replace(/,/g, process.env.CSV_VECTOR_DELIMITER) + "]"); else line.push(topic.value); }
             }
         }
         csv += line.join(process.env.CSV_DELIMITER) + "\n";
@@ -218,7 +222,7 @@ exports.json2CSVHistory = function (jsonHistory, protocol) {
     return csv;
 }
 
-exports.getInPdDataframe = async function (filter, sort, select, page, limit, model,restrictions) {
+exports.getInPdDataframe = async function (filter, sort, select, page, limit, model, restrictions) {
     if (!page) page = '1';
     if (!limit) limit = '10';
     if (!filter) filter = '{}';
@@ -247,9 +251,9 @@ exports.getInPdDataframe = async function (filter, sort, select, page, limit, mo
     ).option(options);
     //list.push({"page":page,"limit":limit}); //for the pagination    
     return list;
-}   
+}
 
-const prepareFilter = function (filter, restriction) {    
+const prepareFilter = function (filter, restriction) {
     if (restriction) {
         if (filter.$and) filter.$and.push(restriction);
         else filter = { $and: [filter, restriction] };

@@ -58,10 +58,10 @@ exports.dataExtractor = async function (req, res, next, modelName) {
                 if (req.method === 'PUT' && modelName === "Experiment") { transpose = true; }
                 let fileText = readFile(req, fileData, modelName, transpose);
                 if (req.method === 'PUT' && modelName === "Experiment") { return addHistory(req, res, fileText, modelName) }
-                let result = inspector.checkHeader(fileText.schema, fileText.header);
+                let result = inspector.checkHeader(fileText.schema, fileText.header,modelName);
                 if (result !== true) return errors.manage(res, errors.wrong_header, result);
                 let body = conversion.csv2json(fileText.userId, fileText.header, fileText.data, fileText.schema, modelName);
-
+                if(modelName === "Timesample"){body.forEach(item => item.measurement = req.params.id)}
                 if (modelName === "Group") {
                     body = await Promise.all(body.map(async function (e) {
                         if (e.users) e.users = await checker.changeUsernameWithId(req, e.users);
@@ -70,7 +70,8 @@ exports.dataExtractor = async function (req, res, next, modelName) {
                 }
 
                 req.body = body;
-                let controllerName = modelName.toLowerCase();
+                let controllerName = modelName!="Timesample"? modelName.toLowerCase():"timeserie";
+                
                 const controller = require('../controllers/' + controllerName + 'Controller');
                 return controller.post(req, res);
             }

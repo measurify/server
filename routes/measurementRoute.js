@@ -5,6 +5,7 @@ const timeserieController = require('../controllers/timeserieController.js');
 const { catchErrors } = require('../commons/errorHandlers.js');
 const dataset = require('../commons/dataset.js');
 const busboy = require('connect-busboy');
+const extractData = require('../commons/extractData.js');
 
 router.get('/',  catchErrors(measurementController.get));
 router.get('/count',  catchErrors(measurementController.count));
@@ -21,6 +22,7 @@ router.get('/:id/timeserie/',  catchErrors(timeserieController.get));
 router.get('/:id/timeserie/count',  catchErrors(timeserieController.count));
 router.get('/:id/timeserie/:id_timesample', catchErrors(timeserieController.getone));
 router.post('/:id/timeserie/', catchErrors(timeserieController.post));
+router.post('/:id/timeserie/file', busboy({ immediate: true }), (req, res, next) => { catchErrors(extractData.dataExtractor(req, res, next,"Timesample")) });
 router.delete('/:id/timeserie/:id_timesample',  catchErrors(timeserieController.deleteone));
 router.delete('/:id/timeserie/',  catchErrors(timeserieController.delete));
 

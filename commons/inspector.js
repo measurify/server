@@ -215,24 +215,28 @@ exports.checkHistory = function (history_element, protocol) {
   return true;
 };
 
-exports.checkHeader = function (schema, header) {
+exports.checkHeader = function (schema, header, modelName) {
   let requiredFields = [];
   let optionalFields = [];
   for (let key in schema.paths) {
     //owner taken from request user id
-    if (schema.paths[key].isRequired && key != "owner")
+    if (schema.paths[key].isRequired && key != "owner") {
+      if (modelName == "Timesample" && key == "measurement") continue;
       requiredFields.push(key);
+    }
     else optionalFields.push(key);
   }
   if (schema.subpaths) {
     for (let key in schema.subpaths) {
-      if (
-        schema.subpaths[key].isRequired &&
-        key != "history.step" &&
-        key != "history.fields.name"
-      )
-        requiredFields.push(key);
-      else optionalFields.push(key);
+      if (schema.subpaths[key]) {
+        if (
+          schema.subpaths[key].isRequired &&
+          key != "history.step" &&
+          key != "history.fields.name"
+        )
+          requiredFields.push(key);
+        else optionalFields.push(key);
+      }
     }
   }
   if (!requiredFields.every((ai) => header.includes(ai))) {

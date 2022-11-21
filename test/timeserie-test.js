@@ -1,5 +1,5 @@
 process.env.ENV = 'test';
-process.env.LOG = 'false'; 
+process.env.LOG = 'false';
 
 // Import test tools
 const chai = require('chai');
@@ -13,11 +13,12 @@ const UserRoles = require('../types/userRoles.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
 const before = require('./before-test.js');
-const VisibilityTypes = require('../types/visibilityTypes.js'); 
+const VisibilityTypes = require('../types/visibilityTypes.js');
+const ItemTypes = require("../types/itemTypes.js");
 
 // Test the /GET route
 describe('/GET time samples', () => {
-    it('it should GET the timeserie of a measurement', async () => {      
+    it('it should GET the timeserie of a measurement', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -66,7 +67,7 @@ describe('/GET time samples', () => {
         res.body.message.should.contain(errors.resource_not_found.message);
     });
 
-    it('it should COUNT the timesamples of a timeserie', async () => {      
+    it('it should COUNT the timesamples of a timeserie', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -84,7 +85,7 @@ describe('/GET time samples', () => {
         res.body.size.should.be.eql(2);
     });
 
-    it('it should not GET timesamples of a fake measurement', async () => {      
+    it('it should not GET timesamples of a fake measurement', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -99,7 +100,7 @@ describe('/GET time samples', () => {
         res.body.message.should.contain(errors.resource_not_found.message);
     });
 
-    it('it should GET a subset of timesample froma filtered timeseries', async () => {      
+    it('it should GET a subset of timesample froma filtered timeseries', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -128,7 +129,7 @@ describe('/GET time samples', () => {
 
 // Test the /POST route
 describe('/POST feature', () => {
-    it('it should not POST a timesample without timestamp field', async () => {      
+    it('it should not POST a timesample without timestamp field', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -143,13 +144,13 @@ describe('/POST feature', () => {
         res.body.details.should.contain('ValidationError: timestamp');
     });
 
-    it('it should not POST a timesample without values field', async () => {      
+    it('it should not POST a timesample without values field', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
         const thing = await factory.createThing("test-thing-1", owner);
         const measurement = await factory.createMeasurement(owner, feature, device, thing, [], []);
-        const timesample = { timestamp: Date.now()}
+        const timesample = { timestamp: Date.now() }
         const res = await chai.request(server).keepOpen().post('/v1/measurements/' + measurement._id + '/timeserie').set("Authorization", await factory.getUserToken(owner)).send(timesample)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -158,48 +159,48 @@ describe('/POST feature', () => {
         res.body.details.should.contain('ValidationError: values');
     });
 
-    it('it should POST a timesample', async () => {      
+    it('it should POST a timesample', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
         const thing = await factory.createThing("test-thing-1", owner);
         const measurement = await factory.createMeasurement(owner, feature, device, thing, [], []);
-        const timesample = { values: [1], timestamp: Date.now()}
+        const timesample = { values: [1], timestamp: Date.now() }
         const res = await chai.request(server).keepOpen().post('/v1/measurements/' + measurement._id + '/timeserie').set("Authorization", await factory.getUserToken(owner)).send(timesample)
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('values');
     });
 
-    it('it should POST a list of timesamples', async () => {      
+    it('it should POST a list of timesamples', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
         const thing = await factory.createThing("test-thing-1", owner);
         const measurement = await factory.createMeasurement(owner, feature, device, thing, [], []);
-        const timesample01 = { values: [1], timestamp: Date.now()};
-        const timesample02 = { values: [1], timestamp: Date.now()};
-        const timesample03 = { values: [1], timestamp: Date.now()};
-        const timesample04 = { values: [1], timestamp: Date.now()};
-        const timesamples  = [ timesample01, timesample02, timesample03, timesample04 ];
+        const timesample01 = { values: [1], timestamp: Date.now() };
+        const timesample02 = { values: [1], timestamp: Date.now() };
+        const timesample03 = { values: [1], timestamp: Date.now() };
+        const timesample04 = { values: [1], timestamp: Date.now() };
+        const timesamples = [timesample01, timesample02, timesample03, timesample04];
         const res = await chai.request(server).keepOpen().post('/v1/measurements/' + measurement._id + '/timeserie').set("Authorization", await factory.getUserToken(owner)).send(timesamples)
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.timesamples.length.should.be.eql(4);
     });
 
-    it('it should POST only correct timesamples of a list', async () => {      
+    it('it should POST only correct timesamples of a list', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
         const thing = await factory.createThing("test-thing-1", owner);
         const measurement = await factory.createMeasurement(owner, feature, device, thing, [], []);
-        const timesample01 = { values: [1], timestamp: Date.now()};
-        const timesample02 = { timestamp: Date.now()};
-        const timesample03 = { values: [1], timestamp: Date.now()};
+        const timesample01 = { values: [1], timestamp: Date.now() };
+        const timesample02 = { timestamp: Date.now() };
+        const timesample03 = { values: [1], timestamp: Date.now() };
         const timesample04 = { values: [1], };
         const timesample05 = { values: [1], };
-        const timesamples  = [ timesample01, timesample02, timesample03, timesample04, timesample05 ];
+        const timesamples = [timesample01, timesample02, timesample03, timesample04, timesample05];
         const res = await chai.request(server).keepOpen().post('/v1/measurements/' + measurement._id + '/timeserie').set("Authorization", await factory.getUserToken(owner)).send(timesamples)
         res.should.have.status(202);
         res.body.should.be.a('object');
@@ -207,16 +208,16 @@ describe('/POST feature', () => {
         res.body.errors.length.should.be.eql(3);
     });
 
-    it('it should not POST a timesample non coherent with the measurement feature', async () => {      
+    it('it should not POST a timesample non coherent with the measurement feature', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner,
-            [ { "name": "a", "unit": "u", "type": "number", "dimension": 0 },
-              { "name": "b", "unit": "u", "type": "number", "dimension": 1 } ]
+            [{ "name": "a", "unit": "u", "type": "number", "dimension": 0 },
+            { "name": "b", "unit": "u", "type": "number", "dimension": 1 }]
         );
         const device = await factory.createDevice("test-device-1", owner, [feature]);
         const thing = await factory.createThing("test-thing-1", owner);
         const measurement = await factory.createMeasurement(owner, feature, device, thing, [], []);
-        const timesample = { values: [0], timestamp: Date.now()}
+        const timesample = { values: [0], timestamp: Date.now() }
         const res = await chai.request(server).keepOpen().post('/v1/measurements/' + measurement._id + '/timeserie').set("Authorization", await factory.getUserToken(owner)).send(timesample)
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
@@ -226,9 +227,27 @@ describe('/POST feature', () => {
     });
 });
 
+// Test the /POST file route
+describe('/DELETE feature', () => {
+    it('it should POST a list of timesamples from a csv file', async () => {
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const items =[{ name: "item-name-1", unit: "items-unit-1", type: ItemTypes.number, dimension:0 },{ name: "item-name-2", unit: "items-unit-2", type: ItemTypes.number, dimension:1 }]
+        const feature = await factory.createFeature("test-feature", owner,items);
+        const device = await factory.createDevice("test-device-1", owner, [feature]);
+        const thing = await factory.createThing("test-thing-1", owner);
+        const measurement = await factory.createMeasurement(owner, feature, device, thing, [], []);
+        const testFile = './test/dummies/timeserie_test.csv';        
+        const res = await chai.request(server).keepOpen().post('/v1/measurements/' + measurement._id + '/timeserie/file').attach('file', testFile).set("Authorization", await factory.getUserToken(owner));       
+        
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.timesamples.length.should.be.eql(5);
+    });
+});
+
 // Test the /DELETE route
 describe('/DELETE feature', () => {
-    it('it should DELETE a timeseries', async () => {      
+    it('it should DELETE a timeseries', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -248,7 +267,7 @@ describe('/DELETE feature', () => {
         timesamples_after.length.should.be.eql(0);
     });
 
-    it('it should DELETE timesample of just one timeseries', async () => {      
+    it('it should DELETE timesample of just one timeseries', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -269,7 +288,7 @@ describe('/DELETE feature', () => {
         timesamples_after.length.should.be.eql(2);
     });
 
-    it('it should DELETE a timesample', async () => {      
+    it('it should DELETE a timesample', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
@@ -290,7 +309,7 @@ describe('/DELETE feature', () => {
         timesamples_after.length.should.be.eql(4);
     });
 
-    it('it should not DELETE a timesample of a different timeseries', async () => {      
+    it('it should not DELETE a timesample of a different timeseries', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
         const device = await factory.createDevice("test-device-1", owner, [feature]);
