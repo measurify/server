@@ -227,9 +227,9 @@ describe('/POST feature', () => {
     });
 });
 
-// Test the /POST file route
-describe('/POST file timeserie', () => {
-    it('it should POST a list of timesamples from a .csv file', async () => {
+// Test the /POST and GET file route
+describe('/POST and GET file timeserie', () => {
+    it('it should POST and GET a list of timesamples from a .csv file', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const items =[{ name: "item-name-1", unit: "items-unit-1", type: ItemTypes.number, dimension:0 },{ name: "item-name-2", unit: "items-unit-2", type: ItemTypes.number, dimension:1 }]
         const feature = await factory.createFeature("test-feature", owner,items);
@@ -242,9 +242,16 @@ describe('/POST file timeserie', () => {
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.timesamples.length.should.be.eql(5);
+
+        const res2 = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id + '/timeserie').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv');
+        res2.should.have.status(200);
+        res2.text.should.be.a('string');
+        res2.text.should.contain('values,_id,timestamp,measurement')
+        res2.text.should.contain('[50,[10,5]],')
+        res2.text.should.contain(',"2022-12-25T14:15:29.976Z","'+measurement._id)        
     });
 
-    it('it should POST a list of timesamples from a .csv file containing text values', async () => {
+    it('it should POST and GET a list of timesamples from a .csv file containing text values', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const items =[{ name: "item-name-1", unit: "items-unit-1", type: ItemTypes.text },{ name: "item-name-2", unit: "items-unit-2", type: ItemTypes.number, dimension:1 }]
         const feature = await factory.createFeature("test-feature", owner,items);
@@ -253,10 +260,16 @@ describe('/POST file timeserie', () => {
         const measurement = await factory.createMeasurement(owner, feature, device, thing, [], []);
         const testFile = './test/dummies/timeserie_with_string_test.csv';        
         const res = await chai.request(server).keepOpen().post('/v1/measurements/' + measurement._id + '/timeserie/file').attach('file', testFile).set("Authorization", await factory.getUserToken(owner));       
-        //console.log(res)
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.timesamples.length.should.be.eql(5);
+
+        const res2 = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id + '/timeserie').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv');
+        res2.should.have.status(200);
+        res2.text.should.be.a('string');
+        res2.text.should.contain('values,_id,timestamp,measurement')
+        res2.text.should.contain('"abc",[10,5]],')
+        res2.text.should.contain('"2022-12-25T14:15:29.976Z","'+measurement._id)     
     });
 });
 

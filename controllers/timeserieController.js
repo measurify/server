@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const controller = require("./controller");
 const checker = require("./checker");
+const { query } = require("express");
 
 exports.get = async (req, res) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
@@ -10,6 +11,7 @@ exports.get = async (req, res) => {
   result = await checker.canOperate(req, res,"Measurement"); if (result != true) return result;  
   result = await checker.hasRights(req, res, Measurement); if (result != true) return result;
   await checker.ofResource(req, res, 'measurement');
+  if(req.headers.accept == 'text/csv')req.query.limit=1000000;
   return await controller.getResourceList( req, res, '{ "timestamp": "desc" }', null, Timesample, null);
 };
 

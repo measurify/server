@@ -100,17 +100,17 @@ const cleanFunction = function (arr, modelName) {
     try {
         if (modelName == "Timesample") {
             if (!/[a-zA-Z]/g.test(arr)) { return JSON.parse(arr.replace(/;/g, ',')); }
-            else { 
-                let arrNew=null;
-                arr=arr.replace(/;/g, ',');
-                if (arr.startsWith("[") && arr.endsWith("]")) arrNew=arr.slice(1, -1).split(/[[\];, ]/);
-                arrNew=arrNew.filter(function (el) {return el !== "";});
-                arrNew.forEach(function(el2){ if(/[a-zA-Z]/g.test(el2)) arr=arr.replace(el2,'"' + el2 + '"')});
-                arr=JSON.parse(arr);
+            else {
+                let arrNew = null;
+                arr = arr.replace(/;/g, ',');
+                if (arr.startsWith("[") && arr.endsWith("]")) arrNew = arr.slice(1, -1).split(/[[\];, ]/);
+                arrNew = arrNew.filter(function (el) { return el !== ""; });
+                arrNew.forEach(function (el2) { if (/[a-zA-Z]/g.test(el2)) arr = arr.replace(el2, '"' + el2 + '"') });
+                arr = JSON.parse(arr);
                 //console.log(arr)
                 return arr;
             }
-        } 
+        }
         else {
             if (arr.startsWith("[") && arr.endsWith("]")) arr.slice(1, -1);
             array = arr.split(/[[\];, ]/);
@@ -200,7 +200,15 @@ exports.jsonToCSV = function (jsonData) {
     if (!jsonData.length) throw new Error('Not found any element')
     const keys = Object.keys(jsonData[0]);
     let csv = keys.join(process.env.CSV_DELIMITER) + "\n";//header
-    jsonData.forEach(doc => { let arr = []; keys.forEach(key => arr.push(key == "samples" ? (!doc[key].length ? "[]" : sampleValues(doc[key][0])) : (isArray(doc[key]) && !doc[key].length || key == "location" ? "[]" : doc[key]))); csv += arr.join(process.env.CSV_DELIMITER) + "\n"; })
+    jsonData.forEach(doc => {
+        let arr = [];
+        keys.forEach(key =>
+            arr.push(key == "samples" ?
+                (!doc[key].length ? "[]" : sampleValues(doc[key][0]))
+                : (isArray(doc[key])
+                    && !doc[key].length || key == "location" ? "[]" : JSON.stringify(doc[key]))));
+        csv += arr.join(process.env.CSV_DELIMITER) + "\n";
+    })
     return csv;
 }
 
