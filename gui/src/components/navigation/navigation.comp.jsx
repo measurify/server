@@ -222,18 +222,17 @@ export default function Navigation() {
             )}
           </div>
 
-          <div className="app-nav-text">{locale().tools}</div>
+          <div className="app-nav-text">{locale().resources}</div>
           <hr />
           <NavLink
-                to={`/measurements`}
-                className={(navData) => (navData.isActive ? "active" : "")}
-                //activeClassName="active"
-                key={"measurements"}
-                onClick={() => setIsOpened(false)}
-              >
-                Controlli
-              </NavLink>
-          
+            to={`/measurements`}
+            className={(navData) => (navData.isActive ? "active" : "")}
+            //activeClassName="active"
+            key={"measurements"}
+            onClick={() => setIsOpened(false)}
+          >
+            Controlli
+          </NavLink>
         </div>
       </div>
     </nav>

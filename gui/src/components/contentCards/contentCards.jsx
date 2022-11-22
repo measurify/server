@@ -43,8 +43,6 @@ export default function ContentCards(props) {
                           " (" +
                           person.values[5] +
                           ") : " +
-                          person.values[7] +
-                          " " +
                           person.values[9] +
                           " " +
                           person.values[10]}

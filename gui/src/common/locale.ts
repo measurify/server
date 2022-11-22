@@ -13,7 +13,7 @@ interface ILocalization {
   welcome: string;
   role: string;
   session_expire_in: string;
-  tools: string;
+  resources: string;
   notifications: string;
   file_content: string;
 

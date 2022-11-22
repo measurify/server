@@ -226,7 +226,7 @@ export default function HorizontalNavigationBar() {
                   alignSelf: "flex-start",
                 }}
               >
-                {locale().tools}
+                {locale().resources}
               </div>
             </Row>
             <Row style={{ padding: 0 }}>
