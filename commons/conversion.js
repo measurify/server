@@ -206,7 +206,7 @@ exports.jsonToCSV = function (jsonData) {
             arr.push(key == "samples" ?
                 (!doc[key].length ? "[]" : sampleValues(doc[key][0]))
                 : (isArray(doc[key])
-                    && !doc[key].length || key == "location" ? "[]" : JSON.stringify(doc[key]))));
+                    && !doc[key].length || key == "location" ? "[]" : JSON.stringify(doc[key]).replace(/,/g,process.env.CSV_VECTOR_DELIMITER))));
         csv += arr.join(process.env.CSV_DELIMITER) + "\n";
     })
     return csv;

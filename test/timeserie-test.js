@@ -246,9 +246,9 @@ describe('/POST and GET file timeserie', () => {
         const res2 = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id + '/timeserie').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv');
         res2.should.have.status(200);
         res2.text.should.be.a('string');
-        res2.text.should.contain('values,_id,timestamp,measurement')
-        res2.text.should.contain('[50,[10,5]],')
-        res2.text.should.contain(',"2022-12-25T14:15:29.976Z","'+measurement._id)        
+        res2.text.should.contain('values,_id,timestamp')
+        res2.text.should.contain('[50;[10;5]],')
+        res2.text.should.contain(',"2022-12-25T14:15:29.976Z"')        
     });
 
     it('it should POST and GET a list of timesamples from a .csv file containing text values', async () => {
@@ -267,9 +267,9 @@ describe('/POST and GET file timeserie', () => {
         const res2 = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id + '/timeserie').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv');
         res2.should.have.status(200);
         res2.text.should.be.a('string');
-        res2.text.should.contain('values,_id,timestamp,measurement')
-        res2.text.should.contain('"abc",[10,5]],')
-        res2.text.should.contain('"2022-12-25T14:15:29.976Z","'+measurement._id)     
+        res2.text.should.contain('values,_id,timestamp')
+        res2.text.should.contain('"abc";[10;5]],')
+        res2.text.should.contain('"2022-12-25T14:15:29.976Z"')     
     });
 });
 

@@ -11,8 +11,9 @@ exports.get = async (req, res) => {
   result = await checker.canOperate(req, res,"Measurement"); if (result != true) return result;  
   result = await checker.hasRights(req, res, Measurement); if (result != true) return result;
   await checker.ofResource(req, res, 'measurement');
-  if(req.headers.accept == 'text/csv')req.query.limit=1000000;
-  return await controller.getResourceList( req, res, '{ "timestamp": "desc" }', null, Timesample, null);
+  let select = null;
+  if(req.headers.accept == 'text/csv'){req.query.limit=1000000;select=["values","timestamp"];}
+  return await controller.getResourceList( req, res, '{ "timestamp": "desc" }', select, Timesample, null);
 };
 
 exports.count = async (req, res) => {
