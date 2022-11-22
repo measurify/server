@@ -20,7 +20,7 @@ exports.csv2json = function (owner, header, data, schema, modelName) {//items ov
                 if (schema.paths[key].instance == 'Array') {
                     if (!result[key]) result[key] = [];//not found, create it   
                     if (!arr[header.indexOf(key)]) continue;//blank element
-                    result[key].push(...cleanFunction(arr[header.indexOf(key)],modelName));
+                    result[key].push(...cleanFunction(arr[header.indexOf(key)], modelName));
                 }
                 else if (header.indexOf("_id") == -1 || arr[header.indexOf("_id")]) result[key] = arr[header.indexOf(key)];//not Array elements can't be splitted in more lines
             }
@@ -95,16 +95,32 @@ exports.csv2json = function (owner, header, data, schema, modelName) {//items ov
     return results;
 };
 
-const cleanFunction = function (arr,modelName) {
-    let array=null;
-    if (modelName == "Timesample") { array = JSON.parse(arr.replace(/;/g, ',')) }
-    else {
-        array = arr.split(/[[\];, ]/);
-        array = array.filter(function (el) {
-            return el != "";
-        });
+const cleanFunction = function (arr, modelName) {
+    let array = null;
+    try {
+        if (modelName == "Timesample") {
+            if (!/[a-zA-Z]/g.test(arr)) { return JSON.parse(arr.replace(/;/g, ',')); }
+            else { 
+                let arrNew=null;
+                arr=arr.replace(/;/g, ',');
+                if (arr.startsWith("[") && arr.endsWith("]")) arrNew=arr.slice(1, -1).split(/[[\];, ]/);
+                arrNew=arrNew.filter(function (el) {return el !== "";});
+                arrNew.forEach(function(el2){ if(/[a-zA-Z]/g.test(el2)) arr=arr.replace(el2,'"' + el2 + '"')});
+                arr=JSON.parse(arr);
+                //console.log(arr)
+                return arr;
+            }
+        } 
+        else {
+            if (arr.startsWith("[") && arr.endsWith("]")) arr.slice(1, -1);
+            array = arr.split(/[[\];, ]/);
+            array = array.filter(function (el) {
+                return el != "";
+            });
+        }
+        return array;
     }
-    return array;
+    catch (error) { console.log(error); return null; }
 }
 
 const saveResult = function (modelName, result, owner) {

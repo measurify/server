@@ -228,8 +228,8 @@ describe('/POST feature', () => {
 });
 
 // Test the /POST file route
-describe('/DELETE feature', () => {
-    it('it should POST a list of timesamples from a csv file', async () => {
+describe('/POST file timeserie', () => {
+    it('it should POST a list of timesamples from a .csv file', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const items =[{ name: "item-name-1", unit: "items-unit-1", type: ItemTypes.number, dimension:0 },{ name: "item-name-2", unit: "items-unit-2", type: ItemTypes.number, dimension:1 }]
         const feature = await factory.createFeature("test-feature", owner,items);
@@ -243,10 +243,25 @@ describe('/DELETE feature', () => {
         res.body.should.be.a('object');
         res.body.timesamples.length.should.be.eql(5);
     });
+
+    it('it should POST a list of timesamples from a .csv file containing text values', async () => {
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const items =[{ name: "item-name-1", unit: "items-unit-1", type: ItemTypes.text },{ name: "item-name-2", unit: "items-unit-2", type: ItemTypes.number, dimension:1 }]
+        const feature = await factory.createFeature("test-feature", owner,items);
+        const device = await factory.createDevice("test-device-1", owner, [feature]);
+        const thing = await factory.createThing("test-thing-1", owner);
+        const measurement = await factory.createMeasurement(owner, feature, device, thing, [], []);
+        const testFile = './test/dummies/timeserie_with_string_test.csv';        
+        const res = await chai.request(server).keepOpen().post('/v1/measurements/' + measurement._id + '/timeserie/file').attach('file', testFile).set("Authorization", await factory.getUserToken(owner));       
+        //console.log(res)
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.timesamples.length.should.be.eql(5);
+    });
 });
 
 // Test the /DELETE route
-describe('/DELETE feature', () => {
+describe('/DELETE timeserie', () => {
     it('it should DELETE a timeseries', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
