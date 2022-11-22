@@ -224,19 +224,16 @@ export default function Navigation() {
 
           <div className="app-nav-text">{locale().tools}</div>
           <hr />
-          {Object.keys(pages).map((k) => {
-            return (
-              <NavLink
-                to={`/` + k}
+          <NavLink
+                to={`/measurements`}
                 className={(navData) => (navData.isActive ? "active" : "")}
                 //activeClassName="active"
-                key={k}
+                key={"measurements"}
                 onClick={() => setIsOpened(false)}
               >
-                {k}
+                Controlli
               </NavLink>
-            );
-          })}
+          
         </div>
       </div>
     </nav>

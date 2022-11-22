@@ -9,6 +9,8 @@ export default function ContentCards(props) {
     return <div>Loading</div>;
   if (props.header.includes("actions") && props.actions === undefined)
     return <div>Loading</div>;
+
+  if (props.resources.length === 0) return "Non sono presenti controlli";
   return (
     <CardGroup>
       {React.Children.toArray(
@@ -32,17 +34,20 @@ export default function ContentCards(props) {
               <ListGroup className="list-group-flush">
                 {React.Children.toArray(
                   res.samples.map((person) => {
+                    if (person.values[10] === "nullo") return "";
                     return (
                       <ListGroup.Item>
-                        {person.values[5] +
-                          " " +
+                        {person.values[6] +
+                          "_" +
                           person.values[4] +
-                          " : " +
+                          " (" +
+                          person.values[5] +
+                          ") : " +
                           person.values[7] +
                           " " +
-                          person.values[8] +
+                          person.values[9] +
                           " " +
-                          person.values[9]}
+                          person.values[10]}
                       </ListGroup.Item>
                     );
                   })

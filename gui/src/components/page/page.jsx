@@ -163,8 +163,7 @@ export default function Page(params) {
   return (
     <div className="page">
       <header className="page-header">
-        {page}
-
+        Controlli
         {addFields[page] !== undefined && (
           <NavLink to={`/add/` + page + "/"} key={page + "_add_navlink"}>
             <Button variant="link" size="sm" key={page + "button"}>

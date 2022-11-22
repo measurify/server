@@ -111,6 +111,12 @@ export const ControlloForm = (props) => {
             </Row>
           );
         }
+
+        //index case (number) -- functional purpouse
+        if (entr[0] === "index") {
+          return "";
+        }
+
         //note case (textarea)
         if (entr[0] === "note") {
           return (
