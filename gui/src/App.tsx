@@ -203,7 +203,7 @@ function App() {
               padding: 0,
             }}
           >
-            <Col md="auto" style={{ padding: 0, minWidth: 250 + "px" }}>
+            <Col md="auto" style={{ padding: 0 }}>
               <Navigation />
             </Col>
 

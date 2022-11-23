@@ -2,19 +2,21 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  max-width: 100%;
+  //max-width: 100%;
   overflow: auto;
   height: 100%;
   min-height: 91vh;
+  background: #f1f9fc; // #d5e1e6;
 }
 
 .page-header {
   position: relative;
-  padding: 30px;
+  //padding: 30px;
   //background: rgba(255,255,255,0.4);
-  background-color: #f1f9fc;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  //background-color: #f1f9fc;
+  //box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   display: flex;
+  margin: auto;
   align-items: center;
   color: #123651;
 
@@ -53,9 +55,10 @@
 .page-content {
   position: relative;
   padding: 30px;
-  background: #f1f9fc; // #d5e1e6;
-  width: 100%;
+  //width: 100%;
   height: 100%;
+  justify-content: center;
+  margin: auto;
 
   .pagination-state {
     margin: 20px 0;

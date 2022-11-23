@@ -163,27 +163,25 @@ export default function Page(params) {
   return (
     <div className="page">
       <header className="page-header">
-        Controlli
-        {addFields[page] !== undefined && (
-          <NavLink to={`/add/` + page + "/"} key={page + "_add_navlink"}>
-            <Button variant="link" size="sm" key={page + "button"}>
-              <i
-                key={page + "icon"}
-                className="fa fa-plus-circle"
-                aria-hidden="true"
-                title={"Add"}
-                style={{
-                  width: 30 + "px",
-                  height: 30 + "px",
-                  marginRight: 10 + "px",
-                  opacity: 0.85,
-                }}
-              ></i>
-            </Button>
-          </NavLink>
-        )}
+        <b>Controlli</b>
+        <NavLink to={`/add/` + page + "/"}>
+          <Button variant="link" size="sm">
+            <i
+              className="fa fa-plus-circle"
+              aria-hidden="true"
+              title={"Add"}
+              style={{
+                width: 30 + "px",
+                height: 30 + "px",
+                //marginRight: 10 + "px",
+                opacity: 0.85,
+              }}
+            ></i>
+          </Button>
+        </NavLink>
       </header>
       <main className="page-content">
+        <br />
         <ContentCards
           resType={page}
           header={header}

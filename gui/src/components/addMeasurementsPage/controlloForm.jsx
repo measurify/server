@@ -294,7 +294,13 @@ export const ControlloForm = (props) => {
   };
 
   return (
-    <Container fluid>
+    <Container
+      fluid
+      style={{
+        paddingRight: 20 + "px",
+        paddingLeft: 20 + "px",
+      }}
+    >
       {UnrollObjectControllo(props.values, [])}
       <Row
         style={{

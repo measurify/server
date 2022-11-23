@@ -10,7 +10,8 @@ export default function ContentCards(props) {
   if (props.header.includes("actions") && props.actions === undefined)
     return <div>Loading</div>;
 
-  if (props.resources.length === 0) return "Non sono presenti controlli";
+  if (props.resources.length === 0)
+    return <div>Non sono presenti controlli</div>;
   return (
     <CardGroup>
       {React.Children.toArray(
