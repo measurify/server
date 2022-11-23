@@ -16,6 +16,49 @@ export default function ContentCards(props) {
       {React.Children.toArray(
         props.resources.map((res) => {
           const date = new Date(res.samples[0].values[2]);
+
+          const numPerson = new Set(
+            res.samples.map((person) => person.values[4])
+          ).size;
+          const report = res.samples
+            .filter((person) => person.values[10] !== "nullo")
+            .map((person) => {
+              return (
+                <ListGroup.Item>
+                  {person.values[6] +
+                    "_" +
+                    person.values[4] +
+                    " (" +
+                    person.values[5] +
+                    ") : " +
+                    person.values[9] +
+                    " " +
+                    person.values[10]}
+                </ListGroup.Item>
+              );
+            });
+
+          if (report.length !== numPerson) {
+            const negPerson = res.samples
+              .filter((person) => person.values[8] === "negativo")
+              .map((e) => [
+                e.values[6],
+                e.values[4],
+                e.values[5],
+                e.values[8],
+              ])[0];
+            report.push(
+              <ListGroup.Item>
+                {negPerson[0] +
+                  "_" +
+                  negPerson[1] +
+                  " (" +
+                  negPerson[2] +
+                  ") : " +
+                  negPerson[3]}
+              </ListGroup.Item>
+            );
+          }
           return (
             <Card border="primary" style={{ width: "18rem" }}>
               <Card.Header>
@@ -32,24 +75,7 @@ export default function ContentCards(props) {
                 <Card.Text>{res.samples[0].values[1]}</Card.Text>
               </Card.Body>
               <ListGroup className="list-group-flush">
-                {React.Children.toArray(
-                  res.samples.map((person) => {
-                    if (person.values[10] === "nullo") return "";
-                    return (
-                      <ListGroup.Item>
-                        {person.values[6] +
-                          "_" +
-                          person.values[4] +
-                          " (" +
-                          person.values[5] +
-                          ") : " +
-                          person.values[9] +
-                          " " +
-                          person.values[10]}
-                      </ListGroup.Item>
-                    );
-                  })
-                )}
+                {React.Children.toArray(report)}
               </ListGroup>
             </Card>
           );

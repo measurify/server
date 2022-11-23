@@ -195,7 +195,9 @@ export default function ActionManager(props) {
         variant="link"
         size="sm"
         onClick={async () => {
-          const result = window.confirm("Want to delete: " + props.id + "?");
+          const result = window.confirm(
+            "Sei sicuro di voler eliminare il controllo?"
+          );
           if (result) {
             try {
               const response = await delete_generic(props.resType, props.id);

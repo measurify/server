@@ -157,7 +157,6 @@ export default function AddMeasurementsPage(props) {
       if (typeof path[i] === "number") lastIndexNumber = i;
     }
     if (typeof path[i] === "number") lastIndexNumber = i;
-    console.log({ path, val, valPtr: valuesPtr });
     valuesPtr[path[i]] = val;
     //add sostanze array when result is positive
     if (path[i] === "risultato" && val === "positivo") {
@@ -253,6 +252,7 @@ export default function AddMeasurementsPage(props) {
     //add all the negative controls when required
     tmpValues.persone.forEach((person) => {
       sostanze.forEach((sos) => {
+        if (person.sostanze === undefined) person.sostanze = [];
         if (person.sostanze.map((e) => e.sostanza).includes(sos) === false) {
           person.sostanze.push({ sostanze: sos, livello: "nullo" });
         }
@@ -290,7 +290,7 @@ export default function AddMeasurementsPage(props) {
     }
     if (res.status === 200) {
       loadedBody.current = null;
-      window.alert("Controllo successivamente caricato");
+      window.alert("Controllo caricato con successo");
 
       navigate("/add/measurements");
     }
