@@ -298,7 +298,8 @@ export default function EditContentPage(props) {
     }
 
     //end da fare
-
+    console.log(toSend);
+    return;
     let res;
     try {
       const resp = await put_generic(resource, toSend, id);

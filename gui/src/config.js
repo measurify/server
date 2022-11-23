@@ -41,7 +41,7 @@ export const aliasPages = {};
 //aliasPages["tags"] = { _id: "Tag Name", actions: "Actions" };
 //aliasPages["devices"] = { _id: "Device Name", actions: "Actions" };
 
-//actions dictionary: key is the page, value is an array that contains actions || working actions arae "view" | "edit" | "delete"
+//actions dictionary: key is the page, value is an array that contains actions || working actions arae "view" | "edit" | "delete" | "duplicate"
 export const pageActions = {};
 ///pageActions["features"] = ["view", "edit", "duplicate", "delete"];
 pageActions["users"] = ["view", "delete"];
@@ -49,7 +49,7 @@ pageActions["users"] = ["view", "delete"];
 //pageActions["tags"] = ["view", "edit", "delete"];
 //pageActions["devices"] = ["view", "edit", "delete"];
 pageActions["protocols"] = ["view", "delete"];
-pageActions["experiments"] = ["view", "delete"];
+pageActions["experiments"] = ["view", "edit", "duplicate", "delete"];
 //pageActions["measurements"] = ["view", "edit", "delete"];
 
 //view dictionary: key is the page, value is an array that contains the fields shown to the user with "view" action
@@ -92,6 +92,20 @@ viewFields["experiments"] = [
 // - key:[{subKey1:"",subkey2:""}] for an array of object with 2 keys each whose value is a string
 
 export const editFields = {};
+
+editFields["experiments"] = {
+  _id: "",
+  description: "",
+  state: NaN,
+  startDate: "",
+  endDate: "",
+  manager: "",
+  place: [{ name: "" }],
+  metadata: [{ name: "", value: "" }],
+  tags: [""],
+  visibility: "",
+};
+
 /*editFields["features"] = {
   _id: "",
   items: [{ name: "", type: "", unit: "", dimension: NaN }],
