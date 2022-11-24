@@ -22,31 +22,31 @@ export default function ContentCards(props) {
             res.samples.map((person) => person.values[4])
           ).size;
           const report = res.samples
-            .filter((person) => person.values[10] !== "nullo")
+            .filter((person) => person.values[11] !== "nullo")
             .map((person) => {
               return (
                 <ListGroup.Item>
-                  {person.values[6] +
+                  {person.values[7] +
                     "_" +
-                    person.values[4] +
-                    " (" +
                     person.values[5] +
+                    " (" +
+                    person.values[6] +
                     ") : " +
-                    person.values[9] +
+                    person.values[10] +
                     " " +
-                    person.values[10]}
+                    person.values[11]}
                 </ListGroup.Item>
               );
             });
 
           if (report.length !== numPerson) {
             const negPerson = res.samples
-              .filter((person) => person.values[8] === "negativo")
+              .filter((person) => person.values[9] === "negativo")
               .map((e) => [
-                e.values[6],
-                e.values[4],
+                e.values[7],
                 e.values[5],
-                e.values[8],
+                e.values[6],
+                e.values[9],
               ])[0];
             report.push(
               <ListGroup.Item>
