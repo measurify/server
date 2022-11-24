@@ -34,14 +34,16 @@ exports.csv2json = function (owner, header, data, schema, modelName) {//items ov
                         if (arr[header.indexOf(key)].startsWith("[")) {//Array
                             let stringData = arr[header.indexOf(key)];
                             stringData = stringData.slice(1, -1);//remove []
-                            stringData = stringData.split(";");//doesn't remove "" because the position is important
-
+                            if(!(modelName==="Experiment"&&subKey[0]==="metadata"))stringData = stringData.split(";");//doesn't remove "" because the position is important
+                            else stringData=[stringData.split(";")];
+                            
                             if (!result[subKey[0]]) result[subKey[0]] = [];//not found, create it
                             if (!supportObj[subKey[0]]) supportObj[subKey[0]] = [];//not found, create it                        
                             if (supportObj[subKey[0]].length == 0 && stringData.length > 0) {//first time
                                 for (let i in stringData) { supportObj[subKey[0]].push({}); }
                             }
-                            for (let k in stringData) { if (stringData[k]) supportObj[subKey[0]][k][subKey[1]] = stringData[k]; }
+                            for (let k in stringData) { if (stringData[k]!==undefined&&stringData[k]!=="") {if(!(modelName==="Experiment"&&subKey[0]==="metadata")){supportObj[subKey[0]][k][subKey[1]] = stringData[k]}else{if(k==0){supportObj[subKey[0]][subKey[1]] = stringData[0];}} }}
+                        
                         }
                         else {//the subpath is not an array                        
                             if (!result[subKey[0]]) result[subKey[0]] = [];//not found, create it                      

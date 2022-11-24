@@ -743,7 +743,7 @@ describe('/POST experiment', () => {
     it('it should POST a experiment loaded from CSV file', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const metadata = [{ name: "metadata1", description: "description metadata 1", type: "scalar" },
-        { name: "metadata2", description: "description metadata 1", type: "scalar" }]
+        { name: "metadata2", description: "description metadata 1", type: "vector" }]
         const topics = [{
             name: "topics1", description: "topic description 1",
             fields: [{ name: "field1", description: "field description 1", type: "scalar" }]
@@ -756,6 +756,56 @@ describe('/POST experiment', () => {
         const testFile = './test/dummies/testExperiment.csv';
 
         const res = await chai.request(server).keepOpen().post('/v1/experiments/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.experiments[0].should.have.property('_id');
+        res.body.experiments[0].should.have.property('metadata');
+        res.body.experiments[0].should.have.property('history');
+        res.body.experiments[0].metadata.length.should.be.eql(2);
+        res.body.experiments[0].history.length.should.be.eql(0);
+    });
+
+    it('it should POST a experiment loaded from CSV file with separator control', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const metadata = [{ name: "metadata1", description: "description metadata 1", type: "scalar" },
+        { name: "metadata2", description: "description metadata 2", type: "vector" }]
+        const topics = [{
+            name: "topics1", description: "topic description 1",
+            fields: [{ name: "field1", description: "field description 1", type: "scalar" }]
+        },
+        {
+            name: "topics2", description: "topic description 1",
+            fields: [{ name: "field2", description: "field description 2", type: "scalar" }]
+        }]
+        const protocol = await factory.createProtocol("Test1", "test-protoco-description-1", user, metadata, topics);
+        const testFile = './test/dummies/testExperimentWithInvertedSepAndSepArray.csv';
+
+        const res = await chai.request(server).keepOpen().post('/v1/experiments/file?sep=;&sepArray=,').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.experiments[0].should.have.property('_id');
+        res.body.experiments[0].should.have.property('metadata');
+        res.body.experiments[0].should.have.property('history');
+        res.body.experiments[0].metadata.length.should.be.eql(2);
+        res.body.experiments[0].history.length.should.be.eql(0);
+    });
+
+    it('it should POST a experiment loaded from CSV file with separator control 2', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const metadata = [{ name: "metadata1", description: "description metadata 1", type: "scalar" },
+        { name: "metadata2", description: "description metadata 2", type: "vector" }]
+        const topics = [{
+            name: "topics1", description: "topic description 1",
+            fields: [{ name: "field1", description: "field description 1", type: "scalar" }]
+        },
+        {
+            name: "topics2", description: "topic description 1",
+            fields: [{ name: "field2", description: "field description 2", type: "scalar" }]
+        }]
+        const protocol = await factory.createProtocol("Test1", "test-protoco-description-1", user, metadata, topics);
+        const testFile = './test/dummies/testExperimentWithInvertedSepAndSepArrayAndSepFloat.csv';
+
+        const res = await chai.request(server).keepOpen().post('/v1/experiments/file?sep=;&sepArray=.&sepFloat=,').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.experiments[0].should.have.property('_id');
@@ -1178,7 +1228,7 @@ describe('/PUT CSV file experiment', () => {
     it('it should POST and PUT experiment history from csv file', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const metadata = [{ name: "metadata1", description: "description metadata 1", type: "scalar" },
-        { name: "metadata2", description: "description metadata 1", type: "scalar" }]
+        { name: "metadata2", description: "description metadata 1", type: "vector" }]
         const topics = [{
             name: "topics1", description: "topic description 1",
             fields: [{ name: "field1", description: "field description 1", type: "scalar" }]
