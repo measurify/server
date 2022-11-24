@@ -38,21 +38,6 @@ userSchema.path('type').validate({
     message: 'Role not existent'
 });
 
-/*ALTERNATIVE
-// check type
-userSchema.pre('save', async function() {
-    const Role = this.constructor.model('Role');    
-    let role = await Role.findById(this.type);
-     if(!role) throw new Error('Role not existent (' + this.type + ')');                          
-});
-*/
-/*OLD
-// check type
-userSchema.pre('save', async function() {
-    if(!this.type) throw new Error('User validation failed: please specify the user type');  
-    if(!Object.values(UserRoles).includes(this.type)) throw new Error('User validation failed: unrecognized type');                      
-});
-*/
 // check status
 userSchema.pre('save', async function() {
     if(this.status) if(!Object.values(UserStatusTypes).includes(this.status)) throw new Error('User validation failed: unrecognized status');                      

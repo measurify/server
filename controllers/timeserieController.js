@@ -7,7 +7,6 @@ exports.get = async (req, res) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   const Timesample = mongoose.dbs[req.tenant.database].model("Timesample");
   let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
-  //result = await checker.canRead(req, res); if (result != true) return result;
   result = await checker.canOperate(req, res,"Measurement"); if (result != true) return result;  
   result = await checker.hasRights(req, res, Measurement); if (result != true) return result;
   await checker.ofResource(req, res, 'measurement');
@@ -20,7 +19,6 @@ exports.count = async (req, res) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   const Timesample = mongoose.dbs[req.tenant.database].model("Timesample");
   let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
-  //result = await checker.canRead(req, res); if (result != true) return result;
   result = await checker.canOperate(req, res,"Measurement"); if (result != true) return result;  
   result = await checker.hasRights(req, res, Measurement); if (result != true) return result;
   await checker.ofResource(req, res, 'measurement');
@@ -31,7 +29,6 @@ exports.getone = async (req, res) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   const Timesample = mongoose.dbs[req.tenant.database].model("Timesample");
   let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
-  //result = await checker.canRead(req, res); if (result != true) return result;
   result = await checker.canOperate(req, res,"Measurement"); if (result != true) return result;  
   result = await checker.hasRights(req, res, Measurement);if (result != true) return result;
   result = await checker.isRelated(req, res, req.params.id_timesample, 'measurement', Timesample); if (result != true) return result;
@@ -43,10 +40,8 @@ exports.post = async (req, res) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   const Timesample = mongoose.dbs[req.tenant.database].model("Timesample");
   let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
-  //result = await checker.canRead(req, res); if (result != true) return result;
   result = await checker.canOperate(req, res,"Measurement","GET"); if (result != true) return result;  
   result = await checker.hasRights(req, res, Measurement);if (result != true) return result;
-  //result = await checker.canCreate(req, res); if (result != true) return result;
   result = await checker.canOperate(req, res,"Measurement"); if (result != true) return result;  
   if (req.body.constructor == Array) req.body.forEach(item => item.measurement = req.resource._id)
   else req.body.measurement = req.resource._id;
@@ -57,7 +52,6 @@ exports.delete = async (req, res) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   const Timesample = mongoose.dbs[req.tenant.database].model("Timesample");
   let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
-  //result = await checker.canDelete(req, res); if (result != true) return result;
   result = await checker.canOperate(req, res,"Measurement"); if (result != true) return result;  
   result = await checker.hasRights(req, res, Measurement); if (result != true) return result;
   await checker.ofResource(req, res, 'measurement');
@@ -68,7 +62,6 @@ exports.deleteone = async (req, res) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   const Timesample = mongoose.dbs[req.tenant.database].model("Timesample");
   let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
-  //result = await checker.canDelete(req, res); if (result != true) return result;
   result = await checker.canOperate(req, res,"Measurement"); if (result != true) return result;  
   result = await checker.hasRights(req, res, Measurement);if (result != true) return result;
   result = await checker.isRelated(req, res, req.params.id_timesample, 'measurement', Timesample); if (result != true) return result;
