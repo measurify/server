@@ -102,7 +102,11 @@ export default function AddMeasurementsPage(props) {
 
         const addr = getAddress();
         const items = feature.items;
-
+        const today = new Date();
+        const time =
+          today.getHours().toString().padStart(2, "0") +
+          ":" +
+          today.getMinutes().toString().padStart(2, "0");
         //tmp = updateAddress(tmp);
 
         //values structure
@@ -110,6 +114,7 @@ export default function AddMeasurementsPage(props) {
           indirizzo: addr,
           note: "",
           data: Date.now(),
+          ora: time,
           veicolo: "",
           persone: [
             {
@@ -248,6 +253,17 @@ export default function AddMeasurementsPage(props) {
       tmpValues["note"] === null
     )
       tmpValues["note"] = "--";
+
+    const wrongAges = tmpValues.persone.filter(
+      (pers) => isNaN(pers["età"]) || pers["età"] < 14 || pers["età"] > 150
+    );
+
+    if (wrongAges.length > 0) {
+      window.alert(
+        "Errore, non è stato possibile salvare i dati. Controllare di aver specificato tutte le voci correttamente"
+      );
+      return;
+    }
 
     //add all the negative controls when required
     tmpValues.persone.forEach((person) => {

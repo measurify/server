@@ -95,6 +95,8 @@ export const ControlloForm = (props) => {
                 <Form.Group>
                   <Form.Control
                     type="number"
+                    min={14}
+                    max={150}
                     value={isNaN(entr[1]) ? "" : entr[1]}
                     onChange={(e) => {
                       e.preventDefault();
@@ -102,6 +104,33 @@ export const ControlloForm = (props) => {
                         parseInt(e.target.value, 10),
                         newPath
                       );
+                    }}
+                    aria-label={locale().enter + " " + entr[0]}
+                    placeholder={locale().enter + " " + entr[0]}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+          );
+        }
+        //età case (number)
+        if (entr[0] === "time" || entr[0] === "ora") {
+          console.log(entr[1]);
+          return (
+            <Row
+              style={{
+                paddingBottom: 10 + "px",
+              }}
+            >
+              <Col xs={9}>
+                <Form.Group>
+                  <Form.Control
+                    type="time"
+                    className="modalTextField"
+                    value={entr[1]}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      props.handleChanges(e.target.value, newPath);
                     }}
                     aria-label={locale().enter + " " + entr[0]}
                     placeholder={locale().enter + " " + entr[0]}
