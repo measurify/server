@@ -85,6 +85,43 @@ export default function AddExperimentPage(props) {
     fetchData(qs);
   }, [props, searchParams]);
 
+  //useeffect to get resource if required
+  useEffect(() => {
+    const fetchDataDuplicate = async (qs = {}) => {
+      // get the data from the api
+      const response = await get_generic(resource, qs);
+
+      const data = response.docs[0];
+      let tmpValues = cloneDeep(values);
+
+      //add metadata and protocol fields
+      tmpValues["protocol"] = "";
+      tmpValues["metadata"] = [{ name: "", value: "" }];
+
+      //disable protocol fields
+      const tmpDisabled = cloneDeep(disabledFields);
+      tmpDisabled["protocol"] = true;
+
+      setDisabledFields(tmpDisabled);
+
+      tmpValues = sortObject(data, tmpValues);
+
+      //add "_copy" to id to avoid duplicate key error
+
+      tmpValues["_id"] = tmpValues["_id"] + "_copy";
+
+      console.log(tmpValues);
+      tmpValues = maintainEmptyElements(tmpValues, addFields, resource);
+      setValues(tmpValues);
+    };
+
+    if (searchParams.get("from") === null || searchParams.get("from") === "")
+      return;
+    const fst = { _id: searchParams.get("from") };
+    const qs = { filter: JSON.stringify(fst) };
+    fetchDataDuplicate(qs);
+  }, [searchParams, resource]);
+
   //return if page shouldn't be rendered
   if (addFields[resource] === undefined)
     return <div>This entity cannot be posted</div>;
@@ -372,19 +409,48 @@ export default function AddExperimentPage(props) {
             height: "fit-content",
           }}
         >
+          {postType === "form" && (
+            <Form.Group className="mb-2">
+              <Form.Control
+                className="mb-3"
+                type="file"
+                accept=".json"
+                label="File"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  props.setFile(file);
+                  const fileReader = new FileReader();
+
+                  fileReader.onloadend = () => {
+                    const content = fileReader.result;
+                    console.log(content);
+                  };
+                  fileReader.readAsText(file);
+                }}
+              />
+
+              <Form.Text className="text-muted">
+                Import values from JSON file
+              </Form.Text>
+            </Form.Group>
+          )}
+          {postType === "form" && "Export values on a json file"}
           {postType === "form" && protocols !== undefined && (
             <div style={{ margin: 5 + "px" }}>
-              <Form.Select
-                aria-label={locale().select + " protocol"}
-                onChange={handleProtocolChange}
-              >
-                <option>{locale().select} protocol</option>
-                {React.Children.toArray(
-                  protocols.map((e) => {
-                    return <option value={e}>{e}</option>;
-                  })
-                )}
-              </Form.Select>
+              {(searchParams.get("from") === null ||
+                searchParams.get("from") === "") && (
+                <Form.Select
+                  aria-label={locale().select + " protocol"}
+                  onChange={handleProtocolChange}
+                >
+                  <option>{locale().select} protocol</option>
+                  {React.Children.toArray(
+                    protocols.map((e) => {
+                      return <option value={e}>{e}</option>;
+                    })
+                  )}
+                </Form.Select>
+              )}
               <br />
               <FormManager
                 values={values}

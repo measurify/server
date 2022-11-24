@@ -299,7 +299,10 @@ export default function EditContentPage(props) {
 
     //end da fare
     console.log(toSend);
-    return;
+    if (Object.keys(toSend).length === 0) {
+      setMsg("No changes found");
+      return;
+    }
     let res;
     try {
       const resp = await put_generic(resource, toSend, id);
