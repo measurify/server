@@ -130,6 +130,7 @@ const addHistory = function (req, res, fileText, modelName) {
             body.history.add.push(obj);
         }
     }
+    if(body.history.add.length==0)return errors.manage(res, errors.file_history_empty); 
     req.body = body;
     let controllerName = modelName.toLowerCase();
     const controller = require('../controllers/' + controllerName + 'Controller');

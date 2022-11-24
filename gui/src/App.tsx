@@ -26,8 +26,9 @@ import MobilePlaceholderPage from "./components/mobilePlaceholderPage/mobilePlac
 import EditContentPage from "./components/editContentPage/editContentPage";
 import AddPage from "./components/addPage/addPage";
 import AddExperimentPage from "./components/addExperimentPage/addExperimentPage";
-import { SetFetchedData, fetchedData } from "./fetchedData";
 import { layout } from "./config";
+import AddMeasurementsPage from "./components/addMeasurementsPage/addMeasurementsPage";
+import cloneDeep from "clone-deep";
 /*
     notifications follow this schema
 
@@ -48,34 +49,13 @@ interface INotification {
 
 function App() {
   const [notifications, setNotifications] = useState<INotification[]>([]);
+  const [types, setTypes] = useState<Object | undefined>();
+  const [data, setData] = useState<Object>({});
 
   let layoutRef = React.useRef<string | null>();
-  const tkn = localStorage.getItem("diten-token");
+  const tkn = localStorage.getItem("token");
 
-  //use effect to fetch static data from the server (like types)
-  useEffect(() => {
-    // declare the async data fetching function
-    const fetchTypes = async () => {
-      // get the data from the api
-      try {
-        const response = await get_generic("types", {}, "");
-
-        SetFetchedData(response.response.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    if (fetchedData !== undefined) return;
-    // call the function
-    try {
-      fetchTypes();
-    } catch (error) {
-      console.log(error);
-    }
-    // make sure to catch any error
-  }, []);
-
+  ////////////////NOTIFICATION MANAGEMENT FRAGMENT
   //function to push a new notification at the beginning of the list
   function PushNotification(obj: INotification) {
     setNotifications((prev) => [obj].concat(prev));
@@ -94,7 +74,7 @@ function App() {
     setNotifications([]);
   }
 
-  const notificationsSettings = {
+  const notificationManagement = {
     notifications: notifications,
     PushNotification,
     RemoveNotification,
@@ -105,13 +85,54 @@ function App() {
   notificationManager.PushNotification = PushNotification;
   notificationManager.RemoveNotification = RemoveNotification;
 
+  ///////////////END NOTIFICATION MANAGEMENT FRAGMENT
+
+  ///////////////FETCHED TYPES AND DATA MANAGEMENT FRAGMENT
+  //function to push a new notification at the beginning of the list
+  function UpdateData(fetched: string[], key: string) {
+    setData((prev) => {
+      return { ...prev, [key]: [...fetched] };
+    });
+  }
+
+  //use effect to fetch static data from the server /types
+  useEffect(() => {
+    // declare the async data fetching function
+    const fetchTypes = async () => {
+      // get the data from the api
+      try {
+        const response = await get_generic("types", {}, "");
+
+        setTypes(response.response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    //if types has been already set, ignore it
+    if (types !== undefined) return;
+    // call the function
+    try {
+      fetchTypes();
+    } catch (error) {
+      console.log(error);
+    }
+    // make sure to catch any error
+  }, []);
+
+  const fetchedManagement = {
+    types: types,
+    data: data,
+    UpdateData: UpdateData,
+  };
+  ///////////////END FETCHED TYPES MANAGEMENT FRAGMENT
+
   //mobile view only allowed to be vertical
   if (/Mobi/i.test(window.navigator.userAgent) == true) {
     layoutRef.current = "vertical";
   } else {
     layoutRef.current = layout;
   }
-  console.log(window);
 
   //not logged => show auth page
   if (tkn === null)
@@ -129,16 +150,21 @@ function App() {
       </div>
     );
 
-  console.log(layoutRef.current);
   return (
-    <AppContext.Provider value={notificationsSettings}>
+    <AppContext.Provider
+      value={{
+        notifications: notificationManagement,
+        fetched: fetchedManagement,
+      }}
+    >
       <Router>
         <Container
           fluid
           style={{
             paddingLeft: 0,
             paddingRight: 0,
-            height: 100 + "%",
+            height: 100 + "vh",
+            width: 99 + "vw",
           }}
         >
           {layoutRef.current === "horizontal" ? (
@@ -173,6 +199,10 @@ function App() {
                 <Route
                   path="/add/experiments/"
                   element={<AddExperimentPage />}
+                />
+                <Route
+                  path="/add/measurements/"
+                  element={<AddMeasurementsPage />}
                 />
 
                 <Route

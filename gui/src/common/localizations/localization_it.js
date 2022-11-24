@@ -8,7 +8,7 @@ const localization_it = {
   welcome: "Bentornato",
   role: "Ruolo",
   session_expire_in: "La sessione scadrà in ",
-  tools: "Strumenti",
+  resources: "Risorse",
   notifications: "Notifiche",
   file_content: "Contenuto del file",
 
@@ -37,6 +37,8 @@ const localization_it = {
   pass_change_confirm: "La password verrà modificata, procedere?",
   pass_not_match:
     "La password inserita e la conferma non combaciano, si prega di reinserirle",
+  old_pass_empty: "Per favore, inserire la vecchia password",
+  old_pass_wrong: "La vecchia password è sbagliata",
   pass_not_null: "La password non può essere vuota",
   password_changed: "Password cambiata",
 
@@ -57,6 +59,8 @@ const localization_it = {
   login_error: "Login errata!",
   unauthorised_user: "Non sei abilitato a utilizzare questa pagina",
   session_expired: "Sessione scaduta",
+  no_file: "Si prega di selezionare un file",
+  duplicate_error: "Nel database è già presente una risorsa con",
 };
 
 export default localization_it;

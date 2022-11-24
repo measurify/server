@@ -70,7 +70,7 @@ It is possible to get information about routes and data model from the following
 To run Measurify on NodeJS (e.g., on a local machine), [Node JS](https://nodejs.org/en/) (version >= 14.x) and [MongoDB](https://www.mongodb.com/) are required.
 Clone this repository, then install the dependencies:
 
-    git clone https://github.com/measurify/server.git
+    git clone https://github.com/measurify/server.git measurify
     npm install
 
 To test the source code, run:

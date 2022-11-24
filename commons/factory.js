@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 const ItemTypes = require("../types/itemTypes.js");
 const ComputationStatusTypes = require("../types/computationStatusTypes.js");
 const PasswordResetStatusTypes = require("../types/passwordResetStatusTypes.js");
-const ExperimentStateTypes = require("../types/experimentStateTypes.js");
+//const ExperimentStateTypes = require("../types/experimentStateTypes.js");
 const TopicFieldTypes = require('../types/topicFieldTypes.js');
 const IssueTypes = require("../types/issueTypes.js");
 const VisibilityTypes = require("../types/visibilityTypes.js");
@@ -336,8 +336,9 @@ exports.createExperiment = async function (name, description, owner, state, star
   const Experiment = mongoose.dbs[tenant.database].model("Experiment");
   const req = {
     _id: name,
-    description: description,
-    state: state || ExperimentStateTypes.ongoing,
+    description: description,    
+    //state: state || ExperimentStateTypes.ongoing,
+    state: state || 0,
     startDate: startDate || Date.now(),
     endDate: endDate || Date.now(),
     owner: owner,

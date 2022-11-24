@@ -18,7 +18,7 @@ export let notificationManager = {
 };
 
 //login
-export function login(username, password, tenant) {
+export function login(username, password, tenant, saveToken = true) {
   const body = {
     username: `${username}`,
     password: `${password}`,
@@ -38,19 +38,17 @@ export function login(username, password, tenant) {
     instance
       .post(url_string, body, options)
       .then((response) => {
-        localStorage.setItem("diten-token", response.data.token);
-        localStorage.setItem(
-          "diten-token-expiration-time",
-          response.data.token_expiration_time
-        );
-        localStorage.setItem("diten-username", response.data.user.username);
-        localStorage.setItem("diten-user-role", response.data.user.type);
-        localStorage.setItem("diten-user-tenant", tenant);
-        localStorage.setItem(
-          "diten-login-time",
-          new Date().getTime().toString()
-        );
-
+        if (saveToken === true) {
+          localStorage.setItem("token", response.data.token);
+          localStorage.setItem(
+            "token-expiration-time",
+            response.data.token_expiration_time
+          );
+          localStorage.setItem("username", response.data.user.username);
+          localStorage.setItem("user-role", response.data.user.type);
+          localStorage.setItem("user-tenant", tenant);
+          localStorage.setItem("login-time", new Date().getTime().toString());
+        }
         resolve(response);
       })
       .catch((error) => {
@@ -75,13 +73,10 @@ export function refreshToken() {
     instance
       .put(url_string, {}, options)
       .then((response) => {
-        localStorage.setItem("diten-token", response.data.token);
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("login-time", new Date().getTime().toString());
         localStorage.setItem(
-          "diten-login-time",
-          new Date().getTime().toString()
-        );
-        localStorage.setItem(
-          "diten-token-expiration-time",
+          "token-expiration-time",
           response.data.token_expiration_time
         );
         resolve(response);
@@ -197,7 +192,6 @@ export async function post_generic(resource_type, body, token = undefined) {
       Authorization: token,
     },
   };
-  console.log({ header: options, body: body, token: token });
   return new Promise((resolve, reject) => {
     instance
       .post(url_string, body, options)
@@ -407,5 +401,5 @@ export async function get_generic(resource_type, qs = {}, token) {
 
 //return the login token from the localstorage
 function GetToken() {
-  return localStorage.getItem("diten-token");
+  return localStorage.getItem("token");
 }

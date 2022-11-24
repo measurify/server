@@ -13,7 +13,7 @@ interface ILocalization {
   welcome: string;
   role: string;
   session_expire_in: string;
-  tools: string;
+  resources: string;
   notifications: string;
   file_content: string;
 
@@ -38,6 +38,8 @@ interface ILocalization {
   profile_page_desc: string;
   pass_change_confirm: string;
   pass_not_match: string;
+  old_pass_empty: string;
+  old_pass_wrong: string;
   pass_not_null: string;
   password_changed: string;
 
@@ -57,10 +59,12 @@ interface ILocalization {
   login_error: string;
   unauthorised_user: string;
   session_expired: string;
+  no_file: string;
+  duplicate_error: string;
 }
 
 export default function locale() {
-  let tkn = localStorage.getItem("diten-language");
+  let tkn = localStorage.getItem("language");
   if (languages.length === 0) {
     return localization_en as ILocalization;
   }

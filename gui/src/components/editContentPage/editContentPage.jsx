@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { get_generic, put_generic } from "../../services/http_operations";
 import { useParams } from "react-router-dom";
 import {
@@ -7,12 +7,13 @@ import {
   removeDefaultElements,
 } from "../../services/misc_functions";
 
-import { editFields, editFieldsSpecifier } from "../../config";
+import { editFields, editFieldsSpecifier, fetchedPageData } from "../../config";
 
 import { useNavigate } from "react-router-dom";
 
 import { FormManager } from "../formManager/formManager";
 
+import AppContext from "../../context";
 import {
   sortObject,
   maintainEmptyElement,
@@ -39,6 +40,28 @@ export default function EditContentPage(props) {
 
   const [disabledFields, setDisabledFields] = useState(undefined);
   //const [mounted, setMounted] = useState(false);
+
+  const context = useContext(AppContext);
+  const myFetched = context.fetched;
+  /////////////FETCH REQUIRED RESOURCES
+  const fetchData = async (res) => {
+    if (myFetched.data[res] !== undefined) return;
+    // get the data from the api
+    try {
+      const response = await get_generic(res, { limit: 100 });
+      myFetched.UpdateData(
+        response.docs.map((e) => e._id),
+        res
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    if (fetchedPageData[resource] !== undefined) {
+      Object.values(fetchedPageData[resource]).forEach((e) => fetchData(e));
+    }
+  }, []);
 
   //useeffect to get resource if required
   useEffect(() => {
@@ -275,7 +298,11 @@ export default function EditContentPage(props) {
     }
 
     //end da fare
-
+    console.log(toSend);
+    if (Object.keys(toSend).length === 0) {
+      setMsg("No changes found");
+      return;
+    }
     let res;
     try {
       const resp = await put_generic(resource, toSend, id);
@@ -295,7 +322,7 @@ export default function EditContentPage(props) {
   return (
     <div className="page">
       <header className="page-header">
-        Edit &nbsp;<b>{resource}</b>&nbsp;of id:&nbsp;<b>{id}</b>&nbsp;from:
+        Edit &nbsp;<b>{resource}</b>&nbsp;of id:&nbsp;<b>{id}</b>&nbsp;
       </header>
       <main className="page-content">
         <FormManager
