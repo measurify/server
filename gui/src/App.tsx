@@ -195,7 +195,8 @@ function App() {
           style={{
             paddingLeft: 0,
             paddingRight: 0,
-            height: 100 + "vh",
+            minHeight: 100 + "vh",
+            //height: 100 + "vh",
           }}
         >
           <Row
