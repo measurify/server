@@ -26,3 +26,10 @@
 2022.11.22
 
 + added csv upload and download for timeseries 
+
+## Version 0.6.3
+
+2022.11.25
+
++ Now separators of CSV file can be defined in the url of the request for POST and GET
++ Updated PostMan Collection

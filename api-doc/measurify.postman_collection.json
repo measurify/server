@@ -2813,6 +2813,31 @@
 						}
 					},
 					"response": []
+				},				
+				{
+					"name": "GET one experiment",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/experiments/{{experiment}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"experiments",
+								"{{experiment}}"
+							]
+						}
+					},
+					"response": []
 				},
 				{
 					"name": "ADD an history element",
@@ -2904,7 +2929,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"state\": 0,\n    \"metadata\": {\n\t    \"update\": [ { \"name\": \"metadata-name-1\", \"new\": { \"name\": \"metadata-name-1\", \"value\": 12 } } ]\n    },\n    \"history\": {\n\t    \"update\": [ { \"step\": 2, \"new\": { \"step\": 2, \"timestamp\": \"2022-12-15T18:15:17.396Z\", \"fields\": [ { \"name\": \"field-1\", \"value\": 128 },\n                                                                                                          { \"name\": \"field-2\", \"value\": \"new 1\" },\n                                                                                                          { \"name\": \"field-3\", \"value\": [3, 56] },\n                                                                                                          { \"name\": \"field-4\", \"value\": 33 },\n                                                                                                          { \"name\": \"field-5\", \"value\": \"new 2\" },\n                                                                                                          { \"name\": \"field-6\", \"value\": [5, 2, 1]}]\n                                        } \n                    } ]\n    }\n}\n"
+							"raw": "{\n    \"state\": 0,\n    \"metadata\": {\n        \"update\": [\n            {\n                \"name\": \"metadata-name-1\",\n                \"new\": {\n                    \"name\": \"metadata-name-1\",\n                    \"value\": 12\n                }\n            }\n        ]\n    },\n    \"history\": {\n        \"update\": [\n            {\n                \"step\": 2,\n                \"new\": {\n                    \"step\": 2,\n                    \"timestamp\": \"2022-12-15T18:15:17.396Z\",\n                    \"fields\": [\n                        {\n                            \"name\": \"field-1\",\n                            \"value\": 128\n                        },\n                        {\n                            \"name\": \"field-2\",\n                            \"value\": \"new 1\"\n                        },\n                        {\n                            \"name\": \"field-3\",\n                            \"value\": [\n                                3,\n                                56\n                            ]\n                        },\n                        {\n                            \"name\": \"field-4\",\n                            \"value\": 33\n                        },\n                        {\n                            \"name\": \"field-5\",\n                            \"value\": \"new 2\"\n                        },\n                        {\n                            \"name\": \"field-6\",\n                            \"value\": [\n                                5,\n                                2,\n                                1\n                            ]\n                        }\n                    ]\n                }\n            }\n        ]\n    }\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/experiments/{{experiment}}",
@@ -2921,25 +2946,60 @@
 					"response": []
 				},
 				{
-					"name": "GET one experiment",
+					"name": "ADD history steps from csv file",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
-						"method": "GET",
+						"method": "PUT",
 						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
 							{
 								"key": "Authorization",
 								"value": "{{token}}",
 								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
 						"url": {
-							"raw": "{{url}}/v1/experiments/{{experiment}}",
+							"raw": "{{url}}/v1/experiments/{{experiment}}/file",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"v1",
 								"experiments",
-								"{{experiment}}"
+								"{{experiment}}",
+								"file"
 							]
 						}
 					},
