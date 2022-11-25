@@ -778,7 +778,7 @@ describe('/POST experiment', () => {
             fields: [{ name: "field2", description: "field description 2", type: "scalar" }]
         }]
         const protocol = await factory.createProtocol("Test1", "test-protoco-description-1", user, metadata, topics);
-        const testFile = './test/dummies/testExperimentWithInvertedSepAndSepArray.csv';
+        const testFile = './test/dummies/testExperimentInvertedSepSepArray.csv';
 
         const res = await chai.request(server).keepOpen().post('/v1/experiments/file?sep=;&sepArray=,').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -803,7 +803,7 @@ describe('/POST experiment', () => {
             fields: [{ name: "field2", description: "field description 2", type: "scalar" }]
         }]
         const protocol = await factory.createProtocol("Test1", "test-protoco-description-1", user, metadata, topics);
-        const testFile = './test/dummies/testExperimentWithInvertedSepAndSepArrayAndSepFloat.csv';
+        const testFile = './test/dummies/testExperimentInvertedSepSepArraySepFloat.csv';
 
         const res = await chai.request(server).keepOpen().post('/v1/experiments/file?sep=;&sepArray=.&sepFloat=,').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
@@ -1186,7 +1186,7 @@ describe('/PUT CSV file experiment', () => {
         },
         {
             name: "topics2", description: "topic description 1",
-            fields: [{ name: "field2", description: "field description 2", type: "scalar" }]
+            fields: [{ name: "field2", description: "field description 2", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("Test1", "test-protocol-description-1", user, metadata, topics);
         const metadatavalue = [{ name: "metadata1", value: 43 },
@@ -1194,6 +1194,58 @@ describe('/PUT CSV file experiment', () => {
         const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description-1", user, 0, null, null, null, protocol, metadatavalue,[]);
         const testFile = './test/dummies/testExp1_step1_2.csv';
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id + '/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('history');
+        res.body.history.length.should.be.eql(2);
+        const expectedReport={ success: [ '1', '2' ], ignored: [], overridden: [] }
+        res.body.report.should.be.eql(expectedReport);
+    });
+
+    it('it should PUT experiment history from csv file to add an item with Sep and SepArray inverted', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const metadata = [{ name: "metadata1", description: "description metadata 1", type: "scalar" },
+        { name: "metadata2", description: "description metadata 1", type: "scalar" }]
+        const topics = [{
+            name: "topics1", description: "topic description 1",
+            fields: [{ name: "field1", description: "field description 1", type: "scalar" }]
+        },
+        {
+            name: "topics2", description: "topic description 1",
+            fields: [{ name: "field2", description: "field description 2", type: "vector" }]
+        }]
+        const protocol = await factory.createProtocol("Test1", "test-protocol-description-1", user, metadata, topics);
+        const metadatavalue = [{ name: "metadata1", value: 43 },
+        { name: "metadata2", value: 5 }];
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description-1", user, 0, null, null, null, protocol, metadatavalue,[]);
+        const testFile = './test/dummies/testExp1_step1_2InvertedSepSepArray.csv';
+        const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id + '/file?sep=;&sepArray=,').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('history');
+        res.body.history.length.should.be.eql(2);
+        const expectedReport={ success: [ '1', '2' ], ignored: [], overridden: [] }
+        res.body.report.should.be.eql(expectedReport);
+    });
+
+    it('it should PUT experiment history from csv file to add an item with Sep, SepArray, SepFloat inverted', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const metadata = [{ name: "metadata1", description: "description metadata 1", type: "scalar" },
+        { name: "metadata2", description: "description metadata 1", type: "scalar" }]
+        const topics = [{
+            name: "topics1", description: "topic description 1",
+            fields: [{ name: "field1", description: "field description 1", type: "scalar" }]
+        },
+        {
+            name: "topics2", description: "topic description 1",
+            fields: [{ name: "field2", description: "field description 2", type: "vector" }]
+        }]
+        const protocol = await factory.createProtocol("Test1", "test-protocol-description-1", user, metadata, topics);
+        const metadatavalue = [{ name: "metadata1", value: 43 },
+        { name: "metadata2", value: 5 }];
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description-1", user, 0, null, null, null, protocol, metadatavalue,[]);
+        const testFile = './test/dummies/testExp1_step1_2InvertedSepSepArraySepFloat.csv';
+        const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id + '/file?sep=;&sepArray=.&sepFloat=,').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('history');
@@ -1235,7 +1287,7 @@ describe('/PUT CSV file experiment', () => {
         },
         {
             name: "topics2", description: "topic description 1",
-            fields: [{ name: "field2", description: "field description 2", type: "scalar" }]
+            fields: [{ name: "field2", description: "field description 2", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("Test1", "test-protoco-description-1", user, metadata, topics);
         const testFile = './test/dummies/testExperiment.csv';
