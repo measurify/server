@@ -62,6 +62,167 @@ describe('/GET experiment', () => {
         res.body.should.contain(experiment.history[0].fields[1].name+',');
         res.body.should.contain(experiment.history[0].fields[2].name+',');
     });
+
+    it('it should GET a history of an experiment in csv with inverted sep and sepArray', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const metadata = [
+            { "name": "metadata-name-1", "description": "description metadata 1", "type": "scalar"},
+            { "name": "metadata-name-2", "description": "description metadata 2", "type": "text"},
+            { "name": "metadata-name-3", "description": "description metadata 3", "type": "scalar"},
+            { "name": "metadata-name-4", "description": "description metadata 4", "type": "vector"}
+        ]
+        const topics = [
+            {
+                "name": "topic name 1",
+                "description": "topic description 1",
+                "fields": [
+                    { "name": "field-1", "description": "field description 1", "type": "scalar"},
+                    { "name": "field-2", "description": "field description 2", "type": "text"},
+                    { "name": "field-3", "description": "field description 3", "type": "vector"}
+                ]
+            },
+            {
+                "name": "topic name 2",
+                "description": "topic description 2",
+                "fields": [
+                    { "name": "field-4", "description": "field description 4", "type": "scalar"},
+                    { "name": "field-5", "description": "field description 5", "type": "text"},
+                    { "name": "field-6", "description": "field description 6", "type": "vector"}
+                ]
+            }
+        ] 
+        const protocol = await factory.createProtocol("test-protocol-1", "test-protocol-description-1", user, metadata, topics);
+        const experiment = {
+            "_id": "experiment id",
+            "description": "experiment description",
+            "anonymization": true,
+            "state": 1,
+            "startDate": "2022-05-30T07:15:17.396Z",
+            "endDate": "2022-09-15T18:15:17.396Z",
+            "protocol": "test-protocol-1",
+            "metadata": [
+                { "name": "metadata-name-1", "value": 10 },
+                { "name": "metadata-name-2", "value": "value 2" },
+                { "name": "metadata-name-3", "value": 55 },
+                { "name": "metadata-name-4", "value": [34, 25, 45] }
+            ],
+            "history": [
+                {
+                    "step": 1,
+                    "timestamp": "2022-09-15T18:15:17.396Z",
+                    "fields": [
+                        { "name": "field-1", "value": 55 },
+                        { "name": "field-2", "value": "text value" },
+                        { "name": "field-3", "value": [21, 32, 432] },
+                        { "name": "field-4", "value": 13 },
+                        { "name": "field-5", "value": "another text value" },
+                        { "name": "field-6", "value": [324, 432, 432]  }
+                    ]
+                },
+                {
+                    "step": 2,
+                    "timestamp": "2022-12-15T18:15:17.396Z",
+                    "fields": [
+                        { "name": "field-1", "value": 65 },
+                        { "name": "field-2", "value": "text value 2" },
+                        { "name": "field-3", "value": [3.5, 56] },
+                        { "name": "field-4", "value": 33.5 },
+                        { "name": "field-5", "value": "another text value 2" },
+                        { "name": "field-6", "value": [543.5, 534, 5656]  }
+                    ]
+                }
+            ]
+        }
+        const res0 = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user)).send(experiment)
+        res0.should.have.status(200);
+
+
+        const res = await chai.request(server).keepOpen().get('/v1/experiments/' + experiment._id+'/history?sep=;&sepArray=,').set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        
+        res.body.should.be.a('string');
+        res.body.should.contain("step;1;2\nfield-1;55;65\nfield-2;text value;text value 2\nfield-3;[21,32,432];[3.5,56]\nfield-4;13;33.5\nfield-5;another text value;another text value 2\nfield-6;[324,432,432];[543.5,534,5656]\n");
+    });
+
+    it('it should GET a history of an experiment in csv with inverted sep and sepArray and sepFloat', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const metadata = [
+            { "name": "metadata-name-1", "description": "description metadata 1", "type": "scalar"},
+            { "name": "metadata-name-2", "description": "description metadata 2", "type": "text"},
+            { "name": "metadata-name-3", "description": "description metadata 3", "type": "scalar"},
+            { "name": "metadata-name-4", "description": "description metadata 4", "type": "vector"}
+        ]
+        const topics = [
+            {
+                "name": "topic name 1",
+                "description": "topic description 1",
+                "fields": [
+                    { "name": "field-1", "description": "field description 1", "type": "scalar"},
+                    { "name": "field-2", "description": "field description 2", "type": "text"},
+                    { "name": "field-3", "description": "field description 3", "type": "vector"}
+                ]
+            },
+            {
+                "name": "topic name 2",
+                "description": "topic description 2",
+                "fields": [
+                    { "name": "field-4", "description": "field description 4", "type": "scalar"},
+                    { "name": "field-5", "description": "field description 5", "type": "text"},
+                    { "name": "field-6", "description": "field description 6", "type": "vector"}
+                ]
+            }
+        ] 
+        const protocol = await factory.createProtocol("test-protocol-1", "test-protocol-description-1", user, metadata, topics);
+        const experiment = {
+            "_id": "experiment id",
+            "description": "experiment description",
+            "anonymization": true,
+            "state": 1,
+            "startDate": "2022-05-30T07:15:17.396Z",
+            "endDate": "2022-09-15T18:15:17.396Z",
+            "protocol": "test-protocol-1",
+            "metadata": [
+                { "name": "metadata-name-1", "value": 10 },
+                { "name": "metadata-name-2", "value": "value 2" },
+                { "name": "metadata-name-3", "value": 55 },
+                { "name": "metadata-name-4", "value": [34, 25, 45] }
+            ],
+            "history": [
+                {
+                    "step": 1,
+                    "timestamp": "2022-09-15T18:15:17.396Z",
+                    "fields": [
+                        { "name": "field-1", "value": 55 },
+                        { "name": "field-2", "value": "text value" },
+                        { "name": "field-3", "value": [21, 32, 432] },
+                        { "name": "field-4", "value": 13 },
+                        { "name": "field-5", "value": "another text value" },
+                        { "name": "field-6", "value": [324, 432, 432]  }
+                    ]
+                },
+                {
+                    "step": 2,
+                    "timestamp": "2022-12-15T18:15:17.396Z",
+                    "fields": [
+                        { "name": "field-1", "value": 65 },
+                        { "name": "field-2", "value": "text value 2" },
+                        { "name": "field-3", "value": [3.5, 56] },
+                        { "name": "field-4", "value": 33.5 },
+                        { "name": "field-5", "value": "another text value 2" },
+                        { "name": "field-6", "value": [543.5, 534, 5656]  }
+                    ]
+                }
+            ]
+        }
+        const res0 = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user)).send(experiment)
+        res0.should.have.status(200);
+
+        
+        const res = await chai.request(server).keepOpen().get('/v1/experiments/' + experiment._id+'/history?sep=;&sepArray=.&sepFloat=,').set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('string');
+        res.body.should.contain("step;1;2\nfield-1;55;65\nfield-2;text value;text value 2\nfield-3;[21.32.432];[3,5.56]\nfield-4;13;33,5\nfield-5;another text value;another text value 2\nfield-6;[324.432.432];[543,5.534.5656]\n");
+    });
 });
 
 // Test the /POST route

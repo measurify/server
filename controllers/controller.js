@@ -77,6 +77,7 @@ exports.getResourceList = async function (req, res, sort, select, model, restric
         if (req.headers.accept == 'text/csv') {
             res.header('Content-Type', 'text/csv');
             csvresultlibrary = conversion.jsonToCSV(list);
+            [csvresultlibrary, result] = conversion.replaceSeparatorsGet(csvresultlibrary, req.query); if (result != null) return result;
             return res.status(200).send(csvresultlibrary);
         }
         else return res.status(200).json(list);

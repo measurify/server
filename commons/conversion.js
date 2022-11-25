@@ -1,5 +1,6 @@
 const { isArray, forEach, isObject } = require('underscore');
 const extractData = require("./extractData.js");
+const errors = require("./errors.js");
 
 exports.csv2json = function (owner, header, data, schema, modelName) {//items over more lines
     let result = {};
@@ -285,4 +286,33 @@ const prepareFilter = function (filter, restriction) {
         else filter = { $and: [filter, restriction] };
     }
     return filter;
+}
+
+exports.replaceSeparatorsGet = function (data, query,res) {
+    if (!process.env.CSV_DELIMITER) process.env.CSV_DELIMITER = ',';
+    if (!process.env.CSV_VECTOR_DELIMITER) process.env.CSV_VECTOR_DELIMITER = ';';
+    if(query.sep==".")return [null, errors.manage(res, errors.get_request_error, "Separator can't be a dot")];
+    let sep = !query.sep ? process.env.CSV_DELIMITER : query.sep;
+    let sepArray = !query.sepArray ? process.env.CSV_VECTOR_DELIMITER : query.sepArray;
+    let sepFloat = !query.sepFloat ? "." : query.sepFloat;
+    if (!query || (!query.sep && !query.sepArray && !query.sepFloat)) return [data,null];
+    if (sep === sepArray) return [null,errors.manage(res, errors.get_request_error,  "Separator and Separator Array can't be the same " + sep)];
+    if (sep === sepFloat) return [null, errors.manage(res, errors.get_request_error, "Separator and Separator Float can't be the same " + sep)];
+    if (sepArray === sepFloat) return [null, errors.manage(res, errors.get_request_error, "Separator Array and Separator Float can't be the same " + sepArray)];
+    if (sep != process.env.CSV_DELIMITER) {
+        let regex = new RegExp("\\"+process.env.CSV_DELIMITER, "g");
+        data = data.replace(regex, "¤");
+    }    
+    if (sepArray != process.env.CSV_VECTOR_DELIMITER) {
+        regex = new RegExp("\\"+process.env.CSV_VECTOR_DELIMITER, "g");        
+        data = data.replace(regex, "¬");
+    }    
+    if (sepFloat != ".") {
+        regex = new RegExp("\\.", "g");
+        data = data.replace(regex, "§");
+    }    
+    data = data.replace(/¤/g, sep);
+    data = data.replace(/¬/g, sepArray);
+    data = data.replace(/§/g, sepFloat);    
+    return [data,null];
 }

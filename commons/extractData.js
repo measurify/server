@@ -147,15 +147,15 @@ const addHistory = function (req, res, fileText, modelName) {
 }
 
 const replaceSeparator = function (fileData, query) {    
-    if (!process.env.CSV_VECTOR_DELIMITER) process.env.CSV_VECTOR_DELIMITER = ',';
+    if (!process.env.CSV_VECTOR_DELIMITER) process.env.CSV_VECTOR_DELIMITER = ';';
     if(query.sep==".")return [null, "Separator can't be a dot"];
     let sep = !query.sep ? process.env.CSV_DELIMITER : query.sep;
     let sepArray = !query.sepArray ? process.env.CSV_VECTOR_DELIMITER : query.sepArray;
     let sepFloat = !query.sepFloat ? "." : query.sepFloat;
     if (!query || (!query.sep && !query.sepArray && !query.sepFloat)) return [fileData,null];
-    if (sep === sepArray) return [null, "Separator and Separator Array can't be the same: " + sep];
-    if (sep === sepFloat) return [null, "Separator and Separator Float can't be the same: " + sep];
-    if (sepArray === sepFloat) return [null, "Separator Array and Separator Float can't be the same: " + sepArray];
+    if (sep === sepArray) return [null, "Separator and Separator Array can't be the same " + sep];
+    if (sep === sepFloat) return [null, "Separator and Separator Float can't be the same " + sep];
+    if (sepArray === sepFloat) return [null, "Separator Array and Separator Float can't be the same " + sepArray];
     if (sep != process.env.CSV_DELIMITER) {
         let regex = new RegExp("\\"+sep, "g");
         fileData = fileData.replace(regex, "¤");

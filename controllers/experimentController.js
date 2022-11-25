@@ -44,7 +44,8 @@ exports.gethistory = async (req, res) => {
     if (!experiment) return errors.manage(res, errors.resource_not_found, req.params.id);
     const protocol = await persistence.get(experiment._doc.protocol, null, Protocol, select);
     if (!protocol) return errors.manage(res, errors.resource_not_found, req.params.id);
-    item=conversion.json2CSVHistory(experiment._doc.history,protocol._doc);
+    item = conversion.json2CSVHistory(experiment._doc. history,protocol._doc);    
+    let error=null;[item, error] = conversion.replaceSeparatorsGet(item, req.query,res); if (error !== null) return error;
     return res.status(200).json(item);
 };
 
