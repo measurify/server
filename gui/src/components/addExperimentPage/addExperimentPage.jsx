@@ -409,31 +409,6 @@ export default function AddExperimentPage(props) {
             height: "fit-content",
           }}
         >
-          {postType === "form" && (
-            <Form.Group className="mb-2">
-              <Form.Control
-                className="mb-3"
-                type="file"
-                accept=".json"
-                label="File"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  props.setFile(file);
-                  const fileReader = new FileReader();
-
-                  fileReader.onloadend = () => {
-                    const content = fileReader.result;
-                    console.log(content);
-                  };
-                  fileReader.readAsText(file);
-                }}
-              />
-
-              <Form.Text className="text-muted">
-                Import values from JSON file
-              </Form.Text>
-            </Form.Group>
-          )}
           {postType === "form" && "Export values on a json file"}
           {postType === "form" && protocols !== undefined && (
             <div style={{ margin: 5 + "px" }}>
