@@ -72,10 +72,7 @@ exports.put = async (req, res) => {
 
 exports.delete = async (req, res) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
-  //const result = await checker.canDeleteMeasurementList(req, res);  if (result != true) return result;
-  //let result = await checker.canOperate(req, res,"Measurement"); if (result != true) return result;   
   let result = await checker.canDeleteMeasurementList(req, res,"Measurement");  if (result != true) return result;
-  //const restriction_1 = await checker.whatCanDelete(req, res);  
   const restriction_1 = await checker.whatCanOperate(req, res,"Measurement");
   const restriction_2 = await checker.whichRights(req, res, Measurement);
   const restrictions = { ...restriction_1, ...restriction_2 };
@@ -85,7 +82,6 @@ exports.delete = async (req, res) => {
 exports.deleteone = async (req, res) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   let result = await checker.isAvailable(req, res, Measurement);  if (result != true) return result;
-  //result = await checker.canDelete(req, res);  if (result != true) return result;
   result = await checker.canOperate(req, res,"Measurement"); if (result != true) return result; 
   result = await checker.hasRights(req, res, Measurement);  if (result != true) return result;
   return await controller.deleteResource(req, res, Measurement);
@@ -94,7 +90,6 @@ exports.deleteone = async (req, res) => {
 exports.getstream = async (ws, req) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   let result = await checker.isAvailable(req, ws, Measurement);  if (result != true) return result;
-  //result = await checker.canRead(req, ws);  if (result != true) return result;  
   result = await checker.canOperate(req, ws,"Measurement"); if (result != true) return result; 
   result = await checker.hasRights(req, ws, Measurement);  if (result != true) return result;
   filemanager.upload(ws, req.resource._id, "webm");
@@ -102,7 +97,6 @@ exports.getstream = async (ws, req) => {
 
 exports.poststream = async (ws, req) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
-  //let result = await checker.canCreate(req, ws);  if (result != true) return result;  
   letresult = await checker.canOperate(req, res,"Measurement"); if (result != true) return result; 
   result = await checker.hasRightsToCreate(req, ws, [ "thing", "device", "feature", "tags", ]);  if (result != true) return result;
   ws.on("message", async function incoming(data) {
@@ -114,7 +108,6 @@ exports.poststream = async (ws, req) => {
 exports.getfile = async (req, res) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   let result = await checker.isAvailable(req, res, Measurement);  if (result != true) return result;
-  //result = await checker.canDelete(req, res);  if (result != true) return result;
   result = await checker.canOperate(req, res,"Measurement"); if (result != true) return result; 
   result = await checker.hasRights(req, res, Measurement);  if (result != true) return result;
   await filemanager.download(req, res, req.resource._id, "webm");

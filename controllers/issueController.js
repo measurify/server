@@ -14,7 +14,6 @@ exports.get = async (req, res) => {
 exports.getone = async (req, res) => { 
     const Issue = mongoose.dbs[req.tenant.database].model('Issue');
     let result = await checker.isAvailable(req, res, Issue); if (result != true) return result;
-    //result = await checker.canRead(req, res); if (result != true) return result;
     result = await checker.canOperate(req, res,"Issue"); if (result != true) return result;
     return await controller.getResource(req, res, null, Issue); 
 };
@@ -38,7 +37,6 @@ exports.put = async (req, res) => {
     let result = await checker.isAvailable(req, res, Issue); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
     result = await checker.isValid(req, res, IssueStatusTypes, 'status'); if (result != true) return result;
-    //result = await checker.canModify(req, res); if (result != true) return result;
     result = await checker.canOperate(req, res,"Issue"); if (result != true) return result;
     return await controller.updateResource(req, res, fields, Issue);
 }

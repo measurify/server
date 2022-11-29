@@ -62,6 +62,167 @@ describe('/GET experiment', () => {
         res.body.should.contain(experiment.history[0].fields[1].name+',');
         res.body.should.contain(experiment.history[0].fields[2].name+',');
     });
+
+    it('it should GET a history of an experiment in csv with inverted sep and sepArray', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const metadata = [
+            { "name": "metadata-name-1", "description": "description metadata 1", "type": "scalar"},
+            { "name": "metadata-name-2", "description": "description metadata 2", "type": "text"},
+            { "name": "metadata-name-3", "description": "description metadata 3", "type": "scalar"},
+            { "name": "metadata-name-4", "description": "description metadata 4", "type": "vector"}
+        ]
+        const topics = [
+            {
+                "name": "topic name 1",
+                "description": "topic description 1",
+                "fields": [
+                    { "name": "field-1", "description": "field description 1", "type": "scalar"},
+                    { "name": "field-2", "description": "field description 2", "type": "text"},
+                    { "name": "field-3", "description": "field description 3", "type": "vector"}
+                ]
+            },
+            {
+                "name": "topic name 2",
+                "description": "topic description 2",
+                "fields": [
+                    { "name": "field-4", "description": "field description 4", "type": "scalar"},
+                    { "name": "field-5", "description": "field description 5", "type": "text"},
+                    { "name": "field-6", "description": "field description 6", "type": "vector"}
+                ]
+            }
+        ] 
+        const protocol = await factory.createProtocol("test-protocol-1", "test-protocol-description-1", user, metadata, topics);
+        const experiment = {
+            "_id": "experiment id",
+            "description": "experiment description",
+            "anonymization": true,
+            "state": 1,
+            "startDate": "2022-05-30T07:15:17.396Z",
+            "endDate": "2022-09-15T18:15:17.396Z",
+            "protocol": "test-protocol-1",
+            "metadata": [
+                { "name": "metadata-name-1", "value": 10 },
+                { "name": "metadata-name-2", "value": "value 2" },
+                { "name": "metadata-name-3", "value": 55 },
+                { "name": "metadata-name-4", "value": [34, 25, 45] }
+            ],
+            "history": [
+                {
+                    "step": 1,
+                    "timestamp": "2022-09-15T18:15:17.396Z",
+                    "fields": [
+                        { "name": "field-1", "value": 55 },
+                        { "name": "field-2", "value": "text value" },
+                        { "name": "field-3", "value": [21, 32, 432] },
+                        { "name": "field-4", "value": 13 },
+                        { "name": "field-5", "value": "another text value" },
+                        { "name": "field-6", "value": [324, 432, 432]  }
+                    ]
+                },
+                {
+                    "step": 2,
+                    "timestamp": "2022-12-15T18:15:17.396Z",
+                    "fields": [
+                        { "name": "field-1", "value": 65 },
+                        { "name": "field-2", "value": "text value 2" },
+                        { "name": "field-3", "value": [3.5, 56] },
+                        { "name": "field-4", "value": 33.5 },
+                        { "name": "field-5", "value": "another text value 2" },
+                        { "name": "field-6", "value": [543.5, 534, 5656]  }
+                    ]
+                }
+            ]
+        }
+        const res0 = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user)).send(experiment)
+        res0.should.have.status(200);
+
+
+        const res = await chai.request(server).keepOpen().get('/v1/experiments/' + experiment._id+'/history?sep=;&sepArray=,').set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        
+        res.body.should.be.a('string');
+        res.body.should.contain("step;1;2\nfield-1;55;65\nfield-2;text value;text value 2\nfield-3;[21,32,432];[3.5,56]\nfield-4;13;33.5\nfield-5;another text value;another text value 2\nfield-6;[324,432,432];[543.5,534,5656]\n");
+    });
+
+    it('it should GET a history of an experiment in csv with inverted sep and sepArray and sepFloat', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const metadata = [
+            { "name": "metadata-name-1", "description": "description metadata 1", "type": "scalar"},
+            { "name": "metadata-name-2", "description": "description metadata 2", "type": "text"},
+            { "name": "metadata-name-3", "description": "description metadata 3", "type": "scalar"},
+            { "name": "metadata-name-4", "description": "description metadata 4", "type": "vector"}
+        ]
+        const topics = [
+            {
+                "name": "topic name 1",
+                "description": "topic description 1",
+                "fields": [
+                    { "name": "field-1", "description": "field description 1", "type": "scalar"},
+                    { "name": "field-2", "description": "field description 2", "type": "text"},
+                    { "name": "field-3", "description": "field description 3", "type": "vector"}
+                ]
+            },
+            {
+                "name": "topic name 2",
+                "description": "topic description 2",
+                "fields": [
+                    { "name": "field-4", "description": "field description 4", "type": "scalar"},
+                    { "name": "field-5", "description": "field description 5", "type": "text"},
+                    { "name": "field-6", "description": "field description 6", "type": "vector"}
+                ]
+            }
+        ] 
+        const protocol = await factory.createProtocol("test-protocol-1", "test-protocol-description-1", user, metadata, topics);
+        const experiment = {
+            "_id": "experiment id",
+            "description": "experiment description",
+            "anonymization": true,
+            "state": 1,
+            "startDate": "2022-05-30T07:15:17.396Z",
+            "endDate": "2022-09-15T18:15:17.396Z",
+            "protocol": "test-protocol-1",
+            "metadata": [
+                { "name": "metadata-name-1", "value": 10 },
+                { "name": "metadata-name-2", "value": "value 2" },
+                { "name": "metadata-name-3", "value": 55 },
+                { "name": "metadata-name-4", "value": [34, 25, 45] }
+            ],
+            "history": [
+                {
+                    "step": 1,
+                    "timestamp": "2022-09-15T18:15:17.396Z",
+                    "fields": [
+                        { "name": "field-1", "value": 55 },
+                        { "name": "field-2", "value": "text value" },
+                        { "name": "field-3", "value": [21, 32, 432] },
+                        { "name": "field-4", "value": 13 },
+                        { "name": "field-5", "value": "another text value" },
+                        { "name": "field-6", "value": [324, 432, 432]  }
+                    ]
+                },
+                {
+                    "step": 2,
+                    "timestamp": "2022-12-15T18:15:17.396Z",
+                    "fields": [
+                        { "name": "field-1", "value": 65 },
+                        { "name": "field-2", "value": "text value 2" },
+                        { "name": "field-3", "value": [3.5, 56] },
+                        { "name": "field-4", "value": 33.5 },
+                        { "name": "field-5", "value": "another text value 2" },
+                        { "name": "field-6", "value": [543.5, 534, 5656]  }
+                    ]
+                }
+            ]
+        }
+        const res0 = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user)).send(experiment)
+        res0.should.have.status(200);
+
+        
+        const res = await chai.request(server).keepOpen().get('/v1/experiments/' + experiment._id+'/history?sep=;&sepArray=.&sepFloat=,').set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('string');
+        res.body.should.contain("step;1;2\nfield-1;55;65\nfield-2;text value;text value 2\nfield-3;[21.32.432];[3,5.56]\nfield-4;13;33,5\nfield-5;another text value;another text value 2\nfield-6;[324.432.432];[543,5.534.5656]\n");
+    });
 });
 
 // Test the /POST route
@@ -743,7 +904,7 @@ describe('/POST experiment', () => {
     it('it should POST a experiment loaded from CSV file', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const metadata = [{ name: "metadata1", description: "description metadata 1", type: "scalar" },
-        { name: "metadata2", description: "description metadata 1", type: "scalar" }]
+        { name: "metadata2", description: "description metadata 1", type: "vector" }]
         const topics = [{
             name: "topics1", description: "topic description 1",
             fields: [{ name: "field1", description: "field description 1", type: "scalar" }]
@@ -756,6 +917,56 @@ describe('/POST experiment', () => {
         const testFile = './test/dummies/testExperiment.csv';
 
         const res = await chai.request(server).keepOpen().post('/v1/experiments/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.experiments[0].should.have.property('_id');
+        res.body.experiments[0].should.have.property('metadata');
+        res.body.experiments[0].should.have.property('history');
+        res.body.experiments[0].metadata.length.should.be.eql(2);
+        res.body.experiments[0].history.length.should.be.eql(0);
+    });
+
+    it('it should POST a experiment loaded from CSV file with separator control', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const metadata = [{ name: "metadata1", description: "description metadata 1", type: "scalar" },
+        { name: "metadata2", description: "description metadata 2", type: "vector" }]
+        const topics = [{
+            name: "topics1", description: "topic description 1",
+            fields: [{ name: "field1", description: "field description 1", type: "scalar" }]
+        },
+        {
+            name: "topics2", description: "topic description 1",
+            fields: [{ name: "field2", description: "field description 2", type: "scalar" }]
+        }]
+        const protocol = await factory.createProtocol("Test1", "test-protoco-description-1", user, metadata, topics);
+        const testFile = './test/dummies/testExperimentInvertedSepSepArray.csv';
+
+        const res = await chai.request(server).keepOpen().post('/v1/experiments/file?sep=;&sepArray=,').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.experiments[0].should.have.property('_id');
+        res.body.experiments[0].should.have.property('metadata');
+        res.body.experiments[0].should.have.property('history');
+        res.body.experiments[0].metadata.length.should.be.eql(2);
+        res.body.experiments[0].history.length.should.be.eql(0);
+    });
+
+    it('it should POST a experiment loaded from CSV file with separator control 2', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const metadata = [{ name: "metadata1", description: "description metadata 1", type: "scalar" },
+        { name: "metadata2", description: "description metadata 2", type: "vector" }]
+        const topics = [{
+            name: "topics1", description: "topic description 1",
+            fields: [{ name: "field1", description: "field description 1", type: "scalar" }]
+        },
+        {
+            name: "topics2", description: "topic description 1",
+            fields: [{ name: "field2", description: "field description 2", type: "scalar" }]
+        }]
+        const protocol = await factory.createProtocol("Test1", "test-protoco-description-1", user, metadata, topics);
+        const testFile = './test/dummies/testExperimentInvertedSepSepArraySepFloat.csv';
+
+        const res = await chai.request(server).keepOpen().post('/v1/experiments/file?sep=;&sepArray=.&sepFloat=,').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.experiments[0].should.have.property('_id');
@@ -1136,7 +1347,7 @@ describe('/PUT CSV file experiment', () => {
         },
         {
             name: "topics2", description: "topic description 1",
-            fields: [{ name: "field2", description: "field description 2", type: "scalar" }]
+            fields: [{ name: "field2", description: "field description 2", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("Test1", "test-protocol-description-1", user, metadata, topics);
         const metadatavalue = [{ name: "metadata1", value: 43 },
@@ -1144,6 +1355,58 @@ describe('/PUT CSV file experiment', () => {
         const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description-1", user, 0, null, null, null, protocol, metadatavalue,[]);
         const testFile = './test/dummies/testExp1_step1_2.csv';
         const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id + '/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('history');
+        res.body.history.length.should.be.eql(2);
+        const expectedReport={ success: [ '1', '2' ], ignored: [], overridden: [] }
+        res.body.report.should.be.eql(expectedReport);
+    });
+
+    it('it should PUT experiment history from csv file to add an item with Sep and SepArray inverted', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const metadata = [{ name: "metadata1", description: "description metadata 1", type: "scalar" },
+        { name: "metadata2", description: "description metadata 1", type: "scalar" }]
+        const topics = [{
+            name: "topics1", description: "topic description 1",
+            fields: [{ name: "field1", description: "field description 1", type: "scalar" }]
+        },
+        {
+            name: "topics2", description: "topic description 1",
+            fields: [{ name: "field2", description: "field description 2", type: "vector" }]
+        }]
+        const protocol = await factory.createProtocol("Test1", "test-protocol-description-1", user, metadata, topics);
+        const metadatavalue = [{ name: "metadata1", value: 43 },
+        { name: "metadata2", value: 5 }];
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description-1", user, 0, null, null, null, protocol, metadatavalue,[]);
+        const testFile = './test/dummies/testExp1_step1_2InvertedSepSepArray.csv';
+        const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id + '/file?sep=;&sepArray=,').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('history');
+        res.body.history.length.should.be.eql(2);
+        const expectedReport={ success: [ '1', '2' ], ignored: [], overridden: [] }
+        res.body.report.should.be.eql(expectedReport);
+    });
+
+    it('it should PUT experiment history from csv file to add an item with Sep, SepArray, SepFloat inverted', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const metadata = [{ name: "metadata1", description: "description metadata 1", type: "scalar" },
+        { name: "metadata2", description: "description metadata 1", type: "scalar" }]
+        const topics = [{
+            name: "topics1", description: "topic description 1",
+            fields: [{ name: "field1", description: "field description 1", type: "scalar" }]
+        },
+        {
+            name: "topics2", description: "topic description 1",
+            fields: [{ name: "field2", description: "field description 2", type: "vector" }]
+        }]
+        const protocol = await factory.createProtocol("Test1", "test-protocol-description-1", user, metadata, topics);
+        const metadatavalue = [{ name: "metadata1", value: 43 },
+        { name: "metadata2", value: 5 }];
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description-1", user, 0, null, null, null, protocol, metadatavalue,[]);
+        const testFile = './test/dummies/testExp1_step1_2InvertedSepSepArraySepFloat.csv';
+        const res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id + '/file?sep=;&sepArray=.&sepFloat=,').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('history');
@@ -1178,14 +1441,14 @@ describe('/PUT CSV file experiment', () => {
     it('it should POST and PUT experiment history from csv file', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const metadata = [{ name: "metadata1", description: "description metadata 1", type: "scalar" },
-        { name: "metadata2", description: "description metadata 1", type: "scalar" }]
+        { name: "metadata2", description: "description metadata 1", type: "vector" }]
         const topics = [{
             name: "topics1", description: "topic description 1",
             fields: [{ name: "field1", description: "field description 1", type: "scalar" }]
         },
         {
             name: "topics2", description: "topic description 1",
-            fields: [{ name: "field2", description: "field description 2", type: "scalar" }]
+            fields: [{ name: "field2", description: "field description 2", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("Test1", "test-protoco-description-1", user, metadata, topics);
         const testFile = './test/dummies/testExperiment.csv';

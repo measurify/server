@@ -192,7 +192,7 @@ describe('/POST feature from file', () => {
         const tag2 = await factory.createTag("tag2", user);
         const testFile = './test/dummies/feature_test.csv';        
         
-        const res = await chai.request(server).keepOpen().post('/v1/features/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        const res = await chai.request(server).keepOpen().post('/v1/features/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));        
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('features');

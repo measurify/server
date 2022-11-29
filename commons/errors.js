@@ -51,7 +51,7 @@ exports.wrong_header                         = { status: 400, value: 48, message
 exports.wrong_xlsx                           = { status: 400, value: 49, message: 'wrong xlsx file'}; 
 exports.file_history_empty                   = { status: 400, value: 50, message: 'the file doesn\'t have history steps'}; 
 exports.restricted_access_operation          = { status: 403, value: 51, message: 'You cannot do this operation on the resource' };
-
+exports.separatorError                       = { status: 403, value: 52, message: 'Problem with selected separators' };
 
 
 exports.manage = function(res, error, more) {

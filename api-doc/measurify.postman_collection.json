@@ -142,38 +142,7 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "API documentation",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var jsonData = JSON.parse(responseBody);",
-									"postman.setEnvironmentVariable(\"demo\", jsonData);",
-									"tests[\"demo = \" + jsonData] = true;"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{url}}/v1/errors",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"v1",
-								"errors"
-							]
-						}
-					},
-					"response": []
-				},
+				},				
 				{
 					"name": "API types",
 					"event": [
@@ -193,20 +162,20 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/v1/errors",
+							"raw": "{{url}}/v1/types",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"v1",
-								"errors"
+								"types"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "API models",
+					"name": "API models (Only model registry)",
 					"event": [
 						{
 							"listen": "test",
@@ -563,7 +532,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"_id\": \"measurify-tenat-test\",\r\n    \"organization\": \"Measurify org\",\r\n    \"address\": \"Measurify Street, Genova\",\r\n    \"email\": \"info@measurify.org\",\r\n    \"phone\": \"+39103218793817\",\r\n    \"admin_username\": \"pluto\",\r\n    \"admin_password\": \"pippo\",\r\n    \"passwordhash\": \"true\"\r\n}"
+							"raw": "{\r\n    \"_id\": \"measurify-tenant-test\",\r\n    \"organization\": \"Measurify org\",\r\n    \"address\": \"Measurify Street, Genova\",\r\n    \"email\": \"info@measurify.org\",\r\n    \"phone\": \"+39103218793817\",\r\n    \"admin_username\": \"test-username\",\r\n    \"admin_password\": \"test-password\",\r\n    \"passwordhash\": \"true\"\r\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/tenants/",
@@ -1381,336 +1350,291 @@
 			]
 		},
 		{
-			"name": "TAGS",
+			"name": "ROLES",
 			"item": [
 				{
-					"name": "TAGS",
-					"item": [
+					"name": "LOGIN as admin",
+					"event": [
 						{
-							"name": "LOGIN as admin",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
-								},
-								"url": {
-									"raw": "{{url}}/v1/login",
-									"host": [
-										"{{url}}"
-									],
-									"path": [
-										"v1",
-										"login"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "GET all tags",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{token}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{url}}/v1/tags",
-									"host": [
-										"{{url}}"
-									],
-									"path": [
-										"v1",
-										"tags"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "POST a new tag",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.environment.set(\"tag\", JSON.parse(responseBody)._id);"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									},
-									{
-										"key": "Authorization",
-										"value": "{{token}}",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{ \n\t\"_id\": \"test_tag\"\n}"
-								},
-								"url": {
-									"raw": "{{url}}/v1/tags",
-									"host": [
-										"{{url}}"
-									],
-									"path": [
-										"v1",
-										"tags"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "GET a tag",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{token}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{url}}/v1/tags/{{tag}}",
-									"host": [
-										"{{url}}"
-									],
-									"path": [
-										"v1",
-										"tags",
-										"{{tag}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "POST a list of new tags (tagged)",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									},
-									{
-										"key": "Authorization",
-										"value": "{{token}}",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "[\r\n  { \"_id\": \"tagged-tag-1\", \"tags\": [\"{{tag}}\"] },\r\n  { \"_id\": \"tagged-tag-2\", \"tags\": [\"{{tag}}\"] },\r\n  { \"_id\": \"tagged-tag-3\", \"tags\": [\"{{tag}}\"] },\r\n  { \"_id\": \"tagged-tag-4\", \"tags\": [\"{{tag}}\"] }\r\n]"
-								},
-								"url": {
-									"raw": "{{url}}/v1/tags",
-									"host": [
-										"{{url}}"
-									],
-									"path": [
-										"v1",
-										"tags"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "PUT a tag",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{token}}",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"visibility\": \"private\",\n    \"tags\": {\n        \"remove\": [],\n        \"add\": [\"tagged-tag-1\", \"tagged-tag-2\"]\n    }\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{url}}/v1/tags/{{tag}}",
-									"host": [
-										"{{url}}"
-									],
-									"path": [
-										"v1",
-										"tags",
-										"{{tag}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "GET all tags filtered by tag",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"var data = JSON.parse(responseBody);",
-											"if(data.docs) pm.environment.set('tag', data.docs[0]._id);"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "{{token}}"
-									}
-								],
-								"url": {
-									"raw": "{{url}}/v1/tags?filter={\"tags\": \"{{tag}}\"}",
-									"host": [
-										"{{url}}"
-									],
-									"path": [
-										"v1",
-										"tags"
-									],
-									"query": [
-										{
-											"key": "filter",
-											"value": "{\"tags\": \"{{tag}}\"}"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "DELETE a tag (not used)",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "DELETE",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{token}}",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{url}}/v1/tags/{{tag}}",
-									"host": [
-										"{{url}}"
-									],
-									"path": [
-										"v1",
-										"tags",
-										"{{tag}}"
-									]
-								}
-							},
-							"response": []
+								"type": "text/javascript"
+							}
 						}
-					]
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
 				},
+				{
+					"name": "GET all roles",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/roles",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new role",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"role\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"_id\": \"role0\",\n    \"default\": {\n        \"create\": \"true\",\n        \"read\": \"public_and_owned\",\n        \"update\": \"owned\",\n        \"delete\": \"none\"\n    },\n    \"actions\": [\n        {\n            \"entity\": \"Feature\",\n            \"crud\": {\n                \"create\": \"true\",\n                \"read\": \"all\",\n                \"update\": \"all\",\n                \"delete\": \"all\"\n            }\n        },\n        {\n            \"entity\": \"Device\",\n            \"crud\": {\n                \"create\": \"true\",\n                \"read\": \"all\",\n                \"update\": \"all\",\n                \"delete\": \"all\"\n            }\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/roles",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET a role",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/roles/{{role}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"roles",
+								"{{role}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a list of new roles",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n        \"_id\": \"role1\",\r\n        \"default\": {\r\n            \"create\": \"true\",\r\n            \"read\": \"owned\",\r\n            \"update\": \"owned\",\r\n            \"delete\": \"owned\"\r\n        },\r\n        \"actions\": [\r\n            {\r\n                \"entity\": \"Feature\",\r\n                \"crud\": {\r\n                    \"create\": \"true\",\r\n                    \"read\": \"all\",\r\n                    \"update\": \"all\",\r\n                    \"delete\": \"all\"\r\n                }\r\n            }\r\n        ]\r\n    },\r\n    {\r\n        \"_id\": \"role2\",\r\n        \"default\": {\r\n            \"create\": \"true\",\r\n            \"read\": \"owned\",\r\n            \"update\": \"owned\",\r\n            \"delete\": \"owned\"\r\n        },\r\n        \"actions\": [\r\n            {\r\n                \"entity\": \"Feature\",\r\n                \"crud\": {\r\n                    \"create\": \"true\",\r\n                    \"read\": \"all\",\r\n                    \"update\": \"all\",\r\n                    \"delete\": \"all\"\r\n                }\r\n            }\r\n        ]\r\n    },\r\n    {\r\n        \"_id\": \"role3\",\r\n        \"default\": {\r\n            \"create\": \"true\",\r\n            \"read\": \"owned\",\r\n            \"update\": \"owned\",\r\n            \"delete\": \"owned\"\r\n        },\r\n        \"actions\": [\r\n            {\r\n                \"entity\": \"Feature\",\r\n                \"crud\": {\r\n                    \"create\": \"true\",\r\n                    \"read\": \"all\",\r\n                    \"update\": \"all\",\r\n                    \"delete\": \"all\"\r\n                }\r\n            }\r\n        ]\r\n    }\r\n]"
+						},
+						"url": {
+							"raw": "{{url}}/v1/roles",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT a role",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"default\":{\n        \"create\":true,\n        \"read\": \"public_and_owned\",\n        \"update\": \"public_and_owned\",\n        \"delete\": \"public_and_owned\"\n    },\n    \"actions\": {\n        \"remove\": [\"Device\"],\n        \"add\": [\n            {\n                \"entity\": \"Thing\",\n                \"crud\": {\n                    \"create\": \"true\",\n                    \"read\": \"all\",\n                    \"update\": \"all\",\n                    \"delete\": \"all\"\n                }\n            }\n        ]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/roles/{{role}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"roles",
+								"{{role}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE a role (if not used)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/v1/roles/{{role}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"roles",
+								"{{role}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "TAGS",
+			"item": [				
 				{
 					"name": "LOGIN as admin",
 					"event": [
@@ -1995,6 +1919,65 @@
 					"response": []
 				},
 				{
+					"name": "POST tags from csv file",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/v1/tags/file",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"tags",
+								"file"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "DELETE a tag (not used)",
 					"event": [
 						{
@@ -2232,6 +2215,102 @@
 							"path": [
 								"v1",
 								"features"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT a feature",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"_id\": \"new-feature-id\",\n    \"tags\": {\n        \"remove\": [],\n        \"add\": [\n            \"tag1\"\n        ]\n    },\n    \"items\": {\n        \"update\": [\n            {\n                \"name\": \"longitude\",\n                \"new\": {\n                    \"name\": \"height\",\n                    \"unit\": \"m\",\n                    \"type\": \"number\",\n                    \"dimension\": 0\n                }\n            }\n        ],\n        \"add\": [\n            {\n                \"name\": \"weight\",\n                \"unit\": \"kg\",\n                \"type\": \"number\",\n                \"dimension\": 0\n            }\n        ],\n        \"remove\": [\n            \"latitude\"\n        ]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/features/{{feature}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"features",
+								"{{feature}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST features from csv file",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/v1/features/file",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"features",
+								"file"
 							]
 						}
 					},
@@ -2720,7 +2799,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"_id\": \"experiment id\",\n    \"description\": \"experiment description\",\n    \"anonymization\": true,\n    \"state\": \"completed\",\n    \"startDate\": \"2022-05-30T07:15:17.396Z\",\n    \"endDate\": \"2022-09-15T18:15:17.396Z\",\n    \"protocol\": \"{{protocol}}\",\n    \"metadata\": [\n        { \"name\": \"metadata-name-1\", \"value\": 10 },\n        { \"name\": \"metadata-name-2\", \"value\": \"value 2\" },\n        { \"name\": \"metadata-name-3\", \"value\": 55 },\n        { \"name\": \"metadata-name-4\", \"value\": [34, 25, 45] }\n    ],\n    \"history\": [\n        {\n            \"step\": 1,\n            \"timestamp\": \"2022-09-15T18:15:17.396Z\",\n            \"fields\": [\n                { \"name\": \"field-1\", \"value\": 55 },\n                { \"name\": \"field-2\", \"value\": \"text value\" },\n                { \"name\": \"field-3\", \"value\": [21, 32, 432] },\n                { \"name\": \"field-4\", \"value\": 13 },\n                { \"name\": \"field-5\", \"value\": \"another text value\" },\n                { \"name\": \"field-6\", \"value\": [324, 432, 432]  }\n            ]\n        },\n        {\n            \"step\": 2,\n            \"timestamp\": \"2022-12-15T18:15:17.396Z\",\n            \"fields\": [\n                { \"name\": \"field-1\", \"value\": 65 },\n                { \"name\": \"field-2\", \"value\": \"text value 2\" },\n                { \"name\": \"field-3\", \"value\": [3, 56] },\n                { \"name\": \"field-4\", \"value\": 33 },\n                { \"name\": \"field-5\", \"value\": \"another text value 2\" },\n                { \"name\": \"field-6\", \"value\": [543, 534, 5656]  }\n            ]\n        }\n    ]\n}\n"
+							"raw": "{\n    \"_id\": \"experiment id\",\n    \"description\": \"experiment description\",\n    \"anonymization\": true,\n    \"state\": 1,\n    \"startDate\": \"2022-05-30T07:15:17.396Z\",\n    \"endDate\": \"2022-09-15T18:15:17.396Z\",\n    \"protocol\": \"{{protocol}}\",\n    \"metadata\": [\n        { \"name\": \"metadata-name-1\", \"value\": 10 },\n        { \"name\": \"metadata-name-2\", \"value\": \"value 2\" },\n        { \"name\": \"metadata-name-3\", \"value\": 55 },\n        { \"name\": \"metadata-name-4\", \"value\": [34, 25, 45] }\n    ],\n    \"history\": [\n        {\n            \"step\": 1,\n            \"timestamp\": \"2022-09-15T18:15:17.396Z\",\n            \"fields\": [\n                { \"name\": \"field-1\", \"value\": 55 },\n                { \"name\": \"field-2\", \"value\": \"text value\" },\n                { \"name\": \"field-3\", \"value\": [21, 32, 432] },\n                { \"name\": \"field-4\", \"value\": 13 },\n                { \"name\": \"field-5\", \"value\": \"another text value\" },\n                { \"name\": \"field-6\", \"value\": [324, 432, 432]  }\n            ]\n        },\n        {\n            \"step\": 2,\n            \"timestamp\": \"2022-12-15T18:15:17.396Z\",\n            \"fields\": [\n                { \"name\": \"field-1\", \"value\": 65 },\n                { \"name\": \"field-2\", \"value\": \"text value 2\" },\n                { \"name\": \"field-3\", \"value\": [3, 56] },\n                { \"name\": \"field-4\", \"value\": 33 },\n                { \"name\": \"field-5\", \"value\": \"another text value 2\" },\n                { \"name\": \"field-6\", \"value\": [543, 534, 5656]  }\n            ]\n        }\n    ]\n}\n"
 						},
 						"url": {
 							"raw": "{{url}}/v1/experiments",
@@ -2730,6 +2809,31 @@
 							"path": [
 								"v1",
 								"experiments"
+							]
+						}
+					},
+					"response": []
+				},				
+				{
+					"name": "GET one experiment",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/experiments/{{experiment}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"experiments",
+								"{{experiment}}"
 							]
 						}
 					},
@@ -2825,7 +2929,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"state\": \"on going\",\n    \"metadata\": {\n\t    \"update\": [ { \"name\": \"metadata-name-1\", \"new\": { \"name\": \"metadata-name-1\", \"value\": 12 } } ]\n    },\n    \"history\": {\n\t    \"update\": [ { \"step\": 2, \"new\": { \"step\": 2, \"timestamp\": \"2022-12-15T18:15:17.396Z\", \"fields\": [ { \"name\": \"field-1\", \"value\": 128 },\n                                                                                                          { \"name\": \"field-2\", \"value\": \"new 1\" },\n                                                                                                          { \"name\": \"field-3\", \"value\": [3, 56] },\n                                                                                                          { \"name\": \"field-4\", \"value\": 33 },\n                                                                                                          { \"name\": \"field-5\", \"value\": \"new 2\" },\n                                                                                                          { \"name\": \"field-6\", \"value\": [5, 2, 1]}]\n                                        } \n                    } ]\n    }\n}\n"
+							"raw": "{\n    \"state\": 0,\n    \"metadata\": {\n        \"update\": [\n            {\n                \"name\": \"metadata-name-1\",\n                \"new\": {\n                    \"name\": \"metadata-name-1\",\n                    \"value\": 12\n                }\n            }\n        ]\n    },\n    \"history\": {\n        \"update\": [\n            {\n                \"step\": 2,\n                \"new\": {\n                    \"step\": 2,\n                    \"timestamp\": \"2022-12-15T18:15:17.396Z\",\n                    \"fields\": [\n                        {\n                            \"name\": \"field-1\",\n                            \"value\": 128\n                        },\n                        {\n                            \"name\": \"field-2\",\n                            \"value\": \"new 1\"\n                        },\n                        {\n                            \"name\": \"field-3\",\n                            \"value\": [\n                                3,\n                                56\n                            ]\n                        },\n                        {\n                            \"name\": \"field-4\",\n                            \"value\": 33\n                        },\n                        {\n                            \"name\": \"field-5\",\n                            \"value\": \"new 2\"\n                        },\n                        {\n                            \"name\": \"field-6\",\n                            \"value\": [\n                                5,\n                                2,\n                                1\n                            ]\n                        }\n                    ]\n                }\n            }\n        ]\n    }\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/experiments/{{experiment}}",
@@ -2842,25 +2946,60 @@
 					"response": []
 				},
 				{
-					"name": "GET one experiment",
+					"name": "ADD history steps from csv file",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
-						"method": "GET",
+						"method": "PUT",
 						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
 							{
 								"key": "Authorization",
 								"value": "{{token}}",
 								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
 						"url": {
-							"raw": "{{url}}/v1/experiments/{{experiment}}",
+							"raw": "{{url}}/v1/experiments/{{experiment}}/file",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"v1",
 								"experiments",
-								"{{experiment}}"
+								"{{experiment}}",
+								"file"
 							]
 						}
 					},
@@ -2947,7 +3086,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\",\n\t\"tenant\": \"atmosphere-dev\"\n}"
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/login",
@@ -3060,7 +3199,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"_id\": \"car-test\"\r\n}"
+							"raw": "{\r\n  \"_id\": \"thing-test\"\r\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/things/",
@@ -3106,7 +3245,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\r\n\t{ \"_id\": \"car-test-1\", \"tags\": [\"{{tag1}}\", \"{{tag2}}\"] },\r\n\t{ \"_id\": \"car-test-2\", \"tags\": [\"{{tag2}}\"] },\r\n\t{ \"_id\": \"car-test-3\", \"tags\": [\"{{tag1}}\"] },\r\n\t{ \"_id\": \"car-test-4\", \"tags\": [\"{{tag1}}\", \"{{tag2}}\"] }\r\n]"
+							"raw": "[\r\n\t{ \"_id\": \"thing-test-1\", \"tags\": [\"{{tag1}}\", \"{{tag2}}\"] },\r\n\t{ \"_id\": \"thing-test-2\", \"tags\": [\"{{tag2}}\"] },\r\n\t{ \"_id\": \"thing-test-3\", \"tags\": [\"{{tag1}}\"] },\r\n\t{ \"_id\": \"thing-test-4\", \"tags\": [\"{{tag1}}\", \"{{tag2}}\"] }\r\n]"
 						},
 						"url": {
 							"raw": "{{url}}/v1/things",
@@ -3122,7 +3261,44 @@
 					"response": []
 				},
 				{
-					"name": "DELETE a things",
+					"name": "PUT a thing",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"visibility\": \"public\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/things/{{thing}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"things",
+								"{{thing}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE a thing",
 					"request": {
 						"method": "DELETE",
 						"header": [
@@ -3725,7 +3901,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"status\": \"closed\"\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4382,15 +4558,12 @@
 					"response": []
 				},
 				{
-					"name": "GET all measurements with CSV format",
+					"name": "GET all measurements in CSV format",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"exec": [
-									"var data = JSON.parse(responseBody);",
-									"if(data.docs) pm.environment.set('measurement', data.docs[0]._id);"
-								],
+								"exec": [],
 								"type": "text/javascript"
 							}
 						}
@@ -4709,7 +4882,13 @@
 					"name": "GET measurements only from a specific feature OR with a specific tag (filtered)",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
 						"url": {
 							"raw": "{{url}}/v1/measurements?filter=[{\"feature\":\"speed-statistics\"}, {\"tags\":\"automatic\"}]",
 							"host": [
@@ -4818,6 +4997,63 @@
 					"response": []
 				},
 				{
+					"name": "POST measurements from csv file",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							},
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "description",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/v1/measurements/file",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements",
+								"file"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "DELETE a measurement by id",
 					"request": {
 						"method": "DELETE",
@@ -4839,20 +5075,55 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/v1/measurements{{measurement}}",
+							"raw": "{{url}}/v1/measurements/{{measurement}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"v1",
-								"measurements{{measurement}}"
+								"measurements",
+								"{{measurement}}"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "DELETE a list of measurements",
+					"name": "DELETE a list of measurements with a filter",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/v1/measurements?filter={\"thing\":\"car-test\"}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"measurements"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE ALL measurements",
 					"request": {
 						"method": "DELETE",
 						"header": [
@@ -4969,7 +5240,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"_id\": \"thing-test\"\r\n}"
+							"raw": "{\r\n  \"_id\": \"car-test\"\r\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/things/",
@@ -5129,7 +5400,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"thing\": \"thing-test\",\r\n\t\"feature\": \"feature-test\",\r\n\t\"device\": \"device-test\"\r\n}\r\n"
+							"raw": "{\r\n\t\"thing\": \"car-test\",\r\n\t\"feature\": \"feature-test\",\r\n\t\"device\": \"device-test\"\r\n}\r\n"
 						},
 						"url": {
 							"raw": "{{url}}/v1/measurements",
@@ -5464,6 +5735,517 @@
 								"measurements",
 								"{{measurement}}",
 								"timeserie"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "DATASETS",
+			"item": [
+				{
+					"name": "LOGIN as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET all datasets",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/datasets",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"datasets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET all datasets in CSV format",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "text/csv",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/datasets",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"datasets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET dataset only from specific thing",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "text/csv",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/datasets?filter={\"thing\":\"thing-test\"}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "{\"thing\":\"thing-test\"}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET dataset only from specific feature",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/datasets?filter={\"feature\":\"feature-test\"}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "{\"feature\":\"feature-test\"}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET dataset only from specific thing in Csv format",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "text/csv",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/datasets?filter={\"thing\":\"thing-test\"}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "{\"thing\":\"thing-test\"}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET dataset in Csv+ format (feature required)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "text/csv+",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/datasets?filter={\"feature\":\"feature-test\"}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "{\"feature\":\"feature-test\"}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET dataset with specific dataupload",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "text/csv",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/datasets/{{dataupload}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"datasets",
+								"{{dataupload}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET dataset with specific dataupload + filter",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "text/csv",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/datasets/{{dataupload}}?filter={\"thing\":\"thing-test\"}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"datasets",
+								"{{dataupload}}"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "{\"thing\":\"thing-test\"}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET dataset with tag dataupload + filter in CSV+ format (feature required)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "text/csv+",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/datasets/{{dataupload}}?filter={\"feature\":\"feature-test\"}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"datasets",
+								"{{dataupload}}"
+							],
+							"query": [
+								{
+									"key": "filter",
+									"value": "{\"feature\":\"feature-test\"}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET dataset id  info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/datasets/{{dataupload}}/info",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"datasets",
+								"{{dataupload}}",
+								"info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new dataset in CSV with description file",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							},
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "description",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/v1/datasets",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"datasets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new dataset in CSV without header with description file",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							},
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "description",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/v1/datasets?header=false",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"datasets"
+							],
+							"query": [
+								{
+									"key": "header",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE a dataset",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/v1/datasets/{{dataupload}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"datasets",
+								"{{dataupload}}"
 							]
 						}
 					},
@@ -5825,7 +6607,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"type": "text/javascript",
+						"type": "texpippot/javascript",
 						"exec": [
 							""
 						]
@@ -6289,7 +7071,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{url}}/v1/rights?",
+							"raw": "{{url}}/v1/rights",
 							"host": [
 								"{{url}}"
 							],
@@ -6595,6 +7377,334 @@
 							""
 						]
 					}
+				}
+			]
+		},
+		{
+			"name": "GROUPS",
+			"item": [
+				{
+					"name": "LOGIN as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"token\", JSON.parse(responseBody).token);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\" : \"admin\",\n\t\"password\" : \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET all groups",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/groups",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a new group",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"group\", JSON.parse(responseBody)._id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": " {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"_id\": \"group1\",\n  \"users\":[\"user-test-1\",\"user-test-2\"]\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/groups",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET a group",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/groups/{{group}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"groups",
+								"{{group}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST a list of new groups",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n\t{\n\t\t\"_id\": \"groupA\"\n\t},\n\t{\n\t\t\"_id\": \"groupB\"\n\t},\n\t{\n\t\t\"_id\": \"groupC\"\n\t},\n\t{\n\t\t\"_id\": \"groupD\"\n\t}\n]"
+						},
+						"url": {
+							"raw": "{{url}}/v1/groups",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT a group",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"users\": {\r\n        \"add\": [\r\n            \"user1\",\r\n            \"user2\"\r\n        ]\r\n    }\r\n}"
+						},
+						"url": {
+							"raw": "{{url}}/v1/groups/{{group}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"groups",
+								"{{group}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST groups from csv file",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							},
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/v1/groups/file",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"groups",
+								"file"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE a group",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{url}}/v1/groups/{{group}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"groups",
+								"{{group}}"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -8611,7 +9721,7 @@
 			"name": "MULTI-TENANCY",
 			"item": [
 				{
-					"name": "POST tenat-1",
+					"name": "POST tenant-1",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -8647,7 +9757,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"_id\": \"tenat-1\",\r\n    \"database\": \"measurify-database-tenant-1\",\r\n    \"organization\": \"Measurify org\",\r\n    \"address\": \"Measurify Street, Genova\",\r\n    \"email\": \"info@measurify.org\",\r\n    \"phone\": \"+39103218793817\",\r\n    \"admin_username\": \"test-username-1\",\r\n    \"admin_password\": \"test-password-1\",\r\n    \"passwordhash\" : \"false\"\r\n}\t"
+							"raw": "{\r\n    \"_id\": \"tenant-1\",\r\n    \"database\": \"measurify-database-tenant-1\",\r\n    \"organization\": \"Measurify org\",\r\n    \"address\": \"Measurify Street, Genova\",\r\n    \"email\": \"info@measurify.org\",\r\n    \"phone\": \"+39103218793817\",\r\n    \"admin_username\": \"test-username-1\",\r\n    \"admin_password\": \"test-password-1\",\r\n    \"passwordhash\" : \"false\"\r\n}\t"
 						},
 						"url": {
 							"raw": "{{url}}/v1/tenants/",
@@ -8664,7 +9774,7 @@
 					"response": []
 				},
 				{
-					"name": "POST tenat-2",
+					"name": "POST tenant-2",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -8700,7 +9810,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"_id\": \"tenat-2\",\r\n    \"organization\": \"Measurify org\",\r\n    \"address\": \"Measurify Street, Genova\",\r\n    \"email\": \"info@measurify.org\",\r\n    \"phone\": \"+39103218793817\",\r\n    \"admin_username\": \"test-username-2\",\r\n    \"admin_password\": \"test-password-2\",\r\n    \"passwordhash\" : \"true\"\r\n}"
+							"raw": "{\r\n    \"_id\": \"tenant-2\",\r\n    \"organization\": \"Measurify org\",\r\n    \"address\": \"Measurify Street, Genova\",\r\n    \"email\": \"info@measurify.org\",\r\n    \"phone\": \"+39103218793817\",\r\n    \"admin_username\": \"test-username-2\",\r\n    \"admin_password\": \"test-password-2\",\r\n    \"passwordhash\" : \"true\"\r\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/tenants/",
@@ -8717,7 +9827,7 @@
 					"response": []
 				},
 				{
-					"name": "LOGIN as admin of tenat-1",
+					"name": "LOGIN as admin of tenant-1",
 					"event": [
 						{
 							"listen": "test",
@@ -8743,7 +9853,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"test-username-1\",\n\t\"password\" : \"test-password-1\",\n\t\"tenant\": \"tenat-1\"\n}"
+							"raw": "{\n\t\"username\" : \"test-username-1\",\n\t\"password\" : \"test-password-1\",\n\t\"tenant\": \"tenant-1\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/login",
@@ -8759,7 +9869,7 @@
 					"response": []
 				},
 				{
-					"name": "LOGIN as admin of tenat-2",
+					"name": "LOGIN as admin of tenant-2",
 					"event": [
 						{
 							"listen": "test",
@@ -8785,7 +9895,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"username\" : \"test-username-2\",\n\t\"password\" : \"test-password-2\",\n\t\"tenant\": \"tenat-2\"\n}"
+							"raw": "{\n\t\"username\" : \"test-username-2\",\n\t\"password\" : \"test-password-2\",\n\t\"tenant\": \"tenant-2\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/v1/login",
@@ -8936,7 +10046,7 @@
 					"response": []
 				},
 				{
-					"name": "GET all things (of the tennant logged in)",
+					"name": "GET all things (of the tenant logged in)",
 					"event": [
 						{
 							"listen": "test",

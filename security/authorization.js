@@ -73,56 +73,8 @@ exports.whatCanOperate = function(user,role,method,entity) { //read,delete
     if(permission==RoleCrudTypes.all)return result;
     if(permission==RoleCrudTypes.owned)return result={ $and: [  { owner: user._id } ] };    
     if(permission==RoleCrudTypes.public_and_owned)return result={ $or: [  { owner: user._id }, { visibility: VisibilityTypes.public } ] };
-    return result= { $and: [  { owner: user._id }, { visibility: VisibilityTypes.public },{ visibility: VisibilityTypes.private } ] }//none
-
-    //OLD
-    //if (this.isSupplier(user)) result = { $and: [  { owner: user._id }, { visibility: VisibilityTypes.public },{ visibility: VisibilityTypes.private } ] };//can't see anything
-    //if (this.isAdministrator(user)) return result;
-    //if (this.isAnalyst(user)) return result;
-    //if (this.isProvider(user)) result = { $or: [  { owner: user._id }, { visibility: VisibilityTypes.public } ] };
-    //if (this.isProvider(user)) result = { $or: [  { owner: user._id }, { $and: [{ visibility: {$exists: true} , visibility: VisibilityTypes.public }] } ] };
-    //if (this.isProvider(user)) result = { pincopallo: {$exists: false} };
-    //return result;
+    return result= { $and: [  { owner: user._id }, { visibility: VisibilityTypes.public },{ visibility: VisibilityTypes.private } ] }//none    
 } 
-
-/*OLD
-exports.canCreate = function(user) {
-    if (this.isAdministrator(user)) return true;
-    if (this.isProvider(user)) return true;
-    if (this.isSupplier(user)) return true;
-    return false;
-}
-
-exports.canRead = function(resource, user) {
-    if (this.isSupplier(user)) return false;
-    if (!resource.visibility) resource.visibility = VisibilityTypes.private;
-    if (resource.visibility == VisibilityTypes.public) return true;
-    if (this.isAdministrator(user)) return true;
-    if (this.isAnalyst(user)) return true;
-    if (this.isProvider(user) && this.isOwner(resource, user)) return true;
-    return false;
-} 
-
-exports.canModify = function(resource, user) {
-    if (this.isAdministrator(user)) return true;
-    if (this.isProvider(user) && this.isOwner(resource, user)) return true;
-    return false
-} 
-
-exports.canDelete = function(resource, user) {
-    if (this.isAdministrator(user)) return true;
-    if (this.isSupplier(user)) return false;
-    if (this.isProvider(user) && this.isOwner(resource, user)) return true;
-    return false;
-} 
-
-exports.canDeleteList = function(user) {
-    if (this.isAdministrator(user)) return true;
-    if (this.isSupplier(user)) return false;
-    if (this.isProvider(user)) return true;
-    if (this.isAnalyst(user)) return false;
-    return false;
-}*/ 
 
 exports.canDeleteMeasurementList = function(user,role,method,entity) {
     if(method!="DELETE")return false;//Delete
@@ -132,23 +84,11 @@ exports.canDeleteMeasurementList = function(user,role,method,entity) {
     if(permission===undefined)permission=role.default[CrudTypes[method]];    
     if(permission==RoleCrudTypes.all)return true;
     if(permission==RoleCrudTypes.owned)return true; 
-    //if (!resource.visibility) resource.visibility = VisibilityTypes.private;
-    if(permission==RoleCrudTypes.public_and_owned)return true;//||resource.visibility == VisibilityTypes.public;
+    
+    if(permission==RoleCrudTypes.public_and_owned)return true;
     return false;
 }
 
-/*OLD
-exports.whatCanRead = function(user) {
-    let result = {};
-    if (this.isSupplier(user)) result = { $and: [  { owner: user._id }, { visibility: VisibilityTypes.public },{ visibility: VisibilityTypes.private } ] };//can't see anything
-    if (this.isAdministrator(user)) return result;
-    if (this.isAnalyst(user)) return result;
-    if (this.isProvider(user)) result = { $or: [  { owner: user._id }, { visibility: VisibilityTypes.public } ] };
-    //if (this.isProvider(user)) result = { $or: [  { owner: user._id }, { $and: [{ visibility: {$exists: true} , visibility: VisibilityTypes.public }] } ] };
-    //if (this.isProvider(user)) result = { pincopallo: {$exists: false} };
-    return result;
-} 
-*/
 exports.whichRights = function(user, rights, where) {
     let result = {};
     if (this.isAdministrator(user)) return result;
@@ -213,11 +153,3 @@ exports.readJustOwned = function(user) {
     if (this.isAdministrator(user)) return null;
     return { owner: user._id };
 } 
-/*OLD
-exports.whatCanDelete = function(user) {
-    if (this.isAdministrator(user)) return null;
-    if (this.isSupplier(user)) return { $and: [  { owner: user._id }, { visibility: VisibilityTypes.public },{ visibility: VisibilityTypes.private } ] };
-    if (this.isProvider(user)) return { owner: user._id };
-    return null;
-} 
-*/
