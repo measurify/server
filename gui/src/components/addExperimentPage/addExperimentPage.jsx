@@ -409,7 +409,6 @@ export default function AddExperimentPage(props) {
             height: "fit-content",
           }}
         >
-          {postType === "form" && "Export values on a json file"}
           {postType === "form" && protocols !== undefined && (
             <div style={{ margin: 5 + "px" }}>
               {(searchParams.get("from") === null ||
