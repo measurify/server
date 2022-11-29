@@ -49,7 +49,7 @@ pageActions["users"] = ["view", "delete"];
 //pageActions["tags"] = ["view", "edit", "delete"];
 //pageActions["devices"] = ["view", "edit", "delete"];
 pageActions["protocols"] = ["view", "delete"];
-pageActions["experiments"] = ["view", "edit", "duplicate", "delete"];
+pageActions["experiments"] = ["view", "delete"]; //"edit", "duplicate",
 //pageActions["measurements"] = ["view", "edit", "delete"];
 
 //view dictionary: key is the page, value is an array that contains the fields shown to the user with "view" action
