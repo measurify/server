@@ -189,6 +189,32 @@ describe('/POST feature', () => {
         res.body.timesamples.length.should.be.eql(4);
     });
 
+    it('it should POST a list of timesamples in csv from body', async () => {
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature", owner);
+        const device = await factory.createDevice("test-device-1", owner, [feature]);
+        const thing = await factory.createThing("test-thing-1", owner);
+        const measurement = await factory.createMeasurement(owner, feature, device, thing, [], []);
+        const body= {
+            body: "timestamp,values\n2022-12-21T14:15:27.976Z,[10]\n2022-12-22T14:15:27.976Z,[20]\n2022-12-23T14:15:27.976Z,[30]\n2022-12-24T14:15:27.976Z,[40]\n2022-12-25T14:15:27.976Z,[50]"    
+        }
+        const res = await chai.request(server).keepOpen().post('/v1/measurements/' + measurement._id + '/timeserie').set("Authorization", await factory.getUserToken(owner)).set("Accept", "text/csv").send(body);
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.timesamples.length.should.be.eql(5);
+        const body2= {
+            body: "timestamp,values\n2022-12-26T14:15:27.976Z,30\n2022-12-27T14:15:27.976Z,40\n2022-12-28T14:15:27.976Z,50\n2022-12-29T14:15:27.976Z,60\n2022-12-30T14:15:27.976Z,70"    
+        }
+        const res2 = await chai.request(server).keepOpen().post('/v1/measurements/' + measurement._id + '/timeserie').set("Authorization", await factory.getUserToken(owner)).set("Accept", "text/csv").send(body2);
+        res2.should.have.status(200);
+        res2.body.should.be.a('object');
+        res2.body.timesamples.length.should.be.eql(5);
+        const res3 = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id + '/timeserie').set("Authorization", await factory.getUserToken(owner));
+        res3.should.have.status(200);
+        res3.body.docs.should.be.a('array');
+        res3.body.docs.length.should.be.eql(10);
+    });
+
     it('it should POST only correct timesamples of a list', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);

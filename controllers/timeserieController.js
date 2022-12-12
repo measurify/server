@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const controller = require("./controller");
 const checker = require("./checker");
 const { query } = require("express");
+const extractData =require("../commons/extractData.js")
 
 exports.get = async (req, res) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
@@ -43,6 +44,7 @@ exports.post = async (req, res) => {
   result = await checker.canOperate(req, res,"Measurement","GET"); if (result != true) return result;  
   result = await checker.hasRights(req, res, Measurement);if (result != true) return result;
   result = await checker.canOperate(req, res,"Measurement"); if (result != true) return result;  
+  if(req.headers.accept=="text/csv"){result=await extractData.bodyToCSV(req,res);if (result != true) return result;}
   if (req.body.constructor == Array) req.body.forEach(item => item.measurement = req.resource._id)
   else req.body.measurement = req.resource._id;
   return await controller.postResource(req, res, Timesample);

@@ -179,3 +179,23 @@ const restoreHeader = function (header,query) {//replaceSeparator may change inf
     if(sepArray=="."){let regex= new RegExp("\\"+process.env.CSV_VECTOR_DELIMITER, "g");header=header.replace(regex,".")}
     return header;
 }
+
+
+exports.bodyToCSV =async function (req,res){
+    if (!process.env.CSV_DELIMITER) process.env.CSV_DELIMITER = ',';
+    let sep=process.env.CSV_DELIMITER
+    if(req.query&&req.query.sep)sep=req.query.sep;
+    let error=false;
+    let fileData=req.body.body;
+    if(req.query) [fileData,error] = replaceSeparator(fileData, req.query);//req query sep sepArray sepFloat
+    if(error)return errors.manage(res, errors.separatorError, error);
+    let transpose = false;             
+    let modelName="Timesample";
+    let fileText = readFile(req, fileData, modelName, transpose);              
+    let result = inspector.checkHeader(fileText.schema, fileText.header,modelName);                
+    if (result !== true) return errors.manage(res, errors.wrong_header, result);
+    let body = conversion.csv2json(fileText.userId, fileText.header, fileText.data, fileText.schema, modelName);      
+    req.body = body;
+
+    return true;
+}
