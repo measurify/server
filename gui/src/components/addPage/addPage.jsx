@@ -124,7 +124,7 @@ export default function AddPage(props) {
     return <div>This entity cannot be posted</div>;
 
   //handle changes
-  const handleChanges = (val, path) => {
+  const handleChanges = (val, path, ignoreAdd = false) => {
     let tmpVals = cloneDeep(values);
     let valuesPtr = tmpVals;
 
@@ -137,14 +137,13 @@ export default function AddPage(props) {
     valuesPtr[path[i]] = val;
     if (typeof path[i] === "number") lastIndexNumber = i;
 
-    if (lastIndexNumber !== -1)
+    if (ignoreAdd === false && lastIndexNumber !== -1)
       tmpVals = maintainEmptyElement(
         tmpVals,
         path.slice(0, lastIndexNumber),
         addFields,
         resource
       );
-
     setValues(tmpVals);
   };
 
@@ -189,6 +188,7 @@ export default function AddPage(props) {
     let tmpValues = cloneDeep(body);
     removeDefaultElements(tmpValues);
     let res;
+
     try {
       const resp = await post_generic(
         resource,
@@ -226,11 +226,8 @@ export default function AddPage(props) {
     }
 
     if (res.status === 200) {
-      if (window.confirm("Back to resource page?") === true) {
-        if (resource === "tenants") navigate("/");
-        else navigate("/" + resource);
-      } else {
-      }
+      window.alert("Resource successufully posted!");
+      navigate("/" + resource);
     }
   };
 
@@ -285,10 +282,8 @@ export default function AddPage(props) {
     }
 
     if (res.status === 200) {
-      if (window.confirm("Back to resource page?") === true) {
-        navigate("/" + resource);
-      } else {
-      }
+      window.alert("Resource posted correctly");
+      navigate("/" + resource);
     }
   };
   return (
@@ -341,7 +336,6 @@ export default function AddPage(props) {
                 submitFunction={postBody}
                 backFunction={back}
               />
-
               <br />
               <font
                 style={{

@@ -65,7 +65,12 @@ export default function ProfilePage(params) {
       return;
     }
     try {
-      await login(username, oldPassword, tenant, false);
+      await login(
+        username,
+        oldPassword,
+        tenant !== "-" ? tenant : undefined,
+        false
+      );
     } catch (error) {
       setMsg(locale().old_pass_wrong);
       return;
@@ -78,7 +83,7 @@ export default function ProfilePage(params) {
           { password: password },
           username
         );
-
+        setOldPassword("");
         setPassword("");
         setPasswordConfirm("");
         if (response.response.status === 200) {

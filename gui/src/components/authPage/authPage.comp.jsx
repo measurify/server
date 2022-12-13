@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button } from "react-bootstrap";
 import locale from "../../common/locale";
 import { login } from "../../services/http_operations";
+import { SetRoleDefinition } from "../../services/userRolesManagement";
 import { NavLink } from "react-router-dom";
 import { languages } from "../../config";
 import "./authPage.scss";
@@ -31,6 +32,7 @@ const AuthPageComp = () => {
     }
     try {
       await login(user, psw, tenant);
+      await SetRoleDefinition();
       window.location.replace("/");
     } catch (error) {
       console.log({ error: error.response.data });

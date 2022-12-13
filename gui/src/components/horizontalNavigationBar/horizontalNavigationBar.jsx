@@ -23,7 +23,7 @@ import {
 import { pages, languages, website_name } from "../../config";
 import { LanguageSelector } from "../languageSelector/languageSelector";
 import { canDo } from "../../services/userRolesManagement";
-import { capitalize } from "../../services/misc_functions";
+import { Capitalize } from "../../services/misc_functions";
 fontawesome.library.add(
   faTimes,
   faBars,
@@ -248,7 +248,7 @@ export default function HorizontalNavigationBar() {
                         key={k}
                         onClick={() => setIsOpened(false)}
                       >
-                        {capitalize(k)}
+                        {Capitalize(k)}
                       </NavLink>
                     </Col>
                   );

@@ -23,6 +23,7 @@ import {
   maintainEmptyElement,
   maintainEmptyElements,
 } from "../../services/objects_manipulation";
+import ImportExportValues from "../importExportValues/importExportValues";
 
 const cloneDeep = require("clone-deep");
 /*
@@ -57,6 +58,8 @@ export default function AddExperimentPage(props) {
   //message for user
   const [msg, setMsg] = useState("");
   const [isError, setIsError] = useState(false);
+  //import message for user
+  const [importMsg, setImportMsg] = useState("");
   //values
   const [values, setValues] = useState(cloneDeep(addFields[resource]));
   //disabled
@@ -73,7 +76,7 @@ export default function AddExperimentPage(props) {
   const [contentBody, setContentBody] = useState(null);
   const [contentPlain, setContentPlain] = useState(null);
 
-  //useeffect to get resource if required
+  //useeffect to get protocols
   useEffect(() => {
     const fetchData = async (qs = {}) => {
       // get the protocols data from the api
@@ -85,7 +88,7 @@ export default function AddExperimentPage(props) {
     fetchData(qs);
   }, [props, searchParams]);
 
-  //useeffect to get resource if required
+  //useeffect to get resource if required (for the "duplicate" actions)
   useEffect(() => {
     const fetchDataDuplicate = async (qs = {}) => {
       // get the data from the api
@@ -110,7 +113,6 @@ export default function AddExperimentPage(props) {
 
       tmpValues["_id"] = tmpValues["_id"] + "_copy";
 
-      console.log(tmpValues);
       tmpValues = maintainEmptyElements(tmpValues, addFields, resource);
       setValues(tmpValues);
     };
@@ -291,22 +293,49 @@ export default function AddExperimentPage(props) {
       setMsg(error.error.response.data.message + " : " + det);
       setIsError(true);
     }
-
     if (res.status === 200) {
-      if (
-        window.confirm(
-          "Experiment successufully posted! Back to resource page?"
-        ) === true
-      ) {
-        navigate("/" + resource);
-      } else {
-      }
+      window.alert("Experiment successufully posted!");
+      navigate("/" + resource);
     }
   };
 
   const back = (e) => {
     e.preventDefault();
     navigate(-1);
+  };
+
+  const importValues = (importedValues) => {
+    try {
+      const imported = JSON.parse(importedValues);
+      const template = cloneDeep(values);
+
+      template["protocol"] = "";
+      template["metadata"] = [{ name: "", value: "" }];
+      const sorted = sortObject(imported, template);
+
+      if (
+        sorted["_id"] === undefined &&
+        sorted["owner"] === undefined &&
+        sorted["protocol"] === undefined &&
+        sorted["metadata"] === undefined
+      ) {
+        setImportMsg(locale().error_imported_file);
+        return;
+      }
+      setImportMsg("");
+
+      //remove history when present
+      if (sorted["history"] !== undefined) delete sorted["history"];
+      setValues(sorted);
+
+      const tmpDisabled = cloneDeep(disabledFields);
+      tmpDisabled["protocol"] = true;
+
+      setDisabledFields(tmpDisabled);
+    } catch (error) {
+      setImportMsg(locale().error_imported_file);
+      console.log(error);
+    }
   };
 
   const postFile = async (e) => {
@@ -360,14 +389,9 @@ export default function AddExperimentPage(props) {
     }
 
     if (res.status === 200) {
-      if (
-        window.confirm(
-          "Experiment successufully posted! Back to resource page?"
-        ) === true
-      ) {
-        navigate("/" + resource);
-      } else {
-      }
+      window.alert("Experiment successufully posted!");
+
+      navigate("/" + resource);
     }
   };
 
@@ -410,47 +434,26 @@ export default function AddExperimentPage(props) {
           }}
         >
           {postType === "form" && (
-            <Form.Group className="mb-2">
-              <Form.Control
-                className="mb-3"
-                type="file"
-                accept=".json"
-                label="File"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  props.setFile(file);
-                  const fileReader = new FileReader();
-
-                  fileReader.onloadend = () => {
-                    const content = fileReader.result;
-                    console.log(content);
-                  };
-                  fileReader.readAsText(file);
-                }}
-              />
-
-              <Form.Text className="text-muted">
-                Import values from JSON file
-              </Form.Text>
-            </Form.Group>
+            <ImportExportValues
+              values={values}
+              importValues={importValues}
+              importMsg={importMsg}
+            />
           )}
-          {postType === "form" && "Export values on a json file"}
           {postType === "form" && protocols !== undefined && (
             <div style={{ margin: 5 + "px" }}>
-              {(searchParams.get("from") === null ||
-                searchParams.get("from") === "") && (
-                <Form.Select
-                  aria-label={locale().select + " protocol"}
-                  onChange={handleProtocolChange}
-                >
-                  <option>{locale().select} protocol</option>
-                  {React.Children.toArray(
-                    protocols.map((e) => {
-                      return <option value={e}>{e}</option>;
-                    })
-                  )}
-                </Form.Select>
-              )}
+              <Form.Select
+                aria-label={locale().select + " protocol"}
+                onChange={handleProtocolChange}
+                value={values["protocol"]}
+              >
+                <option>{locale().select} protocol</option>
+                {React.Children.toArray(
+                  protocols.map((e) => {
+                    return <option value={e}>{e}</option>;
+                  })
+                )}
+              </Form.Select>
               <br />
               <FormManager
                 values={values}
@@ -462,9 +465,6 @@ export default function AddExperimentPage(props) {
                 submitFunction={postBody}
                 backFunction={back}
               />
-
-              <br />
-
               <font
                 style={{
                   marginLeft: 5 + "px",

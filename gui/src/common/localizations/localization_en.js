@@ -12,6 +12,8 @@ const localization_en = {
   resources: "Resources",
   notifications: "Notifications",
   file_content: "File content",
+  preview: "Preview",
+  configuration: "Configuration",
 
   clear_all: "Clear all",
 
@@ -53,6 +55,8 @@ const localization_en = {
   logout: "Logout",
   repeat: "Repeat",
   close: "Close",
+  import: "Import",
+  export: "Export",
 
   ///Errors
   login_error: "Wrong login!",
@@ -60,6 +64,7 @@ const localization_en = {
   session_expired: "Session expired",
   no_file: "Please, select a file",
   duplicate_error: "The database already contains a resource with",
+  error_imported_file: "File contains errors. It was not possible to import it",
 };
 
 export default localization_en;
