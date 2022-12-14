@@ -21,7 +21,8 @@ export let notificationManager = {
 
 //set APIs url according to configuration or GUI host
 export function SetAPIUrl() {
-  api_url = base_api_url !== undefined ? base_api_url : window.location.origin;
+  api_url =
+    base_api_url !== undefined ? base_api_url : window.location.origin + "/v1";
 }
 
 //login
