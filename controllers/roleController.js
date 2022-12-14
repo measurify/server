@@ -9,10 +9,10 @@ const persistence = require('../commons/persistence.js');
 exports.get = async (req, res) => { 
     const Role = mongoose.dbs[req.tenant.database].model('Role');
     const select = await checker.whatCanSee(req, res, Role);   
-    const restriction_1 = await checker.whatCanOperate(req, res,"Role");
+    //const restriction_1 = await checker.whatCanOperate(req, res,"Role");
     const restriction_2 = await checker.whichRights(req, res, Role);
-    const restrictions = {...restriction_1, ...restriction_2};
-    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Role, restrictions);
+    //const restrictions = {...restriction_1, ...restriction_2};
+    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', select, Role, restriction_2);
 };
 
 exports.pipe = async (req, res) => { 
@@ -28,7 +28,7 @@ exports.getone = async (req, res) => {
     const Role = mongoose.dbs[req.tenant.database].model('Role');
     const select = await checker.whatCanSee(req, res, Role);
     let result = await checker.isAvailable(req, res, Role); if (result != true) return result;
-    result = await checker.canOperate(req, res,"Role"); if (result != true) return result;
+    //result = await checker.canOperate(req, res,"Role"); if (result != true) return result;
     result = await checker.hasRights(req, res, Role); if (result != true) return result;
     return await controller.getResource(req, res, null, Role, select);
 };
