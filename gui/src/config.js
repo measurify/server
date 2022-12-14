@@ -76,6 +76,7 @@ viewFields["tags"] = ["tags"];
 viewFields["things"] = ["_id", "visibility", "tags"];
 viewFields["devices"] = ["_id", "features", "tags", "scripts"];
 viewFields["measurements"] = [
+  "_id",
   "thing",
   "feature",
   "device",
