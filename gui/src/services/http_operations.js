@@ -1,10 +1,12 @@
-import { api_url } from "../config";
+import { base_api_url } from "../config";
 
 const axios = require("axios").default;
 
 const https = require("https");
 
-const instance = axios.create({
+export let api_url;
+
+export const instance = axios.create({
   httpsAgent: new https.Agent({
     //unsafe, delete in prod
     //rejectUnauthorized: false,
@@ -16,6 +18,12 @@ export let notificationManager = {
   RemoveNotification: (id) => {},
   ClearNotifications: () => {},
 };
+
+//set APIs url according to configuration or GUI host
+export function SetAPIUrl() {
+  api_url =
+    base_api_url !== undefined ? base_api_url : window.location.origin + "/v1";
+}
 
 //login
 export function login(username, password, tenant, saveToken = true) {
@@ -83,51 +91,6 @@ export function refreshToken() {
       })
       .catch((error) => {
         reject(error);
-      });
-  });
-}
-
-//this function post a single thing inside the DB
-export function postThing(thingId, pt_options = {}) {
-  const body = { _id: thingId };
-  return new Promise((resolve, reject) => {
-    post_generic("things", body, pt_options)
-      .then((response) => {
-        resolve(response);
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
-}
-
-// This function checks if a thing (i.e., trip) is already in the DB
-// If not in, create one
-export function checkThingAlreadyIn(thingId) {
-  const url = api_url + "/things/" + thingId;
-  const options = {
-    headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-cache",
-      "cache-control": "no-cache",
-      Authorization: GetToken(),
-    },
-  };
-  return new Promise((resolve, reject) => {
-    instance
-      .get(url, options)
-      .then((request) => {
-        //thing found in database
-        if (request.status === 200) resolve({ found: true });
-      })
-      .catch((error) => {
-        //thing not found in database
-        if (error.response.status === 404) {
-          resolve({ found: false });
-        }
-        /*else {
-          reject(false);
-        }*/
       });
   });
 }
@@ -399,7 +362,36 @@ export async function get_generic(resource_type, qs = {}, token) {
   });
 }
 
+export async function get_one_generic(resource_type, id, token) {
+  let url = api_url + "/" + resource_type + "/" + id;
+  if (token === undefined) token = GetToken();
+
+  console.log("GET ONE:" + url);
+
+  let options = {
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache",
+      Authorization: token,
+    },
+
+    json: true,
+  };
+  return new Promise((resolve, reject) => {
+    instance
+      .get(url, options)
+      .then((response) => {
+        resolve({
+          response: response,
+        });
+      })
+      .catch((error) => {
+        reject({ error: error });
+      });
+  });
+}
+
 //return the login token from the localstorage
-function GetToken() {
+export function GetToken() {
   return localStorage.getItem("token");
 }

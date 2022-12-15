@@ -16,6 +16,8 @@ interface ILocalization {
   resources: string;
   notifications: string;
   file_content: string;
+  preview: string;
+  configuration: string;
 
   clear_all: string;
 
@@ -54,12 +56,15 @@ interface ILocalization {
   logout: string;
   repeat: string;
   close: string;
+  import: string;
+  export: string;
 
   ///Errors
   login_error: string;
   unauthorised_user: string;
   session_expired: string;
   no_file: string;
+  error_imported_file: string;
   duplicate_error: string;
 }
 

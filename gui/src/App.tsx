@@ -21,14 +21,22 @@ import NotificationBar from "./components/notificationBar/notificationBar";
 import HorizontalNavigationBar from "./components/horizontalNavigationBar/horizontalNavigationBar";
 import AppContext from "./context";
 
-import { notificationManager, get_generic } from "./services/http_operations";
+import {
+  notificationManager,
+  get_generic,
+  SetAPIUrl,
+} from "./services/http_operations";
+import { logsManager } from "./services/operation_tool_services";
 import MobilePlaceholderPage from "./components/mobilePlaceholderPage/mobilePlaceholderPage";
 import EditContentPage from "./components/editContentPage/editContentPage";
 import AddPage from "./components/addPage/addPage";
 import AddExperimentPage from "./components/addExperimentPage/addExperimentPage";
 import { layout } from "./config";
 import AddMeasurementsPage from "./components/addMeasurementsPage/addMeasurementsPage";
+import UpdateHistoryPage from "./components/OperationToolPages/updateSteps/updateHistory";
+import DownloadPage from "./components/OperationToolPages/download/downloadExperiment";
 import cloneDeep from "clone-deep";
+import RemoveStepsPage from "./components/OperationToolPages/removeSteps/removeSteps";
 /*
     notifications follow this schema
 
@@ -49,11 +57,15 @@ interface INotification {
 
 function App() {
   const [notifications, setNotifications] = useState<INotification[]>([]);
+  const [logs, setLogs] = useState<INotification[]>([]);
   const [types, setTypes] = useState<Object | undefined>();
   const [data, setData] = useState<Object>({});
 
   let layoutRef = React.useRef<string | null>();
   const tkn = localStorage.getItem("token");
+
+  //set api url to run https operations
+  SetAPIUrl();
 
   ////////////////NOTIFICATION MANAGEMENT FRAGMENT
   //function to push a new notification at the beginning of the list
@@ -127,6 +139,38 @@ function App() {
   };
   ///////////////END FETCHED TYPES MANAGEMENT FRAGMENT
 
+  ///////////////////////////LOGGER MANAGEMENT FRAGMENT
+  //function to push a new notification at the beginning of the list
+  function PushLog(obj: INotification) {
+    setLogs((prev) => [obj].concat(prev));
+    let textarea = document.getElementById("logger");
+    if (textarea !== null && textarea !== undefined)
+      textarea.scrollTop = textarea.scrollHeight;
+  }
+  //function to remove a single notification from list
+  function RemoveLog(id: number) {
+    let tmp = [...logs];
+    tmp.splice(id, 1);
+    setLogs(tmp);
+  }
+
+  //function to clear notifications list
+  function ClearLogs() {
+    setLogs([]);
+  }
+
+  const logsManagement = {
+    logs: logs,
+    PushLog,
+    RemoveLog,
+    ClearLogs,
+  };
+
+  logsManager.ClearLogs = ClearLogs;
+  logsManager.PushLog = PushLog;
+  logsManager.RemoveLog = RemoveLog;
+  ///////////////////////////END LOGGER MANAGEMENT FRAGMENT
+
   //mobile view only allowed to be vertical
   if (/Mobi/i.test(window.navigator.userAgent) == true) {
     layoutRef.current = "vertical";
@@ -145,6 +189,7 @@ function App() {
               path="/add/tenants"
               element={<AddPage resource={"tenants"} />}
             />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>
       </div>
@@ -155,6 +200,7 @@ function App() {
       value={{
         notifications: notificationManagement,
         fetched: fetchedManagement,
+        logs: logsManagement,
       }}
     >
       <Router>
@@ -209,6 +255,9 @@ function App() {
                   path="/edit/:resource/:id"
                   element={<EditContentPage />}
                 />
+                <Route path="/downloadexperiment" element={<DownloadPage />} />
+                <Route path="/updatehistory" element={<UpdateHistoryPage />} />
+                <Route path="/removesteps" element={<RemoveStepsPage />} />
                 <Route path="/add/:resource/" element={<AddPage />} />
                 <Route path="/:page" element={<Page res=":page" />} />
 

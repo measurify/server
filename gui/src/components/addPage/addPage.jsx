@@ -24,7 +24,6 @@ import {
 } from "../../services/objects_manipulation";
 import AppContext from "../../context";
 import { fetchedPageTypes, fetchedPageData } from "../../config";
-
 const cloneDeep = require("clone-deep");
 
 /*
@@ -77,21 +76,22 @@ export default function AddPage(props) {
   if (context !== undefined) myFetched = context.fetched;
   else myFetched = {};
 
-  /////////////FETCH REQUIRED RESOURCES
-  const fetchData = async (res) => {
-    if (myFetched.data[res] !== undefined) return;
-    // get the data from the api
-    try {
-      const response = await get_generic(res, { limit: 100 });
-      myFetched.UpdateData(
-        response.docs.map((e) => e._id),
-        res
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  };
   useEffect(() => {
+    /////////////FETCH REQUIRED RESOURCES
+    const fetchData = async (res) => {
+      if (myFetched.data[res] !== undefined) return;
+      // get the data from the api
+      try {
+        const response = await get_generic(res, { limit: 100 });
+        myFetched.UpdateData(
+          response.docs.map((e) => e._id),
+          res
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     if (fetchedPageData[resource] !== undefined) {
       Object.values(fetchedPageData[resource]).forEach((e) => fetchData(e));
     }
@@ -99,7 +99,7 @@ export default function AddPage(props) {
 
   //useeffect to get resource if required
   useEffect(() => {
-    const fetchData = async (qs = {}) => {
+    const fetchSingle = async (qs = {}) => {
       // get the data from the api
       const response = await get_generic(resource, qs);
 
@@ -116,7 +116,7 @@ export default function AddPage(props) {
       return;
     const fst = { _id: searchParams.get("from") };
     const qs = { filter: JSON.stringify(fst) };
-    fetchData(qs);
+    fetchSingle(qs);
   }, [searchParams, resource]);
 
   //return if page shouldn't be rendered
@@ -124,7 +124,7 @@ export default function AddPage(props) {
     return <div>This entity cannot be posted</div>;
 
   //handle changes
-  const handleChanges = (val, path) => {
+  const handleChanges = (val, path, ignoreAdd = false) => {
     let tmpVals = cloneDeep(values);
     let valuesPtr = tmpVals;
 
@@ -137,14 +137,13 @@ export default function AddPage(props) {
     valuesPtr[path[i]] = val;
     if (typeof path[i] === "number") lastIndexNumber = i;
 
-    if (lastIndexNumber !== -1)
+    if (ignoreAdd === false && lastIndexNumber !== -1)
       tmpVals = maintainEmptyElement(
         tmpVals,
         path.slice(0, lastIndexNumber),
         addFields,
         resource
       );
-
     setValues(tmpVals);
   };
 
@@ -189,6 +188,7 @@ export default function AddPage(props) {
     let tmpValues = cloneDeep(body);
     removeDefaultElements(tmpValues);
     let res;
+
     try {
       const resp = await post_generic(
         resource,
@@ -226,11 +226,8 @@ export default function AddPage(props) {
     }
 
     if (res.status === 200) {
-      if (window.confirm("Back to resource page?") === true) {
-        if (resource === "tenants") navigate("/");
-        else navigate("/" + resource);
-      } else {
-      }
+      window.alert("Resource successufully posted!");
+      navigate("/" + resource);
     }
   };
 
@@ -254,14 +251,28 @@ export default function AddPage(props) {
         setIsError(false);
       } catch (error) {
         console.log(error);
-
         res = error.error.response;
+        console.log({
+          message: error.error.response.data.message,
+          details: error.error.response.data.details,
+        });
+
+        let det = "";
+        if (error.error.response.data.details.includes("duplicate key")) {
+          det =
+            locale().duplicate_error +
+            " " +
+            error.error.response.data.details.slice(
+              error.error.response.data.details.indexOf("{") + 1,
+              -1
+            );
+        }
+        //default case: show details from error message
+        else {
+          det = error.error.response.data.details;
+        }
         //add details
-        setMsg(
-          error.error.response.data.message +
-            " : " +
-            error.error.response.data.details
-        );
+        setMsg(error.error.response.data.message + " : " + det);
         setIsError(true);
       }
     }
@@ -274,21 +285,34 @@ export default function AddPage(props) {
       } catch (error) {
         console.log(error);
         res = error.error.response;
+        console.log({
+          message: error.error.response.data.message,
+          details: error.error.response.data.details,
+        });
+
+        let det = "";
+        if (error.error.response.data.details.includes("duplicate key")) {
+          det =
+            locale().duplicate_error +
+            " " +
+            error.error.response.data.details.slice(
+              error.error.response.data.details.indexOf("{") + 1,
+              -1
+            );
+        }
+        //default case: show details from error message
+        else {
+          det = error.error.response.data.details;
+        }
         //add details
-        setMsg(
-          error.error.response.data.message +
-            " : " +
-            error.error.response.data.details
-        );
+        setMsg(error.error.response.data.message + " : " + det);
         setIsError(true);
       }
     }
 
     if (res.status === 200) {
-      if (window.confirm("Back to resource page?") === true) {
-        navigate("/" + resource);
-      } else {
-      }
+      window.alert("Resource posted correctly");
+      navigate("/" + resource);
     }
   };
   return (
@@ -341,7 +365,6 @@ export default function AddPage(props) {
                 submitFunction={postBody}
                 backFunction={back}
               />
-
               <br />
               <font
                 style={{

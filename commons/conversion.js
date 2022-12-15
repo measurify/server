@@ -21,7 +21,11 @@ exports.csv2json = function (owner, header, data, schema, modelName) {//items ov
                 if (schema.paths[key].instance == 'Array') {
                     if (!result[key]) result[key] = [];//not found, create it   
                     if (!arr[header.indexOf(key)]) continue;//blank element
-                    result[key].push(...cleanFunction(arr[header.indexOf(key)], modelName));
+                    try {
+                        result[key].push(...cleanFunction(arr[header.indexOf(key)], modelName));
+                    } catch (error) {                        
+                        throw new Error('Error in CSV format')
+                    }
                 }
                 else if (header.indexOf("_id") == -1 || arr[header.indexOf("_id")]) result[key] = arr[header.indexOf(key)];//not Array elements can't be splitted in more lines
             }
@@ -35,16 +39,16 @@ exports.csv2json = function (owner, header, data, schema, modelName) {//items ov
                         if (arr[header.indexOf(key)].startsWith("[")) {//Array
                             let stringData = arr[header.indexOf(key)];
                             stringData = stringData.slice(1, -1);//remove []
-                            if(!(modelName==="Experiment"&&subKey[0]==="metadata"))stringData = stringData.split(";");//doesn't remove "" because the position is important
-                            else stringData=[stringData.split(";")];
-                            
+                            if (!(modelName === "Experiment" && subKey[0] === "metadata")) stringData = stringData.split(";");//doesn't remove "" because the position is important
+                            else stringData = [stringData.split(";")];
+
                             if (!result[subKey[0]]) result[subKey[0]] = [];//not found, create it
                             if (!supportObj[subKey[0]]) supportObj[subKey[0]] = [];//not found, create it                        
                             if (supportObj[subKey[0]].length == 0 && stringData.length > 0) {//first time
                                 for (let i in stringData) { supportObj[subKey[0]].push({}); }
                             }
-                            for (let k in stringData) { if (stringData[k]!==undefined&&stringData[k]!=="") {if(!(modelName==="Experiment"&&subKey[0]==="metadata")){supportObj[subKey[0]][k][subKey[1]] = stringData[k]}else{if(k==0){supportObj[subKey[0]][subKey[1]] = stringData[0];}} }}
-                        
+                            for (let k in stringData) { if (stringData[k] !== undefined && stringData[k] !== "") { if (!(modelName === "Experiment" && subKey[0] === "metadata")) { supportObj[subKey[0]][k][subKey[1]] = stringData[k] } else { if (k == 0) { supportObj[subKey[0]][subKey[1]] = stringData[0]; } } } }
+
                         }
                         else {//the subpath is not an array                        
                             if (!result[subKey[0]]) result[subKey[0]] = [];//not found, create it                      
@@ -102,7 +106,10 @@ const cleanFunction = function (arr, modelName) {
     let array = null;
     try {
         if (modelName == "Timesample") {
-            if (!/[a-zA-Z]/g.test(arr)) { return JSON.parse(arr.replace(/;/g, ',')); }
+            if (!/[a-zA-Z]/g.test(arr)) {
+                if (arr.startsWith("[") && arr.endsWith("]")) return JSON.parse(arr.replace(/;/g, ','));
+                else{arr="["+arr+"]";return JSON.parse(arr.replace(/;/g, ','));}                
+            }
             else {
                 let arrNew = null;
                 arr = arr.replace(/;/g, ',');
@@ -209,7 +216,7 @@ exports.jsonToCSV = function (jsonData) {
             arr.push(key == "samples" ?
                 (!doc[key].length ? "[]" : sampleValues(doc[key][0]))
                 : (isArray(doc[key])
-                    && !doc[key].length || key == "location" ? "[]" : JSON.stringify(doc[key]).replace(/,/g,process.env.CSV_VECTOR_DELIMITER))));
+                    && !doc[key].length || key == "location" ? "[]" : JSON.stringify(doc[key]).replace(/,/g, process.env.CSV_VECTOR_DELIMITER))));
         csv += arr.join(process.env.CSV_DELIMITER) + "\n";
     })
     return csv;
@@ -288,31 +295,31 @@ const prepareFilter = function (filter, restriction) {
     return filter;
 }
 
-exports.replaceSeparatorsGet = function (data, query,res) {
+exports.replaceSeparatorsGet = function (data, query, res) {
     if (!process.env.CSV_DELIMITER) process.env.CSV_DELIMITER = ',';
     if (!process.env.CSV_VECTOR_DELIMITER) process.env.CSV_VECTOR_DELIMITER = ';';
-    if(query.sep==".")return [null, errors.manage(res, errors.get_request_error, "Separator can't be a dot")];
+    if (query.sep == ".") return [null, errors.manage(res, errors.get_request_error, "Separator can't be a dot")];
     let sep = !query.sep ? process.env.CSV_DELIMITER : query.sep;
     let sepArray = !query.sepArray ? process.env.CSV_VECTOR_DELIMITER : query.sepArray;
     let sepFloat = !query.sepFloat ? "." : query.sepFloat;
-    if (!query || (!query.sep && !query.sepArray && !query.sepFloat)) return [data,null];
-    if (sep === sepArray) return [null,errors.manage(res, errors.get_request_error,  "Separator and Separator Array can't be the same " + sep)];
+    if (!query || (!query.sep && !query.sepArray && !query.sepFloat)) return [data, null];
+    if (sep === sepArray) return [null, errors.manage(res, errors.get_request_error, "Separator and Separator Array can't be the same " + sep)];
     if (sep === sepFloat) return [null, errors.manage(res, errors.get_request_error, "Separator and Separator Float can't be the same " + sep)];
     if (sepArray === sepFloat) return [null, errors.manage(res, errors.get_request_error, "Separator Array and Separator Float can't be the same " + sepArray)];
     if (sep != process.env.CSV_DELIMITER) {
-        let regex = new RegExp("\\"+process.env.CSV_DELIMITER, "g");
+        let regex = new RegExp("\\" + process.env.CSV_DELIMITER, "g");
         data = data.replace(regex, "¤");
-    }    
+    }
     if (sepArray != process.env.CSV_VECTOR_DELIMITER) {
-        regex = new RegExp("\\"+process.env.CSV_VECTOR_DELIMITER, "g");        
+        regex = new RegExp("\\" + process.env.CSV_VECTOR_DELIMITER, "g");
         data = data.replace(regex, "¬");
-    }    
+    }
     if (sepFloat != ".") {
         regex = new RegExp("\\.", "g");
         data = data.replace(regex, "§");
-    }    
+    }
     data = data.replace(/¤/g, sep);
     data = data.replace(/¬/g, sepArray);
-    data = data.replace(/§/g, sepFloat);    
-    return [data,null];
+    data = data.replace(/§/g, sepFloat);
+    return [data, null];
 }

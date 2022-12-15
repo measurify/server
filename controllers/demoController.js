@@ -4,6 +4,7 @@ const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 
 exports.get = async (req, res) => {
+    if(!req.tenant||req.tenant._id!==process.env.DEFAULT_TENANT_DEMO){return errors.manage(res, errors.demo_tenant_required)}
     if (!Authorization.isAdministrator(req.user)) return errors.manage(res, errors.admin_restricted_access); 
     const User = mongoose.dbs[req.tenant.database].model('User');
     const Tag = mongoose.dbs[req.tenant.database].model('Tag');
@@ -27,6 +28,7 @@ exports.get = async (req, res) => {
 };
 
 exports.post = async (req, res) => {
+    if(!req.tenant||req.tenant._id!==process.env.DEFAULT_TENANT_DEMO){return errors.manage(res, errors.demo_tenant_required)}
     if (!Authorization.isAdministrator(req.user)) return errors.manage(res, errors.admin_restricted_access); 
 
     const User = mongoose.dbs[req.tenant.database].model('User');
@@ -54,7 +56,8 @@ exports.post = async (req, res) => {
     res.status(200).json({users: users, tags: tags, features:features, devices:devices, things:things, measurements:measurements, constraints:constraints, script:scripts, rights:rights });
 };
 
-exports.delete = async (req, res) => {
+exports.delete = async (req, res) => {    
+    if(!req.tenant||req.tenant._id!==process.env.DEFAULT_TENANT_DEMO){return errors.manage(res, errors.demo_tenant_required)}
     if (!Authorization.isAdministrator(req.user)) return errors.manage(res, errors.admin_restricted_access); 
     await factory.dropContents(req.tenant);
     /*

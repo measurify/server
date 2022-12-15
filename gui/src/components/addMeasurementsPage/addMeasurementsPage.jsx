@@ -244,7 +244,6 @@ export default function AddMeasurementsPage(props) {
     //deep clone formValues
     let token = undefined;
     let body = cloneDeep(formValues);
-    console.log(samples);
     let tmpSamples = samples.map((sample) => {
       return { values: sample.values.map((v) => v.value) };
     });
@@ -276,11 +275,8 @@ export default function AddMeasurementsPage(props) {
     }
 
     if (res.status === 200) {
-      if (window.confirm("Back to resource page?") === true) {
-        if (resource === "tenants") navigate("/");
-        else navigate("/" + resource);
-      } else {
-      }
+      window.alert("Measurement successufully posted!");
+      navigate("/" + resource);
     }
   };
 
@@ -340,10 +336,8 @@ export default function AddMeasurementsPage(props) {
     }
 
     if (res.status === 200) {
-      if (window.confirm("Back to resource page?") === true) {
-        navigate("/" + resource);
-      } else {
-      }
+      window.alert("Measurement successufully posted!");
+      navigate("/" + resource);
     }
   };
 

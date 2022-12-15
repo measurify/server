@@ -20,10 +20,16 @@ import {
   faCheck,
 } from "@fortawesome/fontawesome-free-solid";
 
-import { pages, languages, website_name } from "../../config";
+import {
+  pages,
+  languages,
+  website_name,
+  operationPages,
+  restrictionPages,
+} from "../../config";
 import { LanguageSelector } from "../languageSelector/languageSelector";
 import { canDo } from "../../services/userRolesManagement";
-import { capitalize } from "../../services/misc_functions";
+import { Capitalize } from "../../services/misc_functions";
 fontawesome.library.add(
   faTimes,
   faBars,
@@ -222,12 +228,16 @@ export default function Navigation() {
               </React.Fragment>
             )}
           </div>
-
+          <hr />
           <div className="app-nav-text">{locale().resources}</div>
           <hr />
           {Object.keys(pages).map((k) => {
             //check if user can access to the page
-            if (!canDo(role.current, k, "read")) {
+            if (
+              !canDo(role.current, k, "read") ||
+              (restrictionPages[k] !== undefined &&
+                !restrictionPages[k].includes(role.current))
+            ) {
               return "";
             }
             return (
@@ -238,10 +248,49 @@ export default function Navigation() {
                 key={k}
                 onClick={() => setIsOpened(false)}
               >
-                {capitalize(k)}
+                {Capitalize(k)}
               </NavLink>
             );
           })}
+          <hr />
+          {operationPages.length !== 0 && (
+            <>
+              <div className="app-nav-text">Manage Experiments</div> <hr />
+            </>
+          )}
+          {operationPages.includes("updatehistory") &&
+            canDo(role.current, "experiments", "update") && (
+              <NavLink
+                to={`/updatehistory`}
+                className={(navData) => (navData.isActive ? "active" : "")}
+                //activeClassName="active"}
+                onClick={() => setIsOpened(false)}
+              >
+                Update Experiments History
+              </NavLink>
+            )}
+          {operationPages.includes("downloadexperiment") &&
+            canDo(role.current, "experiments", "read") && (
+              <NavLink
+                to={`/downloadexperiment`}
+                className={(navData) => (navData.isActive ? "active" : "")}
+                //activeClassName="active"}
+                onClick={() => setIsOpened(false)}
+              >
+                Download Experiments Data
+              </NavLink>
+            )}
+          {operationPages.includes("removesteps") &&
+            canDo(role.current, "experiments", "update") && (
+              <NavLink
+                to={`/removesteps`}
+                className={(navData) => (navData.isActive ? "active" : "")}
+                //activeClassName="active"}
+                onClick={() => setIsOpened(false)}
+              >
+                Remove History Steps
+              </NavLink>
+            )}
         </div>
       </div>
     </nav>

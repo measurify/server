@@ -11,6 +11,8 @@ const localization_it = {
   resources: "Risorse",
   notifications: "Notifiche",
   file_content: "Contenuto del file",
+  preview: "Anteprima",
+  configuration: "Configurazione",
 
   clear_all: "Cancella tutto",
 
@@ -54,6 +56,8 @@ const localization_it = {
   logout: "Esci",
   repeat: "Ripeti",
   close: "Chiudi",
+  import: "Importa",
+  export: "Esporta",
 
   ///Errori
   login_error: "Login errata!",
@@ -61,6 +65,8 @@ const localization_it = {
   session_expired: "Sessione scaduta",
   no_file: "Si prega di selezionare un file",
   duplicate_error: "Nel database è già presente una risorsa con",
+  error_imported_file:
+    "Nel file sono presenti errori, non è stato possibile importarlo",
 };
 
 export default localization_it;

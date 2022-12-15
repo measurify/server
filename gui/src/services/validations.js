@@ -25,7 +25,6 @@ export async function isFeatureInUse(feature) {
       } else return false;
     }
   } catch (errors) {
-    console.log("Error on isFeatureInUse");
     console.log(errors);
     return false;
   }

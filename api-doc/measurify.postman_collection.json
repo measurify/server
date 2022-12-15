@@ -2838,6 +2838,73 @@
 						}
 					},
 					"response": []
+				},							
+				{
+					"name": "GET history steps in csv",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/experiments/{{experiment}}/history",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"experiments",
+								"{{experiment}}",
+								"history"
+							]
+						}
+					},
+					"response": []
+				},
+								
+				{
+					"name": "GET history steps in csv with separators",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/experiments/{{experiment}}/history?sep=,&sepArray=;&sepFloat=.",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"experiments",
+								"{{experiment}}",
+								"history"
+							],
+							"query": [
+								{
+									"key": "sep",
+									"value": ","
+								},
+								{
+									"key": "sepArray",
+									"value": ";"
+								},
+								{
+									"key": "sepFloat",
+									"value": "."
+								}
+							]
+						}
+					},
+					"response": []
 				},
 				{
 					"name": "ADD an history element",
