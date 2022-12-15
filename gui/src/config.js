@@ -58,7 +58,7 @@ aliasPages["experiments"] = { _actions: "Management" };
 //restriction dictionary: key is the page, value is an array of roles allowed to access to that page
 export const restrictionPages = {};
 
-restrictionPages["user"] = ["admin"];
+restrictionPages["users"] = ["admin"];
 restrictionPages["protocols"] = ["admin"];
 restrictionPages["roles"] = ["admin"];
 
