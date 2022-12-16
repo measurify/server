@@ -315,10 +315,12 @@ export default function AddExperimentPage(props) {
     try {
       const imported = JSON.parse(importedValues);
       const template = cloneDeep(values);
+      if (imported["state"] === null) imported["state"] = NaN;
 
       template["protocol"] = "";
       template["metadata"] = [{ name: "", value: "" }];
       const sorted = sortObject(imported, template);
+      console.log(sorted);
 
       if (
         sorted["_id"] === undefined &&
