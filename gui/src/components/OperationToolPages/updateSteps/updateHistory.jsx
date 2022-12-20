@@ -63,17 +63,17 @@ export default function UpdateHistoryPage() {
 
   const postHistory = async (e) => {
     e.preventDefault();
-    const csvSep = csvSepRef.current.value;
+    const _csvSep = csvSep;
     const arraySep = arraySepRef.current.value;
     const floatSep = floatSepRef.current.value;
     const ovd = ovdRef.current.checked;
 
-    if (csvSep === "" || arraySep === "" || floatSep === "") {
+    if (_csvSep === "" || arraySep === "" || floatSep === "") {
       setMsg("Please, define all the separators");
       setIsError(true);
       return;
     }
-    if (csvSep === arraySep || csvSep === floatSep || arraySep === floatSep) {
+    if (_csvSep === arraySep || _csvSep === floatSep || arraySep === floatSep) {
       setMsg("All the separators should have different values");
       setIsError(true);
       return;
@@ -90,7 +90,7 @@ export default function UpdateHistoryPage() {
       type: "info",
       msg: "-------Begin Upload Operation " + operationindex + "-------\n",
     });
-    await postHistoryFile(file, ovd, csvSep, arraySep, floatSep);
+    await postHistoryFile(file, ovd, _csvSep, arraySep, floatSep);
     myLogs.PushLog({
       type: "info",
       msg: "-------End Upload Operation " + operationindex + "-------\n\n",
