@@ -50,7 +50,7 @@
     "greenlock-express": "^4.0.3",
     "json2csv": "^5.0.7",
     "json5": "^2.2.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "mathjs": "^10.6.4",
     "mongodb": "^4.8.0",
     "mongoose": "^5.13.14",
