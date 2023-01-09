@@ -49,7 +49,7 @@
     "firebase-admin": "^11.0.0",
     "greenlock-express": "^4.0.3",
     "json2csv": "^5.0.7",
-    "json5": "^2.2.1",
+    "json5": "^2.2.2",
     "jsonwebtoken": "^8.5.1",
     "mathjs": "^10.6.4",
     "mongodb": "^4.8.0",
