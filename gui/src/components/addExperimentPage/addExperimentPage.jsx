@@ -320,7 +320,6 @@ export default function AddExperimentPage(props) {
       template["protocol"] = "";
       template["metadata"] = [{ name: "", value: "" }];
       const sorted = sortObject(imported, template);
-      console.log(sorted);
 
       if (
         sorted["_id"] === undefined &&

@@ -29,7 +29,6 @@ import { removeDefaultElements } from "../../../services/misc_functions";
 const cloneDeep = require("clone-deep");
 
 const ovdRef = React.createRef();
-const csvSepRef = React.createRef();
 const arraySepRef = React.createRef();
 const floatSepRef = React.createRef();
 

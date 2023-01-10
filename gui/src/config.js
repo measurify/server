@@ -59,8 +59,8 @@ aliasPages["experiments"] = { _actions: "Management" };
 export const restrictionPages = {};
 
 restrictionPages["users"] = ["admin"];
-restrictionPages["protocols"] = ["admin"];
 restrictionPages["roles"] = ["admin"];
+restrictionPages["protocols"] = ["admin"];
 
 //actions dictionary: key is the page, value is an array that contains actions || working actions arae "view" | "edit" | "delete" | "duplicate"
 export const pageActions = {};
@@ -85,7 +85,7 @@ viewFields["roles"] = ["_id", "default", "actions"];
 viewFields["tags"] = ["tags"];
 viewFields["things"] = ["_id", "visibility", "tags"];
 viewFields["devices"] = ["_id", "features", "tags", "scripts"];*/
-viewFields["protocols"] = ["_id", "description", "metadata"];
+viewFields["protocols"] = ["_id", "description", "metadata", "topics"];
 viewFields["experiments"] = [
   "_id",
   "description",

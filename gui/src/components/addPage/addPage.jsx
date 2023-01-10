@@ -202,26 +202,23 @@ export default function AddPage(props) {
       console.log(error);
       res = error.error.response;
       console.log({
-        message: error.error.response.data.message,
-        details: error.error.response.data.details,
+        message: res.data.message,
+        details: res.data.details,
       });
 
       let det = "";
-      if (error.error.response.data.details.includes("duplicate key")) {
+      if (res.data.details.includes("duplicate key")) {
         det =
           locale().duplicate_error +
           " " +
-          error.error.response.data.details.slice(
-            error.error.response.data.details.indexOf("{") + 1,
-            -1
-          );
+          res.data.details.slice(res.data.details.indexOf("{") + 1, -1);
       }
       //default case: show details from error message
       else {
-        det = error.error.response.data.details;
+        det = res.data.details;
       }
       //add details
-      setMsg(error.error.response.data.message + " : " + det);
+      setMsg(res.data.message + " : " + det);
       setIsError(true);
     }
 

@@ -65,12 +65,7 @@ export default function ProfilePage(params) {
       return;
     }
     try {
-      await login(
-        username,
-        oldPassword,
-        tenant !== "-" ? tenant : undefined,
-        false
-      );
+      await login(username, oldPassword, tenant !== "-" ? tenant : "", false);
     } catch (error) {
       setMsg(locale().old_pass_wrong);
       return;
