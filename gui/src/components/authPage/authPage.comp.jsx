@@ -44,7 +44,9 @@ const AuthPageComp = () => {
   return (
     <div className="auth-page">
       <div className="title-wrapper">
-        <div className="logo-section">---</div>
+        <div className="logo-section">
+          <Logo />
+        </div>
         <div className="title-section">Consolidated Database Dashboard</div>
         <br />
         <div className="subtitle-section">
