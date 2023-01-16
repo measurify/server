@@ -7,7 +7,9 @@ mongoose.Promise = global.Promise;
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true, index: true },
     password: { type: String, required: true, unique: true, select: false },
-    email: { type: String, index: true },
+    createdPassword: {type: Date, default: Date.now },
+    validityPasswordDays: {type: Number, default: process.env.DEFAULT_DAYS_VALIDITY_PASSWORD },
+    email: { type: String, required: "Please, supply an email",index: true },
     type: { type: String,  required: "Please, supply a user role", ref:'Role' },
     fieldmask: { type: String, ref: 'Fieldmask' },
     status: { type: String, enum: UserStatusTypes, default: UserStatusTypes.enabled },
@@ -24,6 +26,12 @@ userSchema.plugin(require('mongoose-paginate-v2'));
 userSchema.pre('save', async function() {
     if(this.isNew){let res = await this.constructor.findOne( { username:this.username});                                             
     if(res) throw new Error('The username '+this.username+' already exists'); }                      
+});
+
+//check email duplicated
+userSchema.pre('save', async function() {
+    if(this.isNew){let res = await this.constructor.findOne( { email:this.email});                                             
+    if(res) throw new Error('The email '+this.email+' already exists'); }                      
 });
 
 // validate type
