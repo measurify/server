@@ -262,7 +262,7 @@ describe('/PUT password', () => {
     it('it should GET a password reset', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
-        const res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&password=my_new_password&tenant=' + process.env.DEFAULT_TENANT).send({});
+        const res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&password=My_new_password&tenant=' + process.env.DEFAULT_TENANT).send({});
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('username');
@@ -301,11 +301,11 @@ describe('/PUT password', () => {
     it('it should not GET a password reset with a fake reset', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
-        let res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&password=my_new_password&tenant=' + process.env.DEFAULT_TENANT).send({});
+        let res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&password=My_new_password&tenant=' + process.env.DEFAULT_TENANT).send({});
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('username');
-        res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&password=my_new_password&tenant=' + process.env.DEFAULT_TENANT).send({});
+        res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&password=My_new_password&tenant=' + process.env.DEFAULT_TENANT).send({});
         res.should.have.status(errors.reset_invalid.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
