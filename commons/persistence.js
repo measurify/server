@@ -68,7 +68,7 @@ const postList = async function (body, model, tenant) {
     for (let [i, element] of body.entries()) {
         try {
             element.owner = body.owner;
-            if (element.password) element.password = checkPassword(body.password);
+            if (element.password) element.password = checkPassword(element.password);
             const resource = await (new model(element)).save()
             if (model.modelName == "Measurement") {
                 broker.publish('device-' + resource.device, resource);
