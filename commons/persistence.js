@@ -268,6 +268,6 @@ const modifyEmbeddedResourceList = async function (list, resource, field, identi
 const checkPassword = function (password) {
     const details = passwordStrength(password);
     if (details.id < process.env.MIN_PASSWORD_STRENGTH) throw new Error('The password strength is ' + details.value + ', please choose a stronger password');//MIN_PASSWORD_STRENGTH:0=TOO WEAK; 1=WEAK; 2=MEDIUM; 3=STRONG
-    //if (tenant.passwordhash == true) //removed for security
+    //if (req.tenant.passwordhash == true || req.tenant.passwordhash == 'true') //removed for security
     return bcrypt.hashSync(password, 8);
 }
