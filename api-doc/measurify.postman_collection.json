@@ -8860,7 +8860,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{url}}/v1/self?reset=5ea16a736caa124854c74c73&password=my_new_password&?tenant=atmosphere-dev",
+							"raw": "{{url}}/v1/self?reset=5ea16a736caa124854c74c73&password=my_new_password&tenant=atmosphere-dev",
 							"host": [
 								"{{url}}"
 							],
