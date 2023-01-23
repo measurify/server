@@ -141,24 +141,24 @@ exports.reset = async (req, res) => {
 };
 
 exports.password = async (req, res) => {
-    if(!req.query.tenant) return errors.manage(res, errors.get_request_error, "Query param `tenant` is required");
+    if(!req.body.tenant) return errors.manage(res, errors.get_request_error, "Body param `tenant` is required");
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
-    const tenant = await Tenant.findById(req.query.tenant);
-    if(!tenant) return errors.manage(res, errors.get_request_error, "Unknown tenant (" + req.query.tenant +")");
+    const tenant = await Tenant.findById(req.body.tenant);
+    if(!tenant) return errors.manage(res, errors.get_request_error, "Unknown tenant (" + req.body.tenant +")");
     const User = mongoose.dbs[tenant.database].model('User');
     const PasswordReset = mongoose.dbs[tenant.database].model('PasswordReset');
-    if(!req.query.password) return errors.manage(res, errors.missing_info);
-    if(!req.query.reset) return errors.manage(res, errors.missing_info);
-    if(!ObjectId.isValid(req.query.reset)) return errors.manage(res, errors.resource_not_found, req.body.reset);
-    const reset = await PasswordReset.findById(req.query.reset);
-    if(!reset) return errors.manage(res, errors.resource_not_found, req.query.reset);
-    if(reset.status == PasswordResetStatusTypes.invalid) return errors.manage(res, errors.reset_invalid, req.query.reset);
+    if(!req.body.password) return errors.manage(res, errors.missing_info, "Body param `password` is required");
+    if(!req.body.reset) return errors.manage(res, errors.missing_info, "Body param `reset` is required");
+    if(!ObjectId.isValid(req.body.reset)) return errors.manage(res, errors.resource_not_found, req.body.reset);
+    const reset = await PasswordReset.findById(req.body.reset);
+    if(!reset) return errors.manage(res, errors.resource_not_found, req.body.reset);
+    if(reset.status == PasswordResetStatusTypes.invalid) return errors.manage(res, errors.reset_invalid, req.body.reset);
     const user = await User.findById(reset.user);
     if(!user) return errors.manage(res, errors.resource_not_found, 'user');
-    const reset_updated = await PasswordReset.findByIdAndUpdate(req.query.reset, { "$set": { "status": PasswordResetStatusTypes.invalid } });   
-    if(!isPasswordStrongEnough(req.query.password))return errors.manage(res, errors.get_request_error, "The password strength is too weak, make a new request to reset password and choose a stronger password");        
-    if(tenant.passwordhash == true || tenant.passwordhash == 'true') req.query.password = bcrypt.hashSync(req.query.password, 8);
-    const user_updated = await User.findByIdAndUpdate(user._id, { "$set": { "password": req.query.password, "createdPassword":Date.now() },  });
+    const reset_updated = await PasswordReset.findByIdAndUpdate(req.body.reset, { "$set": { "status": PasswordResetStatusTypes.invalid } });   
+    if(!isPasswordStrongEnough(req.body.password))return errors.manage(res, errors.get_request_error, "The password strength is too weak, make a new request to reset password and choose a stronger password");        
+    if(tenant.passwordhash == true || tenant.passwordhash == 'true') req.body.password = bcrypt.hashSync(req.body.password, 8);
+    const user_updated = await User.findByIdAndUpdate(user._id, { "$set": { "password": req.body.password, "createdPassword":Date.now() },  });
     return res.status(200).json(user_updated);   
 };
 
