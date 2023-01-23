@@ -51,7 +51,7 @@ exports.getList = async function (filter, sort, select, page, limit, restriction
 }
 
 const postOne = async function (body, model, tenant) {
-    if (body.password) body.password = checkPassword(body.password);
+    if (body.password) body.password = checkPassword(body.password,tenant.passwordhash);
     const resource = await (new model(body)).save();
     if (model.modelName == 'Measurement') {
         broker.publish('device-' + body.device, body.device, body);
@@ -68,7 +68,7 @@ const postList = async function (body, model, tenant) {
     for (let [i, element] of body.entries()) {
         try {
             element.owner = body.owner;
-            if (element.password) element.password = checkPassword(element.password);
+            if (element.password) element.password = checkPassword(element.password,tenant.passwordhash);
             const resource = await (new model(element)).save()
             if (model.modelName == "Measurement") {
                 broker.publish('device-' + resource.device, resource);
@@ -104,7 +104,7 @@ exports.update = async function (body, fields, resource, model, tenant, query, r
 
     for (let field of fields) {
         if (typeof body[field] != 'object' && body[field]) {
-            if (field == 'password') body[field] = checkPassword(body[field]);
+            if (field == 'password') body[field] = checkPassword(body[field],tenant.passwordhash);
             resource[field] = body[field]; continue;
         }
         if (typeof body[field] == 'object' && body[field]) {
@@ -265,9 +265,9 @@ const modifyEmbeddedResourceList = async function (list, resource, field, identi
     return [true, report];
 }
 
-const checkPassword = function (password) {
+const checkPassword = function (password,passwordhash) {
     const details = passwordStrength(password);
     if (details.id < process.env.MIN_PASSWORD_STRENGTH) throw new Error('The password strength is ' + details.value + ', please choose a stronger password');//MIN_PASSWORD_STRENGTH:0=TOO WEAK; 1=WEAK; 2=MEDIUM; 3=STRONG
-    //if (req.tenant.passwordhash == true || req.tenant.passwordhash == 'true') //removed for security
+    if (passwordhash === false || passwordhash === 'false') return password;
     return bcrypt.hashSync(password, 8);
 }

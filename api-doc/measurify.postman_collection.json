@@ -241,6 +241,40 @@
 						}
 					},
 					"response": []
+				},{
+					"name": "API info passwordStrength",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [									
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/v1/info/passwordStrength",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"info",
+								"passwordStrength"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
