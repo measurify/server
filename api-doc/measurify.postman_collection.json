@@ -8864,9 +8864,9 @@
 						}
 					},
 					"response": []
-				},
+				},				
 				{
-					"name": "GET to modify user password (needs the reset request information provided by email)",
+					"name": "PUT to modify user password (needs the reset request information provided by email)",
 					"event": [
 						{
 							"listen": "test",
@@ -8877,12 +8877,9 @@
 								"type": "text/javascript"
 							}
 						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
+					],					
 					"request": {
-						"method": "GET",
+						"method": "PUT",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -8891,30 +8888,16 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\r\n  \"reset\": \"5ea16a736caa124854c74c73\",\r\n\r  \"password\": \"My_new_password\"\r\n,\r\n  \"tenant\": \"atmosphere-dev\"\r\n}"
 						},
 						"url": {
-							"raw": "{{url}}/v1/self?reset=5ea16a736caa124854c74c73&password=my_new_password&tenant=atmosphere-dev",
+							"raw": "{{url}}/v1/self",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"v1",
 								"self"
-							],
-							"query": [
-								{
-									"key": "reset",
-									"value": "5ea16a736caa124854c74c73"
-								},
-								{
-									"key": "password",
-									"value": "my_new_password"
-								},
-								{
-									"key": "?tenant",
-									"value": "atmosphere-dev"
-								}
 							]
 						}
 					},
