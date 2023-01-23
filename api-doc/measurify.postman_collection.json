@@ -242,7 +242,7 @@
 					},
 					"response": []
 				},{
-					"name": "API info passwordStrength",
+					"name": "API passwordStrength",
 					"event": [
 						{
 							"listen": "test",
@@ -263,13 +263,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{url}}/v1/info/passwordStrength",
+							"raw": "{{url}}/v1/type/passwordStrength",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"v1",
-								"info",
+								"type",
 								"passwordStrength"
 							]
 						}

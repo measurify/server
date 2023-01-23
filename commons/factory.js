@@ -103,7 +103,7 @@ exports.createUser = async function (username, password, type, fieldmask, email,
     fieldmask: fieldmask,
     email: email||username+"@gmail.com",
     type: type || UserRoles.provider,
-    validityPasswordDays:validityPasswordDays,
+    validityPasswordDays:validityPasswordDays||0,
     createdPassword:createdPassword
   };
   let user = new User(req);
