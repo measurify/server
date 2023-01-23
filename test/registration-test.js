@@ -259,7 +259,7 @@ describe('/POST reset', () => {
 
 // Confirm the password reset
 describe('/PUT password', () => {
-    it('it should GET a password reset', async () => {
+    it('it should PUT a password reset', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
         const body = {reset:reset._id, password:"My_new_password", tenant:process.env.DEFAULT_TENANT};
@@ -269,7 +269,7 @@ describe('/PUT password', () => {
         res.body.should.have.property('username');
     });
 
-    it('it should not GET a password reset without password field', async () => {
+    it('it should not PUT a password reset without password field', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
         const body = {reset:reset._id, tenant:process.env.DEFAULT_TENANT};
@@ -280,7 +280,7 @@ describe('/PUT password', () => {
         res.body.message.should.contain(errors.missing_info.message);
     });
 
-    it('it should not GET a password reset without reset field', async () => {
+    it('it should not PUT a password reset without reset field', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
         const body = {password:"My_new_password", tenant:process.env.DEFAULT_TENANT};
@@ -291,7 +291,7 @@ describe('/PUT password', () => {
         res.body.message.should.contain(errors.missing_info.message);
     });
 
-    it('it should not GET a password reset with a fake reset', async () => {
+    it('it should not PUT a password reset with a fake reset', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
         const body = {reset:"fake_reset", password:"My_new_password", tenant:process.env.DEFAULT_TENANT};
@@ -302,7 +302,7 @@ describe('/PUT password', () => {
         res.body.message.should.contain(errors.resource_not_found.message);
     });
 
-    it('it should not GET a password with a already used reset token', async () => {
+    it('it should not PUT a password with a already used reset token', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
         const body = {reset:reset._id, password:"My_new_password", tenant:process.env.DEFAULT_TENANT};
@@ -317,7 +317,7 @@ describe('/PUT password', () => {
         res.body.message.should.contain(errors.reset_invalid.message);
     });
 
-    it('it should not GET a password reset with a fake tenant', async () => {
+    it('it should not PUT a password reset with a fake tenant', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
         const body = {reset:reset._id, password:"My_new_password", tenant:"fake-tenant"};
@@ -329,7 +329,7 @@ describe('/PUT password', () => {
         res.body.details.should.contain('Unknown tenant');
     });
 
-    it('it should not GET a password reset with a different tenant', async () => {
+    it('it should not PUT a password reset with a different tenant', async () => {
         const other_tenant = await factory.createTenant("test-tenant-2", "organization-test-1", "test street", "test@email", "433232", "test", "test");
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
