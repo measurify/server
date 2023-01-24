@@ -32,6 +32,45 @@ describe('/GET experiment', () => {
         res.body.docs.length.should.be.eql(2);
     });
 
+    it('it should GET all the experiments id with query select', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
+        await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
+        await factory.createExperiment("test-experiment-2", "test-protoco-description-2", user, 0, null, null, null, protocol);
+        let res = await chai.request(server).keepOpen().get('/v1/experiments?select=["_id","visibility","state"]').set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.docs.should.be.a('array');
+        res.body.docs.length.should.be.eql(2);        
+        Object.keys(res.body.docs[0]).length.should.be.eql(3);
+        Object.keys(res.body.docs[1]).length.should.be.eql(3);
+        res.body.docs[0]._id.should.be.eql("test-experiment-2");
+        res.body.docs[0].visibility.should.be.eql("private");
+        res.body.docs[0].state.should.be.eql(0);
+        res = await chai.request(server).keepOpen().get('/v1/experiments?select=["visibility","state"]').set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.docs.should.be.a('array');
+        res.body.docs.length.should.be.eql(2);        
+        Object.keys(res.body.docs[0]).length.should.be.eql(3);
+        Object.keys(res.body.docs[1]).length.should.be.eql(3);
+        res.body.docs[0]._id.should.be.eql("test-experiment-2");
+        res.body.docs[0].visibility.should.be.eql("private");
+        res.body.docs[0].state.should.be.eql(0);
+        res = await chai.request(server).keepOpen().get('/v1/experiments?select=["_id"]').set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.docs.should.be.a('array');
+        res.body.docs.length.should.be.eql(2);        
+        Object.keys(res.body.docs[0]).length.should.be.eql(1);
+        Object.keys(res.body.docs[1]).length.should.be.eql(1);
+        res.body.docs[0]._id.should.be.eql("test-experiment-2");
+        res = await chai.request(server).keepOpen().get('/v1/experiments?select=["fakeField"]').set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.docs.should.be.a('array');
+        res.body.docs.length.should.be.eql(2);        
+        Object.keys(res.body.docs[0]).length.should.be.eql(1);
+        Object.keys(res.body.docs[1]).length.should.be.eql(1);
+        res.body.docs[0]._id.should.be.eql("test-experiment-2");
+    });
+
     it('it should GET a specific experiment', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
