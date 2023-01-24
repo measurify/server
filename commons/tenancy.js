@@ -9,8 +9,7 @@ const init = async function(tenant, username, password) {
     if(!username) username = process.env.DEFAULT_TENANT_ADMIN_USERNAME;
     if(!password) password = process.env.DEFAULT_TENANT_ADMIN_TEMPORARY_PASSWORD;
     if(!tenant.email) tenant.email = process.env.DEFAULT_TENANT_EMAIL;
-    if(!tenant.database) { tenant.database = tenant._id;  await tenant.save(); }   
-    
+    if(!tenant.database) { tenant.database = tenant._id;  await tenant.save(); }       
     mongoose.dbs[tenant.database] = await mongoose.dbs['catalog'].useDb(tenant.database);
     const models = await fs.readdirSync('./models/');
     for(let i=0; i<models.length; i++) {
@@ -31,7 +30,7 @@ const init = async function(tenant, username, password) {
     //let supplierRole= await Role.findById("supplier"); 
     const User = mongoose.dbs[tenant.database].model('User'); 
     let user = await User.findOne();
-    if(!user) await factory.createUser(username, password, UserRoles.admin, null, tenant.email, tenant);
+    if(!user) await factory.createUser(username, password, UserRoles.admin, null, tenant.email, tenant,0);
       
 };
 
