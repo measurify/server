@@ -23,7 +23,7 @@ exports.csv2json = function (owner, header, data, schema, modelName) {//items ov
                     if (!arr[header.indexOf(key)]) continue;//blank element
                     try {
                         result[key].push(...cleanFunction(arr[header.indexOf(key)], modelName));
-                    } catch (error) {                        
+                    } catch (error) {
                         throw new Error('Error in CSV format')
                     }
                 }
@@ -108,7 +108,7 @@ const cleanFunction = function (arr, modelName) {
         if (modelName == "Timesample") {
             if (!/[a-zA-Z]/g.test(arr)) {
                 if (arr.startsWith("[") && arr.endsWith("]")) return JSON.parse(arr.replace(/;/g, ','));
-                else{arr="["+arr+"]";return JSON.parse(arr.replace(/;/g, ','));}                
+                else { arr = "[" + arr + "]"; return JSON.parse(arr.replace(/;/g, ',')); }
             }
             else {
                 let arrNew = null;
@@ -322,4 +322,30 @@ exports.replaceSeparatorsGet = function (data, query, res) {
     data = data.replace(/¬/g, sepArray);
     data = data.replace(/§/g, sepFloat);
     return [data, null];
+}
+
+exports.getGroups = function (experiment, protocol, query) {
+    let groupFilter=undefined;
+    if (query.groups !== undefined && query.groups.length !== 0) {// ?groups=["topic1","topic2"]
+        groupFilter = JSON.parse(query.groups);//filter
+    }
+    const body = {
+        "_id": experiment._id,
+        "history": experiment.history.map(step => ({
+            "step": step.step,//for each step
+            "groups": [{//groupName from protocol:{ field1:value, field2:value...}
+                ...protocol.topics.reduce((acc, topic) => {
+                    groupFilter!==undefined&&!groupFilter.includes(topic.name)?{}
+                        : acc[topic.name] = topic.fields.reduce((fieldsAcc, field) => {
+                            const fieldValue = step.fields.find(stepField => stepField.name === field.name).value;
+                            fieldsAcc[field.name] = fieldValue;
+                            return fieldsAcc;
+                        }, {})
+                    return acc;
+                }, {})
+            }]
+        }))
+    };
+
+    return [body, null];
 }

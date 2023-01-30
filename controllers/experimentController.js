@@ -49,6 +49,21 @@ exports.gethistory = async (req, res) => {
     return res.status(200).json(item);
 };
 
+exports.getgroup = async (req, res) => {
+    const Experiment = mongoose.dbs[req.tenant.database].model('Experiment');
+    const Protocol = mongoose.dbs[req.tenant.database].model('Protocol');
+    const select = await checker.whatCanSee(req, res, Experiment);
+    let result = await checker.isAvailable(req, res, Experiment); if (result != true) return result;
+    result = await checker.canOperate(req, res,"Experiment"); if (result != true) return result;
+    result = await checker.hasRights(req, res, Experiment); if (result != true) return result;
+    const experiment = await persistence.get(req.params.id, null, Experiment, select);
+    if (!experiment) return errors.manage(res, errors.resource_not_found, req.params.id);
+    const protocol = await persistence.get(experiment._doc.protocol, null, Protocol, select);
+    if (!protocol) return errors.manage(res, errors.resource_not_found, req.params.id);
+    let error=null;[body,error] = conversion.getGroups(experiment._doc,protocol._doc,req.query);if (error !== null) return error;
+    return res.status(200).json(body);
+};
+
 exports.post = async (req, res) => {
     const Experiment = mongoose.dbs[req.tenant.database].model('Experiment');
     let result = await checker.canOperate(req, res,"Experiment"); if (result != true) return result;
