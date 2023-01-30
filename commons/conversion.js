@@ -337,7 +337,8 @@ exports.getGroups = function (experiment, protocol, query) {
                 ...protocol.topics.reduce((acc, topic) => {
                     groupFilter!==undefined&&!groupFilter.includes(topic.name)?{}
                         : acc[topic.name] = topic.fields.reduce((fieldsAcc, field) => {
-                            const fieldValue = step.fields.find(stepField => stepField.name === field.name).value;
+                            let fieldValue= undefined;
+                            try{fieldValue =  step.fields.find(stepField => stepField.name === field.name).value}catch(error){};
                             fieldsAcc[field.name] = fieldValue;
                             return fieldsAcc;
                         }, {})
