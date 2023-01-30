@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
 const geojson = require("mongoose-geojson-schema");
-const ExperimentStateTypes = require('../types/experimentStateTypes.js');
+//const ExperimentStateTypes = require('../types/experimentStateTypes.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 const inspector = require("../commons/inspector.js");
 
@@ -28,7 +28,8 @@ const placeSchema = new mongoose.Schema({
 const experimentSchema = new mongoose.Schema({ 
     _id: { type: String, required: "Please, supply an _id" },
     description: { type: String },
-    state: { type: String, enum: ExperimentStateTypes, default: ExperimentStateTypes.ongoing },
+    //state: { type: String, enum: ExperimentStateTypes, default: ExperimentStateTypes.ongoing },
+    state: { type: Number, default: 0 },
     startDate: { type: Date },
     endDate: { type: Date },
     owner: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true },

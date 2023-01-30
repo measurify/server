@@ -11,11 +11,11 @@ exports.welcome = function(url, user) {
 };
 
 exports.reset = function(url, user, reset) {
-      const link = url + '/self?reset=' + reset + '&password=MY_NEW_PASSWORD';
+      const link = url + '/#/passwordreset?token='+reset;
       const message = { to: user.email,
                         subject: 'New password request!',
-                        text: 'Welcome ' + user.usernamne + ', \n\xA0' + 
-                              'to change your password, please replace "MY_NEW_PASSWORD" with your new password in the following string and copy&paste it in your Internet Browser:' + '\n\xA0' + 
+                        text: 'Welcome ' + user.username + ', \n\xA0' + 
+                              'to change your password, please click on this link and choose the new password' + '\n\xA0' + 
                               link + '\n\xA0'
                         };
       return message;

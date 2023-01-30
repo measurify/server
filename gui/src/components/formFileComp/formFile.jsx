@@ -52,10 +52,14 @@ export const FormFile = (props) => {
               props.setContentHeader(splitted[0]);
               splitted.splice(0, 1);
               props.setContentBody(splitted);
+              props.setContentPlain(null);
             }
             if (file.name.endsWith(".json")) {
-              const content = fileReader.result;
-              props.setContentPlain(content);
+              props.setContentHeader(null);
+              props.setContentBody(null);
+              props.setContentPlain(
+                JSON.stringify(JSON.parse(content), null, 4)
+              );
             }
           };
           fileReader.readAsText(file);
@@ -101,7 +105,13 @@ export const FormFile = (props) => {
           <Accordion.Item eventKey="0">
             <Accordion.Header>{locale().file_content}</Accordion.Header>
             <Accordion.Body style={{ overflow: "scroll", height: 70 + "vh" }}>
-              {props.contentPlain}
+              <textarea
+                style={{ resize: "both" }}
+                cols="120"
+                rows="10"
+                readOnly
+                value={props.contentPlain}
+              ></textarea>
             </Accordion.Body>
           </Accordion.Item>
         </Accordion>

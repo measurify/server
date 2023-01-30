@@ -3,12 +3,14 @@ import { aliasPages } from "../../config";
 
 import { Table } from "react-bootstrap";
 import ActionManager from "../actionsManager/actionsManager";
+import { canDo } from "../../services/userRolesManagement";
 
 export default function ContentTable(props) {
   if (props.header === undefined || props.resources === undefined)
     return <div>Loading</div>;
-  if (props.header.includes("actions") && props.actions === undefined)
+  if (props.header.includes("_actions") && props._actions === undefined)
     return <div>Loading</div>;
+
   return (
     <div>
       <Table responsive striped bordered hover>
@@ -31,10 +33,10 @@ export default function ContentTable(props) {
                 <tr>
                   {React.Children.toArray(
                     props.header.map((e) => {
-                      if (e === "actions") {
+                      if (e === "_actions") {
                         return (
                           <td>
-                            {props.actions.includes("view") ? (
+                            {props._actions.includes("view") ? (
                               <ActionManager
                                 resType={props.resType}
                                 action="view"
@@ -45,7 +47,8 @@ export default function ContentTable(props) {
                             ) : (
                               ""
                             )}
-                            {props.actions.includes("edit") ? (
+                            {props._actions.includes("edit") &&
+                            canDo(props.userRole, props.resType, "update") ? (
                               <ActionManager
                                 resType={props.resType}
                                 action="edit"
@@ -56,7 +59,8 @@ export default function ContentTable(props) {
                             ) : (
                               ""
                             )}
-                            {props.actions.includes("duplicate") ? (
+                            {props._actions.includes("duplicate") &&
+                            canDo(props.userRole, props.resType, "create") ? (
                               <ActionManager
                                 resType={props.resType}
                                 action="duplicate"
@@ -66,7 +70,8 @@ export default function ContentTable(props) {
                             ) : (
                               ""
                             )}
-                            {props.actions.includes("delete") ? (
+                            {props._actions.includes("delete") &&
+                            canDo(props.userRole, props.resType, "delete") ? (
                               <ActionManager
                                 resType={props.resType}
                                 action="delete"

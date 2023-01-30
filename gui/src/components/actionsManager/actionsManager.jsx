@@ -17,6 +17,7 @@ import {
 } from "react-bootstrap";
 
 import { delete_generic } from "../../services/http_operations";
+import { FormatDate } from "../../services/misc_functions";
 
 fontawesome.library.add(faEye, faPencilAlt, faCopy);
 
@@ -99,6 +100,8 @@ function UnrollView(item) {
                                   <tr>
                                     {React.Children.toArray(
                                       Object.values(row).map((v) => {
+                                        if (Array.isArray(v))
+                                          return <td>[{v.join(", ")}]</td>;
                                         return <td>{v}</td>;
                                       })
                                     )}
@@ -115,10 +118,31 @@ function UnrollView(item) {
                       "[ ]"
                     )
                   ) : (
-                    "AAAA"
+                    <Table responsive striped bordered hover size="sm">
+                      <tbody>
+                        {React.Children.toArray(
+                          Object.entries(value).map((entr) => {
+                            return (
+                              <tr>
+                                <td>
+                                  <b>{entr[0]}</b>
+                                </td>
+                                <td>
+                                  {typeof entr[1] !== "string"
+                                    ? entr[1].toString()
+                                    : entr[1]}
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </Table>
                   )
                 ) : value === undefined || value == null ? (
                   <i>None</i>
+                ) : key.toLowerCase().includes("date") ? (
+                  FormatDate(value)
                 ) : (
                   value
                 )}

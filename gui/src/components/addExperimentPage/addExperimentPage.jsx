@@ -23,6 +23,7 @@ import {
   maintainEmptyElement,
   maintainEmptyElements,
 } from "../../services/objects_manipulation";
+import ImportExportValues from "../importExportValues/importExportValues";
 
 const cloneDeep = require("clone-deep");
 /*
@@ -56,10 +57,15 @@ export default function AddExperimentPage(props) {
   const [postType, setPostType] = useState("form");
   //message for user
   const [msg, setMsg] = useState("");
+  const [isError, setIsError] = useState(false);
+  //import message for user
+  const [importMsg, setImportMsg] = useState("");
   //values
   const [values, setValues] = useState(cloneDeep(addFields[resource]));
   //disabled
-  const [disabledFields, setDisabledFields] = useState({});
+  const [disabledFields, setDisabledFields] = useState({
+    metadata: { name: true },
+  });
 
   //protocols
   const [protocols, setProtocols] = useState();
@@ -70,7 +76,7 @@ export default function AddExperimentPage(props) {
   const [contentBody, setContentBody] = useState(null);
   const [contentPlain, setContentPlain] = useState(null);
 
-  //useeffect to get resource if required
+  //useeffect to get protocols
   useEffect(() => {
     const fetchData = async (qs = {}) => {
       // get the protocols data from the api
@@ -81,6 +87,42 @@ export default function AddExperimentPage(props) {
     const qs = { limit: 100 };
     fetchData(qs);
   }, [props, searchParams]);
+
+  //useeffect to get resource if required (for the "duplicate" actions)
+  useEffect(() => {
+    const fetchDataDuplicate = async (qs = {}) => {
+      // get the data from the api
+      const response = await get_generic(resource, qs);
+
+      const data = response.docs[0];
+      let tmpValues = cloneDeep(values);
+
+      //add metadata and protocol fields
+      tmpValues["protocol"] = "";
+      tmpValues["metadata"] = [{ name: "", value: "" }];
+
+      //disable protocol fields
+      const tmpDisabled = cloneDeep(disabledFields);
+      tmpDisabled["protocol"] = true;
+
+      setDisabledFields(tmpDisabled);
+
+      tmpValues = sortObject(data, tmpValues);
+
+      //add "_copy" to id to avoid duplicate key error
+
+      tmpValues["_id"] = tmpValues["_id"] + "_copy";
+
+      tmpValues = maintainEmptyElements(tmpValues, addFields, resource);
+      setValues(tmpValues);
+    };
+
+    if (searchParams.get("from") === null || searchParams.get("from") === "")
+      return;
+    const fst = { _id: searchParams.get("from") };
+    const qs = { filter: JSON.stringify(fst) };
+    fetchDataDuplicate(qs);
+  }, [searchParams, resource]);
 
   //return if page shouldn't be rendered
   if (addFields[resource] === undefined)
@@ -137,7 +179,11 @@ export default function AddExperimentPage(props) {
     setValues(val);
   };
   //handle way selector to post new entity
-  const handleTypeSelect = (eventKey) => setPostType(eventKey);
+  const handleTypeSelect = (eventKey) => {
+    setPostType(eventKey);
+    setMsg("");
+    setIsError(false);
+  };
 
   //handle changes to selected protocols
   const handleProtocolChange = async (e) => {
@@ -153,19 +199,19 @@ export default function AddExperimentPage(props) {
       if (protocol.metadata[i].type === "scalar") {
         metadata.push({
           name: protocol.metadata[i].name,
-          value: NaN,
+          value: 0,
         });
       }
       if (protocol.metadata[i].type === "text") {
         metadata.push({
           name: protocol.metadata[i].name,
-          value: "",
+          value: protocol.metadata[i].name + "_Name",
         });
       }
       if (protocol.metadata[i].type === "vector") {
         metadata.push({
           name: protocol.metadata[i].name,
-          value: [NaN],
+          value: [0],
         });
       }
     }
@@ -195,6 +241,21 @@ export default function AddExperimentPage(props) {
 
     let tmpValues = cloneDeep(body);
     removeDefaultElements(tmpValues);
+    if (tmpValues["protocol"] === undefined) {
+      setMsg("Please, select a protocol");
+      setIsError(true);
+      return;
+    }
+    if (tmpValues["_id"] === "") {
+      setMsg("Please, define an _id");
+      setIsError(true);
+      return;
+    }
+    if (tmpValues["state"] === "") {
+      setMsg("Please, select a state");
+      setIsError(true);
+      return;
+    }
 
     let res;
     try {
@@ -205,23 +266,36 @@ export default function AddExperimentPage(props) {
       );
       res = resp.response;
       setMsg(res.statusText);
+      setIsError(false);
     } catch (error) {
       console.log(error);
       res = error.error.response;
-      //add details
-      setMsg(
-        error.error.response.data.message +
-          " : " +
-          error.error.response.data.details
-      );
-    }
+      console.log({
+        message: error.error.response.data.message,
+        details: error.error.response.data.details,
+      });
 
-    if (res.status === 200) {
-      if (window.confirm("Back to resource page?") === true) {
-        if (resource === "tenants") navigate("/");
-        else navigate("/" + resource);
-      } else {
+      let det = "";
+      if (error.error.response.data.details.includes("duplicate key")) {
+        det =
+          locale().duplicate_error +
+          " " +
+          error.error.response.data.details.slice(
+            error.error.response.data.details.indexOf("{") + 1,
+            -1
+          );
       }
+      //default case: show details from error message
+      else {
+        det = error.error.response.data.details;
+      }
+      //add details
+      setMsg(error.error.response.data.message + " : " + det);
+      setIsError(true);
+    }
+    if (res.status === 200) {
+      window.alert("Experiment successufully posted!");
+      navigate("/" + resource);
     }
   };
 
@@ -230,9 +304,48 @@ export default function AddExperimentPage(props) {
     navigate(-1);
   };
 
+  const importValues = (importedValues) => {
+    try {
+      const imported = JSON.parse(importedValues);
+      const template = cloneDeep(values);
+
+      template["protocol"] = "";
+      template["metadata"] = [{ name: "", value: "" }];
+      const sorted = sortObject(imported, template);
+
+      if (
+        sorted["_id"] === undefined &&
+        sorted["owner"] === undefined &&
+        sorted["protocol"] === undefined &&
+        sorted["metadata"] === undefined
+      ) {
+        setImportMsg(locale().error_imported_file);
+        return;
+      }
+      setImportMsg("");
+
+      //remove history when present
+      if (sorted["history"] !== undefined) delete sorted["history"];
+      setValues(sorted);
+
+      const tmpDisabled = cloneDeep(disabledFields);
+      tmpDisabled["protocol"] = true;
+
+      setDisabledFields(tmpDisabled);
+    } catch (error) {
+      setImportMsg(locale().error_imported_file);
+      console.log(error);
+    }
+  };
+
   const postFile = async (e) => {
     e.preventDefault();
     let res;
+    if (file === undefined) {
+      setMsg(locale().no_file);
+      setIsError(true);
+      return;
+    }
     if (file.name.endsWith(".csv")) {
       const formData = new FormData();
       formData.append("file", file);
@@ -242,6 +355,7 @@ export default function AddExperimentPage(props) {
 
         res = resp.response;
         setMsg(res.statusText);
+        setIsError(false);
       } catch (error) {
         console.log(error);
 
@@ -252,6 +366,7 @@ export default function AddExperimentPage(props) {
             " : " +
             error.error.response.data.details
         );
+        setIsError(true);
       }
     }
     if (file.name.endsWith(".json")) {
@@ -259,6 +374,7 @@ export default function AddExperimentPage(props) {
         const resp = await post_generic(resource, contentPlain, undefined);
         res = resp.response;
         setMsg(res.statusText);
+        setIsError(false);
       } catch (error) {
         console.log(error);
         res = error.error.response;
@@ -268,14 +384,14 @@ export default function AddExperimentPage(props) {
             " : " +
             error.error.response.data.details
         );
+        setIsError(true);
       }
     }
 
     if (res.status === 200) {
-      if (window.confirm("Back to resource page?") === true) {
-        navigate("/" + resource);
-      } else {
-      }
+      window.alert("Experiment successufully posted!");
+
+      navigate("/" + resource);
     }
   };
 
@@ -317,11 +433,19 @@ export default function AddExperimentPage(props) {
             height: "fit-content",
           }}
         >
+          {postType === "form" && (
+            <ImportExportValues
+              values={values}
+              importValues={importValues}
+              importMsg={importMsg}
+            />
+          )}
           {postType === "form" && protocols !== undefined && (
             <div style={{ margin: 5 + "px" }}>
               <Form.Select
                 aria-label={locale().select + " protocol"}
                 onChange={handleProtocolChange}
+                value={values["protocol"]}
               >
                 <option>{locale().select} protocol</option>
                 {React.Children.toArray(
@@ -341,10 +465,14 @@ export default function AddExperimentPage(props) {
                 submitFunction={postBody}
                 backFunction={back}
               />
-
-              <br />
-
-              <font style={{ marginLeft: 5 + "px" }}>{msg}</font>
+              <font
+                style={{
+                  marginLeft: 5 + "px",
+                  color: isError ? "red" : "black",
+                }}
+              >
+                {msg}
+              </font>
             </div>
           )}
           {postType === "file" && (
@@ -360,7 +488,14 @@ export default function AddExperimentPage(props) {
                 contentHeader={contentHeader}
                 contentBody={contentBody}
               />
-              <font style={{ marginLeft: 5 + "px" }}>{msg}</font>
+              <font
+                style={{
+                  marginLeft: 5 + "px",
+                  color: isError ? "red" : "black",
+                }}
+              >
+                {msg}
+              </font>
             </div>
           )}
         </div>

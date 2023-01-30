@@ -16,6 +16,8 @@ interface ILocalization {
   resources: string;
   notifications: string;
   file_content: string;
+  preview: string;
+  configuration: string;
 
   clear_all: string;
 
@@ -42,6 +44,8 @@ interface ILocalization {
   profile_page_desc: string;
   pass_change_confirm: string;
   pass_not_match: string;
+  old_pass_empty: string;
+  old_pass_wrong: string;
   pass_not_null: string;
   password_changed: string;
 
@@ -56,12 +60,20 @@ interface ILocalization {
   logout: string;
   repeat: string;
   close: string;
+<<<<<<< HEAD
   remove: string;
+=======
+  import: string;
+  export: string;
+>>>>>>> fresta
 
   ///Errors
   login_error: string;
   unauthorised_user: string;
   session_expired: string;
+  no_file: string;
+  error_imported_file: string;
+  duplicate_error: string;
 }
 
 export default function locale() {

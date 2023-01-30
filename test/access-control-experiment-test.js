@@ -15,7 +15,6 @@ const VisibilityTypes = require('../types/visibilityTypes.js');
 const errors = require('../commons/errors.js');
 chai.use(chaiHttp);
 const before = require('./before-test.js');
-const ExperimentStateTypes = require("../types/experimentStateTypes.js");
 const RoleCrudTypes = require('../types/roleCrudTypes.js');
 
 // CREATE
@@ -41,7 +40,7 @@ describe('Access create experiments', () => {
         const experiment = {
             _id: "test-experiment-1",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 43 },
             { name: "metadata-name-2", value: "my string" },
@@ -84,7 +83,7 @@ describe('Access create experiments', () => {
         const experiment = {
             _id: "test-experiment-1",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 43 },
             { name: "metadata-name-2", value: "my string" },
@@ -127,7 +126,7 @@ describe('Access create experiments', () => {
         const experiment = {
             _id: "test-experiment-1",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 43 },
             { name: "metadata-name-2", value: "my string" },
@@ -171,7 +170,7 @@ describe('Access create experiments', () => {
         const experiment = {
             _id: "test-experiment-1",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 43 },
             { name: "metadata-name-2", value: "my string" },
@@ -217,14 +216,14 @@ describe('Access read a list of experiments', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment_public_1 = await factory.createExperiment("test-experiment-public-1", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_2 = await factory.createExperiment("test-experiment-public-2", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_3 = await factory.createExperiment("test-experiment-public-3", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_4 = await factory.createExperiment("test-experiment-public-4", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_5 = await factory.createExperiment("test-experiment-public-5", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_private_1 = await factory.createExperiment("test-experiment-private-1", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
-        const experiment_private_2 = await factory.createExperiment("test-experiment-private-2", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
-        const experiment_private_3 = await factory.createExperiment("test-experiment-private-3", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_public_1 = await factory.createExperiment("test-experiment-public-1", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_2 = await factory.createExperiment("test-experiment-public-2", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_3 = await factory.createExperiment("test-experiment-public-3", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_4 = await factory.createExperiment("test-experiment-public-4", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_5 = await factory.createExperiment("test-experiment-public-5", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_private_1 = await factory.createExperiment("test-experiment-private-1", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_private_2 = await factory.createExperiment("test-experiment-private-2", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_private_3 = await factory.createExperiment("test-experiment-private-3", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().get('/v1/experiments/').set("Authorization", await factory.getUserToken(user_admin));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
@@ -259,16 +258,16 @@ describe('Access read a list of experiments', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment_public_1 = await factory.createExperiment("test-experiment-public-1", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_2 = await factory.createExperiment("test-experiment-public-2", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_3 = await factory.createExperiment("test-experiment-public-3", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_4 = await factory.createExperiment("test-experiment-public-4", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_5 = await factory.createExperiment("test-experiment-public-5", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_private_1 = await factory.createExperiment("test-experiment-private-1", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
-        const experiment_private_2 = await factory.createExperiment("test-experiment-private-2", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
-        const experiment_private_3 = await factory.createExperiment("test-experiment-private-3", "test-protocol-description", user_provider, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
-        const experiment_private_4 = await factory.createExperiment("test-experiment-private-4", "test-protocol-description", user_provider, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
-        const experiment_private_5 = await factory.createExperiment("test-experiment-private-5", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_public_1 = await factory.createExperiment("test-experiment-public-1", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_2 = await factory.createExperiment("test-experiment-public-2", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_3 = await factory.createExperiment("test-experiment-public-3", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_4 = await factory.createExperiment("test-experiment-public-4", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_5 = await factory.createExperiment("test-experiment-public-5", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_private_1 = await factory.createExperiment("test-experiment-private-1", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_private_2 = await factory.createExperiment("test-experiment-private-2", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_private_3 = await factory.createExperiment("test-experiment-private-3", "test-protocol-description", user_provider, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_private_4 = await factory.createExperiment("test-experiment-private-4", "test-protocol-description", user_provider, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_private_5 = await factory.createExperiment("test-experiment-private-5", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().get('/v1/experiments/').set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
@@ -299,16 +298,16 @@ describe('Access read a list of experiments', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment_public_1 = await factory.createExperiment("test-experiment-public-1", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_2 = await factory.createExperiment("test-experiment-public-2-search", "test-protocol-description-search", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_3 = await factory.createExperiment("test-experiment-public-3-search", "test-protocol-description-search", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_4 = await factory.createExperiment("test-experiment-public-4", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_5 = await factory.createExperiment("test-experiment-public-5", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_private_1 = await factory.createExperiment("test-experiment-private-1", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
-        const experiment_private_2 = await factory.createExperiment("test-experiment-private-2-search", "test-protocol-description-search", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
-        const experiment_private_3 = await factory.createExperiment("test-experiment-private-3-search", "test-protocol-description-search", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
-        const experiment_private_4 = await factory.createExperiment("test-experiment-private-4", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
-        const experiment_private_5 = await factory.createExperiment("test-experiment-private-5-search", "test-protocol-description-search", user_provider, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_public_1 = await factory.createExperiment("test-experiment-public-1", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_2 = await factory.createExperiment("test-experiment-public-2-search", "test-protocol-description-search", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_3 = await factory.createExperiment("test-experiment-public-3-search", "test-protocol-description-search", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_4 = await factory.createExperiment("test-experiment-public-4", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_5 = await factory.createExperiment("test-experiment-public-5", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_private_1 = await factory.createExperiment("test-experiment-private-1", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_private_2 = await factory.createExperiment("test-experiment-private-2-search", "test-protocol-description-search", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_private_3 = await factory.createExperiment("test-experiment-private-3-search", "test-protocol-description-search", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_private_4 = await factory.createExperiment("test-experiment-private-4", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_private_5 = await factory.createExperiment("test-experiment-private-5-search", "test-protocol-description-search", user_provider, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         const filter = "{\"_id\":{\"$regex\": \"search\"}}";
         let res = await chai.request(server).keepOpen().get('/v1/experiments?filter=' + filter).set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(200);
@@ -343,8 +342,8 @@ describe('Access read a experiment', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment_public = await factory.createExperiment("test-experiment-public", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_private = await factory.createExperiment("test-experiment-private", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_public = await factory.createExperiment("test-experiment-public", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_private = await factory.createExperiment("test-experiment-private", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().get('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user_admin));
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -382,7 +381,7 @@ describe('Access read a experiment', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment_public = await factory.createExperiment("test-experiment-public", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public = await factory.createExperiment("test-experiment-public", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
         let res = await chai.request(server).keepOpen().get('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -408,7 +407,7 @@ describe('Access read a experiment', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment_private = await factory.createExperiment("test-experiment-private", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_private = await factory.createExperiment("test-experiment-private", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().get('/v1/experiments/' + experiment_private._id).set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
@@ -433,8 +432,8 @@ describe('Access read a experiment', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user_provider_owner, metadata, topics);
-        const experiment_public = await factory.createExperiment("test-experiment-public", "test-protocol-description", user_provider_owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_private = await factory.createExperiment("test-experiment-private", "test-protocol-description", user_provider_owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_public = await factory.createExperiment("test-experiment-public", "test-protocol-description", user_provider_owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_private = await factory.createExperiment("test-experiment-private", "test-protocol-description", user_provider_owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().get('/v1/experiments/' + experiment_public._id).set("Authorization", await factory.getUserToken(user_provider_owner));
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -467,7 +466,7 @@ describe('Access modify experiments', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment = await factory.createExperiment("test-experiment-private", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment = await factory.createExperiment("test-experiment-private", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
         let res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_admin)).send(modification);
@@ -495,7 +494,7 @@ describe('Access modify experiments', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user_provider_owner, metadata, topics);
-        const experiment = await factory.createExperiment("test-experiment-private", "test-protocol-description", user_provider_owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment = await factory.createExperiment("test-experiment-private", "test-protocol-description", user_provider_owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         const tag = await factory.createTag("test-tag-1", user_provider_owner);
         const modification = { tags: { add: [tag._id] } };
         let res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_provider_owner)).send(modification);
@@ -524,7 +523,7 @@ describe('Access modify experiments', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment = await factory.createExperiment("test-experiment-public", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment = await factory.createExperiment("test-experiment-public", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
         let res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_analyst)).send(modification);
@@ -552,7 +551,7 @@ describe('Access modify experiments', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment = await factory.createExperiment("test-experiment-private", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment = await factory.createExperiment("test-experiment-private", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
         let res = await chai.request(server).keepOpen().put('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_provider)).send(modification);
@@ -583,7 +582,7 @@ describe('Access delete experiments', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment = await factory.createExperiment("test-experiment-private", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment = await factory.createExperiment("test-experiment-private", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_admin));
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -607,7 +606,7 @@ describe('Access delete experiments', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user_provider_owner, metadata, topics);
-        const experiment = await factory.createExperiment("test-experiment-private", "test-protocol-description", user_provider_owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment = await factory.createExperiment("test-experiment-private", "test-protocol-description", user_provider_owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_provider_owner));
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -632,7 +631,7 @@ describe('Access delete experiments', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment = await factory.createExperiment("test-experiment-private", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment = await factory.createExperiment("test-experiment-private", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_analyst));
         res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
@@ -658,7 +657,7 @@ describe('Access delete experiments', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment = await factory.createExperiment("test-experiment-private", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment = await factory.createExperiment("test-experiment-private", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         let res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(errors.restricted_access_operation.status);
         res.body.should.be.a('object');
@@ -688,14 +687,14 @@ describe('Access experiments with rights', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment_public_1 = await factory.createExperiment("test-experiment-1-public", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_2 = await factory.createExperiment("test-experiment-2-public", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_3 = await factory.createExperiment("test-experiment-3-public", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_4 = await factory.createExperiment("test-experiment-4-public", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_5 = await factory.createExperiment("test-experiment-5-public", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_private_1 = await factory.createExperiment("test-experiment-1-private", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
-        const experiment_private_2 = await factory.createExperiment("test-experiment-2-private", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
-        const experiment_private_3 = await factory.createExperiment("test-experiment-3-private", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_public_1 = await factory.createExperiment("test-experiment-1-public", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_2 = await factory.createExperiment("test-experiment-2-public", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_3 = await factory.createExperiment("test-experiment-3-public", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_4 = await factory.createExperiment("test-experiment-4-public", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_5 = await factory.createExperiment("test-experiment-5-public", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_private_1 = await factory.createExperiment("test-experiment-1-private", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_private_2 = await factory.createExperiment("test-experiment-2-private", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_private_3 = await factory.createExperiment("test-experiment-3-private", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         const right_1 = await factory.createRight("right-test-1", experiment_public_1, "Experiment", user_analyst, owner, []);
         const right_2 = await factory.createRight("right-test-2", experiment_public_2, "Experiment", user_analyst, owner, []);
         const right_3 = await factory.createRight("right-test-3", experiment_private_1, "Experiment", user_analyst, owner, []);
@@ -729,14 +728,14 @@ describe('Access experiments with rights', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment_public_1 = await factory.createExperiment("test-experiment-1-public", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_2 = await factory.createExperiment("test-experiment-2-public", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_3 = await factory.createExperiment("test-experiment-3-public", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_4 = await factory.createExperiment("test-experiment-4-public", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_5 = await factory.createExperiment("test-experiment-5-public", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_private_1 = await factory.createExperiment("test-experiment-1-private", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
-        const experiment_private_2 = await factory.createExperiment("test-experiment-2-private", "test-protocol-description", user_provider, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
-        const experiment_private_3 = await factory.createExperiment("test-experiment-3-private", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_public_1 = await factory.createExperiment("test-experiment-1-public", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_2 = await factory.createExperiment("test-experiment-2-public", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_3 = await factory.createExperiment("test-experiment-3-public", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_4 = await factory.createExperiment("test-experiment-4-public", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_5 = await factory.createExperiment("test-experiment-5-public", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_private_1 = await factory.createExperiment("test-experiment-1-private", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_private_2 = await factory.createExperiment("test-experiment-2-private", "test-protocol-description", user_provider, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_private_3 = await factory.createExperiment("test-experiment-3-private", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
         const right_1 = await factory.createRight("right-test-1", experiment_private_2, "Experiment", user_provider, owner, []);
         const right_2 = await factory.createRight("right-test-2", experiment_private_1, "Experiment", user_provider, owner, []);
         const right_3 = await factory.createRight("right-test-3", experiment_public_1, "Experiment", user_provider, owner, []);
@@ -776,11 +775,11 @@ describe('Access experiments with rights', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user_admin, metadata, topics);
-        const experiment_public_A = await factory.createExperiment("test-experiment-A-public", "test-protocol-description", user_provider1, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_public_B = await factory.createExperiment("test-experiment-B-public", "test-protocol-description", user_provider1, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_private_C = await factory.createExperiment("test-experiment-C-private", "test-protocol-description", user_provider1, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
-        const experiment_private_D = await factory.createExperiment("test-experiment-D-private", "test-protocol-description", user_provider2, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
-
+        const experiment_public_A = await factory.createExperiment("test-experiment-A-public", "test-protocol-description", user_provider1, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_public_B = await factory.createExperiment("test-experiment-B-public", "test-protocol-description", user_provider1, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_private_C = await factory.createExperiment("test-experiment-C-private", "test-protocol-description", user_provider1, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        const experiment_private_D = await factory.createExperiment("test-experiment-D-private", "test-protocol-description", user_provider2, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.private);
+        
         //User provider 1
         let res = await chai.request(server).keepOpen().get('/v1/experiments/').set("Authorization", await factory.getUserToken(user_provider1));
         res.should.have.status(200);
@@ -923,8 +922,8 @@ describe('Access experiments with rights', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_owned = await factory.createExperiment("test-experiment-2", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_owned = await factory.createExperiment("test-experiment-2", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
         const right_1 = await factory.createRight("right-test-1", experiment_owned, "Experiment", user_provider, owner, []);
         const right_2 = await factory.createRight("right-test-2", experiment_owned, "Experiment", user_analyst, owner, []);
         let res = await chai.request(server).keepOpen().get('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_provider));
@@ -959,7 +958,7 @@ describe('Access experiments with rights', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
         const right_1 = await factory.createRight("right-test-1", experiment, "Experiment", user_provider, owner, []);
         const right_2 = await factory.createRight("right-test-2", experiment, "Experiment", user_analyst, owner, []);
         let res = await chai.request(server).keepOpen().get('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_provider));
@@ -993,8 +992,8 @@ describe('Delete experiments with rights', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description", user_provider, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_owned = await factory.createExperiment("test-experiment-2", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description",user_provider,  0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_owned = await factory.createExperiment("test-experiment-2","test-protocol-description", owner, 0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
         const right = await factory.createRight("right-test-1", experiment_owned, "Experiment", user_provider, owner, []);
         let res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(errors.restricted_access_operation.status);
@@ -1022,7 +1021,7 @@ describe('Delete experiments with rights', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description", user_provider, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description",user_provider,  0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
         const right = await factory.createRight("right-test-1", experiment, "Experiment", user_provider, owner, []);
         let res = await chai.request(server).keepOpen().delete('/v1/experiments/' + experiment._id).set("Authorization", await factory.getUserToken(user_provider));
         res.should.have.status(200);
@@ -1050,8 +1049,8 @@ describe('Modify experiments with rights', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description", user_provider, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
-        const experiment_owned = await factory.createExperiment("test-experiment-2", "test-protocol-description", owner, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description",user_provider,  0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment_owned = await factory.createExperiment("test-experiment-2", "test-protocol-description",owner,  0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
         const right = await factory.createRight("right-test-1", experiment_owned, "Experiment", user_provider, owner, []);
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
@@ -1081,7 +1080,7 @@ describe('Modify experiments with rights', () => {
             { name: "field-6", description: "field description 6", type: "vector" }]
         }]
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", owner, metadata, topics);
-        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description", user_provider, ExperimentStateTypes.ongoing, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
+        const experiment = await factory.createExperiment("test-experiment-1", "test-protocol-description",user_provider,  0, null, null, null, protocol, null, null, [], null, VisibilityTypes.public);
         const right = await factory.createRight("right-test-1", experiment, "Experiment", user_provider, owner, []);
         const tag = await factory.createTag("test-tag-1", owner);
         const modification = { tags: { add: [tag._id] } };
@@ -1117,7 +1116,7 @@ describe('Create a a experiment with rights', () => {
         const request = {
             _id: "test-experiment-1",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 43 },
             { name: "metadata-name-2", value: "my string" },
@@ -1164,7 +1163,7 @@ describe('Create a a experiment with rights', () => {
         const request = {
             _id: "test-experiment-1",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 43 },
             { name: "metadata-name-2", value: "my string" },
@@ -1230,7 +1229,7 @@ describe('Custom role check for experiment', () => {
         const experiment_public = {
             _id: "test-experiment-1",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 43 },
             { name: "metadata-name-2", value: "my string" },
@@ -1251,7 +1250,7 @@ describe('Custom role check for experiment', () => {
         const experiment_private = {
             _id: "test-experiment-2",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 43 },
             { name: "metadata-name-2", value: "my string" },
@@ -1439,7 +1438,7 @@ describe('Custom role check for experiment', () => {
         const experiment_public1 = {
             _id: "test-experiment-1",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 43 },
             { name: "metadata-name-2", value: "my string" },
@@ -1460,7 +1459,7 @@ describe('Custom role check for experiment', () => {
         const experiment_public2 = {
             _id: "test-experiment-2",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 50 },
             { name: "metadata-name-2", value: "my string" },
@@ -1481,7 +1480,7 @@ describe('Custom role check for experiment', () => {
         const experiment_public3 = {
             _id: "test-experiment-3",
             description: "experiment description",
-            state: ExperimentStateTypes.completed,
+            state: 1,
             protocol: protocol._id,
             metadata: [{ name: "metadata-name-1", value: 50 },
             { name: "metadata-name-2", value: "my string" },

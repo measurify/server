@@ -242,7 +242,7 @@ describe('/POST reset', () => {
         res.should.have.status(errors.post_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
-        res.body.message.should.contain(errors.post_request_error.message);
+        res.body.message.should.contain(errors.put_request_error.message);
         res.body.details.should.contain('Unknown tenant');
     });
 
@@ -257,65 +257,71 @@ describe('/POST reset', () => {
     });
 });
 
-// Confirm the password rest
+// Confirm the password reset
 describe('/PUT password', () => {
-    it('it should GET a password reset', async () => {
+    it('it should PUT a password reset', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
-        const res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&password=my_new_password&tenant=' + process.env.DEFAULT_TENANT).send({});
+        const body = {reset:reset._id, password:"My_new_password", tenant:process.env.DEFAULT_TENANT};
+        const res = await chai.request(server).keepOpen().put('/' + process.env.VERSION + '/self').send(body);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('username');
     });
 
-    it('it should not GET a password reset without password field', async () => {
+    it('it should not PUT a password reset without password field', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
-        const res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&tenant=' + process.env.DEFAULT_TENANT).send({});
+        const body = {reset:reset._id, tenant:process.env.DEFAULT_TENANT};
+        const res = await chai.request(server).keepOpen().put('/' + process.env.VERSION + '/self').send(body);
         res.should.have.status(errors.missing_info.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.missing_info.message);
     });
 
-    it('it should not GET a password reset without reset field', async () => {
+    it('it should not PUT a password reset without reset field', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
-        const res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?password=my_new_password&tenant=' + process.env.DEFAULT_TENANT).send({});
+        const body = {password:"My_new_password", tenant:process.env.DEFAULT_TENANT};
+        const res = await chai.request(server).keepOpen().put('/' + process.env.VERSION + '/self').send(body);
         res.should.have.status(errors.missing_info.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.missing_info.message);
     });
 
-    it('it should not GET a password reset with a fake reset', async () => {
+    it('it should not PUT a password reset with a fake reset', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
-        const res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=fake_reset&password=my_new_password&tenant=' + process.env.DEFAULT_TENANT).send({});
+        const body = {reset:"fake_reset", password:"My_new_password", tenant:process.env.DEFAULT_TENANT};
+        const res = await chai.request(server).keepOpen().put('/' + process.env.VERSION + '/self').send(body);
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.resource_not_found.message);
     });
 
-    it('it should not GET a password reset with a fake reset', async () => {
+    it('it should not PUT a password with a already used reset token', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
-        let res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&password=my_new_password&tenant=' + process.env.DEFAULT_TENANT).send({});
+        const body = {reset:reset._id, password:"My_new_password", tenant:process.env.DEFAULT_TENANT};
+        let res = await chai.request(server).keepOpen().put('/' + process.env.VERSION + '/self').send(body);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('username');
-        res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&password=my_new_password&tenant=' + process.env.DEFAULT_TENANT).send({});
+        res = await chai.request(server).keepOpen().put('/' + process.env.VERSION + '/self').send(body);
         res.should.have.status(errors.reset_invalid.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.reset_invalid.message);
     });
 
-    it('it should not GET a password reset with a fake tenant', async () => {
+    it('it should not PUT a password reset with a fake tenant', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
-        const res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&password=my_new_password&tenant=fake-tenant').send({});
+        const body = {reset:reset._id, password:"My_new_password", tenant:"fake-tenant"};
+        const res = await chai.request(server).keepOpen().put('/' + process.env.VERSION + '/self').send(body);
         res.should.have.status(errors.get_request_error.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
@@ -323,11 +329,12 @@ describe('/PUT password', () => {
         res.body.details.should.contain('Unknown tenant');
     });
 
-    it('it should not GET a password reset with a different tenant', async () => {
+    it('it should not PUT a password reset with a different tenant', async () => {
         const other_tenant = await factory.createTenant("test-tenant-2", "organization-test-1", "test street", "test@email", "433232", "test", "test");
         const user = await factory.createUser("test-username-1", "test-password-1", null, null, "test-email-1@test.it");
         const reset = await factory.createReset(user);
-        const res = await chai.request(server).keepOpen().get('/' + process.env.VERSION + '/self?reset=' + reset._id + '&password=my_new_password&tenant=' + other_tenant._id).send({});
+        const body = {reset:reset._id, password:"My_new_password", tenant: other_tenant._id};
+        const res = await chai.request(server).keepOpen().put('/' + process.env.VERSION + '/self').send(body);
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');

@@ -6,6 +6,7 @@ const dataset=require('../commons/dataset.js');
 
 exports.getResource = async function (req, res, field, model, select) {
     try {
+        if(req.query&&req.query.select) select = prepareSelect(select, query.select);
         const item = await persistence.get(req.params.id, field, model, select);
         if (!item) return errors.manage(res, errors.resource_not_found, req.params.id);
         return res.status(200).json(item);
@@ -20,6 +21,7 @@ exports.getResourceDataset = async function (req, res, sort, select, model,restr
     try {
         const query = req.query;
         if (!query.sort) query.sort = sort;
+        if(query.select) select = prepareSelect(select, query.select);
         filterDataset = await dataset.prepareFilterDataset(req.params.id, query.filter);
         if (!query.page)query.page = 1;
         if (!query.limit) query.limit = await model.countDocuments(filterDataset);
@@ -64,6 +66,7 @@ exports.getResourcePipe = function (req, res, sort, select, model, restriction) 
     try {
         const query = req.query;
         if (!query.sort) query.sort = sort;
+        if(query.select) select = prepareSelect(select, query.select);
         persistence.getPipe(req, res, query.filter, query.sort, select, restriction, model)
     }
     catch (err) { return errors.manage(res, errors.get_request_error, err); }
@@ -73,10 +76,12 @@ exports.getResourceList = async function (req, res, sort, select, model, restric
     try {
         const query = req.query;
         if (!query.sort) query.sort = sort;
+        if(query.select) select = prepareSelect(select, query.select);
         let list = await persistence.getList(query.filter, query.sort, select, query.page, query.limit, restriction, model);
         if (req.headers.accept == 'text/csv') {
             res.header('Content-Type', 'text/csv');
             csvresultlibrary = conversion.jsonToCSV(list);
+            [csvresultlibrary, result] = conversion.replaceSeparatorsGet(csvresultlibrary, req.query); if (result != null) return result;
             return res.status(200).send(csvresultlibrary);
         }
         else return res.status(200).json(list);
@@ -152,3 +157,18 @@ exports.updateResource = async function (req, res, fields, model) {
     }
     catch (err) { return errors.manage(res, errors.put_request_error, err); }
 };
+
+//local function
+const prepareSelect = function (select, querySelect) {
+    try {
+        querySelect=JSON.parse(querySelect);
+    } catch (e) {
+        return select;
+    }
+    let object={};
+    querySelect.map((key) => {
+        if (select[key] === undefined) object[key] = true;
+    });
+    if(object!=={})return object;
+    return select;
+}

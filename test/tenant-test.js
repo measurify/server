@@ -23,7 +23,7 @@ describe('/GET tenant', () => {
         const res = await chai.request(server).keepOpen().get('/v1/tenants').set("Authorization", process.env.API_TOKEN);
         res.should.have.status(200);
         res.body.docs.should.be.a('array');
-        res.body.docs.length.should.be.eql(3);
+        res.body.docs.length.should.be.eql(4);
     });
 
     it('it should GET a specific tenant', async () => {
@@ -68,7 +68,7 @@ describe('/POST tenant', () => {
     });
 
     it('it should POST a tenant', async () => {
-        const tenant = { _id: "test-tenant-3" }
+        const tenant = { _id: "test-tenant-3", email:"test@" }
         const res = await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", process.env.API_TOKEN).send(tenant);
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -77,7 +77,7 @@ describe('/POST tenant', () => {
     });
 
     it('it should not POST a tenant with already existant _id field', async () => {
-       const tenant = { _id: "test-tenant-4" };
+       const tenant = { _id: "test-tenant-4", email:"test@" };
         await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", process.env.API_TOKEN).send(tenant);
         const res = await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", process.env.API_TOKEN).send(tenant)
         res.should.have.status(errors.post_request_error.status);
@@ -88,8 +88,8 @@ describe('/POST tenant', () => {
     });
 
     it('it should POST a list of tenant', async () => {
-        const tenants = [{ _id: "test-tenant-5" },
-                         { _id: "test-tenant-6" }];
+        const tenants = [{ _id: "test-tenant-5", email:"test@" },
+                         { _id: "test-tenant-6", email:"test2@" }];
         const res = await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", process.env.API_TOKEN).send(tenants)
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -99,15 +99,15 @@ describe('/POST tenant', () => {
 
     it('it should POST only not existing tenants from a list', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
-        let tenants = [{ _id: "test-tenant-11" },
-                        { _id: "test-tenant-31" },
-                        { _id: "test-tenant-41" }];
+        let tenants = [{ _id: "test-tenant-11", email:"test@" },
+                        { _id: "test-tenant-31", email:"test@1" },
+                        { _id: "test-tenant-41", email:"test@2" }];
         await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", process.env.API_TOKEN).send(tenants);
-        tenants = [{ _id: "test-tenant-1" },
-                        { _id: "test-tenant-21" },
-                        { _id: "test-tenant-31" },
-                        { _id: "test-tenant-41" },
-                        { _id: "test-tenant-51" }];
+        tenants = [{ _id: "test-tenant-1", email:"test@3" },
+                        { _id: "test-tenant-21", email:"test@4" },
+                        { _id: "test-tenant-31", email:"test@5" },
+                        { _id: "test-tenant-41", email:"test@6" },
+                        { _id: "test-tenant-51", email:"test@7" }];
         const res = await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", process.env.API_TOKEN).send(tenants);
         res.should.have.status(202);
         res.body.should.be.a('object');
@@ -121,19 +121,19 @@ describe('/POST tenant', () => {
     });
 
     it('it should not POST a tenant without API token', async () => {
-        const tenant = { _id: "test-tenant-34" }
+        const tenant = { _id: "test-tenant-34" , email:"test@"}
         const res = await chai.request(server).keepOpen().post('/v1/tenants').send(tenant);
         res.should.have.status(errors.authentication_error.status);
     });
 
     it('it should not POST a tenant with a fake API token', async () => {
-        const tenant = { _id: "test-tenant-34" }
+        const tenant = { _id: "test-tenant-34" , email:"test@"}
         const res = await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", "fake-token").send(tenant);
         res.should.have.status(errors.authentication_error.status);
     });
 
     it('it should login to a new not-hashed tenant', async () => {
-        const tenant = { _id: "test-tenant-343242", database: "db-test-1", passwordhash: "false", admin_username: "test-username-1", admin_password: "test-password-1", }
+        const tenant = { _id: "test-tenant-343242", database: "db-test-1", passwordhash: "false", admin_username: "test-username-1", admin_password: "test-password-1",  email:"test@"}
         let res = await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", process.env.API_TOKEN).send(tenant);
         const request = { username: "test-username-1", password: "test-password-1", tenant: "test-tenant-343242" };
         res = await chai.request(server).keepOpen().post('/v1/login').send(request);
@@ -143,7 +143,7 @@ describe('/POST tenant', () => {
     });
 
     it('it should login to a new hashed tenant', async () => {
-        const tenant = { _id: "test-tenant-343243", database: "db-test-343243", passwordhash: "true", admin_username: "test-username-1", admin_password: "test-password-1", }
+        const tenant = { _id: "test-tenant-343243", database: "db-test-343243", passwordhash: "true", admin_username: "test-username-1", admin_password: "test-password-1",  email:"test@"}
         let res = await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", process.env.API_TOKEN).send(tenant);
         const request = { username: "test-username-1", password: "test-password-1", tenant: "test-tenant-343243" };
         res = await chai.request(server).keepOpen().post('/v1/login').send(request);
@@ -153,11 +153,11 @@ describe('/POST tenant', () => {
     });
 
     it('it should login as a new tenant user (password hashed)', async () => {
-        const tenant = { _id: "test-tenant-8747392", passwordhash: "true", admin_username: "test-username-1", admin_password: "test-password-1" }
+        const tenant = { _id: "test-tenant-8747392", passwordhash: "true", admin_username: "test-username-1", admin_password: "test-password-1" , email:"test@"}
         let res = await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", process.env.API_TOKEN).send(tenant);
         const admin_login_request = {username: "test-username-1", password: "test-password-1", tenant:"test-tenant-8747392"};
         const token = (await chai.request(server).keepOpen().post('/v1/login').send(admin_login_request)).body.token;
-        const user_request = { username: "test-username-2", password: "test-password-2", type: UserRoles.analyst };
+        const user_request = { username: "test-username-2", password: "test-password-2", type: UserRoles.analyst ,email:"test@1"};
         res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', token).send(user_request);
         const user_login_request = { username: "test-username-2", password: "test-password-2", tenant: "test-tenant-8747392" };
         res = await chai.request(server).keepOpen().post('/v1/login').send(user_login_request);
@@ -167,14 +167,14 @@ describe('/POST tenant', () => {
     });
 
     it('it should login as a new tenant user (password hashed) created from a list', async () => {
-        const tenant = { _id: "test-tenant-8747392", passwordhash: "true", admin_username: "test-username-1", admin_password: "test-password-1" }
+        const tenant = { _id: "test-tenant-8747393", passwordhash: "true", admin_username: "test-username-1", admin_password: "test-password-1" , email:"test@"}
         let res = await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", process.env.API_TOKEN).send(tenant);
-        const admin_login_request = {username: "test-username-1", password: "test-password-1", tenant:"test-tenant-8747392"};
+        const admin_login_request = {username: "test-username-1", password: "test-password-1", tenant:"test-tenant-8747393"};
         const token = (await chai.request(server).keepOpen().post('/v1/login').send(admin_login_request)).body.token;
-        const user_request = [ { username : "test-username-4", password : "test-password-4", type: UserRoles.analyst }, 
-                               { username : "test-username-5", password : "test-password-5", type: UserRoles.analyst } ]; 
+        const user_request = [ { username : "test-username-4", password : "test-password-4", type: UserRoles.analyst, email:"test@1" }, 
+                               { username : "test-username-5", password : "test-password-5", type: UserRoles.analyst, email:"test@2"} ]; 
         res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', token).send(user_request);
-        const user_login_request = { username: "test-username-5", password: "test-password-5", tenant: "test-tenant-8747392" };
+        const user_login_request = { username: "test-username-5", password: "test-password-5", tenant: "test-tenant-8747393" };
         res = await chai.request(server).keepOpen().post('/v1/login').send(user_login_request);
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -182,18 +182,18 @@ describe('/POST tenant', () => {
     });
 
     it('it should login as a tenant user (password hashed) that modify his password', async () => {
-        const tenant = { _id: "test-tenant-8747392", passwordhash: "true", admin_username: "test-username-1", admin_password: "test-password-1" }
+        const tenant = { _id: "test-tenant-8747394", passwordhash: "true", admin_username: "test-username-1", admin_password: "test-password-1", email:"test@" }
         let res = await chai.request(server).keepOpen().post('/v1/tenants').set("Authorization", process.env.API_TOKEN).send(tenant);
-        const admin_login_request = {username: "test-username-1", password: "test-password-1", tenant:"test-tenant-8747392"};
+        const admin_login_request = {username: "test-username-1", password: "test-password-1", tenant:"test-tenant-8747394"};
         const token = (await chai.request(server).keepOpen().post('/v1/login').send(admin_login_request)).body.token;
-        const user_request = { username: "test-username-6", password: "test-password-6", type: UserRoles.analyst };
+        const user_request = { username: "test-username-6", password: "test-password-6", type: UserRoles.analyst,email:"test@1" };
         res = await chai.request(server).keepOpen().post('/v1/users').set('Authorization', token).send(user_request);
         const user_id = res.body._id;
-        const user_login_request = { username: "test-username-6", password: "test-password-6", tenant: "test-tenant-8747392" };
+        const user_login_request = { username: "test-username-6", password: "test-password-6", tenant: "test-tenant-8747394" };
         res = await chai.request(server).keepOpen().post('/v1/login').send(user_login_request);
         const modification_requues = { password: 'new_password' };
         res = await chai.request(server).keepOpen().put('/v1/users/' + user_id).set("Authorization", res.body.token).send(modification_requues);
-        const user_login_request_new = { username: "test-username-6", password: "new_password", tenant: "test-tenant-8747392" };
+        const user_login_request_new = { username: "test-username-6", password: "new_password", tenant: "test-tenant-8747394" };
         res = await chai.request(server).keepOpen().post('/v1/login').send(user_login_request_new);
         res.should.have.status(200);
         res.body.should.be.a('object');
@@ -206,24 +206,24 @@ describe('/DELETE tenant', () => {
     it('it should DELETE a tenant', async () => {
         const tenant = await factory.createTenant("test-tenant-200", "organization-test-1", "test street", "test@email", "433232", "test", "test");
         const tenants_before = await before.Tenant.find();
-        tenants_before.length.should.be.eql(16);
+        tenants_before.length.should.be.eql(19);        
         const res = await chai.request(server).keepOpen().delete('/v1/tenants/' + tenant._id).set("Authorization", process.env.API_TOKEN);
         res.should.have.status(200);
         res.body.should.be.a('object');
         const tenants_after = await before.Tenant.find();
-        tenants_after.length.should.be.eql(15);
+        tenants_after.length.should.be.eql(18);
     });
 
     it('it should not DELETE a fake tenant', async () => {
         const tenant = await factory.createTenant("test-tenant-200", "organization-test-1", "test street", "test@email", "433232", "test", "test");
         const tenants_before = await before.Tenant.find();
-        tenants_before.length.should.be.eql(16);
+        tenants_before.length.should.be.eql(19);
         const res = await chai.request(server).keepOpen().delete('/v1/tenants/fake_tenant').set("Authorization", process.env.API_TOKEN);
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
         const tenants_after = await before.Tenant.find();
-        tenants_after.length.should.be.eql(16);
+        tenants_after.length.should.be.eql(19);
     });
 
     it('it should not DELETE a tenant without API token', async () => {

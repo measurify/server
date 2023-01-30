@@ -11,6 +11,8 @@ const localization_it = {
   resources: "Risorse",
   notifications: "Notifiche",
   file_content: "Contenuto del file",
+  preview: "Anteprima",
+  configuration: "Configurazione",
 
   clear_all: "Cancella tutto",
 
@@ -41,6 +43,8 @@ const localization_it = {
   pass_change_confirm: "La password verrà modificata, procedere?",
   pass_not_match:
     "La password inserita e la conferma non combaciano, si prega di reinserirle",
+  old_pass_empty: "Per favore, inserire la vecchia password",
+  old_pass_wrong: "La vecchia password è sbagliata",
   pass_not_null: "La password non può essere vuota",
   password_changed: "Password cambiata",
 
@@ -56,12 +60,21 @@ const localization_it = {
   logout: "Esci",
   repeat: "Ripeti",
   close: "Chiudi",
+<<<<<<< HEAD
   remove: "Rimuovi",
+=======
+  import: "Importa",
+  export: "Esporta",
+>>>>>>> fresta
 
   ///Errori
   login_error: "Login errata!",
   unauthorised_user: "Non sei abilitato a utilizzare questa pagina",
   session_expired: "Sessione scaduta",
+  no_file: "Si prega di selezionare un file",
+  duplicate_error: "Nel database è già presente una risorsa con",
+  error_imported_file:
+    "Nel file sono presenti errori, non è stato possibile importarlo",
 };
 
 export default localization_it;

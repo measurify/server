@@ -4,6 +4,12 @@ export const isDefault = (obj) => {
   if (obj === undefined) return true;
   //null is considered default
   if (obj == null) return true;
+
+  //boolean are considered always default since no default value can be considered
+  if (typeof obj === "boolean") {
+    return true;
+  }
+
   //Nan is default for numbers
   if (typeof obj === "number") {
     return isNaN(obj);
@@ -32,6 +38,7 @@ export const isDefault = (obj) => {
     });
     return def;
   }
+  return true;
 };
 
 //non-default items lenght
@@ -133,3 +140,13 @@ export const areEqual = (obj1, obj2) => {
   }
   return false;
 };
+
+//Capitalize the first letter of a string
+export function Capitalize(s) {
+  return s && s[0].toUpperCase() + s.slice(1);
+}
+
+//format string date into yyyy/mm/dd
+export function FormatDate(dt) {
+  return dt.slice(0, 10).replaceAll("-", "/");
+}

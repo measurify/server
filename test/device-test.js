@@ -240,6 +240,7 @@ describe('/POST device from file', () => {
         const feature4 = await factory.createFeature("feature4", user);
         const testFile = './test/dummies/Device_test.csv';
         const res = await chai.request(server).keepOpen().post('/v1/devices/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
+        //console.log(res)
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('devices');

@@ -20,3 +20,16 @@
 
 + added range attribute for metadata and topic fields in experiments \[min,max\] for scalar
 + added enum type for experiments metadata and topic fields between values compiled in "range" attribute in protocol
+
+## Version 0.6.2
+
+2022.11.22
+
++ added csv upload and download for timeseries 
+
+## Version 0.6.3
+
+2022.11.25
+
++ Now separators of CSV file can be defined in the url of the request for POST and GET
++ Updated PostMan Collection

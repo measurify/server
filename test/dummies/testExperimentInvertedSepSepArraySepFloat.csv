@@ -1,0 +1,3 @@
+_id;description;state;place.name;startDate;endDate;protocol;metadata.name;metadata.value
+testExp1;Description;1;Place;06/01/2022;05/31/2023;Test1;metadata1;1,5
+;;;;;;;metadata2;[0.1]

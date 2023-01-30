@@ -45,7 +45,7 @@ actionSchema.path('entity').validate({
             model_name.push( models[i].substring(0, models[i].length - 9).toLowerCase());
         }
         if(model_name.includes(value.toLowerCase()))return true;
-        throw new Error('Role validation failed: ' + value + 'is not an entity)');
+        throw new Error('Role validation failed: ' + value + ' is not a valid entity name (please check to use singular to define entity Ex: tag )');
     }
 });
 

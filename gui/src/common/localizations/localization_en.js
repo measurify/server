@@ -12,6 +12,8 @@ const localization_en = {
   resources: "Resources",
   notifications: "Notifications",
   file_content: "File content",
+  preview: "Preview",
+  configuration: "Configuration",
 
   clear_all: "Clear all",
 
@@ -41,6 +43,8 @@ const localization_en = {
   pass_change_confirm: "Password will be changed, do you confirm?",
   pass_not_match:
     "Provided password and the confirmation do not match. Please insert them again",
+  old_pass_empty: "Please. enter old password",
+  old_pass_wrong: "The old password is wrong",
   pass_not_null: "Password cannot be empty",
   password_changed: "Password changed",
 
@@ -55,12 +59,20 @@ const localization_en = {
   logout: "Logout",
   repeat: "Repeat",
   close: "Close",
+<<<<<<< HEAD
   remove: "Remove",
+=======
+  import: "Import",
+  export: "Export",
+>>>>>>> fresta
 
   ///Errors
   login_error: "Wrong login!",
   unauthorised_user: "You are not allowed to use this page",
   session_expired: "Session expired",
+  no_file: "Please, select a file",
+  duplicate_error: "The database already contains a resource with",
+  error_imported_file: "File contains errors. It was not possible to import it",
 };
 
 export default localization_en;

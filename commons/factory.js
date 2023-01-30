@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 const ItemTypes = require("../types/itemTypes.js");
 const ComputationStatusTypes = require("../types/computationStatusTypes.js");
 const PasswordResetStatusTypes = require("../types/passwordResetStatusTypes.js");
-const ExperimentStateTypes = require("../types/experimentStateTypes.js");
+//const ExperimentStateTypes = require("../types/experimentStateTypes.js");
 const TopicFieldTypes = require('../types/topicFieldTypes.js');
 const IssueTypes = require("../types/issueTypes.js");
 const VisibilityTypes = require("../types/visibilityTypes.js");
@@ -18,6 +18,7 @@ const IssueStatusTypes = require("../types/issueStatusTypes");
 const MetadataTypes = require('../types/metadataTypes.js');
 const RoleCrudTypes = require('../types/roleCrudTypes.js');
 const { index } = require("mathjs");
+const errors = require('../commons/errors.js');
 
 function sha(content) {
   return crypto.createHash("sha256").update(content).digest("hex");
@@ -46,7 +47,7 @@ exports.dropContents = async function (tenant) {
     }
     await tenancy.init(tenant);
   } catch (error) {
-    console.log("Error in dropping databae " + tenant + "(" + error + ")");
+    console.log("Error in dropping database " + tenant + "(" + error + ")");
   }
 };
 
@@ -89,7 +90,7 @@ exports.createTenant = async function (id, organization, address, email, phone, 
   return await Tenant.findById(tenant._id);
 };
 
-exports.createUser = async function (username, password, type, fieldmask, email, tenant) {
+exports.createUser = async function (username, password, type, fieldmask, email, tenant,validityPasswordDays,createdPassword) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
   if (tenant.passwordhash == true || tenant.passwordhash == "true") {
@@ -100,8 +101,10 @@ exports.createUser = async function (username, password, type, fieldmask, email,
     username: username,
     password: password,
     fieldmask: fieldmask,
-    email: email,
-    type: type || UserRoles.provider
+    email: email||username+"@gmail.com",
+    type: type || UserRoles.provider,
+    validityPasswordDays:validityPasswordDays||0,
+    createdPassword:createdPassword
   };
   let user = new User(req);
   await user.save();
@@ -336,8 +339,9 @@ exports.createExperiment = async function (name, description, owner, state, star
   const Experiment = mongoose.dbs[tenant.database].model("Experiment");
   const req = {
     _id: name,
-    description: description,
-    state: state || ExperimentStateTypes.ongoing,
+    description: description,    
+    //state: state || ExperimentStateTypes.ongoing,
+    state: state || 0,
     startDate: startDate || Date.now(),
     endDate: endDate || Date.now(),
     owner: owner,
@@ -648,7 +652,7 @@ exports.createComputation = async function (
 
 exports.createDemoContent = async function (tenant) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
-  if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
+  if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT_DEMO);
 
   const users = [];
   users.push(
@@ -902,6 +906,7 @@ exports.createDemoContent = async function (tenant) {
       null,
       null,
       VisibilityTypes.public,
+      null,
       tenant
     )
   );
@@ -917,6 +922,7 @@ exports.createDemoContent = async function (tenant) {
       null,
       null,
       VisibilityTypes.public,
+      null,
       tenant
     )
   );
@@ -932,6 +938,7 @@ exports.createDemoContent = async function (tenant) {
       null,
       null,
       VisibilityTypes.public,
+      null,
       tenant
     )
   );
@@ -947,6 +954,7 @@ exports.createDemoContent = async function (tenant) {
       null,
       null,
       VisibilityTypes.public,
+      null,
       tenant
     )
   );
@@ -962,6 +970,7 @@ exports.createDemoContent = async function (tenant) {
       null,
       null,
       VisibilityTypes.public,
+      null,
       tenant
     )
   );
@@ -976,7 +985,8 @@ exports.createDemoContent = async function (tenant) {
       null,
       null,
       null,
-      VisibilityTypes.public,
+      VisibilityTypes.public,      
+      null,
       tenant
     )
   );
@@ -992,6 +1002,7 @@ exports.createDemoContent = async function (tenant) {
       null,
       null,
       VisibilityTypes.public,
+      null,
       tenant
     )
   );
@@ -1007,6 +1018,7 @@ exports.createDemoContent = async function (tenant) {
       null,
       null,
       VisibilityTypes.public,
+      null,
       tenant
     )
   );
@@ -1022,6 +1034,7 @@ exports.createDemoContent = async function (tenant) {
       null,
       null,
       VisibilityTypes.public,
+      null,
       tenant
     )
   );
@@ -1037,6 +1050,7 @@ exports.createDemoContent = async function (tenant) {
       null,
       null,
       VisibilityTypes.public,
+      null,
       tenant
     )
   );
@@ -1052,6 +1066,7 @@ exports.createDemoContent = async function (tenant) {
       null,
       null,
       VisibilityTypes.public,
+      null,
       tenant
     )
   );
@@ -1067,6 +1082,7 @@ exports.createDemoContent = async function (tenant) {
       null,
       null,
       VisibilityTypes.public,
+      null,
       tenant
     )
   );
@@ -1082,6 +1098,7 @@ exports.createDemoContent = async function (tenant) {
       null,
       null,
       VisibilityTypes.public,
+      null,
       tenant
     )
   );
@@ -1097,6 +1114,7 @@ exports.createDemoContent = async function (tenant) {
       null,
       null,
       VisibilityTypes.public,
+      null,
       tenant
     )
   );
@@ -1112,6 +1130,7 @@ exports.createDemoContent = async function (tenant) {
       null,
       null,
       VisibilityTypes.public,
+      null,
       tenant
     )
   );
@@ -1127,6 +1146,7 @@ exports.createDemoContent = async function (tenant) {
       null,
       null,
       VisibilityTypes.public,
+      null,
       tenant
     )
   );

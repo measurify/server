@@ -104,36 +104,7 @@ exports.canDeleteMeasurementList = async function(req, res, entity) {
     if(!authorizator.canDeleteMeasurementList(req.user,role,req.method,entity)) return errors.manage(res, errors.restricted_access_delete);
     return true;
 } 
-/*OLD
-exports.canCreate = async function(req, res) {
-    if(!authorizator.canCreate(req.user)) return errors.manage(res, errors.restricted_access_create, "You cannot create new resources");
-    return true;
-}
 
-exports.canRead = async function(req, res) {
-    if(!authorizator.canRead(req.resource, req.user)) return errors.manage(res, errors.restricted_access_read, req.resource._id);
-    return true;
-} 
-
-exports.canModify = async function(req, res) {
-    if(!authorizator.canModify(req.resource, req.user)) return errors.manage(res, errors.restricted_access_modify, req.resource._id);
-    return true;
-} 
-
-exports.canDelete = async function(req, res) {
-    if(!authorizator.canDelete(req.resource, req.user)) return errors.manage(res, errors.restricted_access_delete, req.resource._id);
-    return true;
-}
-
-exports.canDeleteList = async function(req, res) {
-    if(!authorizator.canDeleteList(req.user)) return errors.manage(res, errors.restricted_access_delete);
-    return true;
-} 
-
-exports.whatCanRead = async function(req, res) {
-    return authorizator.whatCanRead(req.user);
-} 
-*/
 exports.isValid = async function(req, res, type, field) {
     const value = req.body[field];
     if(!value) return true;
@@ -203,11 +174,7 @@ exports.hasRightsToCreate = async function(req, res, fields) {
 exports.readJustOwned = async function(req, res) {
     return authorizator.readJustOwned(req.user);
 } 
-/*OLD
-exports.whatCanDelete = async function(req, res) {
-    return authorizator.whatCanDelete(req.user);
-} 
-*/
+
 exports.changeUsernameWithId = async function(req,list) {
     const User = mongoose.dbs[req.tenant.database].model('User');
     return await Promise.all(list.map(async function (e) {

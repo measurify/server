@@ -1,10 +1,12 @@
-import { api_url } from "../config";
+import { base_api_url } from "../config";
 
 const axios = require("axios").default;
 
 const https = require("https");
 
-const instance = axios.create({
+export let api_url;
+
+export const instance = axios.create({
   httpsAgent: new https.Agent({
     //unsafe, delete in prod
     //rejectUnauthorized: false,
@@ -17,8 +19,14 @@ export let notificationManager = {
   ClearNotifications: () => {},
 };
 
+//set APIs url according to configuration or GUI host
+export function SetAPIUrl() {
+  api_url =
+    base_api_url !== undefined ? base_api_url : window.location.origin + "/v1";
+}
+
 //login
-export function login(username, password, tenant) {
+export function login(username, password, tenant, saveToken = true) {
   const body = {
     username: `${username}`,
     password: `${password}`,
@@ -38,6 +46,7 @@ export function login(username, password, tenant) {
     instance
       .post(url_string, body, options)
       .then((response) => {
+<<<<<<< HEAD
         localStorage.setItem("token", response.data.token);
         localStorage.setItem(
           "token-expiration-time",
@@ -48,6 +57,19 @@ export function login(username, password, tenant) {
         localStorage.setItem("user-tenant", tenant);
         localStorage.setItem("login-time", new Date().getTime().toString());
 
+=======
+        if (saveToken === true) {
+          localStorage.setItem("token", response.data.token);
+          localStorage.setItem(
+            "token-expiration-time",
+            response.data.token_expiration_time
+          );
+          localStorage.setItem("username", response.data.user.username);
+          localStorage.setItem("user-role", response.data.user.type);
+          localStorage.setItem("user-tenant", tenant);
+          localStorage.setItem("login-time", new Date().getTime().toString());
+        }
+>>>>>>> fresta
         resolve(response);
       })
       .catch((error) => {
@@ -353,6 +375,7 @@ export async function get_generic(resource_type, qs = {}, token) {
   });
 }
 
+<<<<<<< HEAD
 //return the login token from the localstorage
 function GetToken() {
   return localStorage.getItem("token");
@@ -395,4 +418,38 @@ export function getBigDataCloudLocation(latitude, longitude) {
         reject(error);
       });
   });
+=======
+export async function get_one_generic(resource_type, id, token) {
+  let url = api_url + "/" + resource_type + "/" + id;
+  if (token === undefined) token = GetToken();
+
+  console.log("GET ONE:" + url);
+
+  let options = {
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache",
+      Authorization: token,
+    },
+
+    json: true,
+  };
+  return new Promise((resolve, reject) => {
+    instance
+      .get(url, options)
+      .then((response) => {
+        resolve({
+          response: response,
+        });
+      })
+      .catch((error) => {
+        reject({ error: error });
+      });
+  });
+}
+
+//return the login token from the localstorage
+export function GetToken() {
+  return localStorage.getItem("token");
+>>>>>>> fresta
 }

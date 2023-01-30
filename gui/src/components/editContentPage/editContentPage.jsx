@@ -5,6 +5,7 @@ import {
   areEqual,
   isDefault,
   removeDefaultElements,
+  FormatDate,
 } from "../../services/misc_functions";
 
 import { editFields, editFieldsSpecifier, fetchedPageData } from "../../config";
@@ -74,6 +75,12 @@ export default function EditContentPage(props) {
 
       tmpValues = sortObject(data, tmpValues);
 
+      Object.entries(tmpValues).forEach((e) => {
+        if (e[0].toLowerCase().includes("date")) {
+          tmpValues[e[0]] = FormatDate(e[1]);
+        }
+      });
+
       //this function evaluate if a field should be disabled or not
       const evaluateSpecifiers = async () => {
         if (editFieldsSpecifier[resource] === undefined) {
@@ -106,15 +113,42 @@ export default function EditContentPage(props) {
           const key = specsEntries[i][0]; //key
           const value = specsEntries[i][1]; //value
 
+          //check if key is in values
           if (tmpValues[key] === undefined) continue;
-
-          if (value.type === "disable") {
+          //check if value contains the type
+          if (value._type !== undefined && value._type === "disable") {
             const resp = await value.policy(id);
 
             disabled[key] = resp;
           }
-        }
+          //check if the disable specification is inside the nested object
+          else {
+            const entr = Object.entries(value);
+            for (let j = 0; j < entr.length; j++) {
+              console.log({
+                value,
+                k: entr[j][0],
+                v: entr[j][1],
+                val: tmpValues[key],
+              });
+              //check if the subkey is in values, in case of array i trust the configuration
+              if (
+                Array.isArray(tmpValues[key]) === false &&
+                tmpValues[key][entr[j][0]] === undefined
+              )
+                continue;
+              if (
+                entr[j][1]._type !== undefined &&
+                entr[j][1]._type === "disable"
+              ) {
+                const resp = await entr[j][1].policy(id);
 
+                disabled[key] = { [entr[j][0]]: resp };
+              }
+            }
+          }
+        }
+        console.log(disabled);
         const keys = Object.keys(tmpValues);
         for (let i = 0; i < keys.length; i++) {
           const _key = keys[i];
@@ -298,12 +332,15 @@ export default function EditContentPage(props) {
     }
 
     //end da fare
-
+    if (Object.keys(toSend).length === 0) {
+      setMsg("No changes found");
+      return;
+    }
     let res;
     try {
       const resp = await put_generic(resource, toSend, id);
       res = resp.response;
-      setMsg(res.statusText);
+      window.alert("Resource successfully edited!");
       navigate("/" + resource);
     } catch (error) {
       res = error.error.response;
@@ -318,7 +355,7 @@ export default function EditContentPage(props) {
   return (
     <div className="page">
       <header className="page-header">
-        Edit &nbsp;<b>{resource}</b>&nbsp;of id:&nbsp;<b>{id}</b>&nbsp;from:
+        Edit &nbsp;<b>{resource}</b>&nbsp;of id:&nbsp;<b>{id}</b>&nbsp;
       </header>
       <main className="page-content">
         <FormManager
