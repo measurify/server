@@ -48,17 +48,32 @@ export default function ContentCards(props) {
                 e.values[6],
                 e.values[9],
               ])[0];
-            report.push(
-              <ListGroup.Item>
-                {negPerson[0] +
-                  "_" +
-                  negPerson[1] +
-                  " (" +
-                  negPerson[2] +
-                  ") : " +
-                  negPerson[3]}
-              </ListGroup.Item>
-            );
+            //wrongly inserted measurement
+            if (negPerson === undefined) {
+              report.push(
+                <ListGroup.Item>
+                  {res.samples[0].values[7] +
+                    "_" +
+                    res.samples[0].values[5] +
+                    " (" +
+                    res.samples[0].values[6] +
+                    ") : " +
+                    res.samples[0].values[9]}
+                </ListGroup.Item>
+              );
+            } else {
+              report.push(
+                <ListGroup.Item>
+                  {negPerson[0] +
+                    "_" +
+                    negPerson[1] +
+                    " (" +
+                    negPerson[2] +
+                    ") : " +
+                    negPerson[3]}
+                </ListGroup.Item>
+              );
+            }
           }
           return (
             <Card border="primary" style={{ width: "18rem" }}>

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Button } from "react-bootstrap";
 import locale from "../../common/locale";
 import { login } from "../../services/http_operations";
-import { SetRoleDefinition } from "../../services/userRolesManagement";
 import { NavLink } from "react-router-dom";
 import { languages } from "../../config";
 import "./authPage.scss";
@@ -24,23 +23,10 @@ const AuthPageComp = () => {
 
     const user = userRef.current.value;
     const psw = pswRef.current.value;
-<<<<<<< HEAD
     const tenant = _tenant;
 
-=======
-    const tenant = tenantRef.current.value;
-    if (user === "") {
-      setMsg("Please, insert your username");
-      return;
-    }
-    if (psw === "") {
-      setMsg("Please, insert your password");
-      return;
-    }
->>>>>>> fresta
     try {
       await login(user, psw, tenant);
-      await SetRoleDefinition();
       window.location.replace("/");
     } catch (error) {
       console.log({ error: error.response.data });
@@ -86,6 +72,11 @@ const AuthPageComp = () => {
       </Form>
       <br />
       <div style={{ color: "red" }}>{msg}</div>
+      <div className="form-row row">
+        <NavLink to={`/passwordrecovery`}>
+          {locale().forgot_password_link}
+        </NavLink>
+      </div>
     </div>
   );
 };

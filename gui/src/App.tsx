@@ -19,33 +19,22 @@ import { Container, Row, Col } from "react-bootstrap";
 
 import NotificationBar from "./components/notificationBar/notificationBar";
 import HorizontalNavigationBar from "./components/horizontalNavigationBar/horizontalNavigationBar";
+import PasswordRecoveryPage from "./components/passwordRecoveryPage/PasswordRecoveryPage";
+import PasswordResetPage from "./components/PasswordResetPage/PasswordResetPage";
 import AppContext from "./context";
 
 import {
   notificationManager,
   get_generic,
-<<<<<<< HEAD
   getBigDataCloudLocation,
 } from "./services/http_operations";
-=======
-  SetAPIUrl,
-} from "./services/http_operations";
-import { logsManager } from "./services/operation_tool_services";
-import MobilePlaceholderPage from "./components/mobilePlaceholderPage/mobilePlaceholderPage";
->>>>>>> fresta
 import EditContentPage from "./components/editContentPage/editContentPage";
 import AddPage from "./components/addPage/addPage";
 import AddExperimentPage from "./components/addExperimentPage/addExperimentPage";
 import { layout } from "./config";
 import AddMeasurementsPage from "./components/addMeasurementsPage/addMeasurementsPage";
-<<<<<<< HEAD
+import AnalyzeDataPage from "./components/analyzeDataPage/analyzeDataPage";
 import cloneDeep from "clone-deep";
-=======
-import UpdateHistoryPage from "./components/OperationToolPages/updateSteps/updateHistory";
-import DownloadPage from "./components/OperationToolPages/download/downloadExperiment";
-import cloneDeep from "clone-deep";
-import RemoveStepsPage from "./components/OperationToolPages/removeSteps/removeSteps";
->>>>>>> fresta
 /*
     notifications follow this schema
 
@@ -66,22 +55,12 @@ interface INotification {
 
 function App() {
   const [notifications, setNotifications] = useState<INotification[]>([]);
-<<<<<<< HEAD
-=======
-  const [logs, setLogs] = useState<INotification[]>([]);
->>>>>>> fresta
   const [types, setTypes] = useState<Object | undefined>();
   const [data, setData] = useState<Object>({});
 
   let layoutRef = React.useRef<string | null>();
   const tkn = localStorage.getItem("token");
-<<<<<<< HEAD
   const location = localStorage.getItem("city");
-=======
-
-  //set api url to run https operations
-  SetAPIUrl();
->>>>>>> fresta
 
   ////////////////NOTIFICATION MANAGEMENT FRAGMENT
   //function to push a new notification at the beginning of the list
@@ -115,7 +94,6 @@ function App() {
 
   ///////////////END NOTIFICATION MANAGEMENT FRAGMENT
 
-<<<<<<< HEAD
   ////////////////////////////GET COORDINATES FROM BROWSER
 
   useEffect(() => {
@@ -151,15 +129,12 @@ function App() {
 
   ///////////////////////////////////////
 
-=======
->>>>>>> fresta
   ///////////////FETCHED TYPES AND DATA MANAGEMENT FRAGMENT
   //function to push a new notification at the beginning of the list
   function UpdateData(fetched: string[], key: string) {
     setData((prev) => {
       return { ...prev, [key]: [...fetched] };
     });
-<<<<<<< HEAD
   }
 
   //use effect to fetch static data from the server /types
@@ -193,80 +168,6 @@ function App() {
     UpdateData: UpdateData,
   };
   ///////////////END FETCHED TYPES MANAGEMENT FRAGMENT
-=======
-  }
-
-  //use effect to fetch static data from the server /types
-  useEffect(() => {
-    // declare the async data fetching function
-    const fetchTypes = async () => {
-      // get the data from the api
-      try {
-        const response = await get_generic("types", {}, "");
-
-        setTypes(response.response.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    //if types has been already set, ignore it
-    if (types !== undefined) return;
-    // call the function
-    try {
-      fetchTypes();
-    } catch (error) {
-      console.log(error);
-    }
-    // make sure to catch any error
-  }, []);
-
-  const fetchedManagement = {
-    types: types,
-    data: data,
-    UpdateData: UpdateData,
-  };
-  ///////////////END FETCHED TYPES MANAGEMENT FRAGMENT
-
-  ///////////////////////////LOGGER MANAGEMENT FRAGMENT
-  //function to push a new notification at the beginning of the list
-  function PushLog(obj: INotification) {
-    setLogs((prev) => [obj].concat(prev));
-    let textarea = document.getElementById("logger");
-    if (textarea !== null && textarea !== undefined)
-      textarea.scrollTop = textarea.scrollHeight;
-  }
-  //function to remove a single notification from list
-  function RemoveLog(id: number) {
-    let tmp = [...logs];
-    tmp.splice(id, 1);
-    setLogs(tmp);
-  }
-
-  //function to clear notifications list
-  function ClearLogs() {
-    setLogs([]);
-  }
-
-  const logsManagement = {
-    logs: logs,
-    PushLog,
-    RemoveLog,
-    ClearLogs,
-  };
-
-  logsManager.ClearLogs = ClearLogs;
-  logsManager.PushLog = PushLog;
-  logsManager.RemoveLog = RemoveLog;
-  ///////////////////////////END LOGGER MANAGEMENT FRAGMENT
-
-  //mobile view only allowed to be vertical
-  if (/Mobi/i.test(window.navigator.userAgent) == true) {
-    layoutRef.current = "vertical";
-  } else {
-    layoutRef.current = layout;
-  }
->>>>>>> fresta
 
   //not logged => show auth page
   if (tkn === null)
@@ -276,10 +177,14 @@ function App() {
           <Routes>
             <Route path="/" element={<AuthPage />} />
             <Route
+              path="/passwordrecovery"
+              element={<PasswordRecoveryPage />}
+            />
+            <Route path="/passwordreset" element={<PasswordResetPage />} />
+            <Route
               path="/add/tenants"
               element={<AddPage resource={"tenants"} />}
             />
-            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>
       </div>
@@ -290,37 +195,39 @@ function App() {
       value={{
         notifications: notificationManagement,
         fetched: fetchedManagement,
-<<<<<<< HEAD
-=======
-        logs: logsManagement,
->>>>>>> fresta
       }}
     >
       <Router>
         <Container
           fluid
           style={{
-            paddingLeft: 0,
-            paddingRight: 0,
-<<<<<<< HEAD
+            paddingLeft: 0 + "px",
+            paddingRight: 0 + "px",
             minHeight: 100 + "vh",
-            //height: 100 + "vh",
-=======
-            height: 100 + "vh",
-            width: 99 + "vw",
->>>>>>> fresta
+            //border: "2px dashed teal",
           }}
         >
           <Row
             style={{
-              padding: 0,
+              padding: 0 + "px",
+              height:
+                /Mobi/i.test(window.navigator.userAgent) == true
+                  ? "auto"
+                  : 100 + "vh",
+              //border: "2px dashed green",
             }}
           >
-            <Col md="auto" style={{ padding: 0 }}>
+            <Col
+              md="auto"
+              style={{
+                padding: 0 + "px",
+                //border: "2px dashed red",
+              }}
+            >
               <Navigation />
             </Col>
 
-            <Col style={{ paddingLeft: 0, paddingRight: 0 }}>
+            <Col style={{ paddingLeft: 0 + "px", paddingRight: 0 + "px" }}>
               <Routes>
                 <Route
                   path="/"
@@ -329,10 +236,7 @@ function App() {
 
                 <Route path="/home" element={<HomePage />} />
                 <Route path="/viewProfile" element={<ProfilePage />} />
-                <Route
-                  path="/add/experiments/"
-                  element={<AddExperimentPage />}
-                />
+                <Route path="/analyzedata" element={<AnalyzeDataPage />} />
                 <Route
                   path="/add/measurements/"
                   element={<AddMeasurementsPage />}
@@ -342,9 +246,6 @@ function App() {
                   path="/edit/:resource/:id"
                   element={<EditContentPage />}
                 />
-                <Route path="/downloadexperiment" element={<DownloadPage />} />
-                <Route path="/updatehistory" element={<UpdateHistoryPage />} />
-                <Route path="/removesteps" element={<RemoveStepsPage />} />
                 <Route path="/add/:resource/" element={<AddPage />} />
                 <Route path="/:page" element={<Page res=":page" />} />
 

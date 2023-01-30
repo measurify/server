@@ -1,16 +1,22 @@
 import React from "react";
 import { aliasPages } from "../../config";
 
-import { Table } from "react-bootstrap";
+import { Table, Button } from "react-bootstrap";
 import ActionManager from "../actionsManager/actionsManager";
-import { canDo } from "../../services/userRolesManagement";
+import { FormatDate } from "../../services/misc_functions";
+import fontawesome from "@fortawesome/fontawesome";
+import {
+  faPlusCircle,
+  faDownload,
+  faList,
+} from "@fortawesome/fontawesome-free-solid";
+fontawesome.library.add(faPlusCircle, faDownload, faList);
 
 export default function ContentTable(props) {
   if (props.header === undefined || props.resources === undefined)
     return <div>Loading</div>;
-  if (props.header.includes("_actions") && props._actions === undefined)
+  if (props.header.includes("actions") && props.actions === undefined)
     return <div>Loading</div>;
-
   return (
     <div>
       <Table responsive striped bordered hover>
@@ -20,8 +26,70 @@ export default function ContentTable(props) {
               props.header.map((e) => {
                 if (aliasPages[props.resType] !== undefined)
                   if (aliasPages[props.resType][e] !== undefined)
-                    return <th>{aliasPages[props.resType][e]}</th>;
-                return <th>{e}</th>;
+                    return (
+                      <th>
+                        {aliasPages[props.resType][e]}
+                        {e !== "Sostanza" && e !== "Livello" && (
+                          <React.Fragment>
+                            {" "}
+                            <Button
+                              variant={props.orderBy === e ? "link" : "light"}
+                              size="sm"
+                              onClick={() => {
+                                props.sortHandler(e);
+                              }}
+                            >
+                              <b>
+                                {props.ascending === true && props.orderBy === e
+                                  ? "^"
+                                  : "V"}
+                              </b>
+                            </Button>
+                            <i
+                              className={"fa fa-list"}
+                              title=""
+                              style={{
+                                width: 20 + "px",
+                                height: 20 + "px",
+                                opacity: 0.85,
+                              }}
+                            ></i>
+                          </React.Fragment>
+                        )}
+                      </th>
+                    );
+
+                return (
+                  <th>
+                    {e}
+                    {e !== "Sostanza" && e !== "Livello" && (
+                      <React.Fragment>
+                        <Button
+                          variant={props.orderBy === e ? "link" : "light"}
+                          size="sm"
+                          onClick={() => {
+                            props.sortHandler(e);
+                          }}
+                        >
+                          <b>
+                            {props.ascending === true && props.orderBy === e
+                              ? "^"
+                              : "V"}
+                          </b>
+                        </Button>
+                        <i
+                          className={"fa fa-list"}
+                          title=""
+                          style={{
+                            width: 20 + "px",
+                            height: 20 + "px",
+                            opacity: 0.85,
+                          }}
+                        ></i>
+                      </React.Fragment>
+                    )}
+                  </th>
+                );
               })
             )}
           </tr>
@@ -33,10 +101,10 @@ export default function ContentTable(props) {
                 <tr>
                   {React.Children.toArray(
                     props.header.map((e) => {
-                      if (e === "_actions") {
+                      if (e === "actions") {
                         return (
                           <td>
-                            {props._actions.includes("view") ? (
+                            {props.actions.includes("view") ? (
                               <ActionManager
                                 resType={props.resType}
                                 action="view"
@@ -47,8 +115,7 @@ export default function ContentTable(props) {
                             ) : (
                               ""
                             )}
-                            {props._actions.includes("edit") &&
-                            canDo(props.userRole, props.resType, "update") ? (
+                            {props.actions.includes("edit") ? (
                               <ActionManager
                                 resType={props.resType}
                                 action="edit"
@@ -59,8 +126,7 @@ export default function ContentTable(props) {
                             ) : (
                               ""
                             )}
-                            {props._actions.includes("duplicate") &&
-                            canDo(props.userRole, props.resType, "create") ? (
+                            {props.actions.includes("duplicate") ? (
                               <ActionManager
                                 resType={props.resType}
                                 action="duplicate"
@@ -70,8 +136,7 @@ export default function ContentTable(props) {
                             ) : (
                               ""
                             )}
-                            {props._actions.includes("delete") &&
-                            canDo(props.userRole, props.resType, "delete") ? (
+                            {props.actions.includes("delete") ? (
                               <ActionManager
                                 resType={props.resType}
                                 action="delete"
@@ -108,6 +173,8 @@ export default function ContentTable(props) {
                         return <td>{"[ " + row[e].join(" , ") + " ]"}</td>;
                       }
 
+                      if (e === "Data")
+                        return <td>{FormatDate(new Date(row[e]))}</td>;
                       return <td>{row[e]}</td>;
                     })
                   )}

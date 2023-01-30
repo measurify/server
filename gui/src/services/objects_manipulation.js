@@ -1,8 +1,4 @@
-import {
-  isDefault,
-  removeDefaultElements,
-  nonDefaultLength,
-} from "./misc_functions";
+import { isDefault, removeDefaultElements } from "./misc_functions";
 
 const cloneDeep = require("clone-deep");
 
@@ -49,10 +45,6 @@ export function maintainEmptyElements(original, fieldSpecifier, resource) {
   return copy;
 }
 
-//this function check if an array contains a default element,
-//a default element is added when required
-//this causes issue for array of boolean, since boolean has no default value is difficult to know when to add an item
-
 export function maintainEmptyElement(
   original,
   path,
@@ -62,62 +54,75 @@ export function maintainEmptyElement(
 ) {
   let tmp = cloneDeep(original);
   let tmpPtr = tmp;
-  let fieldSpecifierCpy =
-    fieldSpecifier !== undefined
-      ? cloneDeep(fieldSpecifier[resource])
-      : undefined;
+  let fieldSpecifierCpy = cloneDeep(fieldSpecifier[resource]);
   const tmpPath = [...path];
 
-  //get the appropriate array to validate
+  //get more nested array
   for (let i = 0; i < tmpPath.length; i++) {
     if (path[i] === undefined) break;
     tmpPtr = tmpPtr[path[i]];
   }
-  const nonDefLen = nonDefaultLength(tmpPtr);
-  const len = tmpPtr.length;
 
-  //if at least one element is non default, can return
-  if (nonDefLen < len) {
-    return tmp;
-  }
-  //otherwise, need to get the appropriate item to append to array
-
-  let element;
-
-  //get the appropriate item, travelling the fieldSpecified (addFields or editFields) according to path
-  //fieldSpecifierCpy becomes undefined when the item cannot be found there
+  //get the appropriate item, if possible
   for (let i = 0; i < tmpPath.length; i++) {
-    //if path or fieldSpecifier becomes undefined, break
     if (path[i] === undefined) break;
     if (fieldSpecifierCpy === undefined) break;
-    //indexes of path should be treated as 0
+    //ignore indexes for fieldSpecifierCpy
     if (typeof path[i] === "number") fieldSpecifierCpy = fieldSpecifierCpy[0];
     else fieldSpecifierCpy = fieldSpecifierCpy[path[i]];
   }
 
-  //item found in fieldSpecifierCpy exist and it's not an array return
-  if (fieldSpecifierCpy !== undefined && !Array.isArray(fieldSpecifierCpy))
-    return tmp;
+  //non array case
+  if (!Array.isArray(fieldSpecifierCpy)) return tmp;
 
-  //add item according to addfield/editfield dictionary
+  //add item according to addfield dictionary
   if (fieldSpecifierCpy !== undefined) {
-    if (fieldSpecifierCpy[0].constructor === Object) {
-      element = {
-        ...fieldSpecifierCpy[0],
-      };
-    } else {
-      element = "";
+    //0-length array
+    if (tmpPtr.length === 0) {
+      if (fieldSpecifierCpy[0].constructor === Object) {
+        tmpPtr.push({
+          ...fieldSpecifierCpy[0],
+        });
+      } else {
+        tmpPtr.push("");
+      }
+    }
+    //else 0-length array
+    else {
+      if (tmpPtr[0].constructor === Object) {
+        //check if there are no default elements in array
+        if (tmpPtr.filter((e) => isDefault(e)).length === 0) {
+          tmpPtr.push({
+            ...fieldSpecifierCpy[0],
+          });
+        }
+      } else {
+        if (!tmpPtr.includes("")) {
+          tmpPtr.push("");
+        }
+      }
     }
   }
 
-  //add item according to param item
+  //add item according to params
   if (item !== undefined && fieldSpecifierCpy === undefined) {
-    if (item.constructor === Object) {
-      element = { ...item };
-    } else {
-      element = item;
+    if (tmpPtr.length === 0) {
+      if (item.constructor === Object) {
+        tmpPtr.push({ ...item });
+      } else {
+        tmpPtr.push(item);
+      }
+    }
+    //else 0-length array
+    else {
+      if (tmpPtr.filter((e) => isDefault(e)).length === 0) {
+        if (item.constructor === Object) {
+          tmpPtr.push({ ...item });
+        } else {
+          tmpPtr.push(item);
+        }
+      }
     }
   }
-  tmpPtr.push(element);
   return tmp;
 }

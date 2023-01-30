@@ -62,11 +62,7 @@ object-assign
  */
 
 /**
-<<<<<<<< HEAD:public/static/js/2.9e581e83.chunk.js.LICENSE.txt
- * @remix-run/router v1.0.3
-========
- * @remix-run/router v1.0.5
->>>>>>>> fresta:public/static/js/2.3f8c9c4d.chunk.js.LICENSE.txt
+ * @remix-run/router v1.3.1
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -77,11 +73,7 @@ object-assign
  */
 
 /**
-<<<<<<<< HEAD:public/static/js/2.9e581e83.chunk.js.LICENSE.txt
- * React Router DOM v6.4.3
-========
- * React Router DOM v6.4.5
->>>>>>>> fresta:public/static/js/2.3f8c9c4d.chunk.js.LICENSE.txt
+ * React Router DOM v6.8.0
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -92,11 +84,7 @@ object-assign
  */
 
 /**
-<<<<<<<< HEAD:public/static/js/2.9e581e83.chunk.js.LICENSE.txt
- * React Router v6.4.3
-========
- * React Router v6.4.5
->>>>>>>> fresta:public/static/js/2.3f8c9c4d.chunk.js.LICENSE.txt
+ * React Router v6.8.0
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -106,11 +94,7 @@ object-assign
  * @license MIT
  */
 
-<<<<<<<< HEAD:public/static/js/2.9e581e83.chunk.js.LICENSE.txt
-/** @license MUI v5.10.14
-========
 /** @license MUI v5.11.0
->>>>>>>> fresta:public/static/js/2.3f8c9c4d.chunk.js.LICENSE.txt
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.

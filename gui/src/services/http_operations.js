@@ -1,12 +1,10 @@
-import { base_api_url } from "../config";
+import { api_url } from "../config";
 
 const axios = require("axios").default;
 
 const https = require("https");
 
-export let api_url;
-
-export const instance = axios.create({
+const instance = axios.create({
   httpsAgent: new https.Agent({
     //unsafe, delete in prod
     //rejectUnauthorized: false,
@@ -19,14 +17,8 @@ export let notificationManager = {
   ClearNotifications: () => {},
 };
 
-//set APIs url according to configuration or GUI host
-export function SetAPIUrl() {
-  api_url =
-    base_api_url !== undefined ? base_api_url : window.location.origin + "/v1";
-}
-
 //login
-export function login(username, password, tenant, saveToken = true) {
+export function login(username, password, tenant) {
   const body = {
     username: `${username}`,
     password: `${password}`,
@@ -46,7 +38,6 @@ export function login(username, password, tenant, saveToken = true) {
     instance
       .post(url_string, body, options)
       .then((response) => {
-<<<<<<< HEAD
         localStorage.setItem("token", response.data.token);
         localStorage.setItem(
           "token-expiration-time",
@@ -54,22 +45,10 @@ export function login(username, password, tenant, saveToken = true) {
         );
         localStorage.setItem("username", response.data.user.username);
         localStorage.setItem("user-role", response.data.user.type);
+        localStorage.setItem("user-email", response.data.user.email);
         localStorage.setItem("user-tenant", tenant);
         localStorage.setItem("login-time", new Date().getTime().toString());
 
-=======
-        if (saveToken === true) {
-          localStorage.setItem("token", response.data.token);
-          localStorage.setItem(
-            "token-expiration-time",
-            response.data.token_expiration_time
-          );
-          localStorage.setItem("username", response.data.user.username);
-          localStorage.setItem("user-role", response.data.user.type);
-          localStorage.setItem("user-tenant", tenant);
-          localStorage.setItem("login-time", new Date().getTime().toString());
-        }
->>>>>>> fresta
         resolve(response);
       })
       .catch((error) => {
@@ -329,6 +308,15 @@ export async function get_generic(resource_type, qs = {}, token) {
   if (qs.page !== undefined) {
     url = url.concat("&page=" + qs.page);
   }
+  if (qs.sort !== undefined && qs.sort.by !== "") {
+    url = url.concat(
+      '&sort={"' +
+        qs.sort.by +
+        '":' +
+        (qs.sort.order === "ascending" ? '"asc"' : '"desc"') +
+        "}"
+    );
+  }
 
   console.log("GET :" + url);
 
@@ -375,7 +363,46 @@ export async function get_generic(resource_type, qs = {}, token) {
   });
 }
 
-<<<<<<< HEAD
+export async function get_generic_pipe(resource_type, qs = {}, token) {
+  let url = api_url + "/" + resource_type + "/pipe/";
+  if (token === undefined) token = GetToken();
+
+  if (qs.filter !== undefined) {
+    url = url.concat("?filter=" + qs.filter);
+  } else {
+    url = url.concat("?filter=");
+  }
+  if (qs.limit !== undefined) {
+    url = url.concat("&limit=" + qs.limit);
+  }
+  if (qs.page !== undefined) {
+    url = url.concat("&page=" + qs.page);
+  }
+
+  console.log("GET PIPE:" + url);
+
+  let options = {
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache",
+      Authorization: token,
+    },
+
+    json: true,
+  };
+  return new Promise((resolve, reject) => {
+    instance
+      .get(url, options)
+      .then((response) => {
+        resolve(response);
+      })
+      .catch((error) => {
+        console.log(error);
+        reject({ error: error });
+      });
+  });
+}
+
 //return the login token from the localstorage
 function GetToken() {
   return localStorage.getItem("token");
@@ -418,38 +445,79 @@ export function getBigDataCloudLocation(latitude, longitude) {
         reject(error);
       });
   });
-=======
-export async function get_one_generic(resource_type, id, token) {
-  let url = api_url + "/" + resource_type + "/" + id;
-  if (token === undefined) token = GetToken();
+}
 
-  console.log("GET ONE:" + url);
+//function to request a password reset
+export async function requestPasswordReset(tenant, email) {
+  console.log({ email, tenant });
 
-  let options = {
+  const url_string = api_url + "/self/reset?tenant=" + tenant;
+  const body = JSON.stringify({ email: email });
+  console.log("POST password reset request:" + url_string);
+  const options = {
     headers: {
       "Content-Type": "application/json",
       "Cache-Control": "no-cache",
-      Authorization: token,
     },
-
-    json: true,
   };
   return new Promise((resolve, reject) => {
     instance
-      .get(url, options)
+      .post(url_string, body, options)
       .then((response) => {
-        resolve({
-          response: response,
-        });
+        resolve({ response: response }); //true;
       })
       .catch((error) => {
-        reject({ error: error });
+        reject({ error: error }); //false;
       });
   });
 }
 
-//return the login token from the localstorage
-export function GetToken() {
-  return localStorage.getItem("token");
->>>>>>> fresta
+//function to reset the password from token
+export async function resetPassword(tenant, token, password) {
+  const url_string = api_url + "/self";
+  console.log("PUT password reset:" + url_string);
+  const body = JSON.stringify({
+    reset: token,
+    password: password,
+    tenant: tenant,
+  });
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache",
+    },
+  };
+  return new Promise((resolve, reject) => {
+    instance
+      .put(url_string, body, options)
+      .then((response) => {
+        resolve({ response: response }); //true;
+      })
+      .catch((error) => {
+        reject({ error: error }); //false;
+      });
+  });
+}
+
+//get required password strength from the API
+export async function getPasswordStrength() {
+  const url_string = api_url + "/types/passwordStrength";
+  console.log("GET password strength:" + url_string);
+
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache",
+    },
+  };
+  return new Promise((resolve, reject) => {
+    instance
+      .get(url_string, options)
+      .then((response) => {
+        resolve({ response: response }); //true;
+      })
+      .catch((error) => {
+        reject({ error: error }); //false;
+      });
+  });
 }

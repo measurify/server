@@ -2,6 +2,7 @@ const localization_it = {
   username: "Nome utente",
   password: "Password",
   tenant: "Organizzazione",
+  email: "email",
   keep_logged: "Mantieni Accesso",
   select: "Seleziona",
   language: "Lingua",
@@ -9,18 +10,23 @@ const localization_it = {
   role: "Ruolo",
   session_expire_in: "La sessione scadrà in ",
   resources: "Risorse",
+  tools: "Strumenti",
   notifications: "Notifiche",
   file_content: "Contenuto del file",
   preview: "Anteprima",
   configuration: "Configurazione",
 
   clear_all: "Cancella tutto",
+  no_changes_found: "Nessun cambiamento trovato",
+  resource_successfully_edited: "Resoursa modificata con successo!",
+  resource_successfully_posted: "Resource successufully posted!",
 
   ///Completamento campi
   enter: "Inserisci",
   username_suggestion: "Inserisci il nome utente",
   password_suggestion: "Inserisci la password",
   tenant_suggestion: "Inserisci la tua organizzazione",
+  email_suggestion: "Inserisci la tua email",
   add_tenant: "Aggiungi organizzazione",
 
   //Homepage
@@ -41,12 +47,12 @@ const localization_it = {
   profile_page_desc:
     "questa è la pagina in cui puoi visionare il tuo profilo o modificare la password",
   pass_change_confirm: "La password verrà modificata, procedere?",
-  pass_not_match:
-    "La password inserita e la conferma non combaciano, si prega di reinserirle",
-  old_pass_empty: "Per favore, inserire la vecchia password",
-  old_pass_wrong: "La vecchia password è sbagliata",
-  pass_not_null: "La password non può essere vuota",
-  password_changed: "Password cambiata",
+  email_change_confirm: "L'indirizzo email verrà modificato, procedere?",
+
+  password_changed: "Password cambiata con successo",
+  email_changed: "Email cambiata con successo",
+  password_rules:
+    "La password deve contenere almeno 6 caratteri, almeno una lettera maiuscola e un numero.",
 
   //404
   oh_no: "Oh No!",
@@ -60,21 +66,48 @@ const localization_it = {
   logout: "Esci",
   repeat: "Ripeti",
   close: "Chiudi",
-<<<<<<< HEAD
-  remove: "Rimuovi",
-=======
   import: "Importa",
   export: "Esporta",
->>>>>>> fresta
+
+  password_recovery: "Recupero Password",
+  password_reset: "Reset Password",
+  forgot_password_link: "Hai dimenticato la tua password?",
+  go_login_page: "Torna alla pagina di login",
+  email_sent_successfully:
+    "Email inviata, segui le istruzioni contenute per cambiare la tua password",
 
   ///Errori
   login_error: "Login errata!",
   unauthorised_user: "Non sei abilitato a utilizzare questa pagina",
   session_expired: "Sessione scaduta",
   no_file: "Si prega di selezionare un file",
-  duplicate_error: "Nel database è già presente una risorsa con",
+  duplicate_resource_error: "Nel database è già presente una risorsa con",
   error_imported_file:
     "Nel file sono presenti errori, non è stato possibile importarlo",
+  pass_not_match:
+    "La password inserita e la conferma non combaciano, si prega di reinserirle.",
+  old_pass_empty: "Per favore, inserire la vecchia password",
+  old_pass_wrong: "La vecchia password è sbagliata",
+  pass_not_null: "La password non può essere vuota",
+  missing_tenant: "Si prega di inserire l'organizzazione",
+  missing_email: "Si prega di inserire l'email",
+  missing_token: "Si prega di inserire il token",
+  missing_password: "Si prega di inserire la propria password",
+  missing_username: "Si prega di inserire il proprio username",
+  stronger_password_required: "Si prega di inserire una password più robusta",
+  email_sent_errors:
+    "Non è stato possibile inviare la mail, controllare i dati inseriti.",
+
+  password_not_changed_errors: "Non è stato possibile cambiare la password.",
+  network_error: "Errore di rete, si prega di controllare la connessione.",
+  empty_email_error:
+    "Il campo email è vuoto, si prega di inserire un indirizzo email valido.",
+  email_not_match:
+    "L'indirizzo email inserito e la sua conferma non combaciano, si prega di reinserirle.",
+  email_same_as_old:
+    "La nuova email coincide con quella vecchia, si prega di inserire un indirizzo email diverso dal precedente.",
+  generic_file_post_error:
+    "Il file selezionato non può essere caricato perché contiene errori.",
 };
 
 export default localization_it;

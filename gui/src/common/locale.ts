@@ -7,6 +7,7 @@ interface ILocalization {
   username: string;
   password: string;
   tenant: string;
+  email: string;
   keep_logged: string;
   select: string;
   language: string;
@@ -14,18 +15,23 @@ interface ILocalization {
   role: string;
   session_expire_in: string;
   resources: string;
+  tools: string;
   notifications: string;
   file_content: string;
   preview: string;
   configuration: string;
 
   clear_all: string;
+  no_changes_found: string;
+  resource_successfully_edited: string;
+  resource_successfully_posted: string;
 
   ///Fields
   enter: string;
   username_suggestion: string;
   password_suggestion: string;
   tenant_suggestion: string;
+  email_suggestion: string;
   add_tenant: string;
 
   //geolocalization messages
@@ -43,11 +49,8 @@ interface ILocalization {
   //profile page
   profile_page_desc: string;
   pass_change_confirm: string;
-  pass_not_match: string;
-  old_pass_empty: string;
-  old_pass_wrong: string;
-  pass_not_null: string;
-  password_changed: string;
+  email_change_confirm: string;
+  password_rules: string;
 
   //404
   oh_no: string;
@@ -60,12 +63,17 @@ interface ILocalization {
   logout: string;
   repeat: string;
   close: string;
-<<<<<<< HEAD
-  remove: string;
-=======
   import: string;
   export: string;
->>>>>>> fresta
+
+  //
+  password_recovery: string;
+  password_reset: string;
+  forgot_password_link: string;
+  go_login_page: string;
+  email_sent_successfully: string;
+  password_changed: string;
+  email_changed: string;
 
   ///Errors
   login_error: string;
@@ -73,7 +81,24 @@ interface ILocalization {
   session_expired: string;
   no_file: string;
   error_imported_file: string;
-  duplicate_error: string;
+  duplicate_resource_error: string;
+  pass_not_match: string;
+  old_pass_empty: string;
+  old_pass_wrong: string;
+  pass_not_null: string;
+  missing_tenant: string;
+  missing_email: string;
+  missing_token: string;
+  missing_username: string;
+  missing_password: string;
+  stronger_password_required: string;
+  email_sent_errors: string;
+  password_not_changed_errors: string;
+  network_error: string;
+  empty_email_error: string;
+  email_not_match: string;
+  email_same_as_old: string;
+  generic_file_post_error: string;
 }
 
 export default function locale() {
@@ -84,7 +109,6 @@ export default function locale() {
   if (languages.length === 1) {
     tkn = languages[0];
   }
-  //let localization : ILocalization;
 
   //check token first
   if (tkn === "it") {

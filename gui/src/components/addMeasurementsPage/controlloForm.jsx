@@ -115,7 +115,6 @@ export const ControlloForm = (props) => {
         }
         //età case (number)
         if (entr[0] === "time" || entr[0] === "ora") {
-          console.log(entr[1]);
           return (
             <Row
               style={{

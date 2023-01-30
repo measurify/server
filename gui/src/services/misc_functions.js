@@ -4,12 +4,6 @@ export const isDefault = (obj) => {
   if (obj === undefined) return true;
   //null is considered default
   if (obj == null) return true;
-
-  //boolean are considered always default since no default value can be considered
-  if (typeof obj === "boolean") {
-    return true;
-  }
-
   //Nan is default for numbers
   if (typeof obj === "number") {
     return isNaN(obj);
@@ -38,7 +32,6 @@ export const isDefault = (obj) => {
     });
     return def;
   }
-  return true;
 };
 
 //non-default items lenght
@@ -141,12 +134,43 @@ export const areEqual = (obj1, obj2) => {
   return false;
 };
 
-//Capitalize the first letter of a string
-export function Capitalize(s) {
-  return s && s[0].toUpperCase() + s.slice(1);
+//format string date into yyyy/mm/dd
+
+export function FormatDate(dt) {
+  return dt.getDate() + "/" + (dt.getMonth() + 1) + "/" + dt.getFullYear();
 }
 
-//format string date into yyyy/mm/dd
-export function FormatDate(dt) {
-  return dt.slice(0, 10).replaceAll("-", "/");
+export function convertJsonToCSV(data, header) {
+  console.log({ data, header });
+
+  //template to sort objects
+  const template = Object.fromEntries(header.map((e) => [e, ""]));
+  //regex to find commas
+  const regexComma = new RegExp(/,/g);
+  //regex to find string terminators
+  const regexTerm = new RegExp(/\n/g);
+
+  //convert JSON into csv by assigning the nested object to sort it to the template, then unroll and join
+  //also process date (to show in format dd/mm/yyyy) and notes (to remove all commas)
+  const CSVdata = header
+    .join(",")
+    .concat("\n")
+    .concat(
+      data
+        .map((row) => {
+          const sorted = Object.assign(template, row);
+          return Object.entries(sorted)
+            .map((entr) => {
+              return typeof entr[1] === "string"
+                ? entr[1].replace(regexComma, "-").replace(regexTerm, "")
+                : entr[0] === "Data"
+                ? FormatDate(new Date(entr[1]))
+                : entr[1];
+            })
+            .join(",");
+        })
+        .join("\n")
+    );
+
+  return CSVdata;
 }
