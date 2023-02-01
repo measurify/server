@@ -333,7 +333,7 @@ exports.getGroups = function (experiment, protocol, query) {
         "_id": experiment._id,
         "history": experiment.history.map(step => ({
             "step": step.step,//for each step
-            "groups": [{//groupName from protocol:{ field1:value, field2:value...}
+            "groups": {//groupName from protocol:{ field1:value, field2:value...}
                 ...protocol.topics.reduce((acc, topic) => {
                     groupFilter!==undefined&&!groupFilter.includes(topic.name)?{}
                         : acc[topic.name] = topic.fields.reduce((fieldsAcc, field) => {
@@ -344,7 +344,7 @@ exports.getGroups = function (experiment, protocol, query) {
                         }, {})
                     return acc;
                 }, {})
-            }]
+            }
         }))
     };
 
