@@ -42,3 +42,4 @@
 + Add settings for check Password strength and validity days of password
 + Added field "select" in the query of get resources routes to receive only chosen fields
 + Experiment/id/group route added to receive the data based on groups of topics chosen in protocol
++ Removed variables.env to create it from variablesTemplate.env
