@@ -9,6 +9,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 const Authorization = require('../security/authorization.js');
 const errors = require('../commons/errors.js');
 const bcrypt = require('bcryptjs');
+const { passwordStrength } = require('check-password-strength');
 
 exports.get = async (req, res) => { 
     const User = mongoose.dbs[req.tenant.database].model('User');
@@ -81,7 +82,9 @@ exports.self = async (req, res) => {
     const User = mongoose.dbs[tenant.database].model('User');
     req.body.status = UserStatusTypes.disabled;
     if(!req.body.email) return errors.manage(res, errors.missing_email);
-    if(req.body.password) if(tenant.passwordhash == 'true') req.body.password = bcrypt.hashSync(req.body.password, 8);
+    if(req.body.password) {
+        if(!isPasswordStrongEnough(req.body.password))return errors.manage(res, errors.post_request_error, "The password strength is too weak, please choose a stronger password");
+        if(tenant.passwordhash == true || tenant.passwordhash == 'true') req.body.password = bcrypt.hashSync(req.body.password, 8);}
     let user=null;
     try { user = await (new User(req.body)).save()}
     catch (err) { return errors.manage(res, errors.post_request_error, err); }
@@ -124,12 +127,12 @@ exports.reset = async (req, res) => {
     if(!req.query.tenant) return errors.manage(res, errors.get_request_error, "Query param `tenant` is required");
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
     const tenant = await Tenant.findById(req.query.tenant);
-    if(!tenant) return errors.manage(res, errors.post_request_error, "Unknown tenant (" + req.query.tenant +")");
+    if(!tenant) return errors.manage(res, errors.put_request_error, "Unknown tenant (" + req.query.tenant +")");
     const User = mongoose.dbs[tenant.database].model('User');
     const PasswordReset = mongoose.dbs[tenant.database].model('PasswordReset');
     if(!req.body.email) return errors.manage(res, errors.missing_email);
     const user = await User.findOne({email: req.body.email});
-    if(!user) return errors.manage(res, errors.resource_not_found);
+    if(!user) return errors.manage(res, errors.resource_not_found,"User with the email "+ req.body.email+  " not found");
     const request = { user: user._id, status: PasswordResetStatusTypes.valid , created: Date.now() };
     const reset = await (new PasswordReset(request)).save();
     const url = req.protocol + '://' + req.get('host')
@@ -138,22 +141,28 @@ exports.reset = async (req, res) => {
 };
 
 exports.password = async (req, res) => {
-    if(!req.query.tenant) return errors.manage(res, errors.get_request_error, "Query param `tenant` is required");
+    if(!req.body.tenant) return errors.manage(res, errors.get_request_error, "Body param `tenant` is required");
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
-    const tenant = await Tenant.findById(req.query.tenant);
-    if(!tenant) return errors.manage(res, errors.get_request_error, "Unknown tenant (" + req.query.tenant +")");
+    const tenant = await Tenant.findById(req.body.tenant);
+    if(!tenant) return errors.manage(res, errors.get_request_error, "Unknown tenant (" + req.body.tenant +")");
     const User = mongoose.dbs[tenant.database].model('User');
     const PasswordReset = mongoose.dbs[tenant.database].model('PasswordReset');
-    if(!req.query.password) return errors.manage(res, errors.missing_info);
-    if(!req.query.reset) return errors.manage(res, errors.missing_info);
-    if(!ObjectId.isValid(req.query.reset)) return errors.manage(res, errors.resource_not_found, req.body.reset);
-    const reset = await PasswordReset.findById(req.query.reset);
-    if(!reset) return errors.manage(res, errors.resource_not_found, req.query.reset);
-    if(reset.status == PasswordResetStatusTypes.invalid) return errors.manage(res, errors.reset_invalid, req.query.reset);
+    if(!req.body.password) return errors.manage(res, errors.missing_info, "Body param `password` is required");
+    if(!req.body.reset) return errors.manage(res, errors.missing_info, "Body param `reset` is required");
+    if(!ObjectId.isValid(req.body.reset)) return errors.manage(res, errors.resource_not_found, "The reset token " + req.body.reset +" is not a valid identifier (24 hex characters), please repeat the reset password procedure");
+    const reset = await PasswordReset.findById(req.body.reset);
+    if(!reset) return errors.manage(res, errors.resource_not_found, "The reset token " + req.body.reset +" doesn't exist, please check the token or repeat the reset password procedure");
+    if(reset.status == PasswordResetStatusTypes.invalid) return errors.manage(res, errors.reset_invalid, req.body.reset);
     const user = await User.findById(reset.user);
-    if(!user) return errors.manage(res, errors.resource_not_found, 'user');
-    const reset_updated = await PasswordReset.findByIdAndUpdate(req.query.reset, { "$set": { "status": PasswordResetStatusTypes.invalid } });
-    if(tenant.passwordhash == 'true') req.query.password = bcrypt.hashSync(req.query.password, 8);
-    const user_updated = await User.findByIdAndUpdate(user._id, { "$set": { "password": req.query.password } });
+    if(!user) return errors.manage(res, errors.resource_not_found, 'user of the reset request not found');
+    const reset_updated = await PasswordReset.findByIdAndUpdate(req.body.reset, { "$set": { "status": PasswordResetStatusTypes.invalid } });   
+    if(!isPasswordStrongEnough(req.body.password))return errors.manage(res, errors.get_request_error, "The password strength is too weak, make a new request to reset password and choose a stronger password");        
+    if(tenant.passwordhash == true || tenant.passwordhash == 'true') req.body.password = bcrypt.hashSync(req.body.password, 8);
+    const user_updated = await User.findByIdAndUpdate(user._id, { "$set": { "password": req.body.password, "createdPassword":Date.now() },  });
     return res.status(200).json(user_updated);   
 };
+
+const isPasswordStrongEnough = function (password) {
+    const details = passwordStrength(password);
+    return details.id >= process.env.MIN_PASSWORD_STRENGTH;
+}

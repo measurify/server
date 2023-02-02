@@ -1,4 +1,4 @@
-username,password,type
-user-username-test-1,password1,provider
-user-username-test-2,password2,analyst
-user-username-test-3,password3,supplier
+username,password,type,email
+user-username-test-1,password1,provider,@test
+user-username-test-2,password2,analyst,@test2
+user-username-test-3,password3,supplier,@test3

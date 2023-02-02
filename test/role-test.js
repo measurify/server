@@ -425,7 +425,7 @@ describe('/PUT role', () => {
         res.body.should.be.a('object');
         res.body.message.should.be.a('string');
         res.body.message.should.contain(errors.put_request_error.message);
-        res.body.details.should.contain(' Role validation failed: fake-entityis not an entity)');
+        res.body.details.should.contain(' Role validation failed: fake-entity is not a valid entity name');
     });
 
     it('it should not PUT a role removing a fake role', async () => {

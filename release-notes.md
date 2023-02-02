@@ -33,3 +33,13 @@
 
 + Now separators of CSV file can be defined in the url of the request for POST and GET
 + Updated PostMan Collection
+
+## Version 0.6.4
+
+2023.02.01
+
++ Reset Password supported by email and reset page added into the gui
++ Add settings for check Password strength and validity days of password
++ Added field "select" in the query of get resources routes to receive only chosen fields
++ Experiment/id/group route added to receive the data based on groups of topics chosen in protocol
++ Removed variables.env to create it from variablesTemplate.env
