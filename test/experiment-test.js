@@ -71,6 +71,36 @@ describe('/GET experiment', () => {
         res.body.docs[0]._id.should.be.eql("test-experiment-2");
     });
 
+    it('it should GET one experiment with query select', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
+        await factory.createExperiment("test-experiment-1", "test-protoco-description-1", user, 0, null, null, null, protocol);
+        let res = await chai.request(server).keepOpen().get('/v1/experiments/test-experiment-1?select=["_id","visibility","state"]').set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');     
+        Object.keys(res.body).length.should.be.eql(3);
+        res.body._id.should.be.eql("test-experiment-1");
+        res.body.visibility.should.be.eql("private");
+        res.body.state.should.be.eql(0);
+        res = await chai.request(server).keepOpen().get('/v1/experiments/test-experiment-1?select=["visibility","state"]').set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');     
+        Object.keys(res.body).length.should.be.eql(3);
+        res.body._id.should.be.eql("test-experiment-1");
+        res.body.visibility.should.be.eql("private");
+        res.body.state.should.be.eql(0);
+        res = await chai.request(server).keepOpen().get('/v1/experiments/test-experiment-1?select=["_id"]').set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');     
+        Object.keys(res.body).length.should.be.eql(1);
+        res.body._id.should.be.eql("test-experiment-1");
+        res = await chai.request(server).keepOpen().get('/v1/experiments/test-experiment-1?select=["fakeField"]').set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);
+        res.body.should.be.a('object');     
+        Object.keys(res.body).length.should.be.eql(1);
+        res.body._id.should.be.eql("test-experiment-1");
+    });
+
     it('it should GET a specific experiment', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const protocol = await factory.createProtocol("test-protocol-1", "test-protoco-description-1", user);
