@@ -26,7 +26,7 @@ import {
   website_name,
   operationPages,
   restrictionPages,
-} from "../../config";
+} from "../../configManager";
 import { LanguageSelector } from "../languageSelector/languageSelector";
 import { canDo } from "../../services/userRolesManagement";
 import { Capitalize } from "../../services/misc_functions";
@@ -255,7 +255,7 @@ export default function Navigation() {
           <hr />
           {operationPages.length !== 0 && (
             <>
-              <div className="app-nav-text">Manage Experiments</div> <hr />
+              <div className="app-nav-text">{locale().tools}</div> <hr />
             </>
           )}
           {operationPages.includes("updatehistory") &&

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import locale from "../../common/locale";
-import { addFields, addTypes } from "../../config";
+import { addFields, addTypes } from "../../configManager";
 import {
   post_generic,
   get_generic,
@@ -27,7 +27,7 @@ import { FormManager } from "../formManager/formManager";
 import { FormFile } from "../formFileComp/formFile";
 
 import AppContext from "../../context";
-import { fetchedPageData } from "../../config";
+import { fetchedPageData } from "../../configManager";
 import {
   sortObject,
   maintainEmptyElement,
@@ -88,13 +88,26 @@ export default function AddMeasurementsPage(props) {
   const myFetched = context.fetched;
 
   /////////////FETCH REQUIRED RESOURCES
-  const fetchData = async (res) => {
+  const fetchRequiredData = async (res) => {
     if (myFetched.data[res] !== undefined) return;
     // get the data from the api
     try {
-      const response = await get_generic(res, { limit: 100 });
+      const response = await get_generic(res, {
+        limit: 100,
+        select: ["_id", "username", "name"],
+      });
       myFetched.UpdateData(
-        response.docs.map((e) => e._id),
+        response.docs.map((e) => {
+          return {
+            _id: e._id,
+            optionalLabel:
+              e.name !== undefined
+                ? e.name
+                : e.username !== undefined
+                ? e.username
+                : undefined,
+          };
+        }),
         res
       );
     } catch (error) {
@@ -103,7 +116,9 @@ export default function AddMeasurementsPage(props) {
   };
   useEffect(() => {
     if (fetchedPageData[resource] !== undefined) {
-      Object.values(fetchedPageData[resource]).forEach((e) => fetchData(e));
+      Object.values(fetchedPageData[resource]).forEach((e) =>
+        fetchRequiredData(e)
+      );
     }
   }, []);
 
@@ -119,7 +134,7 @@ export default function AddMeasurementsPage(props) {
         console.log(error);
       }
     };
-    const qs = { limit: 100 };
+    const qs = { limit: 100, select: ["_id", "items"] };
     fetchData(qs);
   }, [props, searchParams]);
 

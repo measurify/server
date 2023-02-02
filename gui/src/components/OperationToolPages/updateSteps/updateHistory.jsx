@@ -12,7 +12,7 @@ import {
 } from "react-bootstrap";
 import locale from "../../../common/locale";
 import { NavLink } from "react-router-dom";
-import { languages } from "../../../config";
+import { languages } from "../../../configManager";
 import {
   testLogger,
   logsManager,

@@ -8,7 +8,11 @@ import {
   FormatDate,
 } from "../../services/misc_functions";
 
-import { editFields, editFieldsSpecifier, fetchedPageData } from "../../config";
+import {
+  editFields,
+  editFieldsSpecifier,
+  fetchedPageData,
+} from "../../configManager";
 
 import { useNavigate } from "react-router-dom";
 
@@ -20,6 +24,7 @@ import {
   maintainEmptyElement,
   maintainEmptyElements,
 } from "../../services/objects_manipulation";
+import locale from "../../common/locale";
 
 const cloneDeep = require("clone-deep");
 
@@ -45,13 +50,26 @@ export default function EditContentPage(props) {
   const context = useContext(AppContext);
   const myFetched = context.fetched;
   /////////////FETCH REQUIRED RESOURCES
-  const fetchData = async (res) => {
+  const fetchRequiredData = async (res) => {
     if (myFetched.data[res] !== undefined) return;
     // get the data from the api
     try {
-      const response = await get_generic(res, { limit: 100 });
+      const response = await get_generic(res, {
+        limit: 100,
+        select: ["_id", "username", "name"],
+      });
       myFetched.UpdateData(
-        response.docs.map((e) => e._id),
+        response.docs.map((e) => {
+          return {
+            _id: e._id,
+            optionalLabel:
+              e.name !== undefined
+                ? e.name
+                : e.username !== undefined
+                ? e.username
+                : undefined,
+          };
+        }),
         res
       );
     } catch (error) {
@@ -60,7 +78,9 @@ export default function EditContentPage(props) {
   };
   useEffect(() => {
     if (fetchedPageData[resource] !== undefined) {
-      Object.values(fetchedPageData[resource]).forEach((e) => fetchData(e));
+      Object.values(fetchedPageData[resource]).forEach((e) =>
+        fetchRequiredData(e)
+      );
     }
   }, []);
 
@@ -330,16 +350,16 @@ export default function EditContentPage(props) {
       }
     }
 
-    //end da fare
+    //no changes found, so do not send request
     if (Object.keys(toSend).length === 0) {
-      setMsg("No changes found");
+      setMsg(locale().no_changes_found);
       return;
     }
     let res;
     try {
       const resp = await put_generic(resource, toSend, id);
       res = resp.response;
-      window.alert("Resource successfully edited!");
+      window.alert(locale().resource_successfully_edited);
       navigate("/" + resource);
     } catch (error) {
       res = error.error.response;

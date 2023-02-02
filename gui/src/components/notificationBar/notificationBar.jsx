@@ -9,7 +9,7 @@ import React, { useState, useContext, useEffect } from "react";
 import locale from "../../common/locale";
 import "./notificationBar.scss";
 import AppContext from "../../context";
-import { layout } from "../../config";
+import { layout } from "../../configManager";
 const oldNotifications = React.createRef();
 
 export default function NotificationBar(props) {

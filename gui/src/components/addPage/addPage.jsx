@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import locale from "../../common/locale";
-import { addFields, addTypes } from "../../config";
+import { addFields, addTypes } from "../../configManager";
 import {
   post_generic,
   get_generic,
@@ -23,7 +23,7 @@ import {
   maintainEmptyElements,
 } from "../../services/objects_manipulation";
 import AppContext from "../../context";
-import { fetchedPageTypes, fetchedPageData } from "../../config";
+import { fetchedPageTypes, fetchedPageData } from "../../configManager";
 const cloneDeep = require("clone-deep");
 
 /*
@@ -78,22 +78,36 @@ export default function AddPage(props) {
 
   useEffect(() => {
     /////////////FETCH REQUIRED RESOURCES
-    const fetchData = async (res) => {
+    const fetchRequiredData = async (res) => {
       if (myFetched.data[res] !== undefined) return;
       // get the data from the api
       try {
-        const response = await get_generic(res, { limit: 100 });
+        const response = await get_generic(res, {
+          limit: 100,
+          select: ["_id", "username", "name"],
+        });
         myFetched.UpdateData(
-          response.docs.map((e) => e._id),
+          response.docs.map((e) => {
+            return {
+              _id: e._id,
+              optionalLabel:
+                e.name !== undefined
+                  ? e.name
+                  : e.username !== undefined
+                  ? e.username
+                  : undefined,
+            };
+          }),
           res
         );
       } catch (error) {
         console.log(error);
       }
     };
-
     if (fetchedPageData[resource] !== undefined) {
-      Object.values(fetchedPageData[resource]).forEach((e) => fetchData(e));
+      Object.values(fetchedPageData[resource]).forEach((e) =>
+        fetchRequiredData(e)
+      );
     }
   }, []);
 
@@ -188,7 +202,6 @@ export default function AddPage(props) {
     let tmpValues = cloneDeep(body);
     removeDefaultElements(tmpValues);
     let res;
-
     try {
       const resp = await post_generic(
         resource,
@@ -209,7 +222,7 @@ export default function AddPage(props) {
       let det = "";
       if (res.data.details.includes("duplicate key")) {
         det =
-          locale().duplicate_error +
+          locale().duplicate_resource_error +
           " " +
           res.data.details.slice(res.data.details.indexOf("{") + 1, -1);
       }
@@ -223,7 +236,8 @@ export default function AddPage(props) {
     }
 
     if (res.status === 200) {
-      window.alert("Resource successufully posted!");
+      if (resource !== "tenants") myFetched.RemoveData(resource);
+      window.alert(locale().resource_successfully_posted);
       navigate("/" + resource);
     }
   };
@@ -257,7 +271,7 @@ export default function AddPage(props) {
         let det = "";
         if (error.error.response.data.details.includes("duplicate key")) {
           det =
-            locale().duplicate_error +
+            locale().duplicate_resource_error +
             " " +
             error.error.response.data.details.slice(
               error.error.response.data.details.indexOf("{") + 1,
@@ -288,14 +302,22 @@ export default function AddPage(props) {
         });
 
         let det = "";
-        if (error.error.response.data.details.includes("duplicate key")) {
+        if (
+          error.error.response.data.details !== undefined &&
+          error.error.response.data.details.includes("duplicate key")
+        ) {
           det =
-            locale().duplicate_error +
+            locale().duplicate_resource_error +
             " " +
             error.error.response.data.details.slice(
               error.error.response.data.details.indexOf("{") + 1,
               -1
             );
+        } else if (
+          error.error.response.data.details === undefined &&
+          error.error.response.data.message.includes("Unexpected token")
+        ) {
+          det = locale().generic_file_post_error;
         }
         //default case: show details from error message
         else {
@@ -308,7 +330,7 @@ export default function AddPage(props) {
     }
 
     if (res.status === 200) {
-      window.alert("Resource posted correctly");
+      window.alert(locale().resource_successfully_posted);
       navigate("/" + resource);
     }
   };
@@ -385,6 +407,8 @@ export default function AddPage(props) {
                 contentPlain={contentPlain}
                 contentHeader={contentHeader}
                 contentBody={contentBody}
+                setMsg={setMsg}
+                setIsError={setIsError}
               />
               <font
                 style={{

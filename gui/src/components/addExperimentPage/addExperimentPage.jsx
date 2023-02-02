@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import locale from "../../common/locale";
-import { addFields, addTypes } from "../../config";
+import { addFields, addTypes } from "../../configManager";
 import {
   post_generic,
   get_generic,
@@ -85,7 +85,7 @@ export default function AddExperimentPage(props) {
 
       setProtocols(response.docs.map((e) => e._id));
     };
-    const qs = { limit: 100 };
+    const qs = { limit: 100, select: ["_id", "metadata", "topics"] };
     fetchData(qs);
   }, [props, searchParams]);
 
@@ -127,7 +127,10 @@ export default function AddExperimentPage(props) {
     if (searchParams.get("from") === null || searchParams.get("from") === "")
       return;
     const fst = { _id: searchParams.get("from") };
-    const qs = { filter: JSON.stringify(fst) };
+    const qs = {
+      filter: JSON.stringify(fst),
+      select: ["_id", "metadata", "topics"],
+    };
     fetchDataDuplicate(qs);
   }, [searchParams, resource]);
 
@@ -285,7 +288,7 @@ export default function AddExperimentPage(props) {
       let det = "";
       if (error.error.response.data.details.includes("duplicate key")) {
         det =
-          locale().duplicate_error +
+          locale().duplicate_resource_error +
           " " +
           error.error.response.data.details.slice(
             error.error.response.data.details.indexOf("{") + 1,
@@ -375,7 +378,7 @@ export default function AddExperimentPage(props) {
         let det = "";
         if (error.error.response.data.details.includes("duplicate key")) {
           det =
-            locale().duplicate_error +
+            locale().duplicate_resource_error +
             " " +
             error.error.response.data.details.slice(
               error.error.response.data.details.indexOf("{") + 1,
@@ -406,14 +409,23 @@ export default function AddExperimentPage(props) {
         });
 
         let det = "";
-        if (error.error.response.data.details.includes("duplicate key")) {
+        if (
+          error.error.response.data.details !== undefined &&
+          error.error.response.data.details.includes("duplicate key")
+        ) {
           det =
-            locale().duplicate_error +
+            locale().duplicate_resource_error +
             " " +
             error.error.response.data.details.slice(
               error.error.response.data.details.indexOf("{") + 1,
               -1
             );
+        } else if (
+          error.error.response.data.details === undefined &&
+          error.error.response.data.message.includes("Unexpected token")
+        ) {
+          det =
+            "The selected file cannot be uploaded because it contains errors.";
         }
         //default case: show details from error message
         else {
@@ -529,6 +541,8 @@ export default function AddExperimentPage(props) {
                 contentPlain={contentPlain}
                 contentHeader={contentHeader}
                 contentBody={contentBody}
+                setMsg={setMsg}
+                setIsError={setIsError}
               />
               <font
                 style={{

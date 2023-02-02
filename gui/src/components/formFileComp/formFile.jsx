@@ -24,7 +24,9 @@ export const FormFile = (props) => {
     props.setFile === undefined ||
     props.contentBody === undefined ||
     props.contentPlain === undefined ||
-    props.contentHeader === undefined
+    props.contentHeader === undefined ||
+    props.setMsg === undefined ||
+    props.setIsError === undefined
   )
     return "Loading";
 
@@ -55,11 +57,23 @@ export const FormFile = (props) => {
               props.setContentPlain(null);
             }
             if (file.name.endsWith(".json")) {
-              props.setContentHeader(null);
-              props.setContentBody(null);
-              props.setContentPlain(
-                JSON.stringify(JSON.parse(content), null, 4)
-              );
+              try {
+                const contentPlain = JSON.stringify(
+                  JSON.parse(content),
+                  null,
+                  4
+                );
+                props.setContentHeader(null);
+                props.setContentBody(null);
+                props.setContentPlain(contentPlain);
+                props.setMsg("");
+                props.setIsError(false);
+              } catch (error) {
+                props.setMsg(
+                  "The selected file cannot be parsed as JSON because it contains errors. Please select another file or fix it before uploading"
+                );
+                props.setIsError(true);
+              }
             }
           };
           fileReader.readAsText(file);

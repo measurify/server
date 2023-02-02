@@ -1,5 +1,5 @@
 import React from "react";
-import { aliasPages } from "../../config";
+import { aliasPages } from "../../configManager";
 
 import { Table } from "react-bootstrap";
 import ActionManager from "../actionsManager/actionsManager";
@@ -85,7 +85,7 @@ export default function ContentTable(props) {
                           </td>
                         );
                       }
-                      if (row[e] === undefined) return;
+                      if (row[e] === undefined) return <td>--undefined--</td>;
                       if (Array.isArray(row[e]))
                         return <td>{"[ " + row[e].join(" , ") + " ]"}</td>;
                       return <td>{row[e]}</td>;

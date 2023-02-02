@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import locale from "../../common/locale";
-import { website_name } from "../../config";
+import { website_name } from "../../configManager";
 
 import "./homePage.scss";
 

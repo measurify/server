@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "react-bootstrap";
 import locale from "../../common/locale";
-import { languages } from "../../config";
+import { languages } from "../../configManager";
 import "./languageSelector.scss";
 
 export const LanguageSelector = () => {
