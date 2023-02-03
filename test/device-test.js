@@ -183,6 +183,8 @@ describe('/POST device', () => {
         res.body.should.be.a('object');
         res.body.devices[0]._id.should.be.eql(devices[0]._id);
         res.body.devices[1]._id.should.be.eql(devices[1]._id);
+        res.body.devices[0].should.have.property('token');
+        res.body.devices[1].should.have.property('token');
     });
 
     it('it should POST only not existing devices from a list', async () => {
