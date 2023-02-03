@@ -225,3 +225,8 @@ fetchedPageData["measurements"] = {
   thing: "things",
   tags: "tags",
 };
+
+//restriction dictionary: key is the page, value is an array of roles allowed to access to that page
+export const restrictionPages = {};
+restrictionPages["measurements"] = ["admin", "provider"];
+restrictionPages["analyzedata"] = ["admin", "analyst"];

@@ -20,7 +20,8 @@ import {
   faCheck,
 } from "@fortawesome/fontawesome-free-solid";
 
-import { pages, languages, website_name } from "../../config";
+import { canDo } from "../../services/userRolesManagement";
+import { pages, languages, website_name, restrictionPages } from "../../config";
 import { LanguageSelector } from "../languageSelector/languageSelector";
 
 fontawesome.library.add(
@@ -54,6 +55,12 @@ export default function Navigation() {
   username.current = usr !== null ? usr : "";
   role.current = rl !== null ? rl : "";
   tenant.current = tn !== null && tn !== "" ? tn : "-";
+
+  console.log({
+    role: rl,
+    canReadMeas: canDo(role.current, "measurements", "read"),
+    restrictionPages,
+  });
 
   //useeffect on change time
   useEffect(() => {
@@ -182,7 +189,10 @@ export default function Navigation() {
           <i className="fa fa-bars" aria-hidden="true"></i>
         )}
       </Button>
-      <NavLink to="/add/measurements" className="nav-wrap">
+      <NavLink
+        to="/" //{role.current === "analyst" ? "/analyzedata" : "/add/measurements"}
+        className="nav-wrap"
+      >
         {website_name}
       </NavLink>
       <hr />
@@ -224,24 +234,32 @@ export default function Navigation() {
 
           <div className="app-nav-text">{locale().resources}</div>
           <hr />
-          <NavLink
-            to={`/measurements`}
-            className={(navData) => (navData.isActive ? "active" : "")}
-            //activeClassName="active"
-            key={"measurements"}
-            onClick={() => setIsOpened(false)}
-          >
-            Controlli
-          </NavLink>
-          <NavLink
-            to={`/analyzedata`}
-            className={(navData) => (navData.isActive ? "active" : "")}
-            //activeClassName="active"
-            key={"analyzedata"}
-            onClick={() => setIsOpened(false)}
-          >
-            Analisi dati
-          </NavLink>
+          {canDo(role.current, "measurements", "read") &&
+            (restrictionPages["measurements"] === undefined ||
+              restrictionPages["measurements"].includes(role.current)) && (
+              <NavLink
+                to={`/measurements`}
+                className={(navData) => (navData.isActive ? "active" : "")}
+                //activeClassName="active"
+                key={"measurements"}
+                onClick={() => setIsOpened(false)}
+              >
+                Controlli
+              </NavLink>
+            )}
+          {canDo(role.current, "measurements", "read") &&
+            (restrictionPages["analyzedata"] === undefined ||
+              restrictionPages["analyzedata"].includes(role.current)) && (
+              <NavLink
+                to={`/analyzedata`}
+                className={(navData) => (navData.isActive ? "active" : "")}
+                //activeClassName="active"
+                key={"analyzedata"}
+                onClick={() => setIsOpened(false)}
+              >
+                Analisi dati
+              </NavLink>
+            )}
         </div>
       </div>
     </nav>

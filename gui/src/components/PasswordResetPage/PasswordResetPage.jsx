@@ -67,7 +67,6 @@ export default function PasswordResetPage() {
       setMsg(locale().stronger_password_required);
       return;
     }
-    console.log(pswDetails.id);
 
     try {
       const resp = await resetPassword(tenant, token, psw);

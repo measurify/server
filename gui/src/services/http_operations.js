@@ -403,6 +403,35 @@ export async function get_generic_pipe(resource_type, qs = {}, token) {
   });
 }
 
+export async function get_one_generic(resource_type, id, token) {
+  let url = api_url + "/" + resource_type + "/" + id;
+  if (token === undefined) token = GetToken();
+
+  console.log("GET ONE:" + url);
+
+  let options = {
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache",
+      Authorization: token,
+    },
+
+    json: true,
+  };
+  return new Promise((resolve, reject) => {
+    instance
+      .get(url, options)
+      .then((response) => {
+        resolve({
+          response: response,
+        });
+      })
+      .catch((error) => {
+        reject({ error: error });
+      });
+  });
+}
+
 //return the login token from the localstorage
 function GetToken() {
   return localStorage.getItem("token");

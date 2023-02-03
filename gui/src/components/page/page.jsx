@@ -7,11 +7,14 @@ import ContentTable from "../contentTable/contentTable";
 import ContentCards from "../contentCards/contentCards";
 import { useParams, useSearchParams } from "react-router-dom";
 import { Pagination } from "react-bootstrap";
+import { canDo } from "../../services/userRolesManagement";
 import "./page.scss";
 
 import fontawesome from "@fortawesome/fontawesome";
 import { faPlusCircle } from "@fortawesome/fontawesome-free-solid";
 fontawesome.library.add(faPlusCircle);
+
+let role = React.createRef();
 
 export default function Page(params) {
   const { page } = useParams();
@@ -30,6 +33,9 @@ export default function Page(params) {
   const [nextPage, setNextPage] = useState();
 
   const [totalPages, setTotalPages] = useState();
+
+  const rl = localStorage.getItem("user-role");
+  role.current = rl !== null ? rl : "";
 
   useEffect(() => {
     // declare the async data fetching function
@@ -164,21 +170,24 @@ export default function Page(params) {
     <div className="page">
       <header className="page-header">
         <b>Controlli</b>
-        <NavLink to={`/add/` + page + "/"}>
-          <Button variant="link" size="sm">
-            <i
-              className="fa fa-plus-circle"
-              aria-hidden="true"
-              title={"Add"}
-              style={{
-                width: 30 + "px",
-                height: 30 + "px",
-                //marginRight: 10 + "px",
-                opacity: 0.85,
-              }}
-            ></i>
-          </Button>
-        </NavLink>
+        {addFields[page] !== undefined &&
+          canDo(role.current, page, "create") && (
+            <NavLink to={`/add/` + page + "/"}>
+              <Button variant="link" size="sm">
+                <i
+                  className="fa fa-plus-circle"
+                  aria-hidden="true"
+                  title={"Add"}
+                  style={{
+                    width: 30 + "px",
+                    height: 30 + "px",
+                    //marginRight: 10 + "px",
+                    opacity: 0.85,
+                  }}
+                ></i>
+              </Button>
+            </NavLink>
+          )}
       </header>
       <main className="page-content">
         <br />

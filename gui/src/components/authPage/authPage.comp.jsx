@@ -7,6 +7,7 @@ import { languages } from "../../config";
 import "./authPage.scss";
 import { LanguageSelector } from "../languageSelector/languageSelector";
 import { Form, Container, Row, Col } from "react-bootstrap";
+import { SetRoleDefinition } from "../../services/userRolesManagement";
 const userRef = React.createRef();
 const pswRef = React.createRef();
 const tenantRef = React.createRef();
@@ -27,6 +28,7 @@ const AuthPageComp = () => {
 
     try {
       await login(user, psw, tenant);
+      await SetRoleDefinition();
       window.location.replace("/");
     } catch (error) {
       console.log({ error: error.response.data });

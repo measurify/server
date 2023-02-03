@@ -231,7 +231,16 @@ function App() {
               <Routes>
                 <Route
                   path="/"
-                  element={<Navigate replace to="/add/measurements" />}
+                  element={
+                    <Navigate
+                      replace
+                      to={
+                        localStorage.getItem("user-role") === "analyst"
+                          ? "/analyzedata"
+                          : "/add/measurements"
+                      }
+                    />
+                  }
                 />
 
                 <Route path="/home" element={<HomePage />} />

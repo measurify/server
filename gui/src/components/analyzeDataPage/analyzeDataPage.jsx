@@ -99,7 +99,6 @@ export default function AnalyzeDataPage(params) {
             };
           });
 
-        console.log(results);
         // set state with the result
         setHeader(CSVheader);
 
