@@ -26,7 +26,7 @@ passport.use(new strategy_local({
             if (!user) return done(null, false, 'Incorrect username or password');
             if(user.status && user.status != UserStatusTypes.enabled) return done(null, false, 'user not enabled');
             let result = false;
-            if(req.tenant.passwordhash == true || req.tenant.passwordhash == 'true') result = bcrypt.compareSync(password, user._doc.password);
+            if(req.tenant.passwordhash != false && req.tenant.passwordhash != "false") result = bcrypt.compareSync(password, user._doc.password);
             else if(password == user._doc.password) result = true; 
             if (result == false) return done(null, false, 'Incorrect username or password');
             return done(null, user, 'Logged Successfully');

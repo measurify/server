@@ -84,7 +84,7 @@ exports.self = async (req, res) => {
     if(!req.body.email) return errors.manage(res, errors.missing_email);
     if(req.body.password) {
         if(!isPasswordStrongEnough(req.body.password))return errors.manage(res, errors.post_request_error, "The password strength is too weak, please choose a stronger password");
-        if(tenant.passwordhash == true || tenant.passwordhash == 'true') req.body.password = bcrypt.hashSync(req.body.password, 8);}
+        if(tenant.passwordhash != false && tenant.passwordhash != "false") req.body.password = bcrypt.hashSync(req.body.password, 8);}
     let user=null;
     try { user = await (new User(req.body)).save()}
     catch (err) { return errors.manage(res, errors.post_request_error, err); }
@@ -157,7 +157,7 @@ exports.password = async (req, res) => {
     if(!user) return errors.manage(res, errors.resource_not_found, 'user of the reset request not found');
     const reset_updated = await PasswordReset.findByIdAndUpdate(req.body.reset, { "$set": { "status": PasswordResetStatusTypes.invalid } });   
     if(!isPasswordStrongEnough(req.body.password))return errors.manage(res, errors.get_request_error, "The password strength is too weak, make a new request to reset password and choose a stronger password");        
-    if(tenant.passwordhash == true || tenant.passwordhash == 'true') req.body.password = bcrypt.hashSync(req.body.password, 8);
+    if(tenant.passwordhash != false && tenant.passwordhash != "false") req.body.password = bcrypt.hashSync(req.body.password, 8);
     const user_updated = await User.findByIdAndUpdate(user._id, { "$set": { "password": req.body.password, "createdPassword":Date.now() },  });
     return res.status(200).json(user_updated);   
 };

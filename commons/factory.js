@@ -90,21 +90,21 @@ exports.createTenant = async function (id, organization, address, email, phone, 
   return await Tenant.findById(tenant._id);
 };
 
-exports.createUser = async function (username, password, type, fieldmask, email, tenant,validityPasswordDays,createdPassword) {
+exports.createUser = async function (username, password, type, fieldmask, email, tenant, validityPasswordDays, createdPassword) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-  if (tenant.passwordhash == true || tenant.passwordhash == "true") {
+  if (tenant.passwordhash != false && tenant.passwordhash != "false") {
     password = bcrypt.hashSync(password, 8);
   }
   const User = mongoose.dbs[tenant.database].model("User");
-  const req = { 
+  const req = {
     username: username,
     password: password,
     fieldmask: fieldmask,
-    email: email||username+"@gmail.com",
+    email: email || username + "@gmail.com",
     type: type || UserRoles.provider,
-    validityPasswordDays:validityPasswordDays||0,
-    createdPassword:createdPassword
+    validityPasswordDays: validityPasswordDays || 0,
+    createdPassword: createdPassword
   };
   let user = new User(req);
   await user.save();
@@ -130,13 +130,13 @@ exports.createRole = async function (name, defaultAction, actions, description, 
   return role._doc;
 };
 
-exports.createCrud = async function (create,read,update,deleteAction) {
+exports.createCrud = async function (create, read, update, deleteAction) {
   const body = {}
-  if(create===true||create===false)body.create= create;
-  if(read)body.read= read;
-  if(update)body.update= update;
-  if(deleteAction)body.delete= deleteAction;
-  
+  if (create === true || create === false) body.create = create;
+  if (read) body.read = read;
+  if (update) body.update = update;
+  if (deleteAction) body.delete = deleteAction;
+
   return body;
 };
 
@@ -182,7 +182,7 @@ exports.createDefaultRoles = async function (tenant) {
   }
   ];
   let roleDocs = []
-  for(let i=0;i<body.length;i++){
+  for (let i = 0; i < body.length; i++) {
     let role = new Role(body[i]);
     await role.save();
     roleDocs.push(role._doc)
@@ -262,7 +262,7 @@ exports.createMetadata = async function (name, description, type, range) {
     name: name || "metadata-name-" + this.uuid(),
     description: description || "description metadata " + this.uuid(),
     type: type || MetadataTypes.scalar,
-    range:range||[]
+    range: range || []
   }
   return metadata;
 }
@@ -272,7 +272,7 @@ exports.createField = async function (name, description, type, range) {
     name: name || "field-name-" + this.uuid(),
     description: description || "description field " + this.uuid(),
     type: type || TopicFieldTypes.scalar,
-    range:range||[]
+    range: range || []
   }
   return field;
 }
@@ -339,7 +339,7 @@ exports.createExperiment = async function (name, description, owner, state, star
   const Experiment = mongoose.dbs[tenant.database].model("Experiment");
   const req = {
     _id: name,
-    description: description,    
+    description: description,
     //state: state || ExperimentStateTypes.ongoing,
     state: state || 0,
     startDate: startDate || Date.now(),
@@ -579,19 +579,20 @@ exports.createFieldmask = async function (
 exports.createMeasurement = async function (owner, feature, device, thing, tags, samples, startdate, enddate, location, visibility, experiment, tenant) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-  if(samples == undefined) samples = [{ values: [10.4], delta: 200 }];
+  if (samples == undefined) samples = [{ values: [10.4], delta: 200 }];
   const Measurement = mongoose.dbs[tenant.database].model("Measurement");
-  const req = { owner: owner,
-                startDate: startdate || Date.now(),
-                endDate: enddate || Date.now(),
-                location: location || { type: "Point", coordinates: [12.123456, 13.1345678] },
-                thing: thing,
-                feature: feature,
-                device: device,
-                samples: samples,
-                tags: tags,
-                visibility: visibility,
-                experiment: experiment
+  const req = {
+    owner: owner,
+    startDate: startdate || Date.now(),
+    endDate: enddate || Date.now(),
+    location: location || { type: "Point", coordinates: [12.123456, 13.1345678] },
+    thing: thing,
+    feature: feature,
+    device: device,
+    samples: samples,
+    tags: tags,
+    visibility: visibility,
+    experiment: experiment
   };
   const id = sha(JSON.stringify(req));
   req._id = id;
@@ -603,17 +604,18 @@ exports.createMeasurement = async function (owner, feature, device, thing, tags,
 exports.createTimesample = async function (owner, values, timestamp, measurement, tenant) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-  if(!measurement) {
-      const Measurement = mongoose.dbs[tenant.database].model("Measurement");
-      const feature = await this.createFeature(this.uuid(), owner);
-      const device = await this.createDevice(this.uuid(), owner, [feature]);
-      const thing = await this.createThing(this.uuid(), owner);
-      measurement = await factory.createMeasurement(owner, feature, device, thing, [], []);
+  if (!measurement) {
+    const Measurement = mongoose.dbs[tenant.database].model("Measurement");
+    const feature = await this.createFeature(this.uuid(), owner);
+    const device = await this.createDevice(this.uuid(), owner, [feature]);
+    const thing = await this.createThing(this.uuid(), owner);
+    measurement = await factory.createMeasurement(owner, feature, device, thing, [], []);
   }
   const Timesample = mongoose.dbs[tenant.database].model("Timesample");
-  const req = { measurement: measurement,
-                values: values || [1], 
-                timestamp: timestamp || Date.now()
+  const req = {
+    measurement: measurement,
+    values: values || [1],
+    timestamp: timestamp || Date.now()
   }
   const timesample = new Timesample(req);
   await timesample.save();
@@ -985,7 +987,7 @@ exports.createDemoContent = async function (tenant) {
       null,
       null,
       null,
-      VisibilityTypes.public,      
+      VisibilityTypes.public,
       null,
       tenant
     )
@@ -1192,4 +1194,13 @@ exports.areEqual = function areEqual(obj1, obj2) {
     return true;
   }
   return false;
+};
+
+exports.createDeviceToken = async function (req, res) {
+  const Tenant = mongoose.dbs["catalog"].model("Tenant");
+  if (!req.tenant) req.tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
+  if (req.tenant.passwordhash != false && req.tenant.passwordhash != "false") {
+    token = bcrypt.hashSync(token, 8);
+  }
+  return 
 };
