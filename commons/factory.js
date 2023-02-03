@@ -358,9 +358,13 @@ exports.createExperiment = async function (name, description, owner, state, star
   return experiment._doc;
 };
 
-exports.createDevice = async function (name, owner, features, tags, scripts, visibility, tenant) {
+exports.createDevice = async function (name, owner, features, tags, scripts, visibility, tenant, token) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
+  if(!token) token = this.uuid();
+  if (tenant.passwordhash != false && tenant.passwordhash != "false") {
+    token = bcrypt.hashSync(token, 8);
+  }
   const Device = mongoose.dbs[tenant.database].model("Device");
   const req = {
     _id: name,
@@ -369,6 +373,7 @@ exports.createDevice = async function (name, owner, features, tags, scripts, vis
     scripts: scripts,
     features: features || [await this.createFeature(name + "-feature", owner)],
     visibility: visibility,
+    token: token
   };
   const device = new Device(req);
   await device.save();
@@ -1196,11 +1201,11 @@ exports.areEqual = function areEqual(obj1, obj2) {
   return false;
 };
 
-exports.createDeviceToken = async function (req, res) {
+exports.HashDeviceToken = async function (tenant, token) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
-  if (!req.tenant) req.tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-  if (req.tenant.passwordhash != false && req.tenant.passwordhash != "false") {
+  if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);  
+  if (tenant.passwordhash != false && tenant.passwordhash != "false") {
     token = bcrypt.hashSync(token, 8);
   }
-  return 
+  return token;
 };

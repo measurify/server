@@ -136,6 +136,7 @@ describe('/POST device', () => {
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
         res.body.should.have.property('features');
+        res.body.should.have.property('token');
         res.body._id.should.be.eql(device._id);
         res.body.features.length.should.be.eql(1);
     });
@@ -177,7 +178,7 @@ describe('/POST device', () => {
                             { _id: "test-device-3", owner: user, features: [await factory.createFeature("test-device-3-feature-1", user)] },
                             { _id: "test-device-4", features: [await factory.createFeature("test-device-4-feature-2", user)] }
                         ];
-        const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(devices)
+        const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(devices);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.devices[0]._id.should.be.eql(devices[0]._id);

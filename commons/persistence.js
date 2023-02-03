@@ -52,6 +52,7 @@ exports.getList = async function (filter, sort, select, page, limit, restriction
 
 const postOne = async function (body, model, tenant) {
     if (body.password) body.password = checkPassword(body.password,tenant.passwordhash);
+    if(model.modelName == "Device") {token = factory.uuid();body.token =await factory.HashDeviceToken(tenant, token)}//hash token
     const resource = await (new model(body)).save();
     if (model.modelName == 'Measurement') {
         broker.publish('device-' + body.device, body.device, body);
@@ -59,6 +60,7 @@ const postOne = async function (body, model, tenant) {
         broker.notify(body, tenant);
     }
     if (model.modelName == 'Tenant') { await tenancy.init(resource, body.admin_username, body.admin_password); }
+    if (model.modelName == "Device") resource.token = token;//reveal token one time only        
     return resource;
 }
 
@@ -69,6 +71,7 @@ const postList = async function (body, model, tenant) {
         try {
             element.owner = body.owner;
             if (element.password) element.password = checkPassword(element.password,tenant.passwordhash);
+            if(model.modelName == "Device") {token = factory.uuid();element.token =await factory.HashDeviceToken(tenant, token)}//hash token
             const resource = await (new model(element)).save()
             if (model.modelName == "Measurement") {
                 broker.publish('device-' + resource.device, resource);
@@ -76,6 +79,7 @@ const postList = async function (body, model, tenant) {
                 broker.notify(body, tenant);
             }
             if (model.modelName == 'Tenant') await tenancy.init(resource, body.admin_username, body.admin_password);
+            if (model.modelName == "Device") resource.token = token;//reveal token one time only
             results[items].push(resource);
         }
         catch (err) { results.errors.push('Index: ' + i + ' (' + err.message + ')'); }
