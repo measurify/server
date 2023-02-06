@@ -630,7 +630,6 @@ describe("/PUT user", () => {
       .put("/v1/users/" + user._id)
       .set("Authorization", await factory.getUserToken(admin))
       .send(modification);
-      //console.log(res)
     res.should.have.status(200);
     res.body.should.be.a("object");
   });

@@ -9,6 +9,7 @@ const deviceSchema = new mongoose.Schema({
     token: { type: String, unique: true, select: false },
     owner: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true },
     features: { type: [String], required: "Please, supply a feature array", ref:'Feature' },
+    things: { type: [String], ref:'thing' },
     tags: { type: [String], ref:'Tag' },
     scripts: { type: [String], ref:'Script' },
     visibility: {type: String, enum: VisibilityTypes, default: VisibilityTypes.private },

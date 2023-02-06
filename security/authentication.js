@@ -71,10 +71,24 @@ passport.use('jwt-token', new custom_strategy(
         let token = req.body.Authorization || req.get('Authorization') || req.query.Authorization;
         if (!token) return done(null, false, "Missing token"); 
         try { 
+            if (token.startsWith('DVC '))
+            {
+                token = token.replace('DVC ', '');
+                const info = jwt.verify(token, process.env.JWT_SECRET);
+                const Device = mongoose.dbs[info.tenant.database].model('Device');
+                const device = await Device.findById(info.device._id);     
+                if (!device) return done(null, false, "Missing device");
+                const User = mongoose.dbs[info.tenant.database].model('User');
+                const user = await User.findById(device.owner);
+                if (!user) return done(null, false, "Missing user of the device");
+                req.tenant = info.tenant;
+                req.device = info.device;
+                return done(null, user, 'Logged Successfully');
+            }
             token = token.replace('JWT ', '');
             const info = jwt.verify(token, process.env.JWT_SECRET);
             const User = mongoose.dbs[info.tenant.database].model('User');
-            const user = await User.findById(info.user._id);
+            const user = await User.findById(info.user._id);     
             if (!user) return done(null, false, "Missing user");
             req.tenant = info.tenant;
             return done(null, user, 'Logged Successfully');  
@@ -94,6 +108,18 @@ exports.encode = function(user, tenant) {
 
 exports.decode = function(token) {
     token = token.replace('JWT ', '');
+    try {  return jwt.verify(token, process.env.JWT_SECRET); }
+    catch(error) { return 'invalid token'; }  
+}
+exports.encodeDevice = function(device, tenant) {
+    let info = {};
+    info.device = device;
+    info.tenant = tenant;
+    return 'DVC ' + jwt.sign(info, process.env.JWT_SECRET, {expiresIn: '1000y'});
+};
+
+exports.decodeDevice = function(token) {
+    token = token.replace('DVC ', '');
     try {  return jwt.verify(token, process.env.JWT_SECRET); }
     catch(error) { return 'invalid token'; }  
 }

@@ -69,6 +69,14 @@ exports.getUserToken = async function (user, tenant) {
   return authentication.encode(user, tenant);
 };
 
+exports.getDeviceToken = async function (device, tenant) {
+  const Tenant = mongoose.dbs["catalog"].model("Tenant");
+  if (!tenant)
+    if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
+  return authentication.encodeDevice(device, tenant);
+};
+
+
 exports.createTenant = async function (id, organization, address, email, phone, admin_username, admin_password) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   let tenant = await Tenant.findOne({ _id: id });
@@ -358,13 +366,10 @@ exports.createExperiment = async function (name, description, owner, state, star
   return experiment._doc;
 };
 
-exports.createDevice = async function (name, owner, features, tags, scripts, visibility, tenant, token) {
+exports.createDevice = async function (name, owner, features, tags, scripts, visibility, tenant, things, token) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
-  if(!token) token = this.uuid();
-  if (tenant.passwordhash != false && tenant.passwordhash != "false") {
-    token = bcrypt.hashSync(token, 8);
-  }
+  
   const Device = mongoose.dbs[tenant.database].model("Device");
   const req = {
     _id: name,
@@ -372,9 +377,14 @@ exports.createDevice = async function (name, owner, features, tags, scripts, vis
     tags: tags,
     scripts: scripts,
     features: features || [await this.createFeature(name + "-feature", owner)],
-    visibility: visibility,
-    token: token
+    visibility: visibility || VisibilityTypes.private,    
+    things: things
   };
+  if(!token) token = authentication.encodeDevice(req, tenant);
+  if (tenant.passwordhash != false && tenant.passwordhash != "false") {
+    token = bcrypt.hashSync(token, 8);
+  }
+  req.token=token;
   const device = new Device(req);
   await device.save();
   return device._doc;

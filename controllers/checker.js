@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const errors = require('../commons/errors.js');
 const authorizator = require('../security/authorization.js');
 const inspector = require('../commons/inspector.js');
+const VisibilityTypes = require("../types/visibilityTypes.js");
 
 exports.isTenantAvailable = async function(req, res) {
     try {
@@ -89,13 +90,15 @@ exports.canOperate = async function(req, res, entity,method) {
     const role = await Role.findById(req.user.type);
     if(!method)method=req.method;
     if(!authorizator.canOperate(req.user,role,req.method,entity,req.resource)) return errors.manage(res, errors.restricted_access_operation, "You cannot do "+req.method.toLowerCase()+" operation on the resource "+entity);
+    if(req.device) {let result= authorizator.canDeviceOperate(req.device,req.method,entity,req.body); if(!result[0]) return errors.manage(res, errors.restricted_access_operation, result[1]);}
     return true;
 }
 
 exports.whatCanOperate = async function(req, res, entity) {
     const Role = mongoose.dbs[req.tenant.database].model('Role');
     const role = await Role.findById(req.user.type);
-    return authorizator.whatCanOperate(req.user,role,req.method,entity);
+    if(req.device)return { $and: [  { owner: req.user._id }, { visibility: VisibilityTypes.public },{ visibility: VisibilityTypes.private } ] }//impossible solution   //device cannot do get, pipe, delete requests
+    return authorizator.whatCanOperate(req.user,role,req.method,entity);    
 }
 
 exports.canDeleteMeasurementList = async function(req, res, entity) {
