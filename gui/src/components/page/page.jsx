@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { NavLink } from "react-router-dom";
 import { Button } from "react-bootstrap";
-import { pages, pageActions, addFields } from "../../config";
+import { pages, pageActions, addFields } from "../../configManager";
 import { get_generic } from "../../services/http_operations";
 import ContentTable from "../contentTable/contentTable";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -11,6 +11,7 @@ import { Capitalize } from "../../services/misc_functions";
 import { canDo } from "../../services/userRolesManagement";
 import fontawesome from "@fortawesome/fontawesome";
 import { faPlusCircle } from "@fortawesome/fontawesome-free-solid";
+import AppContext from "../../context";
 fontawesome.library.add(faPlusCircle);
 
 let role = React.createRef();
@@ -36,6 +37,11 @@ export default function Page(params) {
   const rl = localStorage.getItem("user-role");
 
   role.current = rl !== null ? rl : "";
+
+  const context = useContext(AppContext);
+  let myFetched;
+  if (context !== undefined) myFetched = context.fetched;
+  else myFetched = {};
 
   useEffect(() => {
     // declare the async data fetching function
@@ -94,6 +100,7 @@ export default function Page(params) {
     let tmp = resource.filter((el) => {
       return el._id !== id;
     });
+    myFetched.RemoveData(page);
     setResource(tmp);
   };
 

@@ -13,10 +13,12 @@ import {
 import locale from "../../../common/locale";
 
 export default function UpdateHistoryFileForm(props) {
-  /*console.log({
+  /*
+  console.log({
     postHistory: props.postHistory,
     arraySepRef: props.arraySepRef,
-    csvSepRef: props.csvSepRef,
+
+    csvSep: props.csvSep,
     floatSepRef: props.floatSepRef,
     ovdRef: props.ovdRef,
     setCsvHeader: props.setCsvHeader,
@@ -29,8 +31,9 @@ export default function UpdateHistoryFileForm(props) {
   if (
     props.postHistory === undefined ||
     props.arraySepRef === undefined ||
-    props.csvSepRef === undefined ||
     props.floatSepRef === undefined ||
+    props.csvSep === undefined ||
+    props.setCsvSep === undefined ||
     props.ovdRef === undefined ||
     props.setCsvHeader === undefined ||
     props.setCsvContent === undefined ||
@@ -40,6 +43,7 @@ export default function UpdateHistoryFileForm(props) {
     props.csvHeader === undefined
   )
     return "Loading";
+
   return (
     <Form onSubmit={props.postHistory}>
       <Row style={{ paddingTop: 10 + "px" }}>
@@ -47,7 +51,11 @@ export default function UpdateHistoryFileForm(props) {
           <Form.Group className="mb-3">
             <Form.Select
               aria-label="CSV Column Separator"
-              ref={props.csvSepRef}
+              value={props.csvSep}
+              onChange={(e) => {
+                e.preventDefault();
+                props.setCsvSep(e.target.value);
+              }}
             >
               <option value=",">,</option>
               <option value=";">;</option>
@@ -137,11 +145,9 @@ export default function UpdateHistoryFileForm(props) {
                   <thead>
                     <tr>
                       {React.Children.toArray(
-                        props.csvHeader
-                          .split(props.csvSepRef.current.value)
-                          .map((h) => {
-                            return <th>{h}</th>;
-                          })
+                        props.csvHeader.split(props.csvSep).map((h) => {
+                          return <th>{h}</th>;
+                        })
                       )}
                     </tr>
                   </thead>
@@ -151,11 +157,9 @@ export default function UpdateHistoryFileForm(props) {
                         return (
                           <tr>
                             {React.Children.toArray(
-                              e
-                                .split(props.csvSepRef.current.value)
-                                .map((h) => {
-                                  return <td>{h}</td>;
-                                })
+                              e.split(props.csvSep).map((h) => {
+                                return <td>{h}</td>;
+                              })
                             )}
                           </tr>
                         );

@@ -20,7 +20,7 @@ import {
   faCheck,
 } from "@fortawesome/fontawesome-free-solid";
 
-import { pages, languages, website_name } from "../../config";
+import { pages, languages, website_name } from "../../configManager";
 import { LanguageSelector } from "../languageSelector/languageSelector";
 import { canDo } from "../../services/userRolesManagement";
 import { Capitalize } from "../../services/misc_functions";

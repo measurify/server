@@ -31,12 +31,16 @@ import MobilePlaceholderPage from "./components/mobilePlaceholderPage/mobilePlac
 import EditContentPage from "./components/editContentPage/editContentPage";
 import AddPage from "./components/addPage/addPage";
 import AddExperimentPage from "./components/addExperimentPage/addExperimentPage";
-import { layout } from "./config";
+import { layout } from "./configManager";
 import AddMeasurementsPage from "./components/addMeasurementsPage/addMeasurementsPage";
 import UpdateHistoryPage from "./components/OperationToolPages/updateSteps/updateHistory";
 import DownloadPage from "./components/OperationToolPages/download/downloadExperiment";
 import cloneDeep from "clone-deep";
 import RemoveStepsPage from "./components/OperationToolPages/removeSteps/removeSteps";
+import PasswordRecoveryPage from "./components/passwordRecoveryPage/PasswordRecoveryPage";
+import PasswordResetPage from "./components/PasswordResetPage/PasswordResetPage";
+
+import { ResetConfig, LoadConfig } from "./configManager";
 /*
     notifications follow this schema
 
@@ -64,6 +68,8 @@ function App() {
   let layoutRef = React.useRef<string | null>();
   const tkn = localStorage.getItem("token");
 
+  //reset the config to define basics variables when not-logged
+  ResetConfig();
   //set api url to run https operations
   SetAPIUrl();
 
@@ -100,10 +106,17 @@ function App() {
   ///////////////END NOTIFICATION MANAGEMENT FRAGMENT
 
   ///////////////FETCHED TYPES AND DATA MANAGEMENT FRAGMENT
-  //function to push a new notification at the beginning of the list
+  //function to push a new fetched data block
   function UpdateData(fetched: string[], key: string) {
     setData((prev) => {
       return { ...prev, [key]: [...fetched] };
+    });
+  }
+
+  //function to remove a fetched data block
+  function RemoveData(key: string) {
+    setData((prev) => {
+      return { ...prev, [key]: undefined };
     });
   }
 
@@ -136,6 +149,7 @@ function App() {
     types: types,
     data: data,
     UpdateData: UpdateData,
+    RemoveData: RemoveData,
   };
   ///////////////END FETCHED TYPES MANAGEMENT FRAGMENT
 
@@ -172,7 +186,7 @@ function App() {
   ///////////////////////////END LOGGER MANAGEMENT FRAGMENT
 
   //mobile view only allowed to be vertical
-  if (/Mobi/i.test(window.navigator.userAgent) == true) {
+  if (/Mobi/i.test(window.navigator.userAgent) === true) {
     layoutRef.current = "vertical";
   } else {
     layoutRef.current = layout;
@@ -186,6 +200,11 @@ function App() {
           <Routes>
             <Route path="/" element={<AuthPage />} />
             <Route
+              path="/passwordrecovery"
+              element={<PasswordRecoveryPage />}
+            />
+            <Route path="/passwordreset" element={<PasswordResetPage />} />
+            <Route
               path="/add/tenants"
               element={<AddPage resource={"tenants"} />}
             />
@@ -194,6 +213,9 @@ function App() {
         </Router>
       </div>
     );
+
+  //load config if token has been set
+  LoadConfig();
 
   return (
     <AppContext.Provider
@@ -232,7 +254,7 @@ function App() {
             ) : (
               ""
             )}
-            {/Mobi/i.test(window.navigator.userAgent) == true && (
+            {/Mobi/i.test(window.navigator.userAgent) === true && (
               <Col md="auto" style={{ padding: 0 }}>
                 <NotificationBar />
               </Col>
@@ -268,7 +290,7 @@ function App() {
               </Routes>
             </Col>
             {layoutRef.current === "vertical" &&
-              /Mobi/i.test(window.navigator.userAgent) == false && (
+              /Mobi/i.test(window.navigator.userAgent) === false && (
                 <Col md="auto" style={{ paddingLeft: 0, paddingRight: 0 }}>
                   <NotificationBar />
                 </Col>

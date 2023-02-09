@@ -20,7 +20,13 @@ import {
   faCheck,
 } from "@fortawesome/fontawesome-free-solid";
 
-import { pages, languages, website_name, operationPages } from "../../config";
+import {
+  pages,
+  languages,
+  website_name,
+  operationPages,
+  restrictionPages,
+} from "../../configManager";
 import { LanguageSelector } from "../languageSelector/languageSelector";
 import { canDo } from "../../services/userRolesManagement";
 import { Capitalize } from "../../services/misc_functions";
@@ -227,7 +233,11 @@ export default function Navigation() {
           <hr />
           {Object.keys(pages).map((k) => {
             //check if user can access to the page
-            if (!canDo(role.current, k, "read")) {
+            if (
+              !canDo(role.current, k, "read") ||
+              (restrictionPages[k] !== undefined &&
+                !restrictionPages[k].includes(role.current))
+            ) {
               return "";
             }
             return (
@@ -245,7 +255,7 @@ export default function Navigation() {
           <hr />
           {operationPages.length !== 0 && (
             <>
-              <div className="app-nav-text">Manage Experiments</div> <hr />
+              <div className="app-nav-text">{locale().tools}</div> <hr />
             </>
           )}
           {operationPages.includes("updatehistory") &&

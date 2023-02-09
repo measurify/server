@@ -26,7 +26,7 @@ import { saveAs } from "file-saver";
 export default function ImportExportValues(props) {
   const [content, setContent] = useState(null);
   return (
-    <Accordion defaultActiveKey={0} size={"lg"}>
+    <Accordion size={"lg"}>
       <Accordion.Item eventKey={0}>
         <Accordion.Header>
           {locale().import +

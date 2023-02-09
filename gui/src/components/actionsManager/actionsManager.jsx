@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { viewFields } from "../../config";
+import { viewFields } from "../../configManager";
 import { NavLink } from "react-router-dom";
 
 import fontawesome from "@fortawesome/fontawesome";
@@ -23,6 +23,7 @@ fontawesome.library.add(faEye, faPencilAlt, faCopy);
 
 function ActionContent(props) {
   const toShow = {};
+  //this should be optimised
   viewFields[props.resType].forEach((k) => {
     if (k.constructor === Object) {
       Object.keys(k).forEach((subK) => {
@@ -44,7 +45,7 @@ function ActionContent(props) {
       }
     }
   });
-
+  //end of optimitazion block
   //render accordion with table when field is array of object
   return UnrollView(toShow);
 }
@@ -68,12 +69,34 @@ function UnrollView(item) {
                       ) ? (
                         React.Children.toArray(
                           value.map((single, i) => {
+                            let title = (
+                              <span>
+                                {key} <i>[{i}]</i>
+                              </span>
+                            );
+                            //specific titles depending on key
+                            if (key === "history" && single.step !== undefined)
+                              title = (
+                                <span>
+                                  Step <i>{single.step}</i>
+                                </span>
+                              );
+                            if (key === "metadata" && single.name !== undefined)
+                              title = (
+                                <span>
+                                  <i>{single.name}</i>
+                                </span>
+                              );
+                            if (key === "topics" && single.name !== undefined)
+                              title = (
+                                <span>
+                                  <i>{single.name}</i>
+                                </span>
+                              );
                             return (
                               <Accordion>
                                 <Accordion.Item eventKey="0">
-                                  <Accordion.Header>
-                                    {key} <i>[{i}]</i>
-                                  </Accordion.Header>
+                                  <Accordion.Header>{title}</Accordion.Header>
                                   <Accordion.Body>
                                     {UnrollView(single)}
                                   </Accordion.Body>

@@ -12,7 +12,7 @@ import {
 } from "react-bootstrap";
 import locale from "../../../common/locale";
 import { NavLink } from "react-router-dom";
-import { languages } from "../../../config";
+import { languages } from "../../../configManager";
 import {
   testLogger,
   logsManager,
@@ -29,7 +29,6 @@ import { removeDefaultElements } from "../../../services/misc_functions";
 const cloneDeep = require("clone-deep");
 
 const ovdRef = React.createRef();
-const csvSepRef = React.createRef();
 const arraySepRef = React.createRef();
 const floatSepRef = React.createRef();
 
@@ -39,7 +38,6 @@ export default function UpdateHistoryPage() {
   const myLogs = useContext(AppContext).logs;
   const [now, setNow] = useState(0);
   const [file, setFile] = useState(null);
-  const [text, setText] = useState("");
   //type of input to post resources
   const [postType, setPostType] = useState("file");
 
@@ -50,6 +48,8 @@ export default function UpdateHistoryPage() {
   //message for user
   const [msg, setMsg] = useState("");
   const [isError, setIsError] = useState(false);
+
+  const [csvSep, setCsvSep] = useState(",");
 
   useEffect(() => {
     const getExperiments = async () => {
@@ -62,17 +62,17 @@ export default function UpdateHistoryPage() {
 
   const postHistory = async (e) => {
     e.preventDefault();
-    const csvSep = csvSepRef.current.value;
+    const _csvSep = csvSep;
     const arraySep = arraySepRef.current.value;
     const floatSep = floatSepRef.current.value;
     const ovd = ovdRef.current.checked;
 
-    if (csvSep === "" || arraySep === "" || floatSep === "") {
+    if (_csvSep === "" || arraySep === "" || floatSep === "") {
       setMsg("Please, define all the separators");
       setIsError(true);
       return;
     }
-    if (csvSep === arraySep || csvSep === floatSep || arraySep === floatSep) {
+    if (_csvSep === arraySep || _csvSep === floatSep || arraySep === floatSep) {
       setMsg("All the separators should have different values");
       setIsError(true);
       return;
@@ -89,7 +89,7 @@ export default function UpdateHistoryPage() {
       type: "info",
       msg: "-------Begin Upload Operation " + operationindex + "-------\n",
     });
-    await postHistoryFile(file, ovd, csvSep, arraySep, floatSep);
+    await postHistoryFile(file, ovd, _csvSep, arraySep, floatSep);
     myLogs.PushLog({
       type: "info",
       msg: "-------End Upload Operation " + operationindex + "-------\n\n",
@@ -217,7 +217,6 @@ export default function UpdateHistoryPage() {
     }
     setValues(tmpVals);
   };
-
   return (
     <div className="page">
       <header className="page-header">Update Experiment History</header>
@@ -255,7 +254,8 @@ export default function UpdateHistoryPage() {
               <UpdateHistoryFileForm
                 postHistory={postHistory}
                 arraySepRef={arraySepRef}
-                csvSepRef={csvSepRef}
+                csvSep={csvSep}
+                setCsvSep={setCsvSep}
                 floatSepRef={floatSepRef}
                 ovdRef={ovdRef}
                 setCsvHeader={setCsvHeader}

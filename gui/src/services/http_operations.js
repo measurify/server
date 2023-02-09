@@ -1,4 +1,4 @@
-import { base_api_url } from "../config";
+import { base_api_url } from "../configManager";
 
 const axios = require("axios").default;
 
@@ -54,6 +54,7 @@ export function login(username, password, tenant, saveToken = true) {
           );
           localStorage.setItem("username", response.data.user.username);
           localStorage.setItem("user-role", response.data.user.type);
+          localStorage.setItem("user-email", response.data.user.email);
           localStorage.setItem("user-tenant", tenant);
           localStorage.setItem("login-time", new Date().getTime().toString());
         }
@@ -316,6 +317,9 @@ export async function get_generic(resource_type, qs = {}, token) {
   if (qs.page !== undefined) {
     url = url.concat("&page=" + qs.page);
   }
+  if (qs.select !== undefined && qs.length !== 0) {
+    url = url.concat('&select=["' + qs.select.join('","') + '"]');
+  }
 
   console.log("GET :" + url);
 
@@ -391,6 +395,78 @@ export async function get_one_generic(resource_type, id, token) {
   });
 }
 
+//function to request a password reset
+export async function requestPasswordReset(tenant, email) {
+  const url_string = api_url + "/self/reset?tenant=" + tenant;
+  const body = JSON.stringify({ email: email });
+  console.log("POST password reset request:" + url_string);
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache",
+    },
+  };
+  return new Promise((resolve, reject) => {
+    instance
+      .post(url_string, body, options)
+      .then((response) => {
+        resolve({ response: response }); //true;
+      })
+      .catch((error) => {
+        reject({ error: error }); //false;
+      });
+  });
+}
+
+//function to reset the password from token
+export async function resetPassword(tenant, token, password) {
+  const url_string = api_url + "/self";
+  console.log("PUT password reset:" + url_string);
+  const body = JSON.stringify({
+    reset: token,
+    password: password,
+    tenant: tenant,
+  });
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache",
+    },
+  };
+  return new Promise((resolve, reject) => {
+    instance
+      .put(url_string, body, options)
+      .then((response) => {
+        resolve({ response: response }); //true;
+      })
+      .catch((error) => {
+        reject({ error: error }); //false;
+      });
+  });
+}
+
+//get required password strength from the API
+export async function getPasswordStrength() {
+  const url_string = api_url + "/types/passwordStrength";
+  console.log("GET password strength:" + url_string);
+
+  const options = {
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache",
+    },
+  };
+  return new Promise((resolve, reject) => {
+    instance
+      .get(url_string, options)
+      .then((response) => {
+        resolve({ response: response }); //true;
+      })
+      .catch((error) => {
+        reject({ error: error }); //false;
+      });
+  });
+}
 //return the login token from the localstorage
 export function GetToken() {
   return localStorage.getItem("token");

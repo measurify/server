@@ -118,6 +118,6 @@ export function maintainEmptyElement(
       element = item;
     }
   }
-  tmpPtr.push(element);
+  if (element !== undefined) tmpPtr.push(element);
   return tmp;
 }

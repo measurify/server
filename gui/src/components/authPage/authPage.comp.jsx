@@ -4,16 +4,16 @@ import locale from "../../common/locale";
 import { login } from "../../services/http_operations";
 import { SetRoleDefinition } from "../../services/userRolesManagement";
 import { NavLink } from "react-router-dom";
-import { languages } from "../../config";
+import { languages } from "../../configManager";
 import "./authPage.scss";
 import { LanguageSelector } from "../languageSelector/languageSelector";
+import LogoHolder from "../logoHolder/logoHolder";
 import { Form, Container, Row, Col } from "react-bootstrap";
 const userRef = React.createRef();
 const pswRef = React.createRef();
 const tenantRef = React.createRef();
 
 const AuthPageComp = () => {
-  //const { location, replace } = useHistory();
   const [msg, setMsg] = useState("");
 
   async function submitForm(e) {
@@ -23,11 +23,11 @@ const AuthPageComp = () => {
     const psw = pswRef.current.value;
     const tenant = tenantRef.current.value;
     if (user === "") {
-      setMsg("Please, insert your username");
+      setMsg(locale().missing_username);
       return;
     }
     if (psw === "") {
-      setMsg("Please, insert your password");
+      setMsg(locale().missing_password);
       return;
     }
     try {
@@ -43,9 +43,7 @@ const AuthPageComp = () => {
   return (
     <div className="auth-page">
       <div className="title-wrapper">
-        <div className="title-section">Measurify</div>
-        <br />
-        <div className="subtitle-section">From the edge to cloud and back</div>
+        <LogoHolder />
       </div>
       {languages.length > 1 && (
         <div className="language-wrapper">
@@ -87,8 +85,13 @@ const AuthPageComp = () => {
             {locale().submit}
           </Button>
         </Form>
-        <br />
         <div style={{ color: "red" }}>{msg}</div>
+        <br />
+        <div className="form-row row">
+          <NavLink to={`/passwordrecovery`}>
+            {locale().forgot_password_link}
+          </NavLink>
+        </div>
         <br />
         <div className="form-row row">
           <NavLink to={`/add/tenants`}>

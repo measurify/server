@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import locale from "../../common/locale";
-import { addFields, addTypes } from "../../config";
+import { addFields, addTypes } from "../../configManager";
 import {
   post_generic,
   get_generic,
@@ -23,8 +23,7 @@ import {
   maintainEmptyElements,
 } from "../../services/objects_manipulation";
 import AppContext from "../../context";
-import { fetchedPageTypes, fetchedPageData } from "../../config";
-
+import { fetchedPageTypes, fetchedPageData } from "../../configManager";
 const cloneDeep = require("clone-deep");
 
 /*
@@ -77,29 +76,44 @@ export default function AddPage(props) {
   if (context !== undefined) myFetched = context.fetched;
   else myFetched = {};
 
-  /////////////FETCH REQUIRED RESOURCES
-  const fetchData = async (res) => {
-    if (myFetched.data[res] !== undefined) return;
-    // get the data from the api
-    try {
-      const response = await get_generic(res, { limit: 100 });
-      myFetched.UpdateData(
-        response.docs.map((e) => e._id),
-        res
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  };
   useEffect(() => {
+    /////////////FETCH REQUIRED RESOURCES
+    const fetchRequiredData = async (res) => {
+      if (myFetched.data[res] !== undefined) return;
+      // get the data from the api
+      try {
+        const response = await get_generic(res, {
+          limit: 100,
+          select: ["_id", "username", "name"],
+        });
+        myFetched.UpdateData(
+          response.docs.map((e) => {
+            return {
+              _id: e._id,
+              optionalLabel:
+                e.name !== undefined
+                  ? e.name
+                  : e.username !== undefined
+                  ? e.username
+                  : undefined,
+            };
+          }),
+          res
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
     if (fetchedPageData[resource] !== undefined) {
-      Object.values(fetchedPageData[resource]).forEach((e) => fetchData(e));
+      Object.values(fetchedPageData[resource]).forEach((e) =>
+        fetchRequiredData(e)
+      );
     }
   }, []);
 
   //useeffect to get resource if required
   useEffect(() => {
-    const fetchData = async (qs = {}) => {
+    const fetchSingle = async (qs = {}) => {
       // get the data from the api
       const response = await get_generic(resource, qs);
 
@@ -116,7 +130,7 @@ export default function AddPage(props) {
       return;
     const fst = { _id: searchParams.get("from") };
     const qs = { filter: JSON.stringify(fst) };
-    fetchData(qs);
+    fetchSingle(qs);
   }, [searchParams, resource]);
 
   //return if page shouldn't be rendered
@@ -188,7 +202,6 @@ export default function AddPage(props) {
     let tmpValues = cloneDeep(body);
     removeDefaultElements(tmpValues);
     let res;
-
     try {
       const resp = await post_generic(
         resource,
@@ -202,31 +215,29 @@ export default function AddPage(props) {
       console.log(error);
       res = error.error.response;
       console.log({
-        message: error.error.response.data.message,
-        details: error.error.response.data.details,
+        message: res.data.message,
+        details: res.data.details,
       });
 
       let det = "";
-      if (error.error.response.data.details.includes("duplicate key")) {
+      if (res.data.details.includes("duplicate key")) {
         det =
-          locale().duplicate_error +
+          locale().duplicate_resource_error +
           " " +
-          error.error.response.data.details.slice(
-            error.error.response.data.details.indexOf("{") + 1,
-            -1
-          );
+          res.data.details.slice(res.data.details.indexOf("{") + 1, -1);
       }
       //default case: show details from error message
       else {
-        det = error.error.response.data.details;
+        det = res.data.details;
       }
       //add details
-      setMsg(error.error.response.data.message + " : " + det);
+      setMsg(res.data.message + " : " + det);
       setIsError(true);
     }
 
     if (res.status === 200) {
-      window.alert("Resource successufully posted!");
+      if (resource !== "tenants") myFetched.RemoveData(resource);
+      window.alert(locale().resource_successfully_posted);
       navigate("/" + resource);
     }
   };
@@ -251,14 +262,28 @@ export default function AddPage(props) {
         setIsError(false);
       } catch (error) {
         console.log(error);
-
         res = error.error.response;
+        console.log({
+          message: error.error.response.data.message,
+          details: error.error.response.data.details,
+        });
+
+        let det = "";
+        if (error.error.response.data.details.includes("duplicate key")) {
+          det =
+            locale().duplicate_resource_error +
+            " " +
+            error.error.response.data.details.slice(
+              error.error.response.data.details.indexOf("{") + 1,
+              -1
+            );
+        }
+        //default case: show details from error message
+        else {
+          det = error.error.response.data.details;
+        }
         //add details
-        setMsg(
-          error.error.response.data.message +
-            " : " +
-            error.error.response.data.details
-        );
+        setMsg(error.error.response.data.message + " : " + det);
         setIsError(true);
       }
     }
@@ -271,18 +296,41 @@ export default function AddPage(props) {
       } catch (error) {
         console.log(error);
         res = error.error.response;
+        console.log({
+          message: error.error.response.data.message,
+          details: error.error.response.data.details,
+        });
+
+        let det = "";
+        if (
+          error.error.response.data.details !== undefined &&
+          error.error.response.data.details.includes("duplicate key")
+        ) {
+          det =
+            locale().duplicate_resource_error +
+            " " +
+            error.error.response.data.details.slice(
+              error.error.response.data.details.indexOf("{") + 1,
+              -1
+            );
+        } else if (
+          error.error.response.data.details === undefined &&
+          error.error.response.data.message.includes("Unexpected token")
+        ) {
+          det = locale().generic_file_post_error;
+        }
+        //default case: show details from error message
+        else {
+          det = error.error.response.data.details;
+        }
         //add details
-        setMsg(
-          error.error.response.data.message +
-            " : " +
-            error.error.response.data.details
-        );
+        setMsg(error.error.response.data.message + " : " + det);
         setIsError(true);
       }
     }
 
     if (res.status === 200) {
-      window.alert("Resource posted correctly");
+      window.alert(locale().resource_successfully_posted);
       navigate("/" + resource);
     }
   };
@@ -359,6 +407,8 @@ export default function AddPage(props) {
                 contentPlain={contentPlain}
                 contentHeader={contentHeader}
                 contentBody={contentBody}
+                setMsg={setMsg}
+                setIsError={setIsError}
               />
               <font
                 style={{

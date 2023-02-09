@@ -5,8 +5,13 @@ import { Button, Form, Accordion, Container, Row, Col } from "react-bootstrap";
 
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import Box from "@mui/material/Box";
 import AppContext from "../../context";
-import { fetchedPageTypes, fetchedPageData, guidelines } from "../../config";
+import {
+  fetchedPageTypes,
+  fetchedPageData,
+  guidelines,
+} from "../../configManager";
 
 /////////form width constant variables
 //row name
@@ -59,7 +64,6 @@ export const FormManager = (props) => {
   const NumericFormRow = (key) => {
     return (
       <Row
-        key={key}
         style={{
           borderBottomStyle: "solid",
           borderBottomWidth: 1 + "px",
@@ -109,7 +113,6 @@ export const FormManager = (props) => {
   const StringFormRow = (key) => {
     return (
       <Row
-        key={key}
         style={{
           borderBottomStyle: "solid",
           borderBottomWidth: 1 + "px",
@@ -129,7 +132,13 @@ export const FormManager = (props) => {
         <Col sm={stringWidth}>
           <Form.Group className="mb-3">
             <Form.Control
-              type={key === "password" ? "password" : "text"}
+              type={
+                key === "password"
+                  ? "password"
+                  : key === "email"
+                  ? "email"
+                  : "text"
+              }
               id={key}
               onChange={(e) => {
                 e.preventDefault();
@@ -159,7 +168,6 @@ export const FormManager = (props) => {
   const BooleanFormRow = (key) => {
     return (
       <Row
-        key={key}
         style={{
           borderBottomStyle: "solid",
           borderBottomWidth: 1 + "px",
@@ -214,7 +222,6 @@ export const FormManager = (props) => {
     }
     return (
       <Row
-        key={key}
         style={{
           borderBottomStyle: "solid",
           borderBottomWidth: 1 + "px",
@@ -234,18 +241,40 @@ export const FormManager = (props) => {
         <Col sm={selectWidth}>
           <Form.Group className="mb-3">
             <Autocomplete
-              id={key}
+              disableClearable
               onChange={(e, newValue) => {
                 e.preventDefault();
-                props.handleChangesCallback(newValue, [key]);
+                if (newValue === "" || newValue === null)
+                  props.handleChangesCallback("", [key]);
+                else props.handleChangesCallback(newValue._id, [key]);
               }}
               disabled={
                 props.disabledFields[key] !== undefined
                   ? props.disabledFields[key]
                   : false
               }
-              value={props.values[key] === "" ? null : props.values[key]}
+              value={
+                props.values[key] === ""
+                  ? null
+                  : options.filter((e) => e._id === props.values[key])[0]
+              }
               options={options}
+              getOptionLabel={(option) => {
+                return option.optionalLabel !== undefined
+                  ? option.optionalLabel
+                  : option._id;
+              }}
+              renderOption={(props, option) => (
+                <Box
+                  component="li"
+                  sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                  {...props}
+                >
+                  {option.optionalLabel !== undefined
+                    ? option.optionalLabel
+                    : option._id}
+                </Box>
+              )}
               renderInput={(params) => (
                 <TextField {...params} label={locale().enter + " " + key} />
               )}
@@ -264,7 +293,6 @@ export const FormManager = (props) => {
           borderBottomWidth: 1 + "px",
           marginBottom: 5 + "px",
         }}
-        key={key}
       >
         <Col
           sm={rowNameWidth}
@@ -729,7 +757,7 @@ export const FormManager = (props) => {
     if (myFetched !== {} && myFetched.data[key] !== undefined) {
       options = myFetched.data[key];
     }
-
+    const allowedVal = options !== undefined ? options.map((e) => e._id) : [];
     return (
       <Row
         style={{
@@ -737,7 +765,6 @@ export const FormManager = (props) => {
           borderBottomWidth: 1 + "px",
           marginBottom: 5 + "px",
         }}
-        key={key}
       >
         <Col
           sm={rowNameWidth}
@@ -784,22 +811,64 @@ export const FormManager = (props) => {
                     <Form.Group className="mb-3">
                       {myFetched.data[key] !== undefined ? (
                         <Autocomplete
+                          disableClearable
                           disabled={
                             props.disabledFields[key] !== undefined
                               ? props.disabledFields[key]
                               : false
                           }
                           id={key}
+                          onBlur={(e) => {
+                            if (e.target.value === "") {
+                              e.preventDefault();
+                              props.arrayDeleteCallback([key, index]);
+                            }
+                          }}
+                          onInputChange={(e) => {
+                            if (e === null) return;
+                            e.preventDefault();
+                            if (e.target.value === 0) return;
+                            props.handleChangesCallback(e.target.value, [
+                              key,
+                              index,
+                            ]);
+                          }}
                           onChange={(e, newValue) => {
                             e.preventDefault();
-                            props.handleChangesCallback(newValue, [key, index]);
+                            if (newValue === "" || newValue === null)
+                              props.handleChangesCallback("", [key, index]);
+                            else
+                              props.handleChangesCallback(newValue._id, [
+                                key,
+                                index,
+                              ]);
                           }}
                           value={
-                            props.values[key][index] === ""
+                            value === ""
                               ? null
-                              : props.values[key][index]
+                              : allowedVal.includes(value)
+                              ? options.filter((e) => e._id === value)[0]
+                              : value
                           }
                           options={options}
+                          getOptionLabel={(option) => {
+                            return option.optionalLabel !== undefined
+                              ? option.optionalLabel
+                              : option._id !== undefined
+                              ? option._id
+                              : option;
+                          }}
+                          renderOption={(props, option) => (
+                            <Box
+                              component="li"
+                              sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                              {...props}
+                            >
+                              {option.optionalLabel !== undefined
+                                ? option.optionalLabel
+                                : option._id}
+                            </Box>
+                          )}
                           renderInput={(params) => (
                             <TextField
                               {...params}
@@ -817,6 +886,12 @@ export const FormManager = (props) => {
                               ? props.disabledFields[key]
                               : false
                           }
+                          onBlur={(e) => {
+                            if (e.target.value === "") {
+                              e.preventDefault();
+                              props.arrayDeleteCallback([key, index]);
+                            }
+                          }}
                           onChange={(e) => {
                             e.preventDefault();
                             props.handleChangesCallback(e.target.value, [
@@ -994,9 +1069,7 @@ export const FormManager = (props) => {
                     <Col sm={deleteArrayWidth}>
                       <Button
                         disabled={
-                          props.disabledFields[key] !== undefined
-                            ? props.disabledFields[key]
-                            : false
+                          props.disabledFields[key] !== undefined ? true : false
                         }
                         variant="link"
                         size="sm"
@@ -1164,7 +1237,10 @@ export const FormManager = (props) => {
                         return (
                           <Accordion
                             defaultActiveKey="0"
-                            style={{ paddingBottom: 10 + "px", width: "auto" }}
+                            style={{
+                              paddingBottom: 10 + "px",
+                              width: "auto",
+                            }}
                           >
                             <Accordion.Item eventKey="0">
                               <Accordion.Header>
@@ -1377,7 +1453,10 @@ export const FormManager = (props) => {
                         return (
                           <Accordion
                             defaultActiveKey="0"
-                            style={{ paddingBottom: 10 + "px", width: "auto" }}
+                            style={{
+                              paddingBottom: 10 + "px",
+                              width: "auto",
+                            }}
                           >
                             <Accordion.Item eventKey="0">
                               <Accordion.Header>

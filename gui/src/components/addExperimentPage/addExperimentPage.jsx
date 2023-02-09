@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import locale from "../../common/locale";
-import { addFields, addTypes } from "../../config";
+import { addFields, addTypes } from "../../configManager";
 import {
   post_generic,
   get_generic,
@@ -24,6 +24,7 @@ import {
   maintainEmptyElements,
 } from "../../services/objects_manipulation";
 import ImportExportValues from "../importExportValues/importExportValues";
+import { FormatDate } from "../../services/misc_functions";
 
 const cloneDeep = require("clone-deep");
 /*
@@ -84,7 +85,7 @@ export default function AddExperimentPage(props) {
 
       setProtocols(response.docs.map((e) => e._id));
     };
-    const qs = { limit: 100 };
+    const qs = { limit: 100, select: ["_id", "metadata", "topics"] };
     fetchData(qs);
   }, [props, searchParams]);
 
@@ -109,6 +110,12 @@ export default function AddExperimentPage(props) {
 
       tmpValues = sortObject(data, tmpValues);
 
+      Object.entries(tmpValues).forEach((e) => {
+        if (e[0].toLowerCase().includes("date")) {
+          tmpValues[e[0]] = FormatDate(e[1]);
+        }
+      });
+
       //add "_copy" to id to avoid duplicate key error
 
       tmpValues["_id"] = tmpValues["_id"] + "_copy";
@@ -120,7 +127,10 @@ export default function AddExperimentPage(props) {
     if (searchParams.get("from") === null || searchParams.get("from") === "")
       return;
     const fst = { _id: searchParams.get("from") };
-    const qs = { filter: JSON.stringify(fst) };
+    const qs = {
+      filter: JSON.stringify(fst),
+      select: ["_id", "metadata", "topics"],
+    };
     fetchDataDuplicate(qs);
   }, [searchParams, resource]);
 
@@ -256,6 +266,17 @@ export default function AddExperimentPage(props) {
       setIsError(true);
       return;
     }
+    //convert date to avoid issues with timezone (with GMT+ X timezones, results in a wrong date)
+    if (tmpValues["startDate"] !== undefined) {
+      const dt = new Date(tmpValues["startDate"]);
+      var timestamp = dt.getTime() - dt.getTimezoneOffset() * 60000;
+      tmpValues["startDate"] = new Date(timestamp).toISOString();
+    }
+    if (tmpValues["endDate"] !== undefined) {
+      const dt = new Date(tmpValues["endDate"]);
+      var timestamp = dt.getTime() - dt.getTimezoneOffset() * 60000;
+      tmpValues["endDate"] = new Date(timestamp).toISOString();
+    }
 
     let res;
     try {
@@ -278,7 +299,7 @@ export default function AddExperimentPage(props) {
       let det = "";
       if (error.error.response.data.details.includes("duplicate key")) {
         det =
-          locale().duplicate_error +
+          locale().duplicate_resource_error +
           " " +
           error.error.response.data.details.slice(
             error.error.response.data.details.indexOf("{") + 1,
@@ -308,6 +329,7 @@ export default function AddExperimentPage(props) {
     try {
       const imported = JSON.parse(importedValues);
       const template = cloneDeep(values);
+      if (imported["state"] === null) imported["state"] = NaN;
 
       template["protocol"] = "";
       template["metadata"] = [{ name: "", value: "" }];
@@ -358,14 +380,28 @@ export default function AddExperimentPage(props) {
         setIsError(false);
       } catch (error) {
         console.log(error);
-
         res = error.error.response;
+        console.log({
+          message: error.error.response.data.message,
+          details: error.error.response.data.details,
+        });
+
+        let det = "";
+        if (error.error.response.data.details.includes("duplicate key")) {
+          det =
+            locale().duplicate_resource_error +
+            " " +
+            error.error.response.data.details.slice(
+              error.error.response.data.details.indexOf("{") + 1,
+              -1
+            );
+        }
+        //default case: show details from error message
+        else {
+          det = error.error.response.data.details;
+        }
         //add details
-        setMsg(
-          error.error.response.data.message +
-            " : " +
-            error.error.response.data.details
-        );
+        setMsg(error.error.response.data.message + " : " + det);
         setIsError(true);
       }
     }
@@ -378,12 +414,36 @@ export default function AddExperimentPage(props) {
       } catch (error) {
         console.log(error);
         res = error.error.response;
+        console.log({
+          message: error.error.response.data.message,
+          details: error.error.response.data.details,
+        });
+
+        let det = "";
+        if (
+          error.error.response.data.details !== undefined &&
+          error.error.response.data.details.includes("duplicate key")
+        ) {
+          det =
+            locale().duplicate_resource_error +
+            " " +
+            error.error.response.data.details.slice(
+              error.error.response.data.details.indexOf("{") + 1,
+              -1
+            );
+        } else if (
+          error.error.response.data.details === undefined &&
+          error.error.response.data.message.includes("Unexpected token")
+        ) {
+          det =
+            "The selected file cannot be uploaded because it contains errors.";
+        }
+        //default case: show details from error message
+        else {
+          det = error.error.response.data.details;
+        }
         //add details
-        setMsg(
-          error.error.response.data.message +
-            " : " +
-            error.error.response.data.details
-        );
+        setMsg(error.error.response.data.message + " : " + det);
         setIsError(true);
       }
     }
@@ -433,27 +493,32 @@ export default function AddExperimentPage(props) {
             height: "fit-content",
           }}
         >
-          {postType === "form" && (
-            <ImportExportValues
-              values={values}
-              importValues={importValues}
-              importMsg={importMsg}
-            />
-          )}
+          {postType === "form" &&
+            (searchParams.get("from") === null ||
+              searchParams.get("from") === "") && (
+              <ImportExportValues
+                values={values}
+                importValues={importValues}
+                importMsg={importMsg}
+              />
+            )}
           {postType === "form" && protocols !== undefined && (
             <div style={{ margin: 5 + "px" }}>
-              <Form.Select
-                aria-label={locale().select + " protocol"}
-                onChange={handleProtocolChange}
-                value={values["protocol"]}
-              >
-                <option>{locale().select} protocol</option>
-                {React.Children.toArray(
-                  protocols.map((e) => {
-                    return <option value={e}>{e}</option>;
-                  })
-                )}
-              </Form.Select>
+              {(searchParams.get("from") === null ||
+                searchParams.get("from") === "") && (
+                <Form.Select
+                  aria-label={locale().select + " protocol"}
+                  onChange={handleProtocolChange}
+                  value={values["protocol"]}
+                >
+                  <option>{locale().select} protocol</option>
+                  {React.Children.toArray(
+                    protocols.map((e) => {
+                      return <option value={e}>{e}</option>;
+                    })
+                  )}
+                </Form.Select>
+              )}
               <br />
               <FormManager
                 values={values}
@@ -487,6 +552,8 @@ export default function AddExperimentPage(props) {
                 contentPlain={contentPlain}
                 contentHeader={contentHeader}
                 contentBody={contentBody}
+                setMsg={setMsg}
+                setIsError={setIsError}
               />
               <font
                 style={{

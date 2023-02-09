@@ -7,9 +7,13 @@ let roleCache = undefined;
 export async function SetRoleDefinition() {
   const role = localStorage.getItem("user-role");
   if (role === null || role === undefined || role === "") return;
-  const response = await get_one_generic("roles", role);
-  if (response !== undefined)
-    localStorage.setItem("role", JSON.stringify(response.response.data));
+  try {
+    const response = await get_one_generic("roles", role);
+    if (response !== undefined)
+      localStorage.setItem("role", JSON.stringify(response.response.data));
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 //check if an user is allowed to do a specific action
@@ -17,7 +21,6 @@ export async function SetRoleDefinition() {
 export function canDo(userRole, resource, actionCRUD) {
   //check if cache-like variable is set
   if (roleCache === undefined) {
-    console.log("Cache undefined");
     //get role from localstorage (saved there after login)
     const tmp = localStorage.getItem("role");
 
@@ -28,7 +31,6 @@ export function canDo(userRole, resource, actionCRUD) {
     //if role was found from the localstorage, set the cache-like variable
     roleCache = JSON.parse(tmp);
   }
-  console.log("roleCache is being used");
 
   //check if action list is not empty
   if (roleCache.actions.length !== 0) {
