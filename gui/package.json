@@ -33,7 +33,7 @@
     "react-infinite-scroll-component": "^5.0.4",
     "react-loading-skeleton": "^2.0.1",
     "react-router-dom": "^6.3.0",
-    "react-scripts": "4.0.3",
+    "react-scripts": "5.0.1",
     "request-promise": "^4.2.6",
     "sass": "^1.48.0",
     "typescript": "^3.7.4"
