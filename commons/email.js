@@ -21,7 +21,8 @@ exports.send = async function(message) {
       to: message.to,
       subject: process.env.EMAIL_TAG + ' ' + message.subject,
       text: message.text,
-      html: message.html
+      html: message.html,
+      //path: '../sendmail/sendmail' //on windows 
    };
    //console.log(transporter)
    let email;
