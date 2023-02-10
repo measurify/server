@@ -135,7 +135,7 @@ exports.reset = async (req, res) => {
     if(!user) return errors.manage(res, errors.resource_not_found,"User with the email "+ req.body.email+  " not found");
     const request = { user: user._id, status: PasswordResetStatusTypes.valid , created: Date.now() };
     const reset = await (new PasswordReset(request)).save();
-    const url = req.protocol + '://' + req.get('host')
+    const url = req.protocol + '://' + req.get('host');
     const emailSent = await email.send(messages.reset(url, user, reset._id));
     console.log(emailSent);
     return res.status(200).json({message: 'request sent'}); 
