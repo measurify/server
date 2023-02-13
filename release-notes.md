@@ -49,3 +49,10 @@
 2023.02.06
 
 + Now device can post measurements with a token given at device creation without do a login with user credential
+
+## Version 0.6.6
+
+2023.02.13
+
++ Added description and tags fields for items in feature
+
