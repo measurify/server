@@ -33,7 +33,7 @@
   "homepage": "https://github.com/measurify/server.git",
   "dependencies": {
     "@nearform/clinic-doctor": "^2.6.1",
-    "@nearform/doctor": "^4.0.6",
+    "@nearform/doctor": "^8.1.0",
     "@types/mongoose-geojson-schema": "^2.1.6",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.0",
