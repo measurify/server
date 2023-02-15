@@ -9,7 +9,9 @@ const itemSchema = new mongoose.Schema({
     unit: { type: String, required: "Please, supply a unit" },
     dimension: { type: Number, default: 0 },
     type: { type: String, enum: ItemTypes, default: ItemTypes.number }, 
-    range: {type:[ String ], default:[] }},
+    range: {type:[ String ], default:[] },
+    description : {type:String},
+    tags: { type: [String], ref:'Tag' }},
     { _id: false }  
 );
 
