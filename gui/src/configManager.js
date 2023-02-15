@@ -9,9 +9,9 @@ import Complete_configuration from "./configs/complete_config";
 //then add the import in this file and edit the LoadConfig function to load the desired configuration when required
 
 //base url of APIs (define it as undefined if you want to use the url where the GUI is actually hosted)
-export const base_api_url = "https://localhost/v1";
+//export const base_api_url = "https://localhost/v1";
 //export const base_api_url = "https://hi-drive.measurify.org/v1";
-//export const base_api_url = undefined;
+export const base_api_url = undefined;
 
 //name of this dashboard, shown to users
 export const website_name = "CDB Dashboard";
