@@ -336,7 +336,6 @@ export async function get_generic(resource_type, qs = {}, token) {
     instance
       .get(url, options)
       .then((response) => {
-        console.log(response.data.docs);
         resolve({
           response: response,
           docs: response.data.docs,
@@ -398,11 +397,6 @@ export async function get_one_generic(resource_type, id, token) {
 
 //function to request a password reset
 export async function requestPasswordReset(tenant, email) {
-<<<<<<< HEAD
-  console.log({ email, tenant });
-
-=======
->>>>>>> master
   const url_string = api_url + "/self/reset?tenant=" + tenant;
   const body = JSON.stringify({ email: email });
   console.log("POST password reset request:" + url_string);

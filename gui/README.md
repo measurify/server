@@ -26,7 +26,7 @@ To use this GUI from source, both for standalone application or to build it insi
 To run as standalone application, use the instructions to run a react app on the [React website](https://reactjs.org).
 
 - GUI requirements must be installed : _npm install_
-- GUI have to be started or built: _npm start_ (will run the React application and it can be reached from http://localhost:3000 )
+- GUI have to be started or built: _npm start_ (will run the React application and it c an be reached from http://localhost:3000 )
 
 ## Built in Measurify
 
