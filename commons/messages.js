@@ -20,7 +20,6 @@ exports.reset = function(url, user, reset) {
                         html: 'Welcome ' + user.username + ', <br>' +
                               'to change your password, please click on this link and choose the new password: <br>' + link
                         };
-      console.log(message);
       return message;
 };
 

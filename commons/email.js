@@ -15,7 +15,6 @@ const transporter = nodemailer.createTransport({
 });
 
 exports.send = async function(message) {
-   console.log(message)
    const options = {
       from: process.env.SMTP_EMAIL,
       to: message.to,
@@ -33,7 +32,6 @@ exports.send = async function(message) {
         console.log({err:err, info:info});
       }
     });}
-   console.log(email)
    //await new Email(email).save();
    return email;
 };

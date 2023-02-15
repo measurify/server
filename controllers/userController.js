@@ -137,7 +137,6 @@ exports.reset = async (req, res) => {
     const reset = await (new PasswordReset(request)).save();
     const url = req.protocol + '://' + req.get('host');
     const emailSent = await email.send(messages.reset(url, user, reset._id));
-    console.log(emailSent);
     return res.status(200).json({message: 'request sent'}); 
 };
 
