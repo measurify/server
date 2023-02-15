@@ -145,12 +145,6 @@ export default function EditContentPage(props) {
           else {
             const entr = Object.entries(value);
             for (let j = 0; j < entr.length; j++) {
-              console.log({
-                value,
-                k: entr[j][0],
-                v: entr[j][1],
-                val: tmpValues[key],
-              });
               //check if the subkey is in values, in case of array i trust the configuration
               if (
                 Array.isArray(tmpValues[key]) === false &&

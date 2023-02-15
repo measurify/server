@@ -266,6 +266,17 @@ export default function AddExperimentPage(props) {
       setIsError(true);
       return;
     }
+    //convert date to avoid issues with timezone (with GMT+ X timezones, results in a wrong date)
+    if (tmpValues["startDate"] !== undefined) {
+      const dt = new Date(tmpValues["startDate"]);
+      var timestamp = dt.getTime() - dt.getTimezoneOffset() * 60000;
+      tmpValues["startDate"] = new Date(timestamp).toISOString();
+    }
+    if (tmpValues["endDate"] !== undefined) {
+      const dt = new Date(tmpValues["endDate"]);
+      var timestamp = dt.getTime() - dt.getTimezoneOffset() * 60000;
+      tmpValues["endDate"] = new Date(timestamp).toISOString();
+    }
 
     let res;
     try {

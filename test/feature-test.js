@@ -77,6 +77,33 @@ describe('/POST feature', () => {
         res.body.items.length.should.be.eql(3);
     });
 
+    it('it should POST a feature with description e tags', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);        
+        const tag1 = await factory.createTag("tag1", user);
+        const tag2 = await factory.createTag("tag2", user);
+        const feature = {
+            _id: "feature-name-text",
+            items: [
+                { name: "item-name-1", unit: "item-unit-1", description:"description1",tags:[tag1,tag2] },
+                { name: "item-name-2", unit: "item-unit-2", description:"description2",tags:[tag1] },
+                { name: "item-name-3", unit: "item-unit-3", description:"description3",tags:[tag2] }
+            ]
+        }
+        const res = await chai.request(server).keepOpen().post('/v1/features').set("Authorization", await factory.getUserToken(user)).send(feature)
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('_id');
+        res.body.should.have.property('items');
+        res.body._id.should.be.eql(feature._id);
+        res.body.items.length.should.be.eql(3);
+        res.body.items[0].description.should.be.eql("description1");
+        res.body.items[0].tags.length.should.be.eql(2);
+        res.body.items[1].description.should.be.eql("description2");
+        res.body.items[1].tags.length.should.be.eql(1);
+        res.body.items[2].description.should.be.eql("description3");
+        res.body.items[2].tags.length.should.be.eql(1);
+    });
+
     it('it should POST a feature with an enum item ', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = {

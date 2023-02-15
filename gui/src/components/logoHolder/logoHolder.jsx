@@ -9,7 +9,11 @@ export default function LogoHolder() {
       <div className="logo-section">
         <Logo />
       </div>
+<<<<<<< HEAD
       <div className="title-section">Consolidated Database Dashboard</div>
+=======
+      <div className="title-section">Measurify</div>
+>>>>>>> master
       <br />
       <div className="subtitle-section">
         Powered by&nbsp;

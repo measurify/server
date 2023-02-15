@@ -16,7 +16,9 @@ exports.reset = function(url, user, reset) {
                         subject: 'New password request!',
                         text: 'Welcome ' + user.username + ', \n\xA0' + 
                               'to change your password, please click on this link and choose the new password' + '\n\xA0' + 
-                              link + '\n\xA0'
+                              link + '\n\xA0',
+                        html: 'Welcome ' + user.username + ', <br>' +
+                              'to change your password, please click on this link and choose the new password: <br>' + link
                         };
       return message;
 };

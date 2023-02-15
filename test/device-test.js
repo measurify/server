@@ -131,11 +131,12 @@ describe('/POST device', () => {
             owner: user,
             features: [await factory.createFeature("test-device-1-feature", user)]
         }
-        const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device)
+        const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(device);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('_id');
         res.body.should.have.property('features');
+        res.body.should.have.property('token');
         res.body._id.should.be.eql(device._id);
         res.body.features.length.should.be.eql(1);
     });
@@ -177,11 +178,13 @@ describe('/POST device', () => {
                             { _id: "test-device-3", owner: user, features: [await factory.createFeature("test-device-3-feature-1", user)] },
                             { _id: "test-device-4", features: [await factory.createFeature("test-device-4-feature-2", user)] }
                         ];
-        const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(devices)
+        const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getUserToken(user)).send(devices);
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.devices[0]._id.should.be.eql(devices[0]._id);
         res.body.devices[1]._id.should.be.eql(devices[1]._id);
+        res.body.devices[0].should.have.property('token');
+        res.body.devices[1].should.have.property('token');
     });
 
     it('it should POST only not existing devices from a list', async () => {
@@ -227,6 +230,22 @@ describe('/POST device', () => {
         res.body._id.should.be.eql(device._id);
         res.body.tags.length.should.be.eql(1);
     });
+
+    it('it should not POST a device with a token device', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const device = await factory.createDevice("test-device-1", user);
+        const device2 = {
+            _id: "test-device-2",
+            owner: user,
+            features: [await factory.createFeature("test-device-2-feature-2", user)]
+        }
+        const res = await chai.request(server).keepOpen().post('/v1/devices').set("Authorization", await factory.getDeviceToken(device)).send(device);
+        res.should.have.status(errors.restricted_access_operation.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.restricted_access_operation.message);
+        res.body.details.should.contain('Device cannot do post operation on the resource Device');
+    });
 });
 
 
@@ -240,7 +259,6 @@ describe('/POST device from file', () => {
         const feature4 = await factory.createFeature("feature4", user);
         const testFile = './test/dummies/Device_test.csv';
         const res = await chai.request(server).keepOpen().post('/v1/devices/file').attach('file', testFile).set("Authorization", await factory.getUserToken(user));
-        //console.log(res)
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('devices');
@@ -328,6 +346,22 @@ describe('/DELETE device', () => {
         res.body.message.should.contain(errors.already_used.message);
         const devices_after = await before.Device.find();
         devices_after.length.should.be.eql(1);
+    });
+
+    it('it should not Delete a device with a token device', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const device = await factory.createDevice("test-device-1", user);
+        const device2 = await factory.createDevice("test-device-2", user);
+        const devices_before = await before.Device.find();
+        devices_before.length.should.be.eql(2);
+        const res = await chai.request(server).keepOpen().delete('/v1/devices/' + device2._id).set("Authorization", await factory.getDeviceToken(device));
+        const devices_after = await before.Device.find();
+        devices_after.length.should.be.eql(2);
+        res.should.have.status(errors.restricted_access_operation.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.restricted_access_operation.message);
+        res.body.details.should.contain('Device cannot do delete operation on the resource Device');
     });
 });
 
@@ -516,5 +550,19 @@ describe('/PUT device', () => {
         res.should.have.status(errors.resource_not_found.status);
         res.body.should.be.a('object');
         res.body.message.should.contain(errors.resource_not_found.message);
+    });
+
+    it('it should not PUT a device with a token device', async () => {
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const feature = await factory.createFeature("test-feature-1", user);
+        const device = await factory.createDevice("test-device-1", user, [feature]);
+        const device2 = await factory.createDevice("test-device-2", user, [feature]);
+        const request = { visibility: VisibilityTypes.public };
+        const res = await chai.request(server).keepOpen().put('/v1/devices/' + device2._id).set("Authorization", await factory.getDeviceToken(device)).send(request);       
+        res.should.have.status(errors.restricted_access_operation.status);
+        res.body.should.be.a('object');
+        res.body.message.should.be.a('string');
+        res.body.message.should.contain(errors.restricted_access_operation.message);
+        res.body.details.should.contain('Device cannot do put operation on the resource Device');
     });
 });

@@ -119,7 +119,7 @@ _npm run build-win_ and _npm run build-mac_ are batch instructions to build and 
 ## Deploy
 
 The Measurify API Sever is developed using [Node JS](https://nodejs.org/en/) and [MongoDB](https://www.mongodb.com/). 
-There is a configuration file **\init\variable.env** which can be edited in order to specify several features:
+There is a configuration file template **\init\variablesTemplate.env** that should be renamed in **\init\variables.env** and can be edited in order to specify several features:
 
     VERSION=v1
     EMAIL=noreply@measurify.org
@@ -131,6 +131,7 @@ There is a configuration file **\init\variable.env** which can be edited in orde
     API_TOKEN=ifhidhfudshuf8
     JWT_SECRET=fdshudshfidsuh
     JWT_EXPIRATIONTIME=30m
+    JWT_RENEW_EXPIRATIONTIME=50m
     DATABASE=mongodb://127.0.0.1:27017/measurify-catalog
     FIREBASE_URL=https://measurify.firebaseio.com
     DEMO=true
@@ -145,7 +146,12 @@ There is a configuration file **\init\variable.env** which can be edited in orde
     DEFAULT_TENANT_ADMIN_USERNAME=admin
     DEFAULT_TENANT_ADMIN_TEMPORARY_PASSWORD=admin
     DEFAULT_TENANT_PASSWORDHASH=true
+    DEFAULT_TENANT_EMAIL=@
+    DEFAULT_TENANT_DEMO=demo-tenant
+    COMPUTATION_BUNCH_SIZE=3
     CACHE_TIME=1000
+    MIN_PASSWORD_STRENGTH=1
+    DEFAULT_DAYS_VALIDITY_PASSWORD=1092
 
 In particular, the connection string with the database and administrator credential (at startup the server will create a admin user with these credential), the expiration time of tokens, the log level, the secret word for the HTTPS certificate file, the secret word for the JWT token.
 

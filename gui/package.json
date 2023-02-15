@@ -1,6 +1,7 @@
 {
-  "name": "measurify-admin-dashboard",
-  "version": "0.1.0",
+  "name": "measurify-dashboard",
+  "description": "Measurify Dashboard is Graphical User Interface (GUI) is developed to support a Measurify instance. This GUI can be installed within the Measurify source code (to run on the same machine) or be configured to communicate with a remote Measurify instance.",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.10.4",
