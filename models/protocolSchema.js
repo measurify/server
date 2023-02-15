@@ -9,7 +9,8 @@ const metadataSchema = new mongoose.Schema({
     name: { type: String, required: "Please, supply a name" },
     description: {type: String},
     type: { type: String, enum: MetadataTypes, default: MetadataTypes.scalar },
-    range: {type:[ String ], default:[]} },
+    range: {type:[ String ], default:[]},
+    unit: { type: String}},
     { _id: false }  
 );
 
@@ -24,6 +25,7 @@ const fieldSchema = new mongoose.Schema({
 const topicSchema = new mongoose.Schema({ 
     name: { type: String, required: "Please, supply a name" },
     description: {type: String},
+    unit: { type: String},
     fields: [ fieldSchema ], },
     { _id: false } 
 );
