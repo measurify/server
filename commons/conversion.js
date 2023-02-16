@@ -323,7 +323,7 @@ exports.replaceSeparatorsGet = function (data, query, res) {
     data = data.replace(/§/g, sepFloat);
     return [data, null];
 }
-
+//OLD
 exports.getGroups = function (experiment, protocol, query) {
     let groupFilter=undefined;
     if (query.groups !== undefined && query.groups.length !== 0) {// ?groups=["topic1","topic2"]
@@ -350,3 +350,35 @@ exports.getGroups = function (experiment, protocol, query) {
 
     return [body, null];
 }
+
+
+/*//NEW //Get groups of topics (all or selected by query) and also the description, unit and values for each step 
+exports.getGroups = function (experiment, protocol, query) {
+    let groupFilter = undefined;
+    if (query.groups !== undefined && query.groups.length !== 0) {// ?groups=["topic1","topic2"]
+        groupFilter = JSON.parse(query.groups);//filter
+    }
+    const body = {
+        "_id": experiment._id,
+        "history": experiment.history.map(step => ({
+            "step": step.step,//for each step
+            "groups": {//groupName from protocol:{ field1:value, field2:value...}
+                ...protocol.topics.reduce((acc, topic) => {
+                    if (groupFilter === undefined || groupFilter.includes(topic.name)) {
+                        acc[topic.name] = {unit: topic.unit,  description: topic.description};
+                        acc[topic.name].values = topic.fields.reduce((fieldsAcc, field) => {
+                            let fieldValue = undefined;
+                            try { fieldValue = step.fields.find(stepField => stepField.name === field.name).value } catch (error) { };
+                            fieldsAcc[field.name] = fieldValue;
+                            return fieldsAcc;
+                        }, {})
+                    }
+                    return acc;
+                }, {})
+            }
+        }))
+    };
+
+    return [body, null];
+}
+*/
