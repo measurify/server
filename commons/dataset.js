@@ -112,7 +112,7 @@ exports.datauploadCheckAndCreate = async function (
 
   //check rights
   //let result = await checker.canCreate(req, res); 
-  let result = await checker.canOperate(req, res,"Dataupload"); 
+  let result = await checker.canOperate(req, res, "Dataupload");
   if (result != true)
     return [errors.manage(res, errors.restricted_access_create), null];
   result = await checker.hasRightsToCreate(req, res, [
@@ -410,21 +410,30 @@ exports.sampleLoop = async function (descriptionDataCleaned, line, feature) {
             continue;
           }
         }
-      } else if (feature.items[k].type == "string") {
-        if (typeof myVar != "string") {
+      } else if (feature.items[k].type == "text") {
+        if (typeof str_val != "string") {
           errMessage = "expected string in samples at position " + k;
           return [null, errMessage];
         }
-      } else {
+      }else if (feature.items[k].type == "enum") {
+        if (typeof str_val != "string") {          
+          errMessage = "expected string in samples at position " + k;
+          return [null, errMessage];}
+        if( !feature.items[k].range.includes(str_val)){          
+          errMessage = "the enum "+str_val+" is not in the rage of items "+feature.items[k].name +" in row " + k;
+          return [null, errMessage];}
+        
+      }
+       else {
         errMessage =
-          "error in the definition of the feature on the database, value.type is not a number or string";
+          "error in the definition of the feature on the database, value.type is not a number or string "+feature.items[k].type;
         return [null, errMessage];
       }
       samples.push(str_val);
     }
   }
   if (samples.every(element => element === null)) {
-    errMessage ="All items of the feature are null";
+    errMessage = "All items of the feature are null";
     return [null, errMessage];
   }
   return [samples, null];
@@ -478,7 +487,7 @@ exports.principalLoop = async function (
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   //TEST OTTIMIZZAZIONE let allMeasurementBody=[];
   //algorithm for check every line of the csv and save the value inside a measurement
-  
+
   for (let i in lines) {
     if (lines[i] == "") continue;
     if ((i == 0) & (header == true)) continue;
@@ -502,7 +511,7 @@ exports.principalLoop = async function (
       featureName = descriptionDataCleaned.commonElements["feature"];
       featureInfo = await Feature.findById(featureName);
     } else {
-      featureName = line[descriptionDataCleaned.feature].replace(/['"]+/g,"");
+      featureName = line[descriptionDataCleaned.feature].replace(/['"]+/g, "");
 
       featureInfo = await Feature.findById(featureName);
       if (!featureInfo) {
@@ -573,40 +582,40 @@ exports.principalLoop = async function (
     } else {
       //device = line[descriptionDataCleaned.device].replace(/['"]+/g, "");
       device = line[descriptionDataCleaned.device].replace(/['"]+/g, "");
+    }
+    resultDevice = await this.checkerIfExist(Device, device);
+    if (!resultDevice) {
+      if (force) {
+        //save device on database by default value
+        body = {
+          //default value
+          _id: device,
+          owner: req.user,
+          features: [feature._id],
+          period: "5s",
+          cycle: "10m",
+          retryTime: "10s",
+          scriptListMaxSize: 5,
+          measurementBufferSize: 20,
+          issueBufferSize: 20,
+          sendBufferSize: 20,
+          scriptStatementMaxSize: 5,
+          statementBufferSize: 10,
+          measurementBufferPolicy: "decimation",
+        };
 
-      resultDevice = await this.checkerIfExist(Device, device);
-      if (!resultDevice) {
-        if (force) {
-          //save device on database by default value
-          body = {
-            //default value
-            _id: device,
-            owner: req.user,
-            features: [feature._id],
-            period: "5s",
-            cycle: "10m",
-            retryTime: "10s",
-            scriptListMaxSize: 5,
-            measurementBufferSize: 20,
-            issueBufferSize: 20,
-            sendBufferSize: 20,
-            scriptStatementMaxSize: 5,
-            statementBufferSize: 10,
-            measurementBufferPolicy: "decimation",
-          };
-
-          let result = await this.saveModelData(req, body, Device);
-          if (result != true) {
-            //error in the post of the value
-            report.errors.push("Index: " + i + " (device: " + result + ")");
-            continue;
-          }
-        } else {
-          errMessage = "device " + device + " not found in database";
-          report.errors.push("Index: " + i + " (" + errMessage + ")");
+        let result = await this.saveModelData(req, body, Device);
+        if (result != true) {
+          //error in the post of the value
+          report.errors.push("Index: " + i + " (device: " + result + ")");
           continue;
         }
+      } else {
+        errMessage = "device " + device + " not found in database";
+        report.errors.push("Index: " + i + " (" + errMessage + ")");
+        continue;
       }
+
     }
 
     //device exist and with force=true the device must have feature.id in features
@@ -673,7 +682,7 @@ exports.principalLoop = async function (
       //startdate fixed
       if (
         isNaN(
-          descriptionDataCleaned.commonElements["startdate"].replace(/['"]+/g,"")
+          descriptionDataCleaned.commonElements["startdate"].replace(/['"]+/g, "")
         )
       ) {
         result = Date.parse(
@@ -889,7 +898,7 @@ exports.checkCommonElements = async function (
   descriptionDataCleaned,
   force
 ) {
-  let featureInfo=null;
+  let featureInfo = null;
   //check if feature exists and has the same number of items
   if (descriptionDataCleaned.commonElements.hasOwnProperty("feature")) {
     //feature fixed
@@ -1069,10 +1078,10 @@ exports.checkCommonElements = async function (
 };
 
 exports.prepareFilterDataset = async function (idFile, filter) {
-  if (!filter) filter = '{}';  
+  if (!filter) filter = '{}';
   filter = JSON.parse(filter);
   if (idFile) {//not null
-      filter["tags"]= idFile ;      
+    filter["tags"] = idFile;
   }
   return filter;
 }
