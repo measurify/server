@@ -12,6 +12,7 @@ const errors = require("./errors.js");
 const checker = require("../controllers/checker");
 const persistence = require("./persistence.js");
 const cache = require("../commons/cache.js");
+const common = require("mocha/lib/interfaces/common");
 
 function sha(content) {
   return crypto.createHash("sha256").update(content).digest("hex");
@@ -20,76 +21,35 @@ function sha(content) {
 //extract data when receive a form-data post
 exports.dataExtractor = async function (req, res, next, saveDataset) {
   if (!req.busboy) { return errors.manage(res, errors.empty_file, "not found any data"); }
-  let fileData = null;
-  let descriptionData = null;
-  let namefile = null;
+  let fileData = "";
+  let descriptionData = "";
+  let nameFile = null;
   let errorOccurred = false;
   req.busboy.on("file", (fieldName, file, filename) => {
-    //fieldname is the key of the file
-
+    if (!nameFile) nameFile = filename.filename.substring(0, filename.filename.lastIndexOf('.'));
     if (!errorOccurred) {
       //if there is some error the lambda function is stopped
       if (fieldName != "file" && fieldName != "description") {
         errorOccurred = true;
-        return errors.manage(res, errors.fieldName_error, fieldName + " is not file or description");
+        return errors.manage(res, errors.fieldName_error, "Key of form-data " + fieldName + " is not file or description");
       }
       file.on("data", (data) => {
         if (!errorOccurred) {
           //if there is some error the lambda function is stopped
-          if (fieldName == "file") {
-            if (fileData === null) {
-              fileData = data.toString();
-              namefile = filename.filename.replace(".txt", "");
-              namefile = namefile.replace(".csv", "");
-              namefile = namefile.replace(".json", "");
-            } else {
-              fileData += data.toString();
-            }
-          }
-          if (fieldName == "description") {
-            if (descriptionData === null) {
-              descriptionData = data.toString();
-            } else {
-              descriptionData += data.toString();
-            }
-          }
+          if (fieldName == "file") fileData += data.toString();
+          if (fieldName == "description") descriptionData += data.toString();
         }
       });
     }
   });
   req.busboy.on("finish", () => {
-    if (!fileData) {
-      return errors.manage(res, errors.empty_file, "file data not found");
-    }
-    if (!descriptionData) {
-      return errors.manage(
-        res,
-        errors.empty_file,
-        "description data not found"
-      );
-    }
+    if (fileData === "") return errors.manage(res, errors.empty_file, "file data not found");
+    if (descriptionData === "") return errors.manage(res, errors.empty_file, "description data not found");
     if (!errorOccurred) {
       if (saveDataset == true) {
-        catchErrors(
-          datasetController.post(
-            req,
-            res,
-            next,
-            fileData,
-            descriptionData,
-            namefile
-          )
-        );
+        catchErrors(datasetController.post(req, res, next, fileData, descriptionData, nameFile));
       } else {
-        catchErrors(
-          measurementController.postFile(
-            req,
-            res,
-            next,
-            fileData,
-            descriptionData,
-            namefile
-          )
+        catchErrors(measurementController.postFile(req, res, fileData, descriptionData, nameFile)
         );
       }
     }
@@ -101,13 +61,8 @@ exports.checkerIfExist = async function (model, id) {
   return await model.exists({ _id: id });
 };
 
-exports.datauploadCheckAndCreate = async function (
-  req,
-  res,
-  descriptionData,
-  filename,
-  fileData
-) {
+//for dataset
+exports.datauploadCheckAndCreate = async function (req, res, descriptionData, filename, fileData) {
   //datauploads check
 
   //check rights
@@ -115,54 +70,26 @@ exports.datauploadCheckAndCreate = async function (
   let result = await checker.canOperate(req, res, "Dataupload");
   if (result != true)
     return [errors.manage(res, errors.restricted_access_create), null];
-  result = await checker.hasRightsToCreate(req, res, [
-    "thing",
-    "device",
-    "feature",
-    "tags",
-  ]);
+  result = await checker.hasRightsToCreate(req, res, ["thing", "device", "feature", "tags",]);
   if (result != true)
     return [errors.manage(res, errors.restricted_access_create), null];
 
   //check if exist dataupload with the same id (the id is the filename)
   const Dataupload = mongoose.dbs[req.tenant.database].model("Dataupload");
   result = await this.checkerIfExist(Dataupload, filename);
-  if (result) {
-    return [
-      errors.manage(res, errors.already_exist_dataupload, filename),
-      null,
-    ];
-  }
+  if (result) { return [errors.manage(res, errors.already_exist_dataupload, filename), null,]; }
 
-  req.body = await this.createDatauploadRequest(
-    filename,
-    req.user._id,
-    Date.now(),
-    fileData.length,
-    null,
-    Date.now()
-  );
+  req.body = await this.createDatauploadRequest(filename, req.user._id, Date.now(), fileData.length, null, Date.now());
 
   try {
-    let resourceDataupload = await persistence.post(
-      req.body,
-      Dataupload,
-      req.tenant
-    );
+    let resourceDataupload = await persistence.post(req.body, Dataupload, req.tenant);
     return [true, resourceDataupload];
   } catch (err) {
     return [errors.manage(res, errors.post_request_error, err), null];
   }
 };
 
-exports.createDatauploadRequest = async function (
-  filename,
-  owner,
-  timestamp,
-  size,
-  results,
-  lastmod
-) {
+exports.createDatauploadRequest = async function (filename, owner, timestamp, size, results, lastmod) {
   var results = {
     _id: filename,
     owner: owner,
@@ -174,6 +101,7 @@ exports.createDatauploadRequest = async function (
   return results;
 };
 
+//useful tu create the dataupload tag
 exports.createTag = async function (req, res, filename) {
   //create tag {id}
   const Tag = mongoose.dbs[req.tenant.database].model("Tag");
@@ -199,10 +127,10 @@ exports.createTagRequest = async function (tagName) {
   return results;
 };
 
-exports.tagLoop = async function (descriptionDataCleaned, Tag) {
+/*exports.tagLoop = async function (descriptionData, Tag) {
   let tags = [];
-  for (let j in descriptionDataCleaned.tags) {
-    id = line[descriptionDataCleaned.tags[j]].replace(/['"]+/g, "");
+  for (let j in descriptionData.tags) {
+    id = line[descriptionData.tags[j]].replace(/['"]+/g, "");
     resultTag = await this.checkerIfExist(Tag, id);
     if (!resultTag) {
       errMessage = "tag " + id + " not found in database";
@@ -211,8 +139,9 @@ exports.tagLoop = async function (descriptionDataCleaned, Tag) {
     tags.push(id);
   }
   return [tags, null];
-};
+};*/
 
+//Count the element in the json file 
 exports.elementsCount = async function (descriptionData) {
   var elementsNumber = 0;
   let arrayItems = [];
@@ -257,7 +186,8 @@ exports.createSamples = function (value, delta) {
   else return [{ values: [value], delta: delta }];
 };
 
-exports.cleanObj = async function (res, descriptionData) {
+//Check the integrity of elements in the Json file and check from numeric value to string value
+exports.checkDescriptionIntegrity = async function (res, descriptionData) {
   //cleaned c and -1 for each row to semplify next steps
   //first try to convert descriptionData to json
   try {
@@ -270,25 +200,22 @@ exports.cleanObj = async function (res, descriptionData) {
   data = descriptionData;
   data.commonElements = {};
 
-  let result = await checkDescriptionKeys(res, descriptionData);
-  if (result != true) return [null, result];
-
+  let result = await checkDescriptionKeys(res, descriptionData); if (result != true) return [null, result];
   try {
     for (var key in descriptionData) {
       if (key == "items") {
-        for (var features in descriptionData.items) {
-          for (var element in descriptionData.items[features]) {
-            data.items[features][element] =
-              parseInt(descriptionData.items[features][element]) - 1;
-          }
+        for (var features of Object.keys(descriptionData.items)) {
+          descriptionData.items[features].forEach(function (value, i) {
+            data.items[features][i] = parseInt(value) - 1;
+          });
         }
       } else {
         if (key == "tags") {
-          for (var element in descriptionData.tags)
-            data.tags[element] = parseInt(descriptionData.tags[element]) - 1;
+          descriptionData.tags.forEach(function (valueTag, j) {
+            if (typeof element !== "string") data.tags[j] = parseInt(valueTag) - 1;
+          });
         } else {
-          if (key == "commonElements") {
-          } else {
+          if (key !== "commonElements") {
             if (typeof descriptionData[key] == "string") {
               // if is not a number it's a string that is in common with all measurements
               data.commonElements[key] = descriptionData[key];
@@ -306,31 +233,17 @@ exports.cleanObj = async function (res, descriptionData) {
   return [data, true];
 };
 
+//check all fields are in the JSON file
 const checkDescriptionKeys = async function (res, descriptionData) {
-  if (
-    descriptionData.hasOwnProperty("thing") &&
-    descriptionData.hasOwnProperty("device") &&
-    descriptionData.hasOwnProperty("items") &&
-    descriptionData.hasOwnProperty("tags") &&
-    descriptionData.hasOwnProperty("startdate") &&
-    descriptionData.hasOwnProperty("enddate") &&
-    descriptionData.hasOwnProperty("feature")
-  ) {
-    return true;
+  let keys = ["thing", "device", "items", "tags", "startdate", "enddate", "feature"];
+  for (let key of keys) {
+    if (!descriptionData.hasOwnProperty(key)) return errors.manage(res, errors.error_description_keys);
   }
-  return errors.manage(res, errors.error_description_keys);
+  return true;
 };
 
-const createRequestObject = async function (
-  startdate,
-  enddate,
-  thing,
-  feature,
-  device,
-  samples,
-  tags,
-  owner
-) {
+//Create Object to send request
+const createRequestObject = async function (startdate, enddate, thing, feature, device, samples, tags, owner) {
   var results = {
     startDate: startdate,
     endDate: enddate,
@@ -346,13 +259,10 @@ const createRequestObject = async function (
   return results;
 };
 
-exports.sampleLoop = async function (descriptionDataCleaned, line, feature) {
+exports.sampleLoop = async function (descriptionData, line, feature) {
   let samples = [];
-  for (let k in descriptionDataCleaned.items[feature._id]) {
-    str_val = line[descriptionDataCleaned.items[feature._id][k]].replace(
-      /['"]+/g,
-      ""
-    );
+  for (let k in descriptionData.items[feature._id]) {
+    str_val = line[descriptionData.items[feature._id][k]].replace(/['"]+/g, "");
     if (feature.items[k].dimension != 0) {
       //dimension 1 an array
       if (isNaN(str_val)) {
@@ -415,18 +325,20 @@ exports.sampleLoop = async function (descriptionDataCleaned, line, feature) {
           errMessage = "expected string in samples at position " + k;
           return [null, errMessage];
         }
-      }else if (feature.items[k].type == "enum") {
-        if (typeof str_val != "string") {          
+      } else if (feature.items[k].type == "enum") {
+        if (typeof str_val != "string") {
           errMessage = "expected string in samples at position " + k;
-          return [null, errMessage];}
-        if( !feature.items[k].range.includes(str_val)){          
-          errMessage = "the enum "+str_val+" is not in the rage of items "+feature.items[k].name +" in row " + k;
-          return [null, errMessage];}
-        
+          return [null, errMessage];
+        }
+        if (!feature.items[k].range.includes(str_val)) {
+          errMessage = "the enum " + str_val + " is not in the rage of items " + feature.items[k].name + " in column  " + k;
+          return [null, errMessage];
+        }
+
       }
-       else {
+      else {
         errMessage =
-          "error in the definition of the feature on the database, value.type is not a number or string "+feature.items[k].type;
+          "error in the definition of the feature on the database, value.type is not a number or string " + feature.items[k].type;
         return [null, errMessage];
       }
       samples.push(str_val);
@@ -438,11 +350,11 @@ exports.sampleLoop = async function (descriptionDataCleaned, line, feature) {
   }
   return [samples, null];
 };
-
-exports.tagLoop = async function (descriptionDataCleaned, Tag, force, req) {
+/*
+exports.tagLoop = async function (descriptionData, Tag, force, req) {
   let tags = [];
-  for (let j in descriptionDataCleaned.tags) {
-    id = line[descriptionDataCleaned.tags[j]].replace(/['"]+/g, "");
+  for (let j in descriptionData.tags) {
+    id = line[descriptionData.tags[j]].replace(/['"]+/g, "");
     if (id == "") { continue; }
     resultTag = await this.checkerIfExist(Tag, id);
     if (!resultTag) {
@@ -467,362 +379,216 @@ exports.tagLoop = async function (descriptionDataCleaned, Tag, force, req) {
   }
   return [tags, null];
 };
+*/
 
-exports.principalLoop = async function (
-  req,
-  res,
-  lines,
-  elementsNumber,
-  feature,
-  report,
-  descriptionDataCleaned,
-  filename,
-  force,
-  header,
-  addDatasetTag
-) {
+//Loop to upload data checking all the information is correct
+exports.dataUpload = async function (req, res, lines, elementsNumber, report, descriptionData, filename, force, header, addDatasetTag) {
   const Device = mongoose.dbs[req.tenant.database].model("Device");
   const Thing = mongoose.dbs[req.tenant.database].model("Thing");
   const Tag = mongoose.dbs[req.tenant.database].model("Tag");
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
-  //TEST OTTIMIZZAZIONE let allMeasurementBody=[];
-  //algorithm for check every line of the csv and save the value inside a measurement
+  const Feature = mongoose.dbs[req.tenant.database].model("Feature");
+  const models = { feature: Feature, device: Device, thing: Thing, tag: Tag };
+  //TEST Optimization let allMeasurementBody=[];
+  //algorithm to check every line of the csv and save the value inside a measurement
+  let error = null;
+  [descriptionData.commonElements, error, descriptionData.commonElementsData] = await this.checkCommonsResources(req, res, descriptionData.commonElements, descriptionData.tags, models, descriptionData.items, force);
+  if (error != null) return [null, error];
 
   for (let i in lines) {
     if (lines[i] == "") continue;
     if ((i == 0) & (header == true)) continue;
-    line = lines[i].split(",");
+    let line = lines[i].split(",");
     if (line.length != elementsNumber) {
-      errMessage =
-        "Mismatch number of elements: Expected " +
-        elementsNumber +
-        ", got " +
-        line.length;
+      errMessage = "Mismatch number of elements: Expected " + elementsNumber + ", got " + line.length;
       report.errors.push("Index: " + i + " (" + errMessage + ")");
       continue;
     }
-
-    //check if feature exists and has the same number of items
-
-    const Feature = mongoose.dbs[req.tenant.database].model("Feature");
-
-    if (descriptionDataCleaned.commonElements.hasOwnProperty("feature")) {
-      //feature in file description checked in checkCommonElements
-      featureName = descriptionDataCleaned.commonElements["feature"];
-      featureInfo = await Feature.findById(featureName);
-    } else {
-      featureName = line[descriptionDataCleaned.feature].replace(/['"]+/g, "");
-
-      featureInfo = await Feature.findById(featureName);
-      if (!featureInfo) {
-        //error feature not found
-        errMessage = "feature " + featureName + " not found in database";
-        report.errors.push("Index: " + i + " (" + errMessage + ")");
-        continue;
-      }
-      //check if feature is also in description in items
-      if (!descriptionDataCleaned.items.hasOwnProperty(featureName)) {
-        errMessage =
-          "the feature " + featureName + " is not as key in description items";
-        report.errors.push("Index: " + i + " (" + errMessage + ")");
-        continue;
-      }
-
-      //check if feature has the same number of items
-      itemsNumber = descriptionDataCleaned.items[featureName].length;
-      if (itemsNumber != featureInfo.items.length) {
-        errMessage =
-          "the feature " +
-          featureName +
-          " has " +
-          featureInfo.items.length +
-          " items, while the line has " +
-          itemsNumber +
-          " items";
-        report.errors.push("Index: " + i + " (" + errMessage + ")");
-        continue;
-      }
-    }
-    feature = featureInfo;
-
-    //check if exist thing with the same id
-    if (descriptionDataCleaned.commonElements.hasOwnProperty("thing")) {
-      //thing fixed
-      thing = descriptionDataCleaned.commonElements["thing"];
-    } else {
-      //thing = line[descriptionDataCleaned.thing].replace(/['"]+/g, "");
-      thing = line[descriptionDataCleaned.thing].replace(/['"]+/g, "")
-
-      let resultThing = await this.checkerIfExist(Thing, thing);
-      if (!resultThing) {
-        if (force) {
+    let resources = ["feature", "device", "thing"];
+    let lineResource = {};
+    let errorOccurred = false;
+    for (let re of resources) {//problema il continue lo fa di questo non per la line
+      if (errorOccurred) continue;
+      if (descriptionData.commonElements.hasOwnProperty(re)) continue;
+      lineResource[re + "Name"] = line[descriptionData[re]];      
+      lineResource[re + "Info"] = await models[re].findById(lineResource[re + "Name"]);
+      if (!lineResource[re + "Info"]) {
+        if (!force || re == "feature") {
+          //error resource not found
+          errMessage = re + " " + lineResource[re + "Name"] + " not found in database";
+          report.errors.push("Index: " + i + " (" + errMessage + ")");
+          errorOccurred = true;
+          continue;
+        }
+        if (re === "thing") {
           //save thing on database by default value
           let body = {
-            _id: thing,
+            _id: lineResource[re + "Name"],
             owner: req.body.owner,
           };
           let result = await this.saveModelData(req, body, Thing);
           if (result != true) {
             //error in the post of the value
             report.errors.push("Index: " + i + " (thing: " + result + ")");
+            errorOccurred = true;
+            continue;
+          }
+          lineResource.thingInfo = await models.thing.findById(lineResource.thingName);
+        }
+        if (re === "device") { ///ATTENZIONE A COMPLETARE LA FEATURE
+          //save device on database by default value
+          let body = {
+            //default value
+            _id: lineResource[re + "Name"],
+            owner: req.body.owner,
+            features: [],
+            period: "5s",
+            cycle: "10m",
+            retryTime: "10s",
+            scriptListMaxSize: 5,
+            measurementBufferSize: 20,
+            issueBufferSize: 20,
+            sendBufferSize: 20,
+            scriptStatementMaxSize: 5,
+            statementBufferSize: 10,
+            measurementBufferPolicy: "decimation",
+          };
+          for (key of Object.keys(descriptionData.items)) body.features.push(key);
+          let result = await this.saveModelData(req, body, Device);
+          if (result != true) {
+            //error in the post of the value
+            report.errors.push("Index: " + i + " (device: " + result + ")");
+            errorOccurred = true;
+            continue;
+          }
+          lineResource.deviceInfo = await models.device.findById(lineResource.deviceName);
+        }
+      }
+    }    
+    if (errorOccurred) { errorOccurred = false; continue; }    
+    //check if feature exists and has the same number of items    
+    if (!descriptionData.commonElements.hasOwnProperty("feature")) {      
+      //check if feature is also in description in items      
+      if (!descriptionData.items.hasOwnProperty(lineResource.featureName)) {
+        errMessage = "the feature " + lineResource.featureName + " is not as key in description items";
+        report.errors.push("Index: " + i + " (" + errMessage + ")");
+        continue;
+      }
+      //check if feature has the same number of items
+      itemsNumber = descriptionData.items[lineResource.featureName].length;
+      if (itemsNumber != lineResource.featureInfo.items.length) {
+        errMessage = "the feature " + lineResource.featureName + " has " + lineResource.featureInfo.items.length + " items, while the line has " + itemsNumber + " items";
+        report.errors.push("Index: " + i + " (" + errMessage + ")");
+        continue;
+      }
+    }
+    //device exist and with force=true the device must have feature.id in features
+    if (!descriptionData.commonElements.hasOwnProperty("device")) {
+      let feature = descriptionData.commonElements.hasOwnProperty("feature") ? descriptionData.commonElements.feature : lineResource.featureName;
+      if (!lineResource.deviceInfo["features"].includes(feature)) {
+        if (force) {
+          try {
+            let fields = ["features"];
+            body = {
+              features: {
+                add: [feature],
+              },
+            };
+            await persistence.update(body, fields, lineResource.deviceInfo, Device, req.tenant);
+            deviceInfo = await Device.findById(lineResource.deviceName);
+            cache.set(lineResource.deviceName + "_device", deviceInfo);
+          } catch (err) {
+            errMessage = "error in adding match between device " + lineResource.deviceName + " and feature " + feature + ", " + err;
+            report.errors.push("Index: " + i + " (" + errMessage + ")");
             continue;
           }
         } else {
-          errMessage = "thing " + thing + " not found in database";
+          errMessage = "device " + lineResource.deviceName + " doesn't have feature " + feature + ", please add it or choose force = true";
           report.errors.push("Index: " + i + " (" + errMessage + ")");
           continue;
         }
       }
     }
 
-    //check if exist device with the same id
-    if (descriptionDataCleaned.commonElements.hasOwnProperty("device")) {
-      //device fixed
-      device = descriptionDataCleaned.commonElements["device"];
-    } else {
-      //device = line[descriptionDataCleaned.device].replace(/['"]+/g, "");
-      device = line[descriptionDataCleaned.device].replace(/['"]+/g, "");
-    }
-    resultDevice = await this.checkerIfExist(Device, device);
-    if (!resultDevice) {
-      if (force) {
-        //save device on database by default value
-        body = {
-          //default value
-          _id: device,
-          owner: req.user,
-          features: [feature._id],
-          period: "5s",
-          cycle: "10m",
-          retryTime: "10s",
-          scriptListMaxSize: 5,
-          measurementBufferSize: 20,
-          issueBufferSize: 20,
-          sendBufferSize: 20,
-          scriptStatementMaxSize: 5,
-          statementBufferSize: 10,
-          measurementBufferPolicy: "decimation",
-        };
-
-        let result = await this.saveModelData(req, body, Device);
-        if (result != true) {
-          //error in the post of the value
-          report.errors.push("Index: " + i + " (device: " + result + ")");
+    //check if startdate is a date    
+    if (!descriptionData.commonElements.hasOwnProperty("startdate")) {
+      //check if date is in date format and convert toISOString   
+      let date = new Date(line[descriptionData.startdate]);
+      if (isNaN(date)) {
+        date = new Date(parseInt(date, 10));
+        //retry to check if the date is a milliseconds number as type string
+        if (isNaN(date)) {
+          //error date not in correct format
+          errMessage = "startdate is not in Date format : Example format: 2022-12-31T00:00:00+00:00";
+          report.errors.push("Index: " + i + " (" + errMessage + ")");
           continue;
         }
-      } else {
-        errMessage = "device " + device + " not found in database";
-        report.errors.push("Index: " + i + " (" + errMessage + ")");
-        continue;
       }
-
+      lineResource.startdate = date.toISOString();
+    }
+    //check if enddate is a date    
+    if (!descriptionData.commonElements.hasOwnProperty("enddate")) {
+      if (line[descriptionData.enddate] === "") lineResource.enddate = lineResource.startdate ? lineResource.startdate : descriptionData.commonElements.startdate;
+      else {
+        //check if date is in date format and convert toISOString    
+        let date = new Date(line[descriptionData.enddate]);
+        if (isNaN(date)) {
+          date = new Date(parseInt(date, 10));
+          //retry to check if the date is a milliseconds number as type string
+          if (isNaN(date)) {
+            //error date not in correct format
+            errMessage = "enddate is not in Date format : Example format: 2022-12-31T00:00:00+00:00";
+            report.errors.push("Index: " + i + " (" + errMessage + ")");
+            continue;
+          }
+        }
+        lineResource.enddate = date.toISOString();
+      }
     }
 
-    //device exist and with force=true the device must have feature.id in features
-    let deviceInfo = await Device.findById(device);
-    if (!deviceInfo["features"].includes(feature.id)) {
-      if (force) {
-        try {
-          let fields = [
-            "features",
-            "scripts",
-            "tags",
-            "visibility",
-            "period",
-            "cycle",
-            "retryTime",
-            "scriptListMaxSize",
-            "measurementBufferSize",
-            "issueBufferSize",
-            "sendBufferSize",
-            "scriptStatementMaxSize",
-            "statementBufferSize",
-            "measurementBufferPolicy",
-          ];
-          body = {
-            features: {
-              add: [feature.id],
-            },
+    //check if tags is in the database
+    errorOccurred = false;
+    for (let tag of descriptionData.tags) if (typeof tag == "number") {
+      if (errorOccurred) continue;
+      result = await this.checkerIfExist(Tag, line[tag]);
+      if (!result) {
+        if (force) {
+          //save tag on database by default value
+          let body = {
+            _id: line[tag],
+            owner: req.body.owner,
           };
-          await persistence.update(
-            body,
-            fields,
-            deviceInfo,
-            Device,
-            req.tenant
-          );
-          deviceInfo = await Device.findById(device);
-          cache.set(device + "_device", deviceInfo);
-        } catch (err) {
-          errMessage =
-            "error in adding match between device " +
-            device +
-            " and feature " +
-            feature.id +
-            ", " +
-            err;
-          report.errors.push("Index: " + i + " (" + errMessage + ")");
+          result = await this.saveModelData(req, body, Tag);
+          if (result != true) {
+            //error in the post of the value
+            report.errors.push("Index: " + i + " (tag " + line[tag] + " " + result + ")");
+            errorOccurred = true;
+            continue;
+          }
+        } else {
+          //error resource not found
+          report.errors.push("Index: " + i + " (tag " + line[tag] + " not found in database)");
+          errorOccurred = true;
           continue;
         }
-      } else {
-        errMessage =
-          "device " +
-          device +
-          " doesn't have feature " +
-          feature.id +
-          ", please add it or choose force = true";
-        report.errors.push("Index: " + i + " (" + errMessage + ")");
-        continue;
-      }
+      };
     }
-
-    //check if startdate is a date
-    let result = null;
-    if (descriptionDataCleaned.commonElements.hasOwnProperty("startdate")) {
-      //startdate fixed
-      if (
-        isNaN(
-          descriptionDataCleaned.commonElements["startdate"].replace(/['"]+/g, "")
-        )
-      ) {
-        result = Date.parse(
-          descriptionDataCleaned.commonElements["startdate"].replace(
-            /['"]+/g,
-            ""
-          )
-        );
-        startdate = descriptionDataCleaned.commonElements[
-          "startdate"
-        ].replace(/['"]+/g, "");
-      } else {
-        //is a number
-        result = descriptionDataCleaned.commonElements["startdate"].replace(
-          /['"]+/g,
-          ""
-        );
-        startdate = descriptionDataCleaned.commonElements[
-          "startdate"
-        ].replace(/['"]+/g, "");
-      }
-    } else {
-      if (
-        isNaN(line[descriptionDataCleaned.startdate].replace(/['"]+/g, ""))
-      ) {
-        result = Date.parse(
-          line[descriptionDataCleaned.startdate].replace(/['"]+/g, "")
-        ); //need to remove ""
-        startdate = line[descriptionDataCleaned.startdate].replace(
-          /['"]+/g,
-          ""
-        );
-      } else {
-        //is a number
-        result = line[descriptionDataCleaned.startdate].replace(
-          /['"]+/g,
-          ""
-        );
-        startdate = line[descriptionDataCleaned.startdate].replace(
-          /['"]+/g,
-          ""
-        );
-      }
+    if (errorOccurred) { errorOccurred = false; continue; }
+    let tags = [];
+    for (let tag of descriptionData.tags) {
+      if (typeof tag == "number") tags.push(line[tag]);
+      else tags.push(tag);
     }
-    if (isNaN(result)) {
-      errMessage = "startdate is not in Date format";
-      report.errors.push("Index: " + i + " (" + errMessage + ")");
-      continue;
-    }
-
-    //check if enddate exist and is a date
-    let enddate = "";
-    if (descriptionDataCleaned.commonElements.hasOwnProperty("enddate")) {
-      //enddate fixed
-      if (
-        isNaN(
-          descriptionDataCleaned.commonElements["enddate"].replace(
-            /['"]+/g,
-            ""
-          )
-        )
-      ) {
-        result = Date.parse(
-          descriptionDataCleaned.commonElements["enddate"].replace(
-            /['"]+/g,
-            ""
-          )
-        );
-        enddate = descriptionDataCleaned.commonElements["enddate"].replace(
-          /['"]+/g,
-          ""
-        );
-      } else {
-        //is a number
-        result = descriptionDataCleaned.commonElements["enddate"].replace(
-          /['"]+/g,
-          ""
-        );
-        enddate = descriptionDataCleaned.commonElements["enddate"].replace(
-          /['"]+/g,
-          ""
-        );
-      }
-    } else {
-      if (
-        descriptionDataCleaned.enddate == descriptionDataCleaned.startdate ||
-        line[descriptionDataCleaned.enddate] == ""
-      ) {
-        enddate = startdate;
-      } else {
-        if (
-          isNaN(line[descriptionDataCleaned.enddate].replace(/['"]+/g, ""))
-        ) {
-          result = Date.parse(
-            line[descriptionDataCleaned.enddate].replace(/['"]+/g, "")
-          ); //need to remove ""
-          enddate = line[descriptionDataCleaned.enddate].replace(
-            /['"]+/g,
-            ""
-          );
-        } else {
-          //is a number
-          result = line[descriptionDataCleaned.enddate].replace(
-            /['"]+/g,
-            ""
-          );
-          enddate = line[descriptionDataCleaned.enddate].replace(
-            /['"]+/g,
-            ""
-          );
-        }
-      }
-    }
-    if (isNaN(result)) {
-      errMessage = "enddate is not in Date format";
-      report.errors.push("Index: " + i + " (" + errMessage + ")");
-      continue;
-    }
-
-    //check if exist tags with the same id
-    var tags = [];
-    let error;
-    [tags, error] = await this.tagLoop(descriptionDataCleaned, Tag, force, req);
-    if (error) {
-      report.errors.push("Index: " + i + " (" + error + ")");
-      continue;
-    }
-
     //Add datauploadtag
     if (addDatasetTag == true) {
       tags.push(filename);
     }
 
+    //CONTINUARE DA QUA DOMANI
+    let feature = descriptionData.commonElementsData.featureInfo ? descriptionData.commonElementsData.featureInfo : lineResource.featureInfo;
     //Add Samples
     var samples = [];
-    [samples, error] = await this.sampleLoop(
-      descriptionDataCleaned,
-      line,
-      feature
-    );
+    [samples, error] = await this.sampleLoop(descriptionData, line, feature);
     if (error) {
       report.errors.push("Index: " + i + " (" + error + ")");
       continue;
@@ -830,19 +596,15 @@ exports.principalLoop = async function (
 
     samples = this.createSamples(samples, 0);
 
-    //create measurement
-    body = await createRequestObject(
-      startdate,
-      enddate,
-      thing,
-      feature._id,
-      device,
-      samples,
-      tags,
-      req.user._id
-    );
+    let startdate = descriptionData.commonElements.startdate ? descriptionData.commonElements.startdate : lineResource.startdate;
 
-    //TEST OTTIMIZZAZIONE allMeasurementBody.push(body);
+    let thing = descriptionData.commonElementsData.thingName ? descriptionData.commonElementsData.thingName : lineResource.thingName;
+    let device = descriptionData.commonElementsData.deviceName ? descriptionData.commonElementsData.deviceName : lineResource.deviceName;
+    let enddate = descriptionData.commonElements.enddate ? descriptionData.commonElements.enddate : (lineResource.enddate ? lineResource.enddate : startdate);
+    //create measurement
+    body = await createRequestObject(startdate, enddate, thing, feature._id, device, samples, tags, req.user._id);
+
+    //TEST OPTIMIZATION allMeasurementBody.push(body);
 
     result = await this.saveModelData(req, body, Measurement);
     if (result != true) {
@@ -852,7 +614,7 @@ exports.principalLoop = async function (
       report.completed.push(i);
     }
   }
-  /*TEST OTTIMIZZAZIONE
+  /*TEST OPTIMIZATION
   result = await this.saveModelData(req, allMeasurementBody, Measurement);
   if (result != true) {//error in the post of the value
     report.errors.push('Index: ' + 0 + ' (' + result + ')');
@@ -860,7 +622,7 @@ exports.principalLoop = async function (
   else {
     report.completed.push(0);
   }*/
-  return report;
+  return [report, null];
 };
 
 exports.saveModelData = async function (req, body, Model) {
@@ -873,37 +635,29 @@ exports.saveModelData = async function (req, body, Model) {
   return true;
 };
 
+
+//only for dataset update information of the dataUpload filename information
 exports.updateDataupload = async function (req, res, report, resource) {
   const Dataupload = mongoose.dbs[req.tenant.database].model("Dataupload");
   const fields = ["results"];
   report = JSON.stringify(report);
   let bodyUpdate = { results: report };
   try {
-    await persistence.update(
-      bodyUpdate,
-      fields,
-      resource,
-      Dataupload,
-      req.tenant
-    );
+    await persistence.update(bodyUpdate, fields, resource, Dataupload, req.tenant);
     return true;
   } catch (err) {
     return errors.manage(res, errors.put_request_error, err);
   }
 };
 
-exports.checkCommonElements = async function (
-  req,
-  res,
-  descriptionDataCleaned,
-  force
-) {
+//Check elements from JSON file that are in common between all lines of csv
+exports.checkCommonElements = async function (req, res, descriptionData, force) {
   let featureInfo = null;
   //check if feature exists and has the same number of items
-  if (descriptionDataCleaned.commonElements.hasOwnProperty("feature")) {
+  if (descriptionData.commonElements.hasOwnProperty("feature")) {
     //feature fixed
     const Feature = mongoose.dbs[req.tenant.database].model("Feature");
-    featureName = descriptionDataCleaned.commonElements["feature"];
+    featureName = descriptionData.commonElements["feature"];
 
     featureInfo = await Feature.findById(featureName);
     if (!featureInfo) {
@@ -916,35 +670,22 @@ exports.checkCommonElements = async function (
     }
 
     //check if feature is also in description in items
-    if (!descriptionDataCleaned.items.hasOwnProperty(featureName)) {
-      return errors.manage(
-        res,
-        errors.feature_not_in_items_description,
-        featureName
-      );
+    if (!descriptionData.items.hasOwnProperty(featureName)) {
+      return errors.manage(res, errors.feature_not_in_items_description, featureName);
     }
 
     //check if feature has the same number of items
-    itemsNumber = descriptionDataCleaned.items[featureName].length;
+    itemsNumber = descriptionData.items[featureName].length;
     if (itemsNumber != featureInfo.items.length) {
-      return errors.manage(
-        res,
-        errors.mismatch_feature_items_description,
-        featureName +
-        " has " +
-        featureInfo.items.length +
-        " elements on database, while in the description has " +
-        itemsNumber +
-        " elements"
-      );
+      return errors.manage(res, errors.mismatch_feature_items_description, featureName + " has " + featureInfo.items.length + " elements on database, while in the description has " + itemsNumber + " elements");
     }
   }
 
   //check if exist thing with the same id
-  if (descriptionDataCleaned.commonElements.hasOwnProperty("thing")) {
+  if (descriptionData.commonElements.hasOwnProperty("thing")) {
     //thing fixed
     const Thing = mongoose.dbs[req.tenant.database].model("Thing");
-    thing = descriptionDataCleaned.commonElements["thing"];
+    thing = descriptionData.commonElements["thing"];
 
     let resultThing = await this.checkerIfExist(Thing, thing);
     if (!resultThing) {
@@ -967,10 +708,10 @@ exports.checkCommonElements = async function (
   }
 
   //check if exist device with the same id
-  if (descriptionDataCleaned.commonElements.hasOwnProperty("device")) {
+  if (descriptionData.commonElements.hasOwnProperty("device")) {
     //device fixed
     const Device = mongoose.dbs[req.tenant.database].model("Device");
-    device = descriptionDataCleaned.commonElements["device"];
+    device = descriptionData.commonElements["device"];
 
     let resultDevice = await this.checkerIfExist(Device, device);
     if (!resultDevice) {
@@ -1025,38 +766,19 @@ exports.checkCommonElements = async function (
     } else {
       //device exist and with force=true the device must have feature.id in features
       let deviceInfo = await Device.findById(device);
-      if (descriptionDataCleaned.commonElements.hasOwnProperty("feature")) {
+      if (descriptionData.commonElements.hasOwnProperty("feature")) {
         if (!deviceInfo["features"].includes(featureInfo.id)) {
           if (force) {
             try {
               let fields = [
-                "features",
-                "scripts",
-                "tags",
-                "visibility",
-                "period",
-                "cycle",
-                "retryTime",
-                "scriptListMaxSize",
-                "measurementBufferSize",
-                "issueBufferSize",
-                "sendBufferSize",
-                "scriptStatementMaxSize",
-                "statementBufferSize",
-                "measurementBufferPolicy",
+                "features"
               ];
               body = {
                 features: {
                   add: [featureInfo.id],
                 },
               };
-              await persistence.update(
-                body,
-                fields,
-                deviceInfo,
-                Device,
-                req.tenant
-              );
+              await persistence.update(body, fields, deviceInfo, Device, req.tenant);
               deviceInfo = await Device.findById(device);
               cache.set(device + "_device", deviceInfo);
             } catch (err) {
@@ -1064,11 +786,7 @@ exports.checkCommonElements = async function (
             }
           } else {
             //force = false
-            return errors.manage(
-              res,
-              errors.device_not_found_description,
-              device + " doesn't have " + featureInfo.id + " as feature"
-            );
+            return errors.manage(res, errors.device_not_found_description, device + " doesn't have " + featureInfo.id + " as feature");
           }
         }
       }
@@ -1086,31 +804,116 @@ exports.prepareFilterDataset = async function (idFile, filter) {
   return filter;
 }
 
-/*
+exports.checkCommonsResources = async function (req, res, commonElements, tags, models, items, force) {
+  let commonElementsData = {};
+  //check if resource exists
+  for (el of Object.keys(commonElements)) {
+    if (el.toLowerCase() == "startdate" || el.toLowerCase() == "enddate") {
+      if (el.toLowerCase() == "enddate" && commonElements[el] == "") continue;
+      //check if date is in date format and convert toISOString    
+      let date = new Date(commonElements[el]);
+      if (isNaN(date)) {
+        date = new Date(parseInt(date, 10));
+        //retry to check if the date is a milliseconds number as type string
+        if (isNaN(date)) {
+          //error date not in correct format
+          errMessage = el + " : " + commonElements[el] + " is not in Date format : Example format: 2022-12-31T00:00:00+00:00";
+          return [null, errors.manage(res, errors.post_request_error, errMessage)];
+        }
+      }
+      commonElements[el] = date.toISOString();
+      continue;
+    }
 
-{
-  feature: "",
-  tags:""
-}
 
-{
-  $or: [{
-    feature:""    
-  },{
-    tags:""
-  }]}
-
-
-{
-  $and:[ {
-    feature:""
-  }]{
-    tags:""
+    commonElementsData[el + "Name"] = commonElements[el];
+    commonElementsData[el + "Info"] = await models[el].findById(commonElementsData[el + "Name"]);
+    if (!commonElementsData[el + "Info"]) {
+      if (!force || el == "feature") {
+        //error resource not found
+        errMessage = el + ": " + commonElementsData[el + "Name"] + " not found in database";
+        return [null, errors.manage(res, errors.resource_not_found, errMessage)];
+      }
+      if (el === "thing") {
+        //save thing on database by default value
+        let body = {
+          _id: commonElementsData[el + "Name"],
+          owner: req.body.owner,
+        };
+        let result = await this.saveModelData(req, body, models.thing);
+        if (result != true) {
+          //error in the post of the value
+          errMessage = "thing: " + result;
+          return [null, errors.manage(res, errors.post_request_error, errMessage)];
+        }
+      }
+      if (el === "device") {
+        //save device on database by default value
+        let body = {
+          //default value
+          _id: commonElementsData[el + "Name"],
+          owner: req.body.owner,
+          features: [],
+          period: "5s",
+          cycle: "10m",
+          retryTime: "10s",
+          scriptListMaxSize: 5,
+          measurementBufferSize: 20,
+          issueBufferSize: 20,
+          sendBufferSize: 20,
+          scriptStatementMaxSize: 5,
+          statementBufferSize: 10,
+          measurementBufferPolicy: "decimation",
+        };
+        for (key of Object.keys(items)) body.features.push(key);
+        let result = await this.saveModelData(req, body, models.device);
+        if (result != true) {
+          //error in the post of the value
+          errMessage = "device: " + result;
+          return [null, errors.manage(res, errors.post_request_error, errMessage)];
+        }
+      }
+    }
   }
+
+  //check if items field has the common feature
+  if (commonElementsData.featureName && !items.hasOwnProperty(commonElementsData.featureName)) {
+    errMessage = "the feature " + commonElementsData.featureName + " is not as key in description items";
+    return [null, errors.manage(res, errors.feature_not_in_items_description, errMessage)];
+  }
+
+  //check if feature has the same number of items
+  if (commonElementsData.featureName) {
+    let itemsNumber = items[commonElementsData.featureName].length;
+    if (itemsNumber != commonElementsData.featureInfo.items.length) {
+      errMessage = "the feature " + commonElementsData.featureName + " has " + commonElementsData.featureInfo.items.length + " items, while in the description Json file has " + itemsNumber + " items";
+      return [null, errors.manage(res, errors.mismatch_feature_items_description, errMessage)];
+    }
+  }
+
+  //Check if tags is in the database
+  for (let tag of tags) if (typeof tag == "string") {
+    result = await this.checkerIfExist(models.tag, tag);
+    if (!result) {
+      if (force) {
+        //save tag on database by default value
+        let body = {
+          _id: tag,
+          owner: req.body.owner,
+        };
+        result = await this.saveModelData(req, body, models.tag);
+        if (result != true) {
+          //error in the post of the value
+          errMessage = "tag: " + result;
+          return [null, errors.manage(res, errors.post_request_error, errMessage)];
+        }
+      } else {
+        //error resource not found
+        errMessage = "tag : " + tag + " not found in database";
+        return [null, errors.manage(res, errors.resource_not_found, errMessage)];
+      }
+    };
+  }
+
+  return [commonElements, null, commonElementsData]
 }
-
-
-
-*/
-
-
