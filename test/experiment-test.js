@@ -299,15 +299,16 @@ describe('/GET experiment group', () => {
     it('it should GET all groups', async () => {
         const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const metadata = [
-            { "name": "metadata-name-1", "description": "description metadata 1", "type": "scalar"},
-            { "name": "metadata-name-2", "description": "description metadata 2", "type": "text"},
-            { "name": "metadata-name-3", "description": "description metadata 3", "type": "scalar"},
-            { "name": "metadata-name-4", "description": "description metadata 4", "type": "vector"}
+            { "name": "metadata-name-1", "description": "description metadata 1", "type": "scalar","unit":"unit",},
+            { "name": "metadata-name-2", "description": "description metadata 2", "type": "text","unit":"unit",},
+            { "name": "metadata-name-3", "description": "description metadata 3", "type": "scalar","unit":"unit",},
+            { "name": "metadata-name-4", "description": "description metadata 4", "type": "vector","unit":"unit",}
         ]
         const topics = [
             {
                 "name": "topics1",
                 "description": "topic description 1",
+                "unit":"unit1",
                 "fields": [
                     { "name": "field-1", "description": "field description 1", "type": "scalar"},
                     { "name": "field-2", "description": "field description 2", "type": "text"},
@@ -317,6 +318,7 @@ describe('/GET experiment group', () => {
             {
                 "name": "topics2",
                 "description": "topic description 2",
+                "unit":"unit2",
                 "fields": [
                     { "name": "field-4", "description": "field description 4", "type": "scalar"},
                     { "name": "field-5", "description": "field description 5", "type": "text"},
@@ -379,10 +381,19 @@ describe('/GET experiment group', () => {
         res.body.history[1].step.should.be.eql(2);
         Object.keys(res.body.history[0].groups).length.should.be.eql(2);
         Object.keys(res.body.history[1].groups).length.should.be.eql(2);
+
         Object.keys(res.body.history[0].groups.topics1).length.should.be.eql(3);
+        Object.keys(res.body.history[0].groups.topics1.values).length.should.be.eql(3);
+        res.body.history[0].groups.topics1.unit.should.be.eql("unit1");
+        res.body.history[0].groups.topics1.description.should.be.eql("topic description 1");
+
         Object.keys(res.body.history[0].groups.topics2).length.should.be.eql(3);
-        Object.keys(res.body.history[1].groups.topics1).length.should.be.eql(3);
-        Object.keys(res.body.history[1].groups.topics2).length.should.be.eql(3);       
+        Object.keys(res.body.history[0].groups.topics2.values).length.should.be.eql(3);
+        res.body.history[0].groups.topics2.unit.should.be.eql("unit2");
+        res.body.history[0].groups.topics2.description.should.be.eql("topic description 2");
+
+        Object.keys(res.body.history[1].groups.topics1.values).length.should.be.eql(3);
+        Object.keys(res.body.history[1].groups.topics2.values).length.should.be.eql(3);       
         
         const res2 = await chai.request(server).keepOpen().get('/v1/experiments/' + experiment._id+'/group?groups=[]').set("Authorization", await factory.getUserToken(user));
         res2.should.have.status(200);
@@ -407,6 +418,7 @@ describe('/GET experiment group', () => {
             {
                 "name": "topics1",
                 "description": "topic description 1",
+                "unit":"unit1",
                 "fields": [
                     { "name": "field-1", "description": "field description 1", "type": "scalar"},
                     { "name": "field-2", "description": "field description 2", "type": "text"},
@@ -416,6 +428,7 @@ describe('/GET experiment group', () => {
             {
                 "name": "topics2",
                 "description": "topic description 2",
+                "unit":"unit1",
                 "fields": [
                     { "name": "field-4", "description": "field description 4", "type": "scalar"},
                     { "name": "field-5", "description": "field description 5", "type": "text"},
@@ -425,6 +438,7 @@ describe('/GET experiment group', () => {
             {
                 "name": "topics3",
                 "description": "topic description 3",
+                "unit":"unit1",
                 "fields": [
                     { "name": "field-7", "description": "field description 7", "type": "scalar"},
                     { "name": "field-8", "description": "field description 8", "type": "text"},
@@ -494,7 +508,12 @@ describe('/GET experiment group', () => {
         Object.keys(res.body.history[0].groups).length.should.be.eql(1);
         Object.keys(res.body.history[1].groups).length.should.be.eql(1);
         Object.keys(res.body.history[0].groups.topics1).length.should.be.eql(3);
-        Object.keys(res.body.history[1].groups.topics1).length.should.be.eql(3);      
+        Object.keys(res.body.history[1].groups.topics1).length.should.be.eql(3);  
+        Object.keys(res.body.history[0].groups.topics1.values).length.should.be.eql(3);
+        Object.keys(res.body.history[1].groups.topics1.values).length.should.be.eql(3); 
+        res.body.history[0].groups.topics1.description.should.be.eql("topic description 1"); 
+        res.body.history[0].groups.topics1.unit.should.be.eql("unit1"); 
+
 
         const res2 = await chai.request(server).keepOpen().get('/v1/experiments/' + experiment._id+'/group?groups=["topics1","topics3"]').set("Authorization", await factory.getUserToken(user));
         res2.should.have.status(200);
@@ -509,6 +528,10 @@ describe('/GET experiment group', () => {
         Object.keys(res2.body.history[0].groups.topics3).length.should.be.eql(3);
         Object.keys(res2.body.history[1].groups.topics1).length.should.be.eql(3);
         Object.keys(res2.body.history[1].groups.topics3).length.should.be.eql(3);   
+        Object.keys(res2.body.history[0].groups.topics1.values).length.should.be.eql(3);
+        Object.keys(res2.body.history[1].groups.topics1.values).length.should.be.eql(3); 
+        res.body.history[0].groups.topics1.description.should.be.eql("topic description 1"); 
+        res.body.history[0].groups.topics1.unit.should.be.eql("unit1"); 
     });
 
     it('it should GET specified groups with correct management of missing fields', async () => {

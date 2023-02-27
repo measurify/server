@@ -324,6 +324,7 @@ exports.replaceSeparatorsGet = function (data, query, res) {
     return [data, null];
 }
 //OLD
+/*
 exports.getGroups = function (experiment, protocol, query) {
     let groupFilter=undefined;
     if (query.groups !== undefined && query.groups.length !== 0) {// ?groups=["topic1","topic2"]
@@ -349,10 +350,10 @@ exports.getGroups = function (experiment, protocol, query) {
     };
 
     return [body, null];
-}
+}*/
 
 
-/*//NEW //Get groups of topics (all or selected by query) and also the description, unit and values for each step 
+//NEW //Get groups of topics (all or selected by query) and also the description, unit and values for each step 
 exports.getGroups = function (experiment, protocol, query) {
     let groupFilter = undefined;
     if (query.groups !== undefined && query.groups.length !== 0) {// ?groups=["topic1","topic2"]
@@ -381,4 +382,3 @@ exports.getGroups = function (experiment, protocol, query) {
 
     return [body, null];
 }
-*/
