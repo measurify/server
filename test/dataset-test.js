@@ -203,9 +203,9 @@ describe('/POST dataset', () => {
         res.body.errors[0].should.be.eql('Index: 2 (thing fake-thing not found in database)');
         res.body.errors[1].should.be.eql('Index: 3 (device fake-device not found in database)');
         res.body.errors[2].should.be.eql('Index: 4 (Mismatch number of elements: Expected 6, got 5)');
-        res.body.errors[3].should.be.eql('Index: 5 (startdate is not in Date format)');
+        res.body.errors[3].should.be.eql('Index: 5 (startdate is not in Date format : Example format: 2022-12-31T00:00:00+00:00)');
         res.body.errors[4].should.be.eql('Index: 6 (tag fake-tag not found in database)'); 
-        res.body.errors[5].should.be.eql('Index: 7 (enddate is not in Date format)');
+        res.body.errors[5].should.be.eql('Index: 7 (enddate is not in Date format : Example format: 2022-12-31T00:00:00+00:00)');
         res.body.errors[6].should.be.eql('Index: 9 (expected number in samples at position 0)');       
     });
 
@@ -232,8 +232,8 @@ describe('/POST dataset', () => {
         res.body.completed[3].should.be.eql('6');
         res.body.completed[4].should.be.eql('8');
         res.body.errors[0].should.be.eql('Index: 4 (Mismatch number of elements: Expected 6, got 5)');
-        res.body.errors[1].should.be.eql('Index: 5 (startdate is not in Date format)');        
-        res.body.errors[2].should.be.eql('Index: 7 (enddate is not in Date format)');
+        res.body.errors[1].should.be.eql('Index: 5 (startdate is not in Date format : Example format: 2022-12-31T00:00:00+00:00)');        
+        res.body.errors[2].should.be.eql('Index: 7 (enddate is not in Date format : Example format: 2022-12-31T00:00:00+00:00)');
         res.body.errors[3].should.be.eql('Index: 9 (expected number in samples at position 0)');       
     });
     
@@ -295,9 +295,9 @@ describe('/POST dataset', () => {
         res.body.errors[0].should.be.eql('Index: 2 (thing fake-thing not found in database)');
         res.body.errors[1].should.be.eql('Index: 3 (device fake-device not found in database)');
         res.body.errors[2].should.be.eql('Index: 4 (Mismatch number of elements: Expected 7, got 6)');
-        res.body.errors[3].should.be.eql('Index: 5 (startdate is not in Date format)');
+        res.body.errors[3].should.be.eql('Index: 5 (startdate is not in Date format : Example format: 2022-12-31T00:00:00+00:00)');
         res.body.errors[4].should.be.eql('Index: 6 (tag fake-tag not found in database)'); 
-        res.body.errors[5].should.be.eql('Index: 7 (enddate is not in Date format)');
+        res.body.errors[5].should.be.eql('Index: 7 (enddate is not in Date format : Example format: 2022-12-31T00:00:00+00:00)');
         res.body.errors[6].should.be.eql('Index: 8 (feature bad-feature not found in database)');
         res.body.errors[7].should.be.eql('Index: 9 (expected number in samples at position 0)');       
     });
@@ -324,8 +324,8 @@ describe('/POST dataset', () => {
         res.body.completed[2].should.be.eql('3');
         res.body.completed[3].should.be.eql('6');
         res.body.errors[0].should.be.eql('Index: 4 (Mismatch number of elements: Expected 7, got 6)');
-        res.body.errors[1].should.be.eql('Index: 5 (startdate is not in Date format)');        
-        res.body.errors[2].should.be.eql('Index: 7 (enddate is not in Date format)');
+        res.body.errors[1].should.be.eql('Index: 5 (startdate is not in Date format : Example format: 2022-12-31T00:00:00+00:00)');        
+        res.body.errors[2].should.be.eql('Index: 7 (enddate is not in Date format : Example format: 2022-12-31T00:00:00+00:00)');
         res.body.errors[3].should.be.eql('Index: 8 (feature bad-feature not found in database)');
         res.body.errors[4].should.be.eql('Index: 9 (expected number in samples at position 0)');       
     });
@@ -352,8 +352,8 @@ describe('/POST dataset', () => {
         res.body.completed[2].should.be.eql('2');
         res.body.completed[3].should.be.eql('5');
         res.body.errors[0].should.be.eql('Index: 3 (Mismatch number of elements: Expected 7, got 6)');
-        res.body.errors[1].should.be.eql('Index: 4 (startdate is not in Date format)');        
-        res.body.errors[2].should.be.eql('Index: 6 (enddate is not in Date format)');
+        res.body.errors[1].should.be.eql('Index: 4 (startdate is not in Date format : Example format: 2022-12-31T00:00:00+00:00)');        
+        res.body.errors[2].should.be.eql('Index: 6 (enddate is not in Date format : Example format: 2022-12-31T00:00:00+00:00)');
         res.body.errors[3].should.be.eql('Index: 7 (feature bad-feature not found in database)');
         res.body.errors[4].should.be.eql('Index: 8 (expected number in samples at position 0)');       
     });

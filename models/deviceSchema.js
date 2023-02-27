@@ -56,6 +56,17 @@ deviceSchema.path('features').validate({
     }
 });
 
+deviceSchema.path('things').validate({
+    validator: async function (value) {
+        const Thing = this.constructor.model('Thing');
+        for(let i=0; i<value.length; i++) {
+            let feature = await Thing.findById(value[i]);
+            if(!feature) throw new Error('Thing not existent (' + value[i] + ')');
+        };
+        return true;
+    }
+});
+
 // validate tags
 deviceSchema.path('tags').validate({
     validator: async function (values) {
