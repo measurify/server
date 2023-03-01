@@ -83,6 +83,7 @@ export default function Complete_configuration() {
     "history",
   ];
   viewFields["measurements"] = [
+    "_id",
     "thing",
     "feature",
     "device",
