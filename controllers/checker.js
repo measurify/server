@@ -117,7 +117,7 @@ exports.isValid = async function(req, res, type, field) {
 
 exports.whatCanSee = async function(req, res, model) {
     const Fieldmask = mongoose.dbs[req.tenant.database].model('Fieldmask'); 
-    let select_base  = { timestamp: false, lastmod: false, __v:false, password:false, token:false};//owner: false,
+    let select_base  = {owner: false, timestamp: false, lastmod: false, __v:false, password:false, token:false};
     if(model.modelName=="Subscription"){select_base  = {owner: false, __v:false};}
     if(!req.user.fieldmask) return select_base;
     const fieldmask = await Fieldmask.findById(req.user.fieldmask);
