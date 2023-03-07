@@ -371,12 +371,14 @@ exports.convertMeasurements = async function (req, res, list, query, model, sele
                 item.items.forEach(elem => columnsName.push(elem.name));
                 let tocsvresult = '';
                 tocsvresult = this.jsonToCSVPlus(list, columnsName);
+                [tocsvresult, result] = this.replaceSeparatorsGet(tocsvresult, query); if (result != null) return result;
                 return res.status(200).send(tocsvresult);
 
             case 'text/csv':
                 res.header('Content-Type', 'text/csv');
                 let csvresultlibrary = '';
                 csvresultlibrary = this.jsonToCSV(list);
+                [csvresultlibrary, result] = this.replaceSeparatorsGet(csvresultlibrary, query); if (result != null) return result;
                 return res.status(200).send(csvresultlibrary);
 
             case 'text/dataframe':
