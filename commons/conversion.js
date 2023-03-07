@@ -1,6 +1,7 @@
 const { isArray, forEach, isObject } = require('underscore');
 const extractData = require("./extractData.js");
 const errors = require("./errors.js");
+const mongoose = require('mongoose');
 
 exports.csv2json = function (owner, header, data, schema, modelName) {//items over more lines
     let result = {};
@@ -323,37 +324,8 @@ exports.replaceSeparatorsGet = function (data, query, res) {
     data = data.replace(/§/g, sepFloat);
     return [data, null];
 }
-//OLD
-/*
-exports.getGroups = function (experiment, protocol, query) {
-    let groupFilter=undefined;
-    if (query.groups !== undefined && query.groups.length !== 0) {// ?groups=["topic1","topic2"]
-        groupFilter = JSON.parse(query.groups);//filter
-    }
-    const body = {
-        "_id": experiment._id,
-        "history": experiment.history.map(step => ({
-            "step": step.step,//for each step
-            "groups": {//groupName from protocol:{ field1:value, field2:value...}
-                ...protocol.topics.reduce((acc, topic) => {
-                    groupFilter!==undefined&&!groupFilter.includes(topic.name)?{}
-                        : acc[topic.name] = topic.fields.reduce((fieldsAcc, field) => {
-                            let fieldValue= undefined;
-                            try{fieldValue =  step.fields.find(stepField => stepField.name === field.name).value}catch(error){};
-                            fieldsAcc[field.name] = fieldValue;
-                            return fieldsAcc;
-                        }, {})
-                    return acc;
-                }, {})
-            }
-        }))
-    };
 
-    return [body, null];
-}*/
-
-
-//NEW //Get groups of topics (all or selected by query) and also the description, unit and values for each step 
+//Get groups of topics (all or selected by query) and also the description, unit and values for each step 
 exports.getGroups = function (experiment, protocol, query) {
     let groupFilter = undefined;
     if (query.groups !== undefined && query.groups.length !== 0) {// ?groups=["topic1","topic2"]
@@ -366,7 +338,7 @@ exports.getGroups = function (experiment, protocol, query) {
             "groups": {//groupName from protocol:{ field1:value, field2:value...}
                 ...protocol.topics.reduce((acc, topic) => {
                     if (groupFilter === undefined || groupFilter.includes(topic.name)) {
-                        acc[topic.name] = {unit: topic.unit,  description: topic.description};
+                        acc[topic.name] = { unit: topic.unit, description: topic.description };
                         acc[topic.name].values = topic.fields.reduce((fieldsAcc, field) => {
                             let fieldValue = undefined;
                             try { fieldValue = step.fields.find(stepField => stepField.name === field.name).value } catch (error) { };
@@ -381,4 +353,45 @@ exports.getGroups = function (experiment, protocol, query) {
     };
 
     return [body, null];
+}
+
+exports.convertMeasurements = async function (req, res, list, query, model, select, restriction) {
+    if (req.headers.accept === 'text/csv+' || req.headers.accept === 'text/dataframe') {
+        if (query.filter)query.filter=JSON.parse(query.filter);
+        if (!query.filter || !query.filter.feature) return errors.manage(res, errors.get_request_error, "csv+ and dataframe formats need the feature declared, ex. url?filter={\"feature\":\"name\"}");
+        else featureId = query.filter.feature;
+    };
+    try {
+        switch (req.headers.accept) {
+            case 'text/csv+'://only with feature specified
+                const Feature = mongoose.dbs[req.tenant.database].model('Feature');
+                const item = await Feature.findById(featureId).select("items");
+                res.header('Content-Type', 'text/csv+');
+                let columnsName = [];
+                item.items.forEach(elem => columnsName.push(elem.name));
+                let tocsvresult = '';
+                tocsvresult = this.jsonToCSVPlus(list, columnsName);
+                return res.status(200).send(tocsvresult);
+
+            case 'text/csv':
+                res.header('Content-Type', 'text/csv');
+                let csvresultlibrary = '';
+                csvresultlibrary = this.jsonToCSV(list);
+                return res.status(200).send(csvresultlibrary);
+
+            case 'text/dataframe':
+                let datalist = await this.getInPdDataframe(query.filter, query.sort, select, query.page, query.limit, model, restriction);
+                return res.status(200).json(datalist);
+
+            case 'application/json':
+                return res.status(200).json(list);
+
+            default:
+                return res.status(200).json(list);
+        }
+    }
+    catch (err) {
+        if (err.name == 'CastError') return errors.manage(res, errors.resource_not_found);
+        else return errors.manage(res, errors.get_request_error, err);
+    }
 }
