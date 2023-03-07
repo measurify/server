@@ -1,4 +1,3 @@
-import EM_configuration from "./configs/EM_config";
 import Complete_configuration from "./configs/complete_config";
 
 //this script manages several configuration according to the tenant name
@@ -14,7 +13,7 @@ import Complete_configuration from "./configs/complete_config";
 export const base_api_url = undefined;
 
 //name of this dashboard, shown to users
-export const website_name = "CDB Dashboard";
+export const website_name = "Measurify Dashboard";
 
 //languages enabled for this GUI, only english "en" and italian "it" are supported with this version
 //if no languages are enabled, the GUI will be localized in english
@@ -125,8 +124,6 @@ export function LoadConfig() {
   //if tenant is deafult or not found in localstorage, show complete config
   if (tenantName === "" || tenantName === null) {
     conf = Complete_configuration();
-  } else if (tenantName.startsWith("EM-")) {
-    conf = EM_configuration();
   }
   //default config is the complete one
   else {
