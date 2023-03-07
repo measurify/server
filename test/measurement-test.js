@@ -43,11 +43,7 @@ describe("/GET measurements", () => {
   });
 
   it("it should GET all the measurements as CSV", async () => {
-    const owner = await factory.createUser(
-      "test-username-1",
-      "test-password-1",
-      UserRoles.provider
-    );
+    const owner = await factory.createUser("test-username-1","test-password-1",UserRoles.provider);
     const feature = await factory.createFeature("test-feature", owner, [
       { name: "item-name-1", unit: "items-unit-1", type: ItemTypes.number },
       { name: "item-name-2", unit: "items-unit-2", type: ItemTypes.number },
@@ -55,37 +51,126 @@ describe("/GET measurements", () => {
     ]);
     const tag1 = await factory.createTag("test-tag-1", owner);
     const tag2 = await factory.createTag("test-tag-2", owner);
-    const device = await factory.createDevice("test-device-1", owner, [
-      feature,
-    ]);
+    const device = await factory.createDevice("test-device-1", owner, [feature]);
     const thing = await factory.createThing("test-thing-1", owner);
-    const measurement1 = await factory.createMeasurement(
-      owner,
-      feature,
-      device,
-      thing,
-      [tag1, tag2],
+    const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2],
       [
         factory.createSample([1.8, 5.3, 6.2]),
         factory.createSample([9.7, 2.1, 5.2]),
       ]
     );
-    const measurement2 = await factory.createMeasurement(
-      owner,
-      feature,
-      device,
-      thing,
-      [tag1, tag2],
-      factory.createSamples([4.4, 7.3, 3.6])
-    );
-    const res = await chai
-      .request(server)
-      .keepOpen()
-      .get("/v1/measurements")
-      .set("Authorization", await factory.getUserToken(owner))
-      .set("Accept", "text/csv");
+    const measurement2 = await factory.createMeasurement(owner,feature,device,thing,[tag1, tag2],factory.createSamples([4.4, 7.3, 3.6]));
+    const res = await chai.request(server).keepOpen().get("/v1/measurements").set("Authorization", await factory.getUserToken(owner)).set("Accept", "text/csv");
     res.should.have.status(200);
     res.text.should.be.a("string");
+    res.text.should.contain('visibility,tags,_id,startDate,endDate,location,thing,feature,device,samples');
+    res.text.should.contain('"private",["test-tag-1";"test-tag-2"],"'+measurement2._id+'","'+measurement2.startDate.toJSON()+'","'+measurement2.endDate.toJSON()+'",[],"test-thing-1","test-feature","test-device-1",[4.4,7.3,3.6]');
+    res.text.should.contain('"private",["test-tag-1";"test-tag-2"],"'+measurement1._id+'","'+measurement1.startDate.toJSON()+'","'+measurement1.endDate.toJSON()+'",[],"test-thing-1","test-feature","test-device-1",[1.8,5.3,6.2]');
+  });
+
+  it("it should GET all the measurements as CSV+", async () => {
+    const owner = await factory.createUser("test-username-1","test-password-1",UserRoles.provider);
+    const feature = await factory.createFeature("test-feature", owner, [
+      { name: "item-name-1", unit: "items-unit-1", type: ItemTypes.number },
+      { name: "item-name-2", unit: "items-unit-2", type: ItemTypes.number },
+      { name: "item-name-3", unit: "items-unit-3", type: ItemTypes.number },
+    ]);
+    const tag1 = await factory.createTag("test-tag-1", owner);
+    const tag2 = await factory.createTag("test-tag-2", owner);
+    const device = await factory.createDevice("test-device-1", owner, [feature]);
+    const thing = await factory.createThing("test-thing-1", owner);
+    const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2],
+      [
+        factory.createSample([1.8, 5.3, 6.2]),
+        factory.createSample([9.7, 2.1, 5.2]),
+      ]
+    );
+    const measurement2 = await factory.createMeasurement(owner,feature,device,thing,[tag1, tag2],factory.createSamples([4.4, 7.3, 3.6]));
+    const res = await chai.request(server).keepOpen().get("/v1/measurements?filter={\"feature\":\""+feature._id+"\"}").set("Authorization", await factory.getUserToken(owner)).set("Accept", "text/csv+");
+    res.should.have.status(200);
+    res.text.should.be.a("string");
+    res.text.should.contain('visibility,tags,_id,startDate,endDate,location,thing,feature,device,item-name-1,item-name-2,item-name-3,deltatime\n');
+    res.text.should.contain('private,[test-tag-1,test-tag-2],'+measurement2._id+','+measurement2.startDate.toJSON()+','+measurement2.endDate.toJSON()+',[object Object],test-thing-1,test-feature,test-device-1,4.4,7.3,3.6,0');
+    res.text.should.contain('private,[test-tag-1,test-tag-2],'+measurement1._id+','+measurement1.startDate.toJSON()+','+measurement1.endDate.toJSON()+',[object Object],test-thing-1,test-feature,test-device-1,1.8,5.3,6.2,0');
+    res.text.should.contain('private,[test-tag-1,test-tag-2],'+measurement1._id+','+measurement1.startDate.toJSON()+','+measurement1.endDate.toJSON()+',[object Object],test-thing-1,test-feature,test-device-1,9.7,2.1,5.2,0');
+  
+  });
+
+  it("it should NOT GET all the measurements as CSV+ without feature specification", async () => {
+    const owner = await factory.createUser("test-username-1","test-password-1",UserRoles.provider);
+    const feature = await factory.createFeature("test-feature", owner, [
+      { name: "item-name-1", unit: "items-unit-1", type: ItemTypes.number },
+      { name: "item-name-2", unit: "items-unit-2", type: ItemTypes.number },
+      { name: "item-name-3", unit: "items-unit-3", type: ItemTypes.number },
+    ]);
+    const tag1 = await factory.createTag("test-tag-1", owner);
+    const tag2 = await factory.createTag("test-tag-2", owner);
+    const device = await factory.createDevice("test-device-1", owner, [feature]);
+    const thing = await factory.createThing("test-thing-1", owner);
+    const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2],
+      [
+        factory.createSample([1.8, 5.3, 6.2]),
+        factory.createSample([9.7, 2.1, 5.2]),
+      ]
+    );
+    const measurement2 = await factory.createMeasurement(owner,feature,device,thing,[tag1, tag2],factory.createSamples([4.4, 7.3, 3.6]));
+    const res = await chai.request(server).keepOpen().get("/v1/measurements").set("Authorization", await factory.getUserToken(owner)).set("Accept", "text/csv+");
+    res.body.should.be.a("object");
+    res.body.message.should.be.a("string");
+    res.should.have.status(errors.post_request_error.status);
+    res.body.message.should.contain(errors.get_request_error.message);
+    res.body.details.should.contain("csv+ and dataframe formats need the feature declared, ex. url?filter={\"feature\":\"name\"}");
+  });
+
+  it("it should GET all the measurements as Dataframe", async () => {
+    const owner = await factory.createUser("test-username-1","test-password-1",UserRoles.provider);
+    const feature = await factory.createFeature("test-feature", owner, [
+      { name: "item-name-1", unit: "items-unit-1", type: ItemTypes.number },
+      { name: "item-name-2", unit: "items-unit-2", type: ItemTypes.number },
+      { name: "item-name-3", unit: "items-unit-3", type: ItemTypes.number },
+    ]);
+    const tag1 = await factory.createTag("test-tag-1", owner);
+    const tag2 = await factory.createTag("test-tag-2", owner);
+    const device = await factory.createDevice("test-device-1", owner, [feature]);
+    const thing = await factory.createThing("test-thing-1", owner);
+    const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2],
+      [
+        factory.createSample([1.8, 5.3, 6.2]),
+        factory.createSample([9.7, 2.1, 5.2]),
+      ]
+    );
+    const measurement2 = await factory.createMeasurement(owner,feature,device,thing,[tag1, tag2],factory.createSamples([4.4, 7.3, 3.6]));
+    const res = await chai.request(server).keepOpen().get("/v1/measurements?filter={\"feature\":\""+feature._id+"\"}").set("Authorization", await factory.getUserToken(owner)).set("Accept", "text/dataframe");
+    res.should.have.status(200);
+    res.text.should.be.a("string");
+    res.text.should.contain('[{"_id":"test-feature","visibility":["private","private","private"],"tags":[["test-tag-1","test-tag-2"],["test-tag-1","test-tag-2"],["test-tag-1","test-tag-2"]],"id":[');
+    res.text.should.contain(',"thing":["test-thing-1","test-thing-1","test-thing-1"],"device":["test-device-1","test-device-1","test-device-1"],"samples":[[1.8,5.3,6.2],[9.7,2.1,5.2],[4.4,7.3,3.6]]}]');
+  });
+
+  it("it should NOT GET all the measurements as Dataframe without feature specification", async () => {
+    const owner = await factory.createUser("test-username-1","test-password-1",UserRoles.provider);
+    const feature = await factory.createFeature("test-feature", owner, [
+      { name: "item-name-1", unit: "items-unit-1", type: ItemTypes.number },
+      { name: "item-name-2", unit: "items-unit-2", type: ItemTypes.number },
+      { name: "item-name-3", unit: "items-unit-3", type: ItemTypes.number },
+    ]);
+    const tag1 = await factory.createTag("test-tag-1", owner);
+    const tag2 = await factory.createTag("test-tag-2", owner);
+    const device = await factory.createDevice("test-device-1", owner, [feature]);
+    const thing = await factory.createThing("test-thing-1", owner);
+    const measurement1 = await factory.createMeasurement(owner, feature, device, thing, [tag1, tag2],
+      [
+        factory.createSample([1.8, 5.3, 6.2]),
+        factory.createSample([9.7, 2.1, 5.2]),
+      ]
+    );
+    const measurement2 = await factory.createMeasurement(owner,feature,device,thing,[tag1, tag2],factory.createSamples([4.4, 7.3, 3.6]));
+    const res = await chai.request(server).keepOpen().get("/v1/measurements").set("Authorization", await factory.getUserToken(owner)).set("Accept", "text/dataframe");
+    res.body.should.be.a("object");
+    res.body.message.should.be.a("string");
+    res.should.have.status(errors.post_request_error.status);
+    res.body.message.should.contain(errors.get_request_error.message);
+    res.body.details.should.contain("csv+ and dataframe formats need the feature declared, ex. url?filter={\"feature\":\"name\"}");
   });
 
   it("it should GET a specific measurement", async () => {
