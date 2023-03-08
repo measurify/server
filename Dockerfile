@@ -14,7 +14,7 @@ RUN npm install pm2 -g
 COPY . . 
 
 #build gui inside /gui folder, then copy it to publig measurify folder
-RUN cd /gui && npm install && npm run build && cp -r ./build/* ../public/ && cd ..
+RUN cd gui && npm install && npm run build && cp -r ./build/* ../public/ && cd ..
 
 
 EXPOSE 8084 

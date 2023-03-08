@@ -5,7 +5,7 @@ export default function Complete_configuration() {
   //operation pages
   //those are the pages of operations performed on experiments,
   // which are: updatehistory, downloadexperiment, removesteps
-  const operationPages = ["updatehistory", "downloadexperiment", "removesteps"];
+  const operationPages = [];
 
   //dictionary of pages: key is the route for the API REST, value is an array that contains the fields shown to users
   //action is a special field that will enable actions for each row || still required, future version may have it removed
@@ -44,7 +44,6 @@ export default function Complete_configuration() {
 
   restrictionPages["users"] = ["admin"];
   restrictionPages["roles"] = ["admin"];
-  restrictionPages["protocols"] = ["admin"];
 
   //actions dictionary: key is the page, value is an array that contains actions || working actions arae "view" | "edit" | "delete" | "duplicate"
   const pageActions = {};
