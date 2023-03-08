@@ -40,6 +40,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "build": "react-scripts build",
     "build-mac": "react-scripts build && cp -r ./build/* ../public/",
     "build-win": "react-scripts  build && (robocopy build/ ../public/ /Mir) ^& IF %ERRORLEVEL% LSS 8 SET ERRORLEVEL=0",
     "test": "react-scripts test",
