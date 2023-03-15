@@ -64,7 +64,7 @@ describe('/GET dataset', () => {
         const res = await chai.request(server).keepOpen().get('/v1/datasets?filter={"feature":"test-feature"}').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv+');
         res.should.have.status(200);
         res.text.should.be.a('string');
-        res.text.should.contain('visibility,tags,_id,startDate,endDate,location,thing,feature,device,item-name-1,deltatime');
+        res.text.should.contain('visibility,tags,_id,startDate,endDate,location,thing,feature,device,item-name-1');
     });
 
     it('it should GET measurements paginated', async () => {
@@ -140,11 +140,11 @@ describe('/GET dataset', () => {
         let res = await chai.request(server).keepOpen().get('/v1/datasets/'+dataupload1._id+'?filter={"feature":"test-feature"}').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv+');
         res.should.have.status(200);
         res.text.should.be.a('string');
-        res.text.should.contain('visibility,tags,_id,startDate,endDate,location,thing,feature,device,item-name-1,deltatime');
+        res.text.should.contain('visibility,tags,_id,startDate,endDate,location,thing,feature,device,item-name-1');
         res = await chai.request(server).keepOpen().get('/v1/datasets/'+dataupload2._id+'?filter={"feature":"test-feature"}').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv+');
         res.should.have.status(200);
         res.text.should.be.a('string');
-        res.text.should.contain('visibility,tags,_id,startDate,endDate,location,thing,feature,device,item-name-1,deltatime');
+        res.text.should.contain('visibility,tags,_id,startDate,endDate,location,thing,feature,device,item-name-1');
     });
 
     it('it should GET info of the dataupload', async () => {

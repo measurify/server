@@ -166,7 +166,7 @@ exports.jsonToCSVPlus = function (jsonData, columnsname) {
                 }
                 else return `${value}`
             })
-            .join(process.env.CSV_DELIMITER)}` + process.env.CSV_DELIMITER + "deltatime" + "\n";
+            .join(process.env.CSV_DELIMITER)}` + "\n";//removed + process.env.CSV_DELIMITER + deltatime
     currentRow = "\n";//string for samples with more values
     json.docs.forEach(doc => {//loop for each sample
         str +=//single sample
@@ -183,7 +183,7 @@ exports.jsonToCSVPlus = function (jsonData, columnsname) {
                                 delta = 0;//inizialization and default = 0
                                 if (x.delta != null) delta = x.delta;  //add as a column                            
                                 // if it's an object containing values:
-                                return x.values.map(x => { if (isArray(x)) { return "[" + x.join(process.env.CSV_VECTOR_DELIMITER) + "]" } else { return x.toString() } }).join(process.env.CSV_DELIMITER) + process.env.CSV_DELIMITER + delta;//mappa i valori di values separandoli con una virgola. 
+                                return x.values.map(x => { if (isArray(x)) { return "[" + x.join(process.env.CSV_VECTOR_DELIMITER) + "]" } else { return x.toString() } }).join(process.env.CSV_DELIMITER);//map values of values and separe it with a comma.  removed + process.env.CSV_DELIMITER + delta
                             }
                             ).join(currentRow);
                         }
@@ -364,6 +364,9 @@ exports.convertMeasurements = async function (req, res, list, query, model, sele
     try {
         switch (req.headers.accept) {
             case 'text/csv+'://only with feature specified
+                list = JSON.stringify(list);
+                list = typeof list !== "object" ? JSON.parse(list) : list;
+                if(req.query&&req.query.select&&!req.query.select.includes("_id"))list.docs.forEach(e=> delete e._id);
                 const Feature = mongoose.dbs[req.tenant.database].model('Feature');
                 const item = await Feature.findById(featureId).select("items");
                 res.header('Content-Type', 'text/csv+');
