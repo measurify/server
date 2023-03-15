@@ -398,7 +398,10 @@ exports.dataUpload = async function (req, res, lines, elementsNumber, report, de
   for (let i in lines) {
     if (lines[i] == "") continue;
     if ((i == 0) & (header == true)) continue;
-    let line = lines[i].split(",");
+    if (!process.env.CSV_DELIMITER) process.env.CSV_DELIMITER = ',';
+    let sep = req.query && req.query.sep ? req.query.sep : process.env.CSV_DELIMITER;
+    const regex = new RegExp(sep + '(?=(?:(?:[^"]*"){2})*[^"]*$)')  //Split a string by commas but ignore commas within double-quotes
+    let line = lines[i].split(regex);
     if (line.length != elementsNumber) {
       errMessage = "Mismatch number of elements: Expected " + elementsNumber + ", got " + line.length;
       report.errors.push("Index: " + i + " (" + errMessage + ")");
