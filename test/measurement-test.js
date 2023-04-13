@@ -1770,6 +1770,35 @@ describe('/POST file CSV route', () => {
       res.body.errors.length.should.be.eql(0);        
   });
 
+  it('it should POST measurements from CSV file with missing items columns', async () => {
+    const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);    
+    const items = [
+      { name: "a", unit: "item-unit-1", type: ItemTypes.number },
+      { name: "b", unit: "item-unit-1", type: ItemTypes.number },
+      { name: "c", unit: "item-unit-1", type: ItemTypes.number },
+      { name: "d", unit: "item-unit-1", type: ItemTypes.number },
+      { name: "e", unit: "item-unit-1", type: ItemTypes.number },
+    ];
+    const feature = await factory.createFeature("test", user, items);
+    const testFile = './test/dummies/test-file3-with-missing-columns.csv';
+    const testDescription = './test/dummies/test-description-test-file3-with-missing-columns.json';
+    
+    const res = await chai.request(server).keepOpen().post('/v1/measurements/file?force=true').attach('file', testFile).attach('description', testDescription).set("Authorization", await factory.getUserToken(user));
+    res.should.have.status(200); 
+    res.body.should.be.a('object');
+    res.body.should.have.property('completed');
+    res.body.should.have.property('errors');
+    res.body.completed.length.should.be.eql(2);
+    res.body.errors.length.should.be.eql(0);       
+    const res2 = await chai.request(server).keepOpen().get("/v1/measurements?filter={\"feature\":\"test\"}").set("Authorization", await factory.getUserToken(user));
+      
+    res2.should.have.status(200);
+    res2.body.docs.should.be.a("array");
+    res2.body.docs.length.should.be.eql(2);    
+    res2.body.docs[0].samples[0].values.should.be.eql([4,5,null,6,null]);
+    res2.body.docs[1].samples[0].values.should.be.eql([1,2,null,3,null]);   
+  });
+
   it('it should POST measurements from CSV some row correct and some not', async () => {
       const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
       const tag1 = await factory.createTag("test-tag-1", user);

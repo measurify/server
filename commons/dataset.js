@@ -414,7 +414,7 @@ exports.dataUpload = async function (req, res, lines, elementsNumber, report, de
     let resources = ["feature", "device", "thing"];
     let lineResource = {};
     let errorOccurred = false;
-    for (let re of resources) {//problema il continue lo fa di questo non per la line
+    for (let re of resources) {
       if (errorOccurred) continue;
       if (descriptionData.commonElements.hasOwnProperty(re)) continue;
       lineResource[re + "Name"] = line[descriptionData[re]];      
@@ -442,7 +442,7 @@ exports.dataUpload = async function (req, res, lines, elementsNumber, report, de
           }
           lineResource.thingInfo = await models.thing.findById(lineResource.thingName);
         }
-        if (re === "device") { ///ATTENZIONE A COMPLETARE LA FEATURE
+        if (re === "device") { 
           //save device on database by default value
           let body = {
             //default value
