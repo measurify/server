@@ -183,7 +183,7 @@ exports.jsonToCSVPlus = function (jsonData, columnsname) {
                                 delta = 0;//inizialization and default = 0
                                 if (x.delta != null) delta = x.delta;  //add as a column                            
                                 // if it's an object containing values:
-                                return x.values.map(x => { if (isArray(x)) { return "[" + x.join(process.env.CSV_VECTOR_DELIMITER) + "]" } else { return x.toString() } }).join(process.env.CSV_DELIMITER);//map values of values and separe it with a comma.  removed + process.env.CSV_DELIMITER + delta
+                                return x.values.map(x => { if (isArray(x)) { return "[" + x.join(process.env.CSV_VECTOR_DELIMITER) + "]" } else { return x!==null?x.toString():"" } }).join(process.env.CSV_DELIMITER);//map values of values and separe it with a comma.  removed + process.env.CSV_DELIMITER + delta
                             }
                             ).join(currentRow);
                         }
@@ -225,7 +225,7 @@ exports.jsonToCSV = function (jsonData) {
 
 const sampleValues = function (sample) {
     let sampleText = "[";
-    sampleText += sample.values.toString();
+    sampleText += sample.values!==null?sample.values.toString():"";
     sampleText += "]";
     return sampleText;
 }
