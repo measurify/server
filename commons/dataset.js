@@ -149,7 +149,8 @@ exports.elementsCount = async function (descriptionData) {
     if (key == "items") {
       for (var features in descriptionData.items) {
         for (var element in descriptionData.items[features]) {
-          arrayItems.push(descriptionData.items[features][element]);
+          if(descriptionData.items[features][element]!=="#"){
+          arrayItems.push(descriptionData.items[features][element]);}
         }
       }
       arrayItems = [...new Set(arrayItems)]; //to eliminate duplicates
@@ -206,7 +207,8 @@ exports.checkDescriptionIntegrity = async function (res, descriptionData) {
       if (key == "items") {
         for (var features of Object.keys(descriptionData.items)) {
           descriptionData.items[features].forEach(function (value, i) {
-            data.items[features][i] = parseInt(value) - 1;
+            if(value==="#") data.items[features][i] = value;
+            else{data.items[features][i] = parseInt(value) - 1;}
           });
         }
       } else {
@@ -261,8 +263,9 @@ const createRequestObject = async function (startdate, enddate, thing, feature, 
 
 exports.sampleLoop = async function (descriptionData, line, feature) {
   let samples = [];
-  for (let k in descriptionData.items[feature._id]) {
-    str_val = line[descriptionData.items[feature._id][k]].replace(/['"]+/g, "");
+  for (let k in descriptionData.items[feature._id]) {   
+    if(descriptionData.items[feature._id][k]==="#"){samples.push(null); continue;}//for elements missing in the csv file 
+    str_val = line[descriptionData.items[feature._id][k]].replace(/['"]+/g, "");    
     if (feature.items[k].dimension != 0) {
       //dimension 1 an array
       if (isNaN(str_val)) {
@@ -402,6 +405,7 @@ exports.dataUpload = async function (req, res, lines, elementsNumber, report, de
     let sep = req.query && req.query.sep ? req.query.sep : process.env.CSV_DELIMITER;
     const regex = new RegExp(sep + '(?=(?:(?:[^"]*"){2})*[^"]*$)')  //Split a string by commas but ignore commas within double-quotes
     let line = lines[i].split(regex);
+    line = line.map(el=>el.replace(/['"]+/g, ""));
     if (line.length != elementsNumber) {
       errMessage = "Mismatch number of elements: Expected " + elementsNumber + ", got " + line.length;
       report.errors.push("Index: " + i + " (" + errMessage + ")");
@@ -587,7 +591,6 @@ exports.dataUpload = async function (req, res, lines, elementsNumber, report, de
       tags.push(filename);
     }
 
-    //CONTINUARE DA QUA DOMANI
     let feature = descriptionData.commonElementsData.featureInfo ? descriptionData.commonElementsData.featureInfo : lineResource.featureInfo;
     //Add Samples
     var samples = [];
