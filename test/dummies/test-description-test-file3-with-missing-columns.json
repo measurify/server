@@ -2,7 +2,7 @@
 "thing":"test2",
 "device":"test2",
 "items":{
-"test":[1,2,"#",3,"#"]
+"test":[1,2,"_",3,"_"]
 },
 "tags":[],
 "startdate":"2022-01-01T00:00:00+01:00",

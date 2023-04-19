@@ -149,7 +149,7 @@ exports.elementsCount = async function (descriptionData) {
     if (key == "items") {
       for (var features in descriptionData.items) {
         for (var element in descriptionData.items[features]) {
-          if(descriptionData.items[features][element]!=="#"){
+          if(descriptionData.items[features][element]!=="_"){
           arrayItems.push(descriptionData.items[features][element]);}
         }
       }
@@ -207,7 +207,7 @@ exports.checkDescriptionIntegrity = async function (res, descriptionData) {
       if (key == "items") {
         for (var features of Object.keys(descriptionData.items)) {
           descriptionData.items[features].forEach(function (value, i) {
-            if(value==="#") data.items[features][i] = value;
+            if(value==="_") data.items[features][i] = value;
             else{data.items[features][i] = parseInt(value) - 1;}
           });
         }
@@ -264,7 +264,7 @@ const createRequestObject = async function (startdate, enddate, thing, feature, 
 exports.sampleLoop = async function (descriptionData, line, feature) {
   let samples = [];
   for (let k in descriptionData.items[feature._id]) {   
-    if(descriptionData.items[feature._id][k]==="#"){samples.push(null); continue;}//for elements missing in the csv file 
+    if(descriptionData.items[feature._id][k]==="_"){samples.push(null); continue;}//for elements missing in the csv file 
     str_val = line[descriptionData.items[feature._id][k]].replace(/['"]+/g, "");    
     if (feature.items[k].dimension != 0) {
       //dimension 1 an array
