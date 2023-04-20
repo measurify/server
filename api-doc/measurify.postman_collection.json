@@ -263,13 +263,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{url}}/v1/type/passwordStrength",
+							"raw": "{{url}}/v1/types/passwordStrength",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"v1",
-								"type",
+								"types",
 								"passwordStrength"
 							]
 						}

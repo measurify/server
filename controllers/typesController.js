@@ -1,4 +1,6 @@
 const fs = require('fs');
+const controller = require('./controller');
+const mongoose = require('mongoose');
 
 exports.get = async (req, res) => { 
     const types = {};
@@ -14,5 +16,10 @@ exports.get = async (req, res) => {
 exports.getPasswordStrength = async (req, res) => {
     const passwordStrength = {passwordStrength:  process.env.MIN_PASSWORD_STRENGTH, ValidityPasswordDays:process.env.DEFAULT_DAYS_VALIDITY_PASSWORD};
     res.status(200).json(passwordStrength);
+};
+
+exports.getTenantNames = async (req, res) => {
+    const Tenant = mongoose.dbs['catalog'].model('Tenant');
+    return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', ["_id"], Tenant, null);     
 };
 
