@@ -9,7 +9,6 @@ services:
       - "443:443"
     depends_on:
       - database
-      - certificator
     volumes:
         - ./resources:/resources   
     restart: always
@@ -20,14 +19,4 @@ services:
         - ./data:/data/db
     ports:
       - "27017:27017"
-    restart: always
-  certificator: 
-    image: linuxserver/letsencrypt 
-    ports: 
-      - 80:80 
-    volumes: 
-      - ./resources:/config 
-    environment: 
-      - URL=tracker.elioslab.net 
-      - VALIDATION=http 
-    restart: always
+
