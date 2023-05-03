@@ -12,12 +12,15 @@ services:
       - certificator
     volumes:
         - ./resources:/resources   
+    restart: always
   database:
     image: mongo
+    container_name: database
     volumes:
         - ./data:/data/db
     ports:
       - "27017:27017"
+    restart: always
   certificator: 
     image: linuxserver/letsencrypt 
     ports: 
