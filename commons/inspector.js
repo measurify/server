@@ -30,7 +30,7 @@ function areSameTypes(values, feature) {
       return ("No match between sample value size and feature items dimension  (" + size + " != " + feature.items[i].dimension + "). Item no. " + i + ", value: " + value + " [" + feature._id + "]");
     }
     if ((isNumber(value) && !shouldBeNumber(feature.items[i])) ||
-      (!isNumber(value) && shouldBeNumber(feature.items[i]))){if(value==="")continue;
+      (!isNumber(value) && shouldBeNumber(feature.items[i]))){if(value==="" || value===null)continue;
       return ("No match between sample value type and feature items type  (" + value + " not of type " + feature.items[i].type + "). Item no. " + i + ", value: " + value);}
     if (feature.items[i].type == ItemTypes.enum) {
       if (!feature.items[i].range.includes(value))
