@@ -41,9 +41,9 @@ exports.post = async (req, res) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   const Timesample = mongoose.dbs[req.tenant.database].model("Timesample");
   let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
-  result = await checker.canOperate(req, res,"Measurement","GET"); if (result != true) return result;  
+  result = await checker.canOperate(req, res,"Measurement","GET");if (result != true) return result; 
   result = await checker.hasRights(req, res, Measurement);if (result != true) return result;
-  result = await checker.canOperate(req, res,"Measurement"); if (result != true) return result;  
+  result = await checker.canOperate(req, res,"Measurement"); if (result != true) return result;  //POST CHECK
   if(req.headers.accept=="text/csv"){result=await extractData.bodyToCSV(req,res);if (result != true) return result;}
   if (req.body.constructor == Array) req.body.forEach(item => item.measurement = req.resource._id)
   else req.body.measurement = req.resource._id;

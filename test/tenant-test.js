@@ -53,6 +53,15 @@ describe('/GET tenant', () => {
         const res = await chai.request(server).keepOpen().get('/v1/tenants/fake-tenant').set("Authorization", "fake-token");
         res.should.have.status(errors.authentication_error.status);
     });
+
+    it('it should GET the names of tenants with the types/tenants without any authorization', async () => {
+        const tenant = await factory.createTenant("test-tenant-2", "organization-test-1", "test street", "test@email", "433232", "test", "test");
+        const res = await chai.request(server).keepOpen().get('/v1/types/tenants');
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.docs.length.should.be.eql(4);
+        res.body.docs[0]._id.should.be.eql(tenant._id);
+    });
 });
 
 // Test the /POST route
