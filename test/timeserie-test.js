@@ -128,7 +128,7 @@ describe('/GET time samples', () => {
 });
 
 // Test the /POST route
-describe('/POST feature', () => {
+describe('/POST time samples', () => {
     it('it should not POST a timesample without timestamp field', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature = await factory.createFeature("test-feature", owner);
@@ -254,7 +254,7 @@ describe('/POST feature', () => {
 });
 
 // Test the /POST and GET file route
-describe('/POST and GET file timeserie', () => {
+describe('/POST and GET file timeserie from a .csv file', () => {
     it('it should POST and GET a list of timesamples from a .csv file', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const items =[{ name: "item-name-1", unit: "items-unit-1", type: ItemTypes.number, dimension:0 },{ name: "item-name-2", unit: "items-unit-2", type: ItemTypes.number, dimension:1 }]

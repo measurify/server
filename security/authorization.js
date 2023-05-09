@@ -64,34 +64,6 @@ exports.canOperate = function (user, role, method, entity, resource) {
     return false;
 }
 
-exports.canDeviceOperate = function (device, method, entity, body) {
-    if (method != "POST" || entity != "Measurement") return [false, "Device cannot do " + method.toLowerCase() + " operation on the resource " + entity];
-    if (!body) return [false, "Body of the device not found"];
-    if (body.constructor == Array) {
-        let notError = [true, null];
-        if (!device.features) return [false, "The device has not acceptable features"];
-        if (!device.things) return [false, "The device has not acceptable things"];
-        body.forEach(element => {
-            if (!notError) return;
-            if (!element.feature) notError = [false, "The body of the request has not the field feature"];
-            if (!element.thing) notError = [false, "The body of the request has not the field thing"];
-            if (!device.features.includes(element.feature)) notError = [false, "The feature " + element.feature + " is not in the acceptable features of the device"];
-            if (!device.things.includes(element.thing)) notError = [false, "The thing " + element.thing + " is not in the acceptable things of the device"];
-        }
-        )
-        return notError;
-
-    }
-    if (!device.features) return [false, "The device has not acceptable features"];
-    if (!device.things) return [false, "The device has not acceptable things"];
-    if (!body.feature) return [false, "The body of the request has not the field feature"];
-    if (!body.thing) return [false, "The body of the request has not the field thing"];
-    if (!device.features.includes(body.feature)) return [false, "The feature " + body.feature + " is not in the acceptable features of the device"];
-    if (!device.things.includes(body.thing)) return [false, "The thing " + body.thing + " is not in the acceptable things of the device"];
-
-    return [true, null];
-}
-
 exports.whatCanOperate = function (user, role, method, entity) { //read,delete 
     let result = {};
     let roleEntity = role.actions.filter(action => action.entity.toLowerCase() == entity.toLowerCase())
@@ -181,3 +153,64 @@ exports.readJustOwned = function (user) {
     if (this.isAdministrator(user)) return null;
     return { owner: user._id };
 } 
+
+exports.canDeviceOperate = async function (device, method, entity, body, paramsId,tenant) {
+    if (entity == "Measurement") {
+        if (paramsId) {//for get one and timeseries
+            if (method == "GET" || method == "POST") {                
+                const Measurement = mongoose.dbs[tenant.database].model('Measurement');
+                const measurement = await Measurement.findById(paramsId);
+                if (measurement.device != device._id) return [false, "The measurement required has not your device id " + device._id];
+                if (!device.features) return [false, "The device has not acceptable features"];
+                if (!device.things) return [false, "The device has not acceptable things"];
+                if (!device.features.includes(measurement.feature)) return [false, "The feature in the measurement required is not in the list of acceptable features of the device"];
+                if (!device.things.includes(measurement.thing)) return [false, "The thing in the measurement required is not in the list acceptable things of the device"];
+                return [true, null];
+            }
+        }
+        else {
+            if (method == "POST") {
+                if (!body) return [false, "Body of the device not found"];
+                if (body.constructor == Array) {
+                    let notError = [true, null];
+                    if (!device.features) return [false, "The device has not acceptable features"];
+                    if (!device.things) return [false, "The device has not acceptable things"];
+                    body.forEach(element => {
+                        if (!notError) return;
+                        if (!element.feature) notError = [false, "The body of the request has not the field feature"];
+                        if (!element.thing) notError = [false, "The body of the request has not the field thing"];
+                        if (!device.features.includes(element.feature)) notError = [false, "The feature " + element.feature + " is not in the acceptable features of the device"];
+                        if (!device.things.includes(element.thing)) notError = [false, "The thing " + element.thing + " is not in the acceptable things of the device"];
+                    })
+                    return notError;
+                }
+                if (!device.features) return [false, "The device has not acceptable features"];
+                if (!device.things) return [false, "The device has not acceptable things"];
+                if (!body.feature) return [false, "The body of the request has not the field feature"];
+                if (!body.thing) return [false, "The body of the request has not the field thing"];
+                if (!device.features.includes(body.feature)) return [false, "The feature " + body.feature + " is not in the acceptable features of the device"];
+                if (!device.things.includes(body.thing)) return [false, "The thing " + body.thing + " is not in the acceptable things of the device"];
+                return [true, null];
+            }
+        }
+    }
+    if ((entity == "Feature" || entity == "Thing")&& method=="GET") {
+        if (paramsId) {//for get one             
+            if (!device[entity.toLowerCase() + "s"]) return [false, "The device has not acceptable " + entity.toLowerCase() + "s"];
+            if (!device[entity.toLowerCase() + "s"].includes(paramsId)) return [false, "The " + entity + " required is not in the list of acceptable " + entity.toLowerCase() + "s of the device"];
+            return [true, null];            
+        }
+        else return [false, "Specify the id of the " + entity + " you want to get"];
+    }
+    if (entity == "Device" && method== "GET") {
+        if (paramsId) {//for get one            
+            if (device._id != paramsId) return [false, "A Device cannot get information of other devices"];
+            return [true, null];
+            
+        }
+        else return [false, "Specify the id of the Device you want to get"];
+       
+    } 
+    if (entity == "Tag" && (method == "GET"|| method == "POST")) return [true, null];    
+    return [false, "Device cannot do " + method.toLowerCase() + " operation on the resource " + entity];
+}

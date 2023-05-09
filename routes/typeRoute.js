@@ -5,5 +5,5 @@ const { catchErrors } = require('../commons/errorHandlers.js');
 
 router.get('/',  catchErrors(typesController.get));
 router.get('/passwordStrength',  catchErrors(typesController.getPasswordStrength));
-router.get('/tenantNames',  catchErrors(typesController.getTenantNames));
+router.get('/tenants',  catchErrors(typesController.getTenantNames));
 module.exports = router;
