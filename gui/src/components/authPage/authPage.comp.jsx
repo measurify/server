@@ -13,7 +13,7 @@ const userRef = React.createRef();
 const pswRef = React.createRef();
 const tenantRef = React.createRef();
 
-const AuthPageComp = () => {
+const AuthPageComp = ({ tenants }) => {
   const [msg, setMsg] = useState("");
 
   async function submitForm(e) {
@@ -22,6 +22,7 @@ const AuthPageComp = () => {
     const user = userRef.current.value;
     const psw = pswRef.current.value;
     const tenant = tenantRef.current.value;
+
     if (user === "") {
       setMsg(locale().missing_username);
       return;
@@ -75,11 +76,16 @@ const AuthPageComp = () => {
           </Form.Group>
           <Form.Group className="mb-3" controlId="tenant">
             <Form.Label>{locale().tenant}</Form.Label>
-            <Form.Control
-              type="text"
+            <Form.Select
+              aria-label={locale().tenant_suggestion}
               ref={tenantRef}
-              placeholder={locale().tenant_suggestion}
-            />
+            >
+              {React.Children.toArray(
+                tenants.map((t) => {
+                  return <option value={t}>{t}</option>;
+                })
+              )}
+            </Form.Select>
           </Form.Group>
           <Button variant="success" type="submit">
             {locale().submit}

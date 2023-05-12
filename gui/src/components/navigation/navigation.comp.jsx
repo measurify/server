@@ -7,7 +7,7 @@ import "./navigation.scss";
 
 import locale from "../../common/locale";
 import { refreshToken } from "../../services/http_operations";
-
+import { LogOut } from "../../services/misc_functions";
 import fontawesome from "@fortawesome/fontawesome";
 import {
   faTimes,
@@ -130,7 +130,7 @@ export default function Navigation() {
         });
       }
       if (remainingSec <= 0) {
-        localStorage.clear();
+        LogOut();
         //session expired, automatically logout
         window.location.replace("/");
         return;
@@ -146,11 +146,6 @@ export default function Navigation() {
       CalcEnding();
     }, 1000);
   }, []);
-
-  function logOut() {
-    localStorage.clear();
-    document.location.replace("/");
-  }
 
   function renderIconRole() {
     if (role.current === "admin") {
@@ -215,7 +210,7 @@ export default function Navigation() {
             </div>
             <br />
             <div style={{ paddingLeft: 20 + "px", paddingBottom: 20 + "px" }}>
-              <Button variant="outline-danger" onClick={() => logOut()}>
+              <Button variant="outline-danger" onClick={() => LogOut()}>
                 {locale().logout}
               </Button>
             </div>
@@ -228,38 +223,50 @@ export default function Navigation() {
               </React.Fragment>
             )}
           </div>
-          <hr />
-          <div className="app-nav-text">{locale().resources}</div>
-          <hr />
-          {Object.keys(pages).map((k) => {
-            //check if user can access to the page
-            if (
-              !canDo(role.current, k, "read") ||
-              (restrictionPages[k] !== undefined &&
-                !restrictionPages[k].includes(role.current))
-            ) {
-              return "";
-            }
-            return (
-              <NavLink
-                to={`/` + k}
-                className={(navData) => (navData.isActive ? "active" : "")}
-                //activeClassName="active"
-                key={k}
-                onClick={() => setIsOpened(false)}
-              >
-                {Capitalize(k)}
-              </NavLink>
-            );
-          })}
-          <hr />
-          {operationPages.length !== 0 && (
-            <>
-              <div className="app-nav-text">{locale().tools}</div> <hr />
-            </>
+          {Object.keys(pages).filter(
+            (k) =>
+              canDo(role.current, k, "read") &&
+              (restrictionPages[k] === undefined ||
+                restrictionPages[k].includes(role.current))
+          ).length !== 0 && (
+            <React.Fragment>
+              <hr />
+              <div className="app-nav-text">{locale().resources}</div>
+              <hr />
+            </React.Fragment>
           )}
+
+          {Object.keys(pages)
+            .filter(
+              (k) =>
+                canDo(role.current, k, "read") &&
+                (restrictionPages[k] === undefined ||
+                  restrictionPages[k].includes(role.current))
+            )
+            .map((k) => {
+              return (
+                <NavLink
+                  to={`/` + k}
+                  className={(navData) => (navData.isActive ? "active" : "")}
+                  //activeClassName="active"
+                  key={k}
+                  onClick={() => setIsOpened(false)}
+                >
+                  {Capitalize(k)}
+                </NavLink>
+              );
+            })}
+          {operationPages.length !== 0 && (
+            <React.Fragment>
+              <hr />
+              <div className="app-nav-text">{locale().tools}</div> <hr />
+            </React.Fragment>
+          )}
+
           {operationPages.includes("updatehistory") &&
-            canDo(role.current, "experiments", "update") && (
+            canDo(role.current, "experiments", "update") &&
+            (restrictionPages["updatehistory"] === undefined ||
+              restrictionPages["updatehistory"].includes(role.current)) && (
               <NavLink
                 to={`/updatehistory`}
                 className={(navData) => (navData.isActive ? "active" : "")}
@@ -270,7 +277,11 @@ export default function Navigation() {
               </NavLink>
             )}
           {operationPages.includes("downloadexperiment") &&
-            canDo(role.current, "experiments", "read") && (
+            canDo(role.current, "experiments", "read") &&
+            (restrictionPages["downloadexperiments"] === undefined ||
+              restrictionPages["downloadexperiments"].includes(
+                role.current
+              )) && (
               <NavLink
                 to={`/downloadexperiment`}
                 className={(navData) => (navData.isActive ? "active" : "")}
@@ -281,7 +292,9 @@ export default function Navigation() {
               </NavLink>
             )}
           {operationPages.includes("removesteps") &&
-            canDo(role.current, "experiments", "update") && (
+            canDo(role.current, "experiments", "update") &&
+            (restrictionPages["removesteps"] === undefined ||
+              restrictionPages["removesteps"].includes(role.current)) && (
               <NavLink
                 to={`/removesteps`}
                 className={(navData) => (navData.isActive ? "active" : "")}
@@ -289,6 +302,66 @@ export default function Navigation() {
                 onClick={() => setIsOpened(false)}
               >
                 Remove History Steps
+              </NavLink>
+            )}
+          {operationPages.includes("uploadquestionnaire") &&
+            canDo(role.current, "measurements", "create") &&
+            (restrictionPages["uploadquestionnaire"] === undefined ||
+              restrictionPages["uploadquestionnaire"].includes(
+                role.current
+              )) && (
+              <NavLink
+                to={`/uploadquestionnaire`}
+                className={(navData) => (navData.isActive ? "active" : "")}
+                //activeClassName="active"}
+                onClick={() => setIsOpened(false)}
+              >
+                Upload Questionnaires
+              </NavLink>
+            )}
+          {operationPages.includes("downloadquestionnaire") &&
+            canDo(role.current, "measurements", "get") &&
+            (restrictionPages["downloadquestionnaire"] === undefined ||
+              restrictionPages["downloadquestionnaire"].includes(
+                role.current
+              )) && (
+              <NavLink
+                to={`/downloadquestionnaire`}
+                className={(navData) => (navData.isActive ? "active" : "")}
+                //activeClassName="active"}
+                onClick={() => setIsOpened(false)}
+              >
+                Download Questionnaires
+              </NavLink>
+            )}
+          {operationPages.includes("uploadmeasurements") &&
+            canDo(role.current, "measurements", "create") &&
+            (restrictionPages["uploadmeasurements"] === undefined ||
+              restrictionPages["uploadmeasurements"].includes(
+                role.current
+              )) && (
+              <NavLink
+                to={`/uploadmeasurements`}
+                className={(navData) => (navData.isActive ? "active" : "")}
+                //activeClassName="active"}
+                onClick={() => setIsOpened(false)}
+              >
+                Upload Measurements
+              </NavLink>
+            )}
+          {operationPages.includes("downloadmeasurements") &&
+            canDo(role.current, "measurements", "get") &&
+            (restrictionPages["downloadmeasurements"] === undefined ||
+              restrictionPages["downloadmeasurements"].includes(
+                role.current
+              )) && (
+              <NavLink
+                to={`/downloadmeasurements`}
+                className={(navData) => (navData.isActive ? "active" : "")}
+                //activeClassName="active"}
+                onClick={() => setIsOpened(false)}
+              >
+                Download Measurements
               </NavLink>
             )}
         </div>

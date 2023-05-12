@@ -65,7 +65,7 @@ function UnrollView(item) {
                   Array.isArray(value) ? (
                     value[0] !== undefined ? (
                       Object.values(value[0]).some(
-                        (e) => e instanceof Object
+                        (e) => e instanceof Object && !Array.isArray(e)
                       ) ? (
                         React.Children.toArray(
                           value.map((single, i) => {

@@ -11,8 +11,9 @@ import {
   Nav,
 } from "react-bootstrap";
 import locale from "../../../common/locale";
-
-export default function UpdateHistoryFileForm(props) {
+import Papa from "papaparse";
+export default function UploadMeasurementsFileForm(props) {
+  const [csvSepGot, setCsvSepGot] = useState(undefined);
   /*
   console.log({
     postHistory: props.postHistory,
@@ -20,13 +21,10 @@ export default function UpdateHistoryFileForm(props) {
 
     csvSep: props.csvSep,
     floatSepRef: props.floatSepRef,
-    ovdRef: props.ovdRef,
-    setCsvHeader: props.setCsvHeader,
     setCsvContent: props.setCsvContent,
-    setFile: props.setFile,
-    file: props.file,
+    setFiles: props.setFiles,
+    files: props.files,
     csvContent: props.csvContent,
-    csvHeader: props.csvHeader,
   });*/
   if (
     props.postHistory === undefined ||
@@ -34,18 +32,40 @@ export default function UpdateHistoryFileForm(props) {
     props.floatSepRef === undefined ||
     props.csvSep === undefined ||
     props.setCsvSep === undefined ||
-    props.ovdRef === undefined ||
-    props.setCsvHeader === undefined ||
     props.setCsvContent === undefined ||
-    props.setFile === undefined ||
-    props.file === undefined ||
-    props.csvContent === undefined ||
-    props.csvHeader === undefined
+    props.setFiles === undefined ||
+    props.files === undefined ||
+    props.setDescription === undefined ||
+    props.description === undefined ||
+    props.csvContent === undefined
   )
     return "Loading";
 
   return (
     <Form onSubmit={props.postHistory}>
+      <Row style={{ paddingTop: 10 + "px" }}>
+        <Col sm={3}>
+          <b>Description file</b>
+        </Col>
+      </Row>
+      <Row style={{ paddingTop: 10 + "px" }}>
+        <Col sm={3}>
+          <Form.Control
+            className="mb-3"
+            type="file"
+            accept=".json"
+            label="File"
+            onChange={(e) => {
+              props.setDescription(e.target.files[0]);
+            }}
+          />
+        </Col>
+      </Row>
+      <Row style={{ paddingTop: 10 + "px" }}>
+        <Col sm={3}>
+          <b>Measurements CSV file</b>
+        </Col>
+      </Row>
       <Row style={{ paddingTop: 10 + "px" }}>
         <Col sm={1}>
           <Form.Group className="mb-3">
@@ -102,50 +122,41 @@ export default function UpdateHistoryFileForm(props) {
             accept=".csv"
             label="File"
             onChange={(e) => {
-              const _file = e.target.files[0];
-              //props.setFile(file);
-              const fileReader = new FileReader();
-
-              fileReader.onloadend = () => {
-                const _content = fileReader.result;
-
-                const regex = new RegExp("\\r", "g");
-                let splitted = _content.replace(regex, "").split("\n");
-
-                props.setCsvHeader(splitted[0]);
-                props.setFile(_file);
-                splitted.splice(0, 1);
-                props.setCsvContent(splitted);
-              };
-              fileReader.readAsText(_file);
+              props.setFiles(e.target.files);
+              if (e.target.files.length === 1) {
+                const _file = e.target.files[0];
+                Papa.parse(_file, {
+                  preview: 11,
+                  complete: function (results) {
+                    setCsvSepGot(results.meta.delimiter);
+                    props.setCsvContent(results.data);
+                  },
+                });
+              }
             }}
           />
         </Col>
       </Row>
-      <Row>
-        <Col>
-          <Form.Group className="mb-3">
-            <Form.Check
-              type="checkbox"
-              label="Update duplicate steps in History Experiment"
-              ref={props.ovdRef}
-            />
-          </Form.Group>
-        </Col>
-      </Row>
       {props.csvContent !== null && (
         <Row>
-          <Accordion>
+          <Accordion
+            style={{
+              overflow: "scroll",
+              //height: 70 + "vh",
+              width: 28 + "vw",
+              //width: 1200 + "px",
+            }}
+          >
             <Accordion.Item eventKey="0">
               <Accordion.Header>
-                {locale().preview + " - " + props.file.name}
+                {locale().preview + " - " + props.files[0].name}
               </Accordion.Header>
-              <Accordion.Body style={{ overflow: "scroll", height: 70 + "vh" }}>
+              <Accordion.Body>
                 <Table responsive striped bordered hover>
                   <thead>
                     <tr>
                       {React.Children.toArray(
-                        props.csvHeader.split(props.csvSep).map((h) => {
+                        props.csvContent[0].map((h) => {
                           return <th>{h}</th>;
                         })
                       )}
@@ -153,11 +164,11 @@ export default function UpdateHistoryFileForm(props) {
                   </thead>
                   <tbody>
                     {React.Children.toArray(
-                      props.csvContent.map((e) => {
+                      props.csvContent.slice(1).map((e) => {
                         return (
                           <tr>
                             {React.Children.toArray(
-                              e.split(props.csvSep).map((h) => {
+                              e.map((h) => {
                                 return <td>{h}</td>;
                               })
                             )}
@@ -170,6 +181,22 @@ export default function UpdateHistoryFileForm(props) {
               </Accordion.Body>
             </Accordion.Item>
           </Accordion>
+        </Row>
+      )}
+      {csvSepGot !== undefined && csvSepGot !== props.csvSep && (
+        <Row>
+          <Col>
+            <font
+              style={{
+                marginLeft: 5 + "px",
+                color: "black",
+              }}
+            >
+              Warning: the selected separator '{props.csvSep}' is different from
+              the one detected in file '{csvSepGot}'. Please check if everything
+              is correct than submit the operation.
+            </font>
+          </Col>
         </Row>
       )}
       <Row>

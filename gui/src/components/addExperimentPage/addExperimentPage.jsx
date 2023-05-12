@@ -129,7 +129,6 @@ export default function AddExperimentPage(props) {
     const fst = { _id: searchParams.get("from") };
     const qs = {
       filter: JSON.stringify(fst),
-      select: ["_id", "metadata", "topics"],
     };
     fetchDataDuplicate(qs);
   }, [searchParams, resource]);
@@ -267,15 +266,24 @@ export default function AddExperimentPage(props) {
       return;
     }
     //convert date to avoid issues with timezone (with GMT+ X timezones, results in a wrong date)
-    if (tmpValues["startDate"] !== undefined) {
-      const dt = new Date(tmpValues["startDate"]);
-      var timestamp = dt.getTime() - dt.getTimezoneOffset() * 60000;
-      tmpValues["startDate"] = new Date(timestamp).toISOString();
-    }
-    if (tmpValues["endDate"] !== undefined) {
-      const dt = new Date(tmpValues["endDate"]);
-      var timestamp = dt.getTime() - dt.getTimezoneOffset() * 60000;
-      tmpValues["endDate"] = new Date(timestamp).toISOString();
+    try {
+      if (
+        tmpValues["startDate"] !== undefined &&
+        tmpValues["startDate"] !== ""
+      ) {
+        const dt = new Date(tmpValues["startDate"]);
+        var timestamp = dt.getTime() - dt.getTimezoneOffset() * 60000;
+        tmpValues["startDate"] = new Date(timestamp).toISOString();
+      }
+      if (tmpValues["endDate"] !== undefined && tmpValues["endDate"] !== "") {
+        const dt = new Date(tmpValues["endDate"]);
+        var timestamp = dt.getTime() - dt.getTimezoneOffset() * 60000;
+        tmpValues["endDate"] = new Date(timestamp).toISOString();
+      }
+    } catch (error) {
+      setMsg("Invalid startDate or endDate, please check it again");
+      setIsError(true);
+      return;
     }
 
     let res;
@@ -313,6 +321,7 @@ export default function AddExperimentPage(props) {
       //add details
       setMsg(error.error.response.data.message + " : " + det);
       setIsError(true);
+      return;
     }
     if (res.status === 200) {
       window.alert("Experiment successufully posted!");

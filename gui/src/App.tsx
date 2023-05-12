@@ -20,7 +20,7 @@ import { Container, Row, Col } from "react-bootstrap";
 import NotificationBar from "./components/notificationBar/notificationBar";
 import HorizontalNavigationBar from "./components/horizontalNavigationBar/horizontalNavigationBar";
 import AppContext from "./context";
-
+import { FilterTenantNames } from "./configManager";
 import {
   notificationManager,
   get_generic,
@@ -33,12 +33,11 @@ import AddPage from "./components/addPage/addPage";
 import AddExperimentPage from "./components/addExperimentPage/addExperimentPage";
 import { layout } from "./configManager";
 import AddMeasurementsPage from "./components/addMeasurementsPage/addMeasurementsPage";
-import UpdateHistoryPage from "./components/OperationToolPages/updateSteps/updateHistory";
-import DownloadPage from "./components/OperationToolPages/download/downloadExperiment";
+import DownloadMeasurementsPage from "./components/OperationalPages/downloadMeasurements/downloadMeasurements";
 import cloneDeep from "clone-deep";
-import RemoveStepsPage from "./components/OperationToolPages/removeSteps/removeSteps";
 import PasswordRecoveryPage from "./components/passwordRecoveryPage/PasswordRecoveryPage";
 import PasswordResetPage from "./components/PasswordResetPage/PasswordResetPage";
+import UploadMeasurementsPage from "./components/OperationalPages/uploadMeasurements/uploadMeasurements";
 
 import { ResetConfig, LoadConfig } from "./configManager";
 /*
@@ -63,13 +62,18 @@ function App() {
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [logs, setLogs] = useState<INotification[]>([]);
   const [types, setTypes] = useState<Object | undefined>();
+  const [tenants, setTenants] = useState<String[]>([]);
   const [data, setData] = useState<Object>({});
 
   let layoutRef = React.useRef<string | null>();
   const tkn = localStorage.getItem("token");
 
-  //reset the config to define basics variables when not-logged
+  //reset the config to define basics variables
   ResetConfig();
+
+  //load configuration according to domain logic
+  LoadConfig();
+
   //set api url to run https operations
   SetAPIUrl();
 
@@ -134,11 +138,29 @@ function App() {
       }
     };
 
+    const fetchTenants = async () => {
+      try {
+        const response = await get_generic("types/tenants", {}, "");
+        const _tenants = response.docs.map((e: any) => e._id);
+        let filtered = FilterTenantNames(_tenants);
+        const tkn = localStorage.getItem("user-tenant");
+        if (tkn !== undefined && filtered.includes(tkn)) {
+          filtered = filtered.filter((item: String) => item !== tkn);
+          filtered.unshift(tkn);
+        }
+
+        setTenants(filtered);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     //if types has been already set, ignore it
     if (types !== undefined) return;
     // call the function
     try {
       fetchTypes();
+      fetchTenants();
     } catch (error) {
       console.log(error);
     }
@@ -198,7 +220,7 @@ function App() {
       <div className="app">
         <Router>
           <Routes>
-            <Route path="/" element={<AuthPage />} />
+            <Route path="/" element={<AuthPage tenants={tenants} />} />
             <Route
               path="/passwordrecovery"
               element={<PasswordRecoveryPage />}
@@ -213,9 +235,6 @@ function App() {
         </Router>
       </div>
     );
-
-  //load config if token has been set
-  LoadConfig();
 
   return (
     <AppContext.Provider
@@ -277,9 +296,15 @@ function App() {
                   path="/edit/:resource/:id"
                   element={<EditContentPage />}
                 />
-                <Route path="/downloadexperiment" element={<DownloadPage />} />
-                <Route path="/updatehistory" element={<UpdateHistoryPage />} />
-                <Route path="/removesteps" element={<RemoveStepsPage />} />
+
+                <Route
+                  path="/uploadmeasurements"
+                  element={<UploadMeasurementsPage />}
+                />
+                <Route
+                  path="/downloadmeasurements"
+                  element={<DownloadMeasurementsPage />}
+                />
                 <Route path="/add/:resource/" element={<AddPage />} />
                 <Route path="/:page" element={<Page res=":page" />} />
 

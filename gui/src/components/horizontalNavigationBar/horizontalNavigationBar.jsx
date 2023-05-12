@@ -7,7 +7,7 @@ import "./horizontalNavigationBar.scss";
 
 import locale from "../../common/locale";
 import { refreshToken } from "../../services/http_operations";
-
+import { LogOut } from "../../services/misc_functions";
 import fontawesome from "@fortawesome/fontawesome";
 import {
   faTimes,
@@ -124,7 +124,7 @@ export default function HorizontalNavigationBar() {
         });
       }
       if (remainingSec <= 0) {
-        localStorage.clear();
+        LogOut();
         //session expired, automatically logout
         window.location.replace("/");
         return;
@@ -140,11 +140,6 @@ export default function HorizontalNavigationBar() {
       CalcEnding();
     }, 1000);
   }, []);
-
-  function logOut() {
-    localStorage.clear();
-    document.location.replace("/");
-  }
 
   function renderIconRole() {
     if (role.current === "admin") {
@@ -204,7 +199,7 @@ export default function HorizontalNavigationBar() {
                 </div>
               </Col>
               <Col>
-                <Button variant="outline-danger" onClick={() => logOut()}>
+                <Button variant="outline-danger" onClick={() => LogOut()}>
                   {locale().logout}
                 </Button>
               </Col>

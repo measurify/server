@@ -83,7 +83,13 @@ export const FormFile = (props) => {
         <Accordion>
           <Accordion.Item eventKey="0">
             <Accordion.Header>{locale().file_content}</Accordion.Header>
-            <Accordion.Body style={{ overflow: "scroll", height: 70 + "vh" }}>
+            <Accordion.Body
+              style={{
+                overflow: "scroll",
+                height: 70 + "vh",
+                width: 1200 + "px",
+              }}
+            >
               <Table responsive striped bordered hover>
                 <thead>
                   <tr>
@@ -120,9 +126,9 @@ export const FormFile = (props) => {
             <Accordion.Header>{locale().file_content}</Accordion.Header>
             <Accordion.Body style={{ overflow: "scroll", height: 70 + "vh" }}>
               <textarea
-                style={{ resize: "both" }}
-                cols="120"
-                rows="10"
+                style={{ resize: "both", width: 30 + "vw", height: 30 + "vh" }}
+                //cols="120"
+                //rows="10"
                 readOnly
                 value={props.contentPlain}
               ></textarea>

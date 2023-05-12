@@ -1,6 +1,6 @@
 import { base_api_url } from "../configManager";
-
-const axios = require("axios").default;
+import { logsManager } from "./operation_tool_services";
+import axios from "axios";
 
 export let api_url;
 
@@ -344,16 +344,6 @@ export async function get_generic(resource_type, qs = {}, token) {
         });
       })
       .catch((error) => {
-        /*commons.PushMsg({
-          type: "error",
-          msg:
-            "Error getting resource(s) of type: " +
-            resource_type +
-            ", with filter: " +
-            qs.limit +
-            ". " +
-            error.message,
-        });*/
         reject({ error: error });
       });
   });
@@ -463,4 +453,51 @@ export async function getPasswordStrength() {
 //return the login token from the localstorage
 export function GetToken() {
   return localStorage.getItem("token");
+}
+
+//post measurements csv file with the description file
+export async function postCsvFile(file, description, force = true) {
+  const data = new FormData();
+  data.append("file", file);
+  data.append("description", description);
+
+  let url = api_url + "/measurements/file";
+  if (force === true) url += "?force=true";
+  const tempH = {
+    "Content-Type": "multipart/form-data",
+    "Cache-Control": "no-cache",
+    Authorization: GetToken(),
+  };
+  const options = {
+    headers: tempH,
+  };
+
+  try {
+    const response = await instance.post(url, data, options);
+    logsManager.PushLog({
+      type: "info",
+      msg:
+        file.name +
+        ", successfully posted " +
+        response.data.completed.length +
+        " row, with " +
+        response.data.errors.length +
+        " errors\n",
+    });
+    if (response.data.errors.length !== 0) {
+      response.data.errors.forEach((e) => {
+        logsManager.PushLog({
+          type: "error",
+          msg: e + " \n",
+        });
+      });
+    }
+  } catch (error) {
+    console.log(error);
+
+    logsManager.PushLog({
+      type: "error",
+      msg: "Failed to post: " + file.name + "\n",
+    });
+  }
 }

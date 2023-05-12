@@ -2,10 +2,10 @@
 import { isFeatureInUse, alwaysTrue } from "../services/validations";
 
 export default function Complete_configuration() {
+  const base_api_url = undefined;
   //operation pages
-  //those are the pages of operations performed on experiments,
-  // which are: updatehistory, downloadexperiment, removesteps
-  const operationPages = [];
+  // which are: "uploadmeasurements", "downloadmeasurements"
+  const operationPages = ["uploadmeasurements", "downloadmeasurements"];
 
   //dictionary of pages: key is the route for the API REST, value is an array that contains the fields shown to users
   //action is a special field that will enable actions for each row || still required, future version may have it removed
@@ -44,6 +44,13 @@ export default function Complete_configuration() {
 
   restrictionPages["users"] = ["admin"];
   restrictionPages["roles"] = ["admin"];
+  restrictionPages["protocols"] = ["admin"];
+  restrictionPages["tags"] = ["admin"];
+  restrictionPages["features"] = ["admin"];
+  restrictionPages["things"] = ["admin"];
+  restrictionPages["devices"] = ["admin"];
+  restrictionPages["experiments"] = ["admin"];
+  restrictionPages["measurements"] = ["admin"];
 
   //actions dictionary: key is the page, value is an array that contains actions || working actions arae "view" | "edit" | "delete" | "duplicate"
   const pageActions = {};
@@ -139,6 +146,7 @@ export default function Complete_configuration() {
     _id: "",
     items: [{ name: "", type: "", unit: "", dimension: NaN, range: [""] }],
     tags: [""],
+    visibility: "",
   };
 
   addFields["devices"] = {
@@ -269,6 +277,7 @@ export default function Complete_configuration() {
   };
   fetchedPageTypes["features"] = {
     items: { type: "ItemTypes" },
+    visibility: "VisibilityTypes",
   };
   fetchedPageTypes["measurements"] = {
     visibility: "VisibilityTypes",
@@ -324,6 +333,7 @@ export default function Complete_configuration() {
     step: "Please, enter the step number.",
   };
   return {
+    base_api_url,
     operationPages,
     pages,
     aliasPages,

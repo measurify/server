@@ -8,9 +8,9 @@ import Complete_configuration from "./configs/complete_config";
 //then add the import in this file and edit the LoadConfig function to load the desired configuration when required
 
 //base url of APIs (define it as undefined if you want to use the url where the GUI is actually hosted)
-//export const base_api_url = "https://localhost/v1";
+export let base_api_url = undefined;
 //export const base_api_url = "https://hi-drive.measurify.org/v1";
-export const base_api_url = undefined;
+//export const base_api_url = undefined;
 
 //name of this dashboard, shown to users
 export const website_name = "Measurify Dashboard";
@@ -85,6 +85,7 @@ export const guidelines = {};
 export function ResetConfig() {
   //clear all the fields from objects and empty arrays while keeping references
   operationPages.length = 0;
+  base_api_url = undefined;
   Object.keys(pages).forEach((key) => delete pages[key]);
   Object.keys(aliasPages).forEach((key) => delete aliasPages[key]);
   Object.keys(restrictionPages).forEach((key) => delete restrictionPages[key]);
@@ -117,17 +118,13 @@ export function ResetConfig() {
 }
 
 export function LoadConfig() {
-  const tenantName = localStorage.getItem("user-tenant");
-
+  const type = WhatAmI();
   let conf;
-
-  //if tenant is deafult or not found in localstorage, show complete config
-  if (tenantName === "" || tenantName === null) {
-    conf = Complete_configuration();
-  }
-  //default config is the complete one
-  else {
-    conf = Complete_configuration();
+  switch (type) {
+    case "unknown":
+    default:
+      conf = Complete_configuration();
+      break;
   }
 
   Object.assign(operationPages, conf.operationPages);
@@ -145,5 +142,28 @@ export function LoadConfig() {
   Object.assign(fetchedPageData, conf.fetchedPageData);
   Object.assign(guidelines, conf.guidelines);
 
+  base_api_url = conf.base_api_url;
+
   return;
+}
+
+//this function return the type of database "EM","QS", etc, according to host name
+export function WhatAmI() {
+  const { hostname } = window.location; //, href, origin, pathname, port, protocol, search  host,
+
+  const splitted = hostname.split(".");
+  const type = splitted[0];
+  if (type === "emdb") return "EM";
+  if (type === "qdb") return "QS";
+
+  return "unknown";
+}
+
+//this function return the tenant names filtered according to tenant names conventions
+export function FilterTenantNames(tenants) {
+  const type = WhatAmI();
+  switch (type) {
+    default:
+      return tenants;
+  }
 }

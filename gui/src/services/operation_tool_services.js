@@ -1,6 +1,6 @@
 import { GetToken, api_url } from "./http_operations";
 import { instance } from "./http_operations";
-
+import { GetPrefixFilename, prefixFileSeparator } from "./file_operations";
 import { saveAs } from "file-saver";
 export let logsManager = {
   PushLog: (obj) => {},
@@ -8,13 +8,25 @@ export let logsManager = {
   ClearLogs: () => {},
 };
 
-//experiment name separator
-const experimentFileSeparator = "#";
+//test logger
+export function testLogger() {
+  let i = 0;
+  setInterval(() => {
+    logsManager.PushLog({
+      type: "info",
+      msg:
+        "----------------------------------------Log Testing " +
+        i +
+        " ------------------------------------\n",
+    });
+    i++;
+  }, 500);
+}
 
 //upload file containing history steps
 export async function postHistoryFile(file, ovd, csvSep, arrSep, floatSep) {
   const filename = file.name;
-  const expName = filename.split(experimentFileSeparator)[0];
+  const expName = GetPrefixFilename(file);
 
   const data = new FormData();
   data.append("file", file);
@@ -145,10 +157,10 @@ export async function downloadHistory(
     arrSep +
     "&sepFloat=" +
     floatSep;
-  const fileName = experiment_id + "#history.csv";
+  const fileName = experiment_id + prefixFileSeparator + "history.csv";
 
   try {
-    const data = await getHistoryCSV(url);
+    const data = await getCSV(url);
     const blob = new Blob([data]);
     let file = null;
     if (compress === undefined || compress === false) {
@@ -167,14 +179,13 @@ export async function downloadHistory(
   }
 }
 
-export async function getHistoryCSV(resource_path) {
+export async function getCSV(resource_path, headers = {}) {
   const url = api_url + "/" + resource_path;
+  headers["Authorization"] = GetToken();
   const config = {
     method: "get",
     url: url,
-    headers: {
-      Authorization: GetToken(),
-    },
+    headers: headers,
   };
 
   let response;
@@ -227,5 +238,45 @@ export async function deleteHistorySteps(selected, toDelete) {
           ? error.response.data.details + "\n"
           : "\n"),
     });
+  }
+}
+//download questionnaires/measurements
+export async function downloadMeasurements(
+  feature,
+  csvSep,
+  arrSep,
+  floatSep,
+  limit = -1,
+  select = [],
+  compress = undefined
+) {
+  console.log({ feature, csvSep, arrSep, floatSep, limit, select, compress });
+  let url = 'measurements/?filter={"feature":"' + feature + '"}&limit=' + limit;
+  if (select.length !== 0) {
+    url = url + '&select=["' + select.join('","') + '"]';
+  }
+
+  url =
+    url + "&sep=" + csvSep + "&sepArray=" + arrSep + "&sepFloat=" + floatSep;
+
+  const fileName = feature + prefixFileSeparator + ".csv";
+
+  try {
+    const data = await getCSV(url, { Accept: "text/csv+" });
+    const blob = new Blob([data]);
+    let file = null;
+    if (compress === undefined || compress === false) {
+      saveAs(blob, fileName);
+    } else {
+      file = new File([blob], fileName);
+    }
+
+    logsManager.PushLog({
+      type: "info",
+      msg: fileName + " successfully downloaded.\n",
+    });
+    return file;
+  } catch (error) {
+    console.log(error);
   }
 }

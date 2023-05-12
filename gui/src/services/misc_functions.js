@@ -150,3 +150,14 @@ export function Capitalize(s) {
 export function FormatDate(dt) {
   return dt.slice(0, 10).replaceAll("-", "/");
 }
+
+export function LogOut() {
+  localStorage.removeItem("login-time");
+  localStorage.removeItem("role");
+  localStorage.removeItem("token");
+  localStorage.removeItem("token-expiration-time");
+  localStorage.removeItem("user-email");
+  localStorage.removeItem("user-role");
+  localStorage.removeItem("username");
+  document.location.replace("/");
+}
