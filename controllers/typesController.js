@@ -20,6 +20,7 @@ exports.getPasswordStrength = async (req, res) => {
 
 exports.getTenantNames = async (req, res) => {
     const Tenant = mongoose.dbs['catalog'].model('Tenant');
+    req.query.limit=1000;
     return await controller.getResourceList(req, res, '{ "timestamp": "desc" }', ["_id"], Tenant, null);     
 };
 
