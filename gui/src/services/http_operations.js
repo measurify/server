@@ -499,5 +499,13 @@ export async function postCsvFile(file, description, force = true) {
       type: "error",
       msg: "Failed to post: " + file.name + "\n",
     });
+    logsManager.PushLog({
+      type: "error",
+      msg: "Message: "+error.response.data.message + " \n",
+    });
+    logsManager.PushLog({
+      type: "error",
+      msg: "Details: "+error.response.data.details + " \n",
+    });
   }
 }

@@ -266,7 +266,7 @@ export default function DownloadMeasurementsPage() {
                       variant="primary"
                       onClick={downloadMeasurementsHandler}
                     >
-                      Download Features
+                      Download Measurements
                     </Button>
                   )}
                 </Col>

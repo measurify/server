@@ -3685,13 +3685,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/v1/deviuces/{{device}}",
+							"raw": "{{url}}/v1/devices/{{device}}",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"v1",
-								"deviuces",
+								"devices",
 								"{{device}}"
 							]
 						}
@@ -4973,7 +4973,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{url}}/v1/measurements?filter=\"$and\":[{\"feature\":\"speed\"}, {\"tags\":\"urban\"}]",
+							"raw": "{{url}}/v1/measurements?filter={\"$and\":[{\"feature\":\"speed\"}, {\"tags\":\"urban\"}]}",
 							"host": [
 								"{{url}}"
 							],
@@ -4984,7 +4984,7 @@
 							"query": [
 								{
 									"key": "filter",
-									"value": "\"$and\":[{\"feature\":\"speed\"}, {\"tags\":\"urban\"}]"
+									"value": "{\"$and\":[{\"feature\":\"speed\"}, {\"tags\":\"urban\"}]}"
 								}
 							]
 						}
