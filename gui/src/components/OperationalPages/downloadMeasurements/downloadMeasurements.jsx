@@ -104,7 +104,7 @@ export default function DownloadMeasurementsPage() {
           arrSep,
           floatSep,
           -1,
-          ["thing", "samples"],
+          ["thing", "device", "feature", "samples"],
           compress
         );
         files.push(f);
