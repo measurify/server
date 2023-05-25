@@ -56,6 +56,14 @@ export default function UploadMeasurementsFileForm(props) {
             accept=".json"
             label="File"
             onChange={(e) => {
+              if (
+                e.target.value === null ||
+                e.target.value === undefined ||
+                e.target.value === ""
+              ) {
+                props.setDescription(null);
+                return;
+              }
               props.setDescription(e.target.files[0]);
             }}
           />
@@ -122,6 +130,15 @@ export default function UploadMeasurementsFileForm(props) {
             accept=".csv"
             label="File"
             onChange={(e) => {
+              if (
+                e.target.value === null ||
+                e.target.value === undefined ||
+                e.target.value === ""
+              ) {
+                props.setFiles(null);
+                props.setCsvContent(null);
+                return;
+              }
               props.setFiles(e.target.files);
               if (e.target.files.length === 1) {
                 const _file = e.target.files[0];
