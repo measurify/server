@@ -9,6 +9,7 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 const compression = require('compression');
+const tls = require('node:tls'); 
 
 // https credentials
 let cert_file_self = './resources/caCert.pem'; // The self certificate
@@ -66,8 +67,8 @@ else {
             fs.readdirSync('./resources/').forEach(el => {
                 if (!el.endsWith(".pem")) {
                     secureContext[el] = tls.createSecureContext({
-                        key: fs.readFileSync('./resources/'+el+'/privkey.pem', 'utf8'),
-                        cert: fs.readFileSync('./resources/'+el+'/fullchain.pem', 'utf8'),
+                        key: fs.readFileSync('./resources/'+el+'/privkey.pem'),
+                        cert: fs.readFileSync('./resources/'+el+'/fullchain.pem'),
                         passphrase: process.env.HTTPSSECRET                        
                     })
                 }
