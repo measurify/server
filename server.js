@@ -65,7 +65,7 @@ else {
         function createSecureContext() {
             var secureContext = {}
             fs.readdirSync('./resources/').forEach(el => {
-                if (!el.endsWith(".pem")) {
+                if (!el.endsWith(".pem") && fs.existsSync('./resources/' + el + '/privkey.pem') && fs.existsSync('./resources/' + el + '/fullchain.pem')) {
                     secureContext[el] = tls.createSecureContext({
                         key: fs.readFileSync('./resources/' + el + '/privkey.pem'),
                         cert: fs.readFileSync('./resources/' + el + '/fullchain.pem'),
@@ -81,15 +81,19 @@ else {
         //provide a SNICallback when you create the options for the https server
         var config = {
             SNICallback: function (domain, cb) {
+                console.log("Called SNICallback")
                 if (secureContext[domain]) {
                     if (cb) {
+                        console.log("Certified Domain");
                         cb(null, secureContext[domain]);
                     } else {
                         // compatibility for older versions of node
+                        console.log("Certified Domain older versions of node");
                         return secureContext[domain];
                     }
                 } else {
                     if (fs.existsSync(key_file_prod) && fs.existsSync(cert_file_prod)) {
+                        console.log("Certified Default");
                         const keysDefault = {
                             key: fs.readFileSync(key_file_prod),
                             cert: fs.readFileSync(cert_file_prod),
@@ -97,7 +101,14 @@ else {
                         }
                         return keysDefault;
                     }
-                    else { return {} }
+                    else {
+                        console.log("Certified Self-Signed");
+                        return {
+                            key: fs.readFileSync(key_file_self),
+                            cert: fs.readFileSync(cert_file_self),
+                            passphrase: process.env.HTTPSSECRET
+                        }
+                    }
                 }
             }
         }
