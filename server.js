@@ -77,45 +77,52 @@ else {
             return secureContext;
         }
 
-        var secureContext = createSecureContext()
+        const secureContext = createSecureContext()
+        let config;
         if (Object.keys(secureContext).length === 0) {
             console.log("No valid keys in subfolders");
 
-            //controlla le chiavi interne /TODO config che o glielo diamo noi qui oppure else della snicallback
+            //controlla le chiavi interne 
+            if (fs.existsSync(key_file_prod) && fs.existsSync(cert_file_prod)) {
+                config = { key: fs.readFileSync(key_file_prod), cert: fs.readFileSync(cert_file_prod), passphrase: process.env.HTTPSSECRET };
+            }
             //altrimenti throw error per andare al self signed
             throw new error("No keys, self signed server");
         }
+        else {
+            config = {
+                SNICallback: function (domain, cb) {
+                    console.log("Called SNICallback")
+                    if (secureContext[domain]) {
+                        console.log("Certified Domain: " + domain);
+                        cb(null, secureContext[domain]);
 
-        //provide a SNICallback when you create the options for the https server
-        var config = {
-            SNICallback: function (domain, cb) {
-                console.log("Called SNICallback")
-                if (secureContext[domain]) {
-                    console.log("Certified Domain: " + domain);
-                    cb(null, secureContext[domain]);
-
-                } else {
-                    if (fs.existsSync(key_file_prod) && fs.existsSync(cert_file_prod)) {
-                        console.log("Unrecognized domain, show default Cert - " + domain);
-                        const keysDefault = tls.createSecureContext({
-                            key: fs.readFileSync(key_file_prod),
-                            cert: fs.readFileSync(cert_file_prod),
-                            passphrase: process.env.HTTPSSECRET
-                        })
-                        cb(null, keysDefault);
-                    }
-                    else {
-                        console.log("Uncertified domain, provide Self-Signed Cert - " + domain);
-                        const keysSelf = tls.createSecureContext({
-                            key: fs.readFileSync(key_file_self),
-                            cert: fs.readFileSync(cert_file_self),
-                            passphrase: process.env.HTTPSSECRET
-                        })
-                        cb(null, keysSelf);
+                    } else {
+                        if (fs.existsSync(key_file_prod) && fs.existsSync(cert_file_prod)) {
+                            console.log("Unrecognized domain, show default Cert - " + domain);
+                            const keysDefault = tls.createSecureContext({
+                                key: fs.readFileSync(key_file_prod),
+                                cert: fs.readFileSync(cert_file_prod),
+                                passphrase: process.env.HTTPSSECRET
+                            })
+                            cb(null, keysDefault);
+                        }
+                        else {
+                            console.log("Uncertified domain, provide Self-Signed Cert - " + domain);
+                            const keysSelf = tls.createSecureContext({
+                                key: fs.readFileSync(key_file_self),
+                                cert: fs.readFileSync(cert_file_self),
+                                passphrase: process.env.HTTPSSECRET
+                            })
+                            cb(null, keysSelf);
+                        }
                     }
                 }
             }
         }
+
+        //provide a SNICallback when you create the options for the https server
+
         server = https.createServer(config, app);
         port = process.env.HTTPS_PORT;
         message = 'Measurify Cloud API Server is running on HTTPS';
