@@ -48,6 +48,7 @@ app.get('/' + process.env.VERSION, (req, res, next) => { res.redirect(req.baseUr
 
 // Provide API version information
 const { version } = require('./package.json');
+const { error } = require('console');
 app.get('/' + process.env.VERSION + '/version', (req, res, next) => { return res.status(200).json({ version: version }); });
 
 // Takes the raw requests and turns them into usable properties on req.body
@@ -79,9 +80,10 @@ else {
         var secureContext = createSecureContext()
         if(Object.keys(secureContext).length===0){
             console.log("No valid keys in subfolders");
-
+            
             //controlla le chiavi interne
             //altrimenti throw error per andare al self signed
+            throw new error("No keys, self signed server");
         }
 
         //provide a SNICallback when you create the options for the https server
@@ -100,24 +102,24 @@ else {
                 } else {
                     if (fs.existsSync(key_file_prod) && fs.existsSync(cert_file_prod)) {
                         console.log("Unrecognized domain, show default Cert - "+domain);
-                        const keysDefault = {
+                        
+                        const keysDefault =  tls.createSecureContext({
                             key: fs.readFileSync(key_file_prod),
                             cert: fs.readFileSync(cert_file_prod),
                             passphrase: process.env.HTTPSSECRET
-                        }
+                        })
                         console.log(keysDefault)
                         return keysDefault;
                     }
                     else {
                         console.log("Uncertified domain, provide Self-Signed Cert - "+domain);
-                        const keysSelf = {
+                        const keysSelf = tls.createSecureContext({
                             key: fs.readFileSync(key_file_self),
                             cert: fs.readFileSync(cert_file_self),
                             passphrase: process.env.HTTPSSECRET
-                        }
+                        })
                         console.log(keysSelf)
-                        return keysSelf;
-                       
+                        return keysSelf;                       
                     }
                 }
             }
