@@ -89,7 +89,7 @@ else {
                         return secureContext[domain];
                     }
                 } else {
-                    try {
+                    if (fs.existsSync(key_file_prod) && fs.existsSync(cert_file_prod)) {
                         const keysDefault = {
                             key: fs.readFileSync(key_file_prod),
                             cert: fs.readFileSync(cert_file_prod),
@@ -97,12 +97,10 @@ else {
                         }
                         return keysDefault;
                     }
-                    catch (error) {
-                        throw new Error('No keys/certificates for domain requested');
-                    }
+                    else { return {} }
                 }
             }
-        }        
+        }
         server = https.createServer(config, app);
         port = process.env.HTTPS_PORT;
         message = 'Measurify Cloud API Server is running on HTTPS';
