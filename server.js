@@ -78,10 +78,10 @@ else {
         }
 
         var secureContext = createSecureContext()
-        if(Object.keys(secureContext).length===0){
+        if (Object.keys(secureContext).length === 0) {
             console.log("No valid keys in subfolders");
-            
-            //controlla le chiavi interne
+
+            //controlla le chiavi interne /TODO config che o glielo diamo noi qui oppure else della snicallback
             //altrimenti throw error per andare al self signed
             throw new error("No keys, self signed server");
         }
@@ -91,35 +91,27 @@ else {
             SNICallback: function (domain, cb) {
                 console.log("Called SNICallback")
                 if (secureContext[domain]) {
-                    if (cb) {
-                        console.log("Certified Domain: "+domain);
-                        cb(null, secureContext[domain]);
-                    } else {
-                        // compatibility for older versions of node
-                        console.log("Certified Domain older versions of node");
-                        return secureContext[domain];
-                    }
+                    console.log("Certified Domain: " + domain);
+                    cb(null, secureContext[domain]);
+
                 } else {
                     if (fs.existsSync(key_file_prod) && fs.existsSync(cert_file_prod)) {
-                        console.log("Unrecognized domain, show default Cert - "+domain);
-                        
-                        const keysDefault =  tls.createSecureContext({
+                        console.log("Unrecognized domain, show default Cert - " + domain);
+                        const keysDefault = tls.createSecureContext({
                             key: fs.readFileSync(key_file_prod),
                             cert: fs.readFileSync(cert_file_prod),
                             passphrase: process.env.HTTPSSECRET
                         })
-                        console.log(keysDefault)
-                        return keysDefault;
+                        cb(null, keysDefault);
                     }
                     else {
-                        console.log("Uncertified domain, provide Self-Signed Cert - "+domain);
+                        console.log("Uncertified domain, provide Self-Signed Cert - " + domain);
                         const keysSelf = tls.createSecureContext({
                             key: fs.readFileSync(key_file_self),
                             cert: fs.readFileSync(cert_file_self),
                             passphrase: process.env.HTTPSSECRET
                         })
-                        console.log(keysSelf)
-                        return keysSelf;                       
+                        cb(null, keysSelf);
                     }
                 }
             }
