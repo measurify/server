@@ -9,7 +9,7 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 const compression = require('compression');
-const tls = require('node:tls'); 
+const tls = require('node:tls');
 
 // https credentials
 let cert_file_self = './resources/caCert.pem'; // The self certificate
@@ -67,9 +67,9 @@ else {
             fs.readdirSync('./resources/').forEach(el => {
                 if (!el.endsWith(".pem")) {
                     secureContext[el] = tls.createSecureContext({
-                        key: fs.readFileSync('./resources/'+el+'/privkey.pem'),
-                        cert: fs.readFileSync('./resources/'+el+'/fullchain.pem'),
-                        passphrase: process.env.HTTPSSECRET                        
+                        key: fs.readFileSync('./resources/' + el + '/privkey.pem'),
+                        cert: fs.readFileSync('./resources/' + el + '/fullchain.pem'),
+                        passphrase: process.env.HTTPSSECRET
                     })
                 }
             })
@@ -89,14 +89,20 @@ else {
                         return secureContext[domain];
                     }
                 } else {
-                    throw new Error('No keys/certificates for domain requested');
+                    try {
+                        const keysDefault = {
+                            key: fs.readFileSync(key_file_prod),
+                            cert: fs.readFileSync(cert_file_prod),
+                            passphrase: process.env.HTTPSSECRET
+                        }
+                        return keysDefault;
+                    }
+                    catch (error) {
+                        throw new Error('No keys/certificates for domain requested');
+                    }
                 }
-            },
-            // must list a default key and cert because required by tls.createServer()
-            key: fs.readFileSync(key_file_prod),
-            cert: fs.readFileSync(cert_file_prod), 
-            passphrase: process.env.HTTPSSECRET
-        }
+            }
+        }        
         server = https.createServer(config, app);
         port = process.env.HTTPS_PORT;
         message = 'Measurify Cloud API Server is running on HTTPS';
