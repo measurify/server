@@ -77,6 +77,12 @@ else {
         }
 
         var secureContext = createSecureContext()
+        if(Object.keys(secureContext).length===0){
+            console.log("No valid keys in subfolders");
+
+            //controlla le chiavi interne
+            //altrimenti throw error per andare al self signed
+        }
 
         //provide a SNICallback when you create the options for the https server
         var config = {
@@ -84,7 +90,7 @@ else {
                 console.log("Called SNICallback")
                 if (secureContext[domain]) {
                     if (cb) {
-                        console.log("Certified Domain");
+                        console.log("Certified Domain: "+domain);
                         cb(null, secureContext[domain]);
                     } else {
                         // compatibility for older versions of node
@@ -93,21 +99,25 @@ else {
                     }
                 } else {
                     if (fs.existsSync(key_file_prod) && fs.existsSync(cert_file_prod)) {
-                        console.log("Certified Default");
+                        console.log("Unrecognized domain, show default Cert - "+domain);
                         const keysDefault = {
                             key: fs.readFileSync(key_file_prod),
                             cert: fs.readFileSync(cert_file_prod),
                             passphrase: process.env.HTTPSSECRET
                         }
+                        console.log(keysDefault)
                         return keysDefault;
                     }
                     else {
-                        console.log("Certified Self-Signed");
-                        return {
+                        console.log("Uncertified domain, provide Self-Signed Cert - "+domain);
+                        const keysSelf = {
                             key: fs.readFileSync(key_file_self),
                             cert: fs.readFileSync(cert_file_self),
                             passphrase: process.env.HTTPSSECRET
                         }
+                        console.log(keysSelf)
+                        return keysSelf;
+                       
                     }
                 }
             }
