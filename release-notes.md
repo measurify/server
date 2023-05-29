@@ -43,6 +43,7 @@
 + Added field "select" in the query of get resources routes to receive only chosen fields
 + Experiment/id/group route added to receive the data based on groups of topics chosen in protocol
 + Removed variables.env to create it from variablesTemplate.env
++ Now GUI can be placed from an other GitHub Repository and replaced
 
 ## Version 0.6.5
 
@@ -56,3 +57,31 @@
 
 + Added description and tags fields for items in feature
 
+## Version 0.6.7
+
+2023.02.27
+
++ Added get groups of topics
++ Optimized load measurements from csv file
+
+## Version 0.6.8
+
+2023.04.13
+
++ Added limit=-1 to get all measurements in CSV, CSV+ and Dataframe format
++ Added replace separator for CSV, CSV+
++ CSV bug Fixes and improvements
+
+## Version 0.6.9
+
+2023.04.20
+
++ .JSON description file now use '_' symbol in items array for csv values missing and set it as null.
++ Get all tenants name route.
+
+## Version 0.7.0
+
+2023.05.09
+
++ Improve token device to get device thing tag, post measurements and timeseries
++ Support to store more certificates for different url at the same GUI 
