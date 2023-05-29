@@ -86,8 +86,10 @@ else {
             if (fs.existsSync(key_file_prod) && fs.existsSync(cert_file_prod)) {
                 config = { key: fs.readFileSync(key_file_prod), cert: fs.readFileSync(cert_file_prod), passphrase: process.env.HTTPSSECRET };
             }
-            //altrimenti throw error per andare al self signed
-            throw new error("No keys, self signed server");
+            else {
+                //altrimenti throw error per andare al self signed
+                throw new error("No keys, self signed server");
+            }
         }
         else {
             config = {
