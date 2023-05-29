@@ -166,6 +166,7 @@ Install Certbot
     sudo add-apt-repository universe
     sudo apt-get install certbot
 
+### Certificate one url
 Use Certbot (modify in order to provide your domain)
 
     sudo ufw allow 80
@@ -182,5 +183,25 @@ Update certificates
     sudo certbot certonly --standalone --preferred-challenges http -d {{url}}
     sudo cp /etc/letsencrypt/live/{{url}}/fullchain.pem ~/measurify/resources/fullchain.pem
     sudo cp /etc/letsencrypt/live/{{url}}/privkey.pem ~/measurify/resources/privkey.pem
+
+Finally update the measurify image.
+
+### Certificate more urls
+Use Certbot (modify in order to provide your domain and folders)
+
+    sudo ufw allow 80
+    sudo certbot certonly --standalone --preferred-challenges http -d {{url}}
+
+Copy certificates in the folder
+
+    sudo cp /etc/letsencrypt/live/{{url}}/fullchain.pem ~/measurify/resources/{{url}}/fullchain.pem
+    sudo cp /etc/letsencrypt/live/{{url}}/privkey.pem ~/measurify/resources/{{url}}/privkey.pem
+
+Update certificates
+
+    sudo docker stop measurify
+    sudo certbot certonly --standalone --preferred-challenges http -d {{url}}
+    sudo cp /etc/letsencrypt/live/{{url}}/fullchain.pem ~/measurify/resources/{{url}}/fullchain.pem
+    sudo cp /etc/letsencrypt/live/{{url}}/privkey.pem ~/measurify/resources/{{url}}/privkey.pem
 
 Finally update the measurify image.
