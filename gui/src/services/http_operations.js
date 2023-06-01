@@ -1,15 +1,8 @@
 import { api_url } from "../config";
 
-const axios = require("axios").default;
+import axios from "axios";
 
-const https = require("https");
-
-const instance = axios.create({
-  httpsAgent: new https.Agent({
-    //unsafe, delete in prod
-    //rejectUnauthorized: false,
-  }),
-});
+export const instance = axios.create({});
 
 export let notificationManager = {
   PushNotification: (obj) => {},
