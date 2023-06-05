@@ -263,95 +263,98 @@ const createRequestObject = async function (startdate, enddate, thing, feature, 
 
 exports.sampleLoop = async function (descriptionData, line, feature) {
   let samples = [];
-  for (let k in descriptionData.items[feature._id]) {   
-    if(descriptionData.items[feature._id][k]==="_"){samples.push(null); continue;}//for elements missing in the csv file 
-    str_val = line[descriptionData.items[feature._id][k]].replace(/['"]+/g, "");    
-    if (feature.items[k].dimension != 0) {
-      //dimension 1 an array
-      if (isNaN(str_val)) {
-        //expected array []
-        if (str_val.startsWith("[") && str_val.endsWith("]")) {
-          const arr = str_val.split(/[[\]\";, ]/); //cover space or ; or other separator
-          let filtered_str = arr.filter(function (el) {
-            //delete ""
-            return el != "";
-          });
-          if (feature.items[k].type == "number") {
-            //if type == number conversion to number
-            var aggr = filtered_str.reduce(function (filt, val) {
-              const v = Number(val);
-              filt.push(v);
-              return filt;
-            }, []);
-            filtered_str = aggr;
+  try{
+    for (let k in descriptionData.items[feature._id]) {   
+      if(descriptionData.items[feature._id][k]==="_"){samples.push(null); continue;}//for elements missing in the csv file 
+      str_val = line[descriptionData.items[feature._id][k]].replace(/['"]+/g, "");    
+      if (feature.items[k].dimension != 0) {
+        //dimension 1 an array
+        if (isNaN(str_val)) {
+          //expected array []
+          if (str_val.startsWith("[") && str_val.endsWith("]")) {
+            const arr = str_val.split(/[[\]\";, ]/); //cover space or ; or other separator
+            let filtered_str = arr.filter(function (el) {
+              //delete ""
+              return el != "";
+            });
+            if (feature.items[k].type == "number") {
+              //if type == number conversion to number
+              var aggr = filtered_str.reduce(function (filt, val) {
+                const v = Number(val);
+                filt.push(v);
+                return filt;
+              }, []);
+              filtered_str = aggr;
+            }
+            samples.push(filtered_str);
+          } else {
+            errMessage =
+              "Format not recognized: " + str_val + ", expected an array []";
+            return [null, errMessage];
           }
-          samples.push(filtered_str);
         } else {
-          errMessage =
-            "Format not recognized: " + str_val + ", expected an array []";
+          //expected an array but is a Number
+          errMessage = "expected array in samples at position " + k;
           return [null, errMessage];
         }
       } else {
-        //expected an array but is a Number
-        errMessage = "expected array in samples at position " + k;
-        return [null, errMessage];
-      }
-    } else {
-      if (feature.items[k].type == "number") {
-        if (
-          str_val == " " ||
-          str_val == "" ||
-          str_val == "NaN" ||
-          str_val == "nan" ||
-          str_val == "Nan" ||
-          str_val == "NAN" ||
-          str_val == "Inf" ||
-          str_val == "-Inf" ||
-          str_val == "inf" ||
-          str_val == "-inf"
-        ) {
-          str_val = null;
-          samples.push(str_val);
-          continue;
-        } else {
-          if (isNaN(str_val)) {
-            //not a number
-            errMessage = "expected number in samples at position " + k;
-            return [null, errMessage];
-          } else {
-            samples.push(Number(str_val));
+        if (feature.items[k].type == "number") {
+          if (
+            str_val == " " ||
+            str_val == "" ||
+            str_val == "NaN" ||
+            str_val == "nan" ||
+            str_val == "Nan" ||
+            str_val == "NAN" ||
+            str_val == "Inf" ||
+            str_val == "-Inf" ||
+            str_val == "inf" ||
+            str_val == "-inf"
+          ) {
+            str_val = null;
+            samples.push(str_val);
             continue;
+          } else {
+            if (isNaN(str_val)) {
+              //not a number
+              errMessage = "expected number in samples at position " + k;
+              return [null, errMessage];
+            } else {
+              samples.push(Number(str_val));
+              continue;
+            }
           }
-        }
-      } else if (feature.items[k].type == "text") {
-        if (typeof str_val != "string") {
-          errMessage = "expected string in samples at position " + k;
-          return [null, errMessage];
-        }
-      } else if (feature.items[k].type == "enum") {
-        if (typeof str_val != "string") {
-          errMessage = "expected string in samples at position " + k;
-          return [null, errMessage];
-        }
-        if (!feature.items[k].range.includes(str_val)) {
-          errMessage = "the enum " + str_val + " is not in the rage of items " + feature.items[k].name + " in column  " + k;
-          return [null, errMessage];
-        }
+        } else if (feature.items[k].type == "text") {
+          if (typeof str_val != "string") {
+            errMessage = "expected string in samples at position " + k;
+            return [null, errMessage];
+          }
+        } else if (feature.items[k].type == "enum") {
+          if (typeof str_val != "string") {
+            errMessage = "expected string in samples at position " + k;
+            return [null, errMessage];
+          }
+          if (!feature.items[k].range.includes(str_val)) {
+            errMessage = "the enum " + str_val + " is not in the rage of items " + feature.items[k].name + " in column  " + k;
+            return [null, errMessage];
+          }
 
+        }
+        else {
+          errMessage =
+            "error in the definition of the feature on the database, value.type is not a number or string " + feature.items[k].type;
+          return [null, errMessage];
+        }
+        samples.push(str_val);
       }
-      else {
-        errMessage =
-          "error in the definition of the feature on the database, value.type is not a number or string " + feature.items[k].type;
-        return [null, errMessage];
-      }
-      samples.push(str_val);
     }
+    if (samples.every(element => element === null)) {
+      errMessage = "All items of the feature are null";
+      return [null, errMessage];
+    }
+    return [samples, null];
   }
-  if (samples.every(element => element === null)) {
-    errMessage = "All items of the feature are null";
-    return [null, errMessage];
-  }
-  return [samples, null];
+  catch(error){return [null, error];}
 };
 /*
 exports.tagLoop = async function (descriptionData, Tag, force, req) {
