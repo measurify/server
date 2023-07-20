@@ -1,7 +1,7 @@
 const firebase = require("firebase-admin");
-const account = require("../security/firebase-config.json");
 
 try{
+    const account = require("../security/firebaseConfig.json");
     firebase.initializeApp({
         credential: firebase.credential.cert(account),
         databaseURL: process.env.FIREBASE_URL

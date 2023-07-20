@@ -1,6 +1,6 @@
 node_modules/
 data/
-security/firebase-config-secret.json
+security/firebaseConfig.json
 warehouse/
 uploads/
 gui/node_modules
