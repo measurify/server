@@ -49,8 +49,8 @@ exports.getone = async (req, res) => {
 };
 
 exports.post = async (req, res) => {
-  if (Array.isArray(req.body)) { req.body.map((r) => { if (r._id == undefined) { r._id = sha(JSON.stringify(r)); } }); }
-  else if (req.body._id == undefined) { req.body._id = sha(JSON.stringify(req.body)); }
+  if (Array.isArray(req.body)) { req.body.map((r) => { if (r._id == undefined) {if (r.startDate == undefined){r.startDate=Date.now();} r._id = sha(JSON.stringify(r)); } }); }
+  else if (req.body._id == undefined) { if (req.body.startDate == undefined){req.body.startDate=Date.now();}req.body._id = sha(JSON.stringify(req.body)); }
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   //let result = await checker.canCreate(req, res);if (result != true) return result;
   let result = await checker.canOperate(req, res, "Measurement"); if (result != true) return result;
