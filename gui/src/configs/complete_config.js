@@ -45,12 +45,12 @@ export default function Complete_configuration() {
   restrictionPages["users"] = ["admin"];
   restrictionPages["roles"] = ["admin"];
   restrictionPages["protocols"] = ["admin"];
-  restrictionPages["tags"] = ["admin"];
+  restrictionPages["experiments"] = ["admin"];
+  /*restrictionPages["tags"] = ["admin"];
   restrictionPages["features"] = ["admin"];
   restrictionPages["things"] = ["admin"];
-  restrictionPages["devices"] = ["admin"];
-  restrictionPages["experiments"] = ["admin"];
-  restrictionPages["measurements"] = ["admin"];
+  restrictionPages["devices"] = ["admin"];  
+  restrictionPages["measurements"] = ["admin"];*/
 
   //actions dictionary: key is the page, value is an array that contains actions || working actions arae "view" | "edit" | "delete" | "duplicate"
   const pageActions = {};
