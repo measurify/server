@@ -149,13 +149,6 @@ export function LoadConfig() {
 
 //this function return the type of database "EM","QS", etc, according to host name
 export function WhatAmI() {
-  const { hostname } = window.location; //, href, origin, pathname, port, protocol, search  host,
-
-  const splitted = hostname.split(".");
-  const type = splitted[0];
-  if (type === "emdb") return "EM";
-  if (type === "qdb") return "QS";
-
   return "unknown";
 }
 

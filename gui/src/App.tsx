@@ -38,8 +38,10 @@ import cloneDeep from "clone-deep";
 import PasswordRecoveryPage from "./components/passwordRecoveryPage/PasswordRecoveryPage";
 import PasswordResetPage from "./components/PasswordResetPage/PasswordResetPage";
 import UploadMeasurementsPage from "./components/OperationalPages/uploadMeasurements/uploadMeasurements";
-
-import { ResetConfig, LoadConfig } from "./configManager";
+import DownloadHistoryPage from "./components/OperationalPages/downloadhistory/downloadExperiment";
+import RemoveStepsPage from "./components/OperationalPages/removeHistorySteps/removeSteps";
+import UpdateHistoryPage from "./components/OperationalPages/updateHistorySteps/updateHistory";
+import { ResetConfig, LoadConfig, operationPages } from "./configManager";
 /*
     notifications follow this schema
 
@@ -296,7 +298,36 @@ function App() {
                   path="/edit/:resource/:id"
                   element={<EditContentPage />}
                 />
-
+                <Route
+                  path="/downloadexperiment"
+                  element={
+                    operationPages.includes("downloadexperiment") ? (
+                      <DownloadHistoryPage />
+                    ) : (
+                      <Navigate to="/404" replace />
+                    )
+                  }
+                />
+                <Route
+                  path="/updatehistory"
+                  element={
+                    operationPages.includes("updatehistory") ? (
+                      <UpdateHistoryPage />
+                    ) : (
+                      <Navigate to="/404" replace />
+                    )
+                  }
+                />
+                <Route
+                  path="/removesteps"
+                  element={
+                    operationPages.includes("removesteps") ? (
+                      <RemoveStepsPage />
+                    ) : (
+                      <Navigate to="/404" replace />
+                    )
+                  }
+                />
                 <Route
                   path="/uploadmeasurements"
                   element={<UploadMeasurementsPage />}
