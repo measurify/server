@@ -329,8 +329,7 @@ export default function Complete_configuration() {
     _id: "Please, enter experiment's name (N.B. don't use the # character in experiment's name).",
     state: "Please, enter 0 for ongoing experiment, 1 for finished experiment.",
     description: "Please, enter a short experiment's description.",
-    manager:
-      "Please, enter the experiment's company name (as a short Acronym).",
+    manager: "Please, enter the experiment's manager name.",
     startDate: "Please, use yyyy/mm/dd format.",
     endDate: "Please, use yyyy/mm/dd format.",
   };
