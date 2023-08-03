@@ -32,11 +32,11 @@ Clone code
 Connect to the containeraized database
 
     cd init
-    sudo nano variable.env 
+    sudo nano variable.env
 
     search for "DATABASE" variable and set the varlue as
     DATABASE=mongodb://database:27017/measurify-catalog
-    
+
     cd ..
 
 Run containers
@@ -60,6 +60,8 @@ To get info:
     sudo docker exec -it measurify pm2 show measurify
 
 ## Documentation
+
+For a detailed step by step guide on how to use Measurify, [click here](/quickstart/index.md)
 
 It is possible to get information about routes and data model from the following route:
 
@@ -87,7 +89,7 @@ To start the server in production mode, run:
 
 ## Admin Dashboard GUI configuration and Building
 
-The source code of the Admin Dashboard GUI can be accessed in _./gui_ folder. The Admin Dashboard you can found here is already configured and it will start together with the server. It can be accessed from a web browser from https://localhost:8080/ (the actual URL is specified in the configuration file, see next)
+The source code of the Admin Dashboard GUI can be accessed in _./gui_ folder. The Admin Dashboard you can found here is already configured and it will start together with the server. It can be accessed from a web browser from https://localhost/ (the actual URL is specified in the configuration file, see next)
 
 ### Deploy your own version of the Admin Dashboard GUI
 
@@ -118,7 +120,7 @@ _npm run build-win_ and _npm run build-mac_ are batch instructions to build and 
 
 ## Deploy
 
-The Measurify API Sever is developed using [Node JS](https://nodejs.org/en/) and [MongoDB](https://www.mongodb.com/). 
+The Measurify API Sever is developed using [Node JS](https://nodejs.org/en/) and [MongoDB](https://www.mongodb.com/).
 There is a configuration file template **\init\variablesTemplate.env** that should be renamed in **\init\variables.env** and can be edited in order to specify several features:
 
     VERSION=v1
@@ -167,6 +169,7 @@ Install Certbot
     sudo apt-get install certbot
 
 ### Certificate one url
+
 Use Certbot (modify in order to provide your domain)
 
     sudo ufw allow 80
@@ -187,6 +190,7 @@ Update certificates
 Finally update the measurify image.
 
 ### Certificate more urls
+
 Use Certbot (modify in order to provide your domain and folders)
 
     sudo ufw allow 80
