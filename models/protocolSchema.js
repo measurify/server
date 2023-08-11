@@ -4,6 +4,7 @@ mongoose.Promise = global.Promise;
 const MetadataTypes = require('../types/metadataTypes.js');
 const TopicFieldTypes = require('../types/topicFieldTypes.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
+const StageTypes = require("../types/stageTypes.js");
 
 const metadataSchema = new mongoose.Schema({ 
     name: { type: String, required: "Please, supply a name" },
@@ -38,6 +39,7 @@ const protocolSchema = new mongoose.Schema({
     owner: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true },
     tags: { type: [String], ref:'Tag' },
     visibility: {type: String, default: VisibilityTypes.public },
+    stage: { type: String, enum: StageTypes, default: StageTypes.final },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });

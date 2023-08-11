@@ -4,6 +4,7 @@ mongoose.Promise = global.Promise;
 const RelationshipTypes = require('../types/relationshipTypes.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 const ConstraintTypes = require('../types/constraintTypes.js');
+const StageTypes = require("../types/stageTypes.js");
  
 const constraintSchema = new mongoose.Schema({ 
     owner: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true },
@@ -13,6 +14,7 @@ const constraintSchema = new mongoose.Schema({
     element2: { type: String, required: "Please, supply element2"  },
     relationship: { type: String, required: "Please, supply a relationship"  },
     visibility: {type: String, enum: VisibilityTypes, default: VisibilityTypes.public },
+    stage: { type: String, enum: StageTypes, default: StageTypes.final },
     tags: { type: [String], ref: 'Tag' },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }

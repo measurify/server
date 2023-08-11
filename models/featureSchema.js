@@ -3,6 +3,7 @@ const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
 const ItemTypes = require('../types/itemTypes.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
+const StageTypes = require("../types/stageTypes.js");
 
 const itemSchema = new mongoose.Schema({ 
     name: { type: String, required: "Please, supply a name" },
@@ -23,6 +24,7 @@ const featureSchema = new mongoose.Schema({
     tags: { type: [String], ref:'Tag' },
     description: {type: String},
     visibility: {type: String, default: VisibilityTypes.public },
+    stage: { type: String, enum: StageTypes, default: StageTypes.final },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });

@@ -5,6 +5,7 @@ const geojson = require("mongoose-geojson-schema");
 //const ExperimentStateTypes = require('../types/experimentStateTypes.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 const inspector = require("../commons/inspector.js");
+const StageTypes = require("../types/stageTypes.js");
 
 const fieldSchema = new mongoose.Schema({ 
     name: { type: String, required: "Please, supply a name" },
@@ -40,6 +41,7 @@ const experimentSchema = new mongoose.Schema({
     history: [ historySchema ], 
     tags: { type: [String], ref:'Tag' },
     visibility: {type: String, enum: VisibilityTypes, default: VisibilityTypes.private },
+    stage: { type: String, enum: StageTypes, default: StageTypes.final },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });

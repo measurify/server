@@ -5,6 +5,7 @@ mongoose.Promise = global.Promise;
 const inspector = require('../commons/inspector.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 const cache = require('../commons/cache.js');
+const StageTypes = require("../types/stageTypes.js");
 
 const datauploadSchema = new mongoose.Schema({
     _id: { type: String, required: "Please, supply an _id" },//corrisponde a file name
@@ -12,7 +13,9 @@ const datauploadSchema = new mongoose.Schema({
     timestamp: { type: Date, default: Date.now },
     size: {type: Number, default: 0 },
     results: { type: String, default: ""},
-    lastmod: {type: Date, default: Date.now, select: false }//per la put
+    lastmod: {type: Date, default: Date.now, select: false },//per la put
+    stage: { type: String, enum: StageTypes, default: StageTypes.final },
+    
 });
 
 datauploadSchema.set('toJSON', { versionKey: false });

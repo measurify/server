@@ -2,12 +2,14 @@ const mongoose = require('mongoose');
 const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
+const StageTypes = require("../types/stageTypes.js");
 
 const scriptSchema = new mongoose.Schema({
     _id: { type: String, required: "Please, supply an _id" },
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     code: { type: String, required: "Please, supply the code" },
     visibility: {type: String, enum: VisibilityTypes, default: VisibilityTypes.private },
+    stage: { type: String, enum: StageTypes, default: StageTypes.final },
     tags: { type: [String], ref: 'Tag' },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }

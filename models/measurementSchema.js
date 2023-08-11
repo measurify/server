@@ -4,6 +4,7 @@ const paginate = require("mongoose-paginate-v2");
 mongoose.Promise = global.Promise;
 const inspector = require("../commons/inspector.js");
 const VisibilityTypes = require("../types/visibilityTypes.js");
+const StageTypes = require("../types/stageTypes.js");
 const cache = require("../commons/cache.js");
 
 const sampleSchema = new mongoose.Schema(
@@ -27,6 +28,7 @@ const measurementSchema = new mongoose.Schema({
   script: { type: String, ref: "Script", index: true },
   samples: [sampleSchema],
   visibility: { type: String, enum: VisibilityTypes, default: VisibilityTypes.private },
+  stage: { type: String, enum: StageTypes, default: StageTypes.final },
   tags: { type: [String], ref: "Tag" },
   timestamp: { type: Date, default: Date.now },
   lastmod: { type: Date, default: Date.now, select: false },

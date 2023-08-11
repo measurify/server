@@ -5,6 +5,7 @@ const ComputationStatusTypes = require('../types/computationStatusTypes.js');
 const ComputationCodeTypes = require('../types/computationCodeTypes.js'); 
 const ItemTypes = require('../types/itemTypes.js');
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
+const StageTypes = require("../types/stageTypes.js");
 
 const computationSchema = new mongoose.Schema({
     _id: { type: String, required: "Please, supply an _id" },
@@ -20,6 +21,7 @@ const computationSchema = new mongoose.Schema({
     startDate: { type: Date, default: Date.now },
     endDate: { type: Date },
     visibility: {type: String, enum: VisibilityTypes, default: VisibilityTypes.private },
+    stage: { type: String, enum: StageTypes, default: StageTypes.final },
     tags: { type: [String], ref: 'Tag' },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false },

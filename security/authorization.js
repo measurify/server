@@ -5,6 +5,7 @@ const CrudTypes = require('../types/crudTypes.js');
 const RoleCrudTypes = require('../types/roleCrudTypes.js');
 const persistence = require('../commons/persistence.js');
 const { equalScalarDependencies } = require('mathjs');
+const StageTypes = require("../types/stageTypes.js");
 
 exports.isAdministrator = function (user) {
     if (user.type == UserRoles.admin) return true;
@@ -72,6 +73,8 @@ exports.whatCanOperate = function (user, role, method, entity) { //read,delete
     if (permission === undefined) permission = role.default[CrudTypes[method]];
     if (permission == RoleCrudTypes.all) return result;
     if (permission == RoleCrudTypes.owned) return result = { $and: [{ owner: user._id }] };
+    //ADDED 
+    if (permission == RoleCrudTypes.public_and_owned&&method==CrudTypes.GET&&entity.toLowerCase()=="measurement") return result = { $or: [{$and: [{ visibility: VisibilityTypes.public },{ $or:[{stage:StageTypes.final},{stage:undefined}]}]}, { owner: user._id }] };
     if (permission == RoleCrudTypes.public_and_owned) return result = { $or: [{ owner: user._id }, { visibility: VisibilityTypes.public }] };
     return result = { $and: [{ owner: user._id }, { visibility: VisibilityTypes.public }, { visibility: VisibilityTypes.private }] }//none    
 }

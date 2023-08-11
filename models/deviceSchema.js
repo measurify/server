@@ -3,6 +3,7 @@ const paginate = require('mongoose-paginate-v2');
 mongoose.Promise = global.Promise;
 const VisibilityTypes = require('../types/visibilityTypes.js'); 
 const MeasurementBufferPolicyTypes = require('../types/measurementBufferPolicyTypes.js'); 
+const StageTypes = require("../types/stageTypes.js");
  
 const deviceSchema = new mongoose.Schema({ 
     _id: { type: String, required: "Please, supply an _id" },
@@ -13,6 +14,7 @@ const deviceSchema = new mongoose.Schema({
     tags: { type: [String], ref:'Tag' },
     scripts: { type: [String], ref:'Script' },
     visibility: {type: String, enum: VisibilityTypes, default: VisibilityTypes.private },
+    stage: { type: String, enum: StageTypes, default: StageTypes.final },
     period: {type: String, default: "5s" },
     cycle: {type: String, default: "10m" },
     retryTime: {type: String, default: "10s" },

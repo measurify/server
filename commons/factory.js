@@ -19,6 +19,7 @@ const MetadataTypes = require('../types/metadataTypes.js');
 const RoleCrudTypes = require('../types/roleCrudTypes.js');
 const { index } = require("mathjs");
 const errors = require('../commons/errors.js');
+const StageTypes = require("../types/stageTypes.js");
 
 function sha(content) {
   return crypto.createHash("sha256").update(content).digest("hex");
@@ -607,7 +608,8 @@ exports.createMeasurement = async function (owner, feature, device, thing, tags,
     samples: samples,
     tags: tags,
     visibility: visibility,
-    experiment: experiment
+    experiment: experiment,
+    stage: StageTypes.final
   };
   const id = sha(JSON.stringify(req));
   req._id = id;
