@@ -70,7 +70,7 @@ const postList = async function (body, model, tenant) {
     const results = { [items]: [], errors: [] };
     for (let [i, element] of body.entries()) {
         try {
-            element.owner = body.owner;
+            //element.owner = body.owner;
             if (element.password) element.password = checkPassword(element.password,tenant.passwordhash);
             if(model.modelName == "Device") {token = authentication.encodeDevice(element,tenant); element.token =await factory.HashDeviceToken(tenant, token)}//hash token 
             const resource = await (new model(element)).save()
