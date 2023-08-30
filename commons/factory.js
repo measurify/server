@@ -592,7 +592,7 @@ exports.createFieldmask = async function (
   return fieldmask._doc;
 };
 
-exports.createMeasurement = async function (owner, feature, device, thing, tags, samples, startdate, enddate, location, visibility, experiment, tenant) {
+exports.createMeasurement = async function (owner, feature, device, thing, tags, samples, startdate, enddate, location, visibility, experiment, tenant,stage) {
   const Tenant = mongoose.dbs["catalog"].model("Tenant");
   if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
   if (samples == undefined) samples = [{ values: [10.4], delta: 200 }];
@@ -609,7 +609,7 @@ exports.createMeasurement = async function (owner, feature, device, thing, tags,
     tags: tags,
     visibility: visibility,
     experiment: experiment,
-    stage: StageTypes.final
+    stage: stage || StageTypes.final
   };
   const id = sha(JSON.stringify(req));
   req._id = id;

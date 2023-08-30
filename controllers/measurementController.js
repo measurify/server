@@ -60,7 +60,7 @@ exports.post = async (req, res) => {
 
 exports.put = async (req, res) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
-  const fields = ["tags"];
+  const fields = ["tags","stage"];
   let result = await checker.isAvailable(req, res, Measurement); if (result != true) return result;
   result = await checker.isFilled(req, res, fields); if (result != true) return result;
   //result = await checker.canModify(req, res);  if (result != true) return result;

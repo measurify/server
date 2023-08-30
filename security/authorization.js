@@ -74,7 +74,7 @@ exports.whatCanOperate = function (user, role, method, entity) { //read,delete
     if (permission == RoleCrudTypes.all) return result;
     if (permission == RoleCrudTypes.owned) return result = { $and: [{ owner: user._id }] };
     //ADDED 
-    if (permission == RoleCrudTypes.public_and_owned&&method==CrudTypes.GET&&entity.toLowerCase()=="measurement") return result = { $or: [{$and: [{ visibility: VisibilityTypes.public },{ $or:[{stage:StageTypes.final},{stage:undefined}]}]}, { owner: user._id }] };
+    if (permission == RoleCrudTypes.public_and_owned&&method=="GET"&&entity.toLowerCase()=="measurement") return result = { $or: [{$and: [{ visibility: VisibilityTypes.public },{ $or:[{stage:StageTypes.final},{stage:undefined}]}]}, { owner: user._id }] };
     if (permission == RoleCrudTypes.public_and_owned) return result = { $or: [{ owner: user._id }, { visibility: VisibilityTypes.public }] };
     return result = { $and: [{ owner: user._id }, { visibility: VisibilityTypes.public }, { visibility: VisibilityTypes.private }] }//none    
 }

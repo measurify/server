@@ -15,6 +15,8 @@ const ItemTypes = require("../types/itemTypes.js");
 chai.use(chaiHttp);
 const before = require("./before-test.js");
 const { token } = require("../types/issueTypes.js");
+const StageTypes = require("../types/stageTypes.js");
+const VisibilityTypes = require('../types/visibilityTypes.js'); 
 
 // Test the /GET route
 describe("/GET measurements", () => {
@@ -63,9 +65,9 @@ describe("/GET measurements", () => {
     const res = await chai.request(server).keepOpen().get("/v1/measurements").set("Authorization", await factory.getUserToken(owner)).set("Accept", "text/csv");
     res.should.have.status(200);
     res.text.should.be.a("string");
-    res.text.should.contain('visibility,tags,_id,startDate,endDate,location,thing,feature,device,samples');
-    res.text.should.contain('"private",["test-tag-1";"test-tag-2"],"'+measurement2._id+'","'+measurement2.startDate.toJSON()+'","'+measurement2.endDate.toJSON()+'",[],"test-thing-1","test-feature","test-device-1",[4.4,7.3,3.6]');
-    res.text.should.contain('"private",["test-tag-1";"test-tag-2"],"'+measurement1._id+'","'+measurement1.startDate.toJSON()+'","'+measurement1.endDate.toJSON()+'",[],"test-thing-1","test-feature","test-device-1",[1.8,5.3,6.2]');
+    res.text.should.contain('visibility,stage,tags,_id,startDate,endDate,location,thing,feature,device,samples');
+    res.text.should.contain('"private","final",["test-tag-1";"test-tag-2"],"'+measurement2._id+'","'+measurement2.startDate.toJSON()+'","'+measurement2.endDate.toJSON()+'",[],"test-thing-1","test-feature","test-device-1",[4.4,7.3,3.6]');
+    res.text.should.contain('"private","final",["test-tag-1";"test-tag-2"],"'+measurement1._id+'","'+measurement1.startDate.toJSON()+'","'+measurement1.endDate.toJSON()+'",[],"test-thing-1","test-feature","test-device-1",[1.8,5.3,6.2]');
   });
 
   it("it should GET all the measurements as CSV+", async () => {
@@ -89,10 +91,10 @@ describe("/GET measurements", () => {
     const res = await chai.request(server).keepOpen().get("/v1/measurements?filter={\"feature\":\""+feature._id+"\"}").set("Authorization", await factory.getUserToken(owner)).set("Accept", "text/csv+");
     res.should.have.status(200);
     res.text.should.be.a("string");
-    res.text.should.contain('visibility,tags,_id,startDate,endDate,location,thing,feature,device,item-name-1,item-name-2,item-name-3\n');
-    res.text.should.contain('private,[test-tag-1,test-tag-2],'+measurement2._id+','+measurement2.startDate.toJSON()+','+measurement2.endDate.toJSON()+',[object Object],test-thing-1,test-feature,test-device-1,4.4,7.3,3.6');
-    res.text.should.contain('private,[test-tag-1,test-tag-2],'+measurement1._id+','+measurement1.startDate.toJSON()+','+measurement1.endDate.toJSON()+',[object Object],test-thing-1,test-feature,test-device-1,1.8,5.3,6.2');
-    res.text.should.contain('private,[test-tag-1,test-tag-2],'+measurement1._id+','+measurement1.startDate.toJSON()+','+measurement1.endDate.toJSON()+',[object Object],test-thing-1,test-feature,test-device-1,9.7,2.1,5.2');
+    res.text.should.contain('visibility,stage,tags,_id,startDate,endDate,location,thing,feature,device,item-name-1,item-name-2,item-name-3\n');
+    res.text.should.contain('private,final,[test-tag-1,test-tag-2],'+measurement2._id+','+measurement2.startDate.toJSON()+','+measurement2.endDate.toJSON()+',[object Object],test-thing-1,test-feature,test-device-1,4.4,7.3,3.6');
+    res.text.should.contain('private,final,[test-tag-1,test-tag-2],'+measurement1._id+','+measurement1.startDate.toJSON()+','+measurement1.endDate.toJSON()+',[object Object],test-thing-1,test-feature,test-device-1,1.8,5.3,6.2');
+    res.text.should.contain('private,final,[test-tag-1,test-tag-2],'+measurement1._id+','+measurement1.startDate.toJSON()+','+measurement1.endDate.toJSON()+',[object Object],test-thing-1,test-feature,test-device-1,9.7,2.1,5.2');
   
   });
 
@@ -1571,6 +1573,128 @@ describe("/POST measurement", () => {
     res.body.should.be.a("object");
     res.body.saved.should.be.eql(1);
     res.body.errors.should.be.eql(3);
+  });
+
+  it("it should POST a measurement with stage final or draft", async () => {
+    const user = await factory.createUser("test-username-1","test-password-1",UserRoles.provider);
+    const items = [
+      { name: "item-name-1", unit: "item-unit-1", type: ItemTypes.number },
+      { name: "item-name-2", unit: "item-unit-2", type: ItemTypes.number },
+      { name: "item-name-3", unit: "item-unit-3", type: ItemTypes.number },
+      { name: "item-name-4", unit: "item-unit-4", type: ItemTypes.number },
+    ];
+    const feature = await factory.createFeature("test-feature-3", user, items);
+    const device = await factory.createDevice("test-device-3", user, [feature]);
+    const thing = await factory.createThing("test-thing-3", user);
+    const measurement = {
+      owner: user,
+      startDate: new Date().toISOString,
+      endDate: new Date().toISOString,
+      position: {
+        type: "Point",
+        coordinates: [12.123456, 13.1345678],
+      },
+      thing: thing._id,
+      device: device._id,
+      feature: feature._id,
+      samples: [
+        { values: [10.4, 11, 54, 12], delta: 200 },
+        { values: [10.5, 43, 23, 10], delta: 220 },
+      ],
+      stage: StageTypes.draft
+    };
+    const res = await chai
+      .request(server)
+      .keepOpen()
+      .post("/v1/measurements")
+      .set("Authorization", await factory.getUserToken(user))
+      .send(measurement);
+    res.should.have.status(200);
+    res.body.should.be.a("object");
+    res.body.should.have.property("_id");
+    res.body.should.have.property("startDate");
+    res.body.should.have.property("thing");
+    res.body.should.have.property("feature");
+    res.body.should.have.property("device");
+    res.body.should.have.property("timestamp");
+    res.body.should.have.property("samples");
+    res.body.should.have.property("stage");
+    res.body.thing.should.be.eql(measurement.thing);
+    res.body.feature.should.be.eql(measurement.feature);
+    res.body.device.should.be.eql(measurement.device);
+    res.body.stage.should.be.eql(StageTypes.draft);
+
+    measurement.stage = StageTypes.final;
+    const res2 = await chai.request(server)
+    .keepOpen()
+    .post("/v1/measurements")
+    .set("Authorization", await factory.getUserToken(user))
+    .send(measurement);
+    res2.should.have.status(200);
+    res2.body.should.be.a("object");
+    res2.body.should.have.property("_id");
+    res2.body.should.have.property("startDate");
+    res2.body.should.have.property("thing");
+    res2.body.should.have.property("feature");
+    res2.body.should.have.property("device");
+    res2.body.should.have.property("timestamp");
+    res2.body.should.have.property("samples");
+    res2.body.should.have.property("stage");
+    res2.body.thing.should.be.eql(measurement.thing);
+    res2.body.feature.should.be.eql(measurement.feature);
+    res2.body.device.should.be.eql(measurement.device);
+    res2.body.stage.should.be.eql(StageTypes.final);
+  });
+});
+
+// Test the /PUT route
+describe("/PUT measurement", () => {
+  it("it should PUT a measurement tags", async () => {    
+    const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+    const tag_1 = await factory.createTag("test-tag-1", user, [], VisibilityTypes.public);
+    const tag_2 = await factory.createTag("test-tag-2", user, [], VisibilityTypes.public);
+    const tag_3 = await factory.createTag("test-tag-3", user, [], VisibilityTypes.public);
+    const tag_4 = await factory.createTag("test-tag-4", user, [], VisibilityTypes.public);
+    const feature = await factory.createFeature("test-feature", user);
+    const device = await factory.createDevice("test-device-4", user, [feature]);
+    const thing = await factory.createThing("test-thing", user);
+    const measurement = await factory.createMeasurement(user,
+      feature,
+      device,
+      thing,
+      [tag_1, tag_2]);
+    const request = { tags: { add: ['test-tag-3', 'test-tag-4'], remove: ['test-tag-1'] } };
+    const res = await chai.request(server).keepOpen().put('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user)).send(request);
+    res.should.have.status(200);
+    res.body.should.be.a('object');
+    res.body.should.have.property('tags');
+    res.body.tags.length.should.be.eql(3);
+    res.body.tags[0].should.be.eql('test-tag-2');
+    res.body.tags[1].should.be.eql('test-tag-3');
+    res.body.tags[2].should.be.eql('test-tag-4');  
+  });
+
+  it("it should PUT a measurement stage", async () => {    
+    const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+    const feature = await factory.createFeature("test-feature", user);
+    const device = await factory.createDevice("test-device-4", user, [feature]);
+    const tag = await factory.createTag("test-tag", user);
+    const thing = await factory.createThing("test-thing", user);
+    const measurement = await factory.createMeasurement(user,feature,device,thing,[tag],undefined,null,null,null,VisibilityTypes.public,null,null,StageTypes.draft);
+    const request = { stage: StageTypes.final };
+    const res = await chai.request(server).keepOpen().put('/v1/measurements/' + measurement._id).set("Authorization", await factory.getUserToken(user)).send(request);
+    res.should.have.status(200);
+    res.body.should.be.a('object');
+    res.body.should.have.property('stage');
+    res.body.stage.should.be.eql(StageTypes.final);
+
+    const measurement2 = await factory.createMeasurement(user,feature,device,thing,[tag],undefined,null,null,null,VisibilityTypes.public,null,null,StageTypes.final);
+    const request2 = { stage: StageTypes.draft };
+    const res2 = await chai.request(server).keepOpen().put('/v1/measurements/' + measurement2._id).set("Authorization", await factory.getUserToken(user)).send(request2);
+    res2.should.have.status(200);
+    res2.body.should.be.a('object');
+    res2.body.should.have.property('stage');
+    res2.body.stage.should.be.eql(StageTypes.draft);    
   });
 });
 

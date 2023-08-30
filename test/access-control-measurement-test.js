@@ -15,6 +15,7 @@ const VisibilityTypes = require("../types/visibilityTypes.js");
 const errors = require("../commons/errors.js");
 chai.use(chaiHttp);
 const before = require("./before-test.js");
+const StageTypes = require("../types/stageTypes.js");
 
 // CREATE
 describe("Access create measurement", () => {
@@ -811,6 +812,198 @@ describe("Access read a list of measurements", () => {
     res.should.have.status(200);
     res.body.docs.should.be.a("array");
     res.body.docs.length.should.be.eql(1);
+  });
+  
+  it("it should get the list of his own or final public measurements as provider (STAGE CHECK)", async () => {
+    const user_admin = await factory.createUser(
+      "test-username-admin",
+      "test-password-admin",
+      UserRoles.admin
+    );
+    const user_provider = await factory.createUser(
+      "test-username-provider",
+      "test-password-provider",
+      UserRoles.provider
+    );
+    const owner = await factory.createUser(
+      "test-username-owner",
+      "test-password-owner",
+      UserRoles.provider
+    );
+    const feature = await factory.createFeature("test-feature", owner);
+    const device = await factory.createDevice("test-device-1", owner, [feature]);
+    const thing_1 = await factory.createThing("test-thing-1", owner);
+    const thing_2 = await factory.createThing("test-thing-2", owner);
+    const thing_3 = await factory.createThing("test-thing-3", owner);
+    const thing_4 = await factory.createThing("test-thing-4", owner);
+    const thing_5 = await factory.createThing("test-thing-5", owner);
+    const thing_6 = await factory.createThing("test-thing-6", owner);
+    const thing_7 = await factory.createThing("test-thing-7", owner);
+    const thing_8 = await factory.createThing("test-thing-8", owner);
+    const thing_9 = await factory.createThing("test-thing-9", owner);
+    const thing_10 = await factory.createThing("test-thing-10", owner);
+    const measurement_public_1_final = await factory.createMeasurement(
+      owner,
+      feature,
+      device,
+      thing_1,
+      [],
+      factory.createSamples(1),
+      null,
+      null,
+      null,
+      VisibilityTypes.public,
+      null,
+      null,
+      StageTypes.final
+    );
+    const measurement_public_2_draft = await factory.createMeasurement(
+      owner,
+      feature,
+      device,
+      thing_2,
+      [],
+      factory.createSamples(1),
+      null,
+      null,
+      null,
+      VisibilityTypes.public,
+      null,
+      null,
+      StageTypes.draft
+    );
+    const measurement_public_3_draft = await factory.createMeasurement(
+      owner,
+      feature,
+      device,
+      thing_3,
+      [],
+      factory.createSamples(1),
+      null,
+      null,
+      null,
+      VisibilityTypes.public,
+      null,
+      null,
+      StageTypes.draft
+    );
+    const measurement_public_4_final = await factory.createMeasurement(
+      user_provider,
+      feature,
+      device,
+      thing_4,
+      [],
+      factory.createSamples(1),
+      null,
+      null,
+      null,
+      VisibilityTypes.public,
+      null,
+      null,
+      StageTypes.final
+    );
+    const measurement_public_5_draft = await factory.createMeasurement(
+      user_provider,
+      feature,
+      device,
+      thing_5,
+      [],
+      factory.createSamples(1),
+      null,
+      null,
+      null,
+      VisibilityTypes.public,
+      null,
+      null,
+      StageTypes.draft
+    );
+    const measurement_private_1_final = await factory.createMeasurement(
+      owner,
+      feature,
+      device,
+      thing_6,
+      [],
+      factory.createSamples(2),
+      null,
+      null,
+      null,
+      VisibilityTypes.private,
+      null,
+      null,
+      StageTypes.final
+    );
+    const measurement_private_2_final = await factory.createMeasurement(
+      user_provider,
+      feature,
+      device,
+      thing_7,
+      [],
+      factory.createSamples(2),
+      null,
+      null,
+      null,
+      VisibilityTypes.private,
+      null,
+      null,
+      StageTypes.final
+    );
+    const measurement_private_3_draft = await factory.createMeasurement(
+      user_provider,
+      feature,
+      device,
+      thing_8,
+      [],
+      factory.createSamples(2),
+      null,
+      null,
+      null,
+      VisibilityTypes.private,
+      null,
+      null,
+      StageTypes.draft
+    );
+    const measurement_private_4_draft = await factory.createMeasurement(
+      owner,
+      feature,
+      device,
+      thing_9,
+      [],
+      factory.createSamples(2),
+      null,
+      null,
+      null,
+      VisibilityTypes.private,
+      null,
+      null,
+      StageTypes.draft
+    );
+    const measurement_private_5_final = await factory.createMeasurement(
+      owner,
+      feature,
+      device,
+      thing_10,
+      [],
+      factory.createSamples(2),
+      null,
+      null,
+      null,
+      VisibilityTypes.private,
+      null,
+      null,
+      StageTypes.final
+    );
+    let res = await chai.request(server).keepOpen().get("/v1/measurements").set("Authorization", await factory.getUserToken(owner));
+    res.should.have.status(200);
+    res.body.docs.should.be.a("array");
+    res.body.docs.length.should.be.eql(7);
+    let res2 = await chai.request(server).keepOpen().get("/v1/measurements").set("Authorization", await factory.getUserToken(user_provider));
+    res2.should.have.status(200);
+    res2.body.docs.should.be.a("array");
+    res2.body.docs.length.should.be.eql(5);
+    let res3 = await chai.request(server).keepOpen().get("/v1/measurements").set("Authorization", await factory.getUserToken(user_admin));
+    res3.should.have.status(200);
+    res3.body.docs.should.be.a("array");
+    res3.body.docs.length.should.be.eql(10);
   });
 });
 
