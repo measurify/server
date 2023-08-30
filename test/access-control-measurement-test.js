@@ -3056,7 +3056,7 @@ describe("Access measurements withs right as provider", () => {
       null,
       VisibilityTypes.private
     );
-    const measurement_right_3_noown = await factory.createMeasurement(
+    const measurement_right_3_owned_but_private = await factory.createMeasurement(
       owner,
       feature_right_2,
       device,
@@ -3068,7 +3068,7 @@ describe("Access measurements withs right as provider", () => {
       null,
       VisibilityTypes.private
     );
-    const measurement_right_4_noown_public = await factory.createMeasurement(
+    const measurement_right_4_owned_public = await factory.createMeasurement(
       owner,
       feature_right_2,
       device,
@@ -3080,7 +3080,7 @@ describe("Access measurements withs right as provider", () => {
       null,
       VisibilityTypes.public
     );
-    const measurement_right_5_noown = await factory.createMeasurement(
+    const measurement_right_5_owned_but_private = await factory.createMeasurement(
       owner,
       feature_right_2,
       device,
@@ -3092,7 +3092,7 @@ describe("Access measurements withs right as provider", () => {
       null,
       VisibilityTypes.private
     );
-    const measurement_right_6_noown = await factory.createMeasurement(
+    const measurement_right_6_owned_but_private = await factory.createMeasurement(
       owner,
       feature_right_2,
       device,
@@ -3114,7 +3114,7 @@ describe("Access measurements withs right as provider", () => {
       null,
       null,
       null,
-      VisibilityTypes.private
+      VisibilityTypes.public
     );
     const measurement_noright_2_noown = await factory.createMeasurement(
       owner,
@@ -3126,7 +3126,7 @@ describe("Access measurements withs right as provider", () => {
       null,
       null,
       null,
-      VisibilityTypes.private
+      VisibilityTypes.public
     );
     const measurement_noright_3_noown = await factory.createMeasurement(
       owner,
@@ -3151,6 +3151,227 @@ describe("Access measurements withs right as provider", () => {
       null,
       null,
       VisibilityTypes.private
+    );
+    let res = await chai
+      .request(server)
+      .keepOpen()
+      .get("/v1/measurements")
+      .set("Authorization", await factory.getUserToken(provider));
+    res.should.have.status(200);
+    res.body.docs.should.be.a("array");
+    res.body.docs.length.should.be.eql(3);
+    res = await chai
+      .request(server)
+      .keepOpen()
+      .get("/v1/measurements/count")
+      .set("Authorization", await factory.getUserToken(provider));
+    res.body.size.should.be.eql(3);
+  });
+
+  it("it should get only his measurements of features and final with rights as provider (STAGE CHECK)", async () => {
+    const provider = await factory.createUser(
+      "test-username-admin",
+      "test-password-admin",
+      UserRoles.provider
+    );
+    const owner = await factory.createUser(
+      "test-username-owner",
+      "test-password-owner",
+      UserRoles.provider
+    );
+    const feature_right_1 = await factory.createFeature(
+      "test-feature-1",
+      owner
+    );
+    const feature_right_2 = await factory.createFeature(
+      "test-feature-2",
+      owner
+    );
+    const feature_noright_1 = await factory.createFeature(
+      "test-feature-3",
+      owner
+    );
+    const feature_noright_2 = await factory.createFeature(
+      "test-feature-4",
+      owner
+    );
+    const feature_noright_3 = await factory.createFeature(
+      "test-feature-5",
+      owner
+    );
+    const device = await factory.createDevice("test-device-1", owner, [
+      feature_right_1,
+      feature_right_2,
+      feature_noright_1,
+      feature_noright_2,
+      feature_noright_3,
+    ]);
+    const thing = await factory.createThing("test-thing-1-search", owner);
+    const right_1 = await factory.createRight(
+      "right-test-1",
+      feature_right_1,
+      "Feature",
+      provider,
+      owner,
+      []
+    );
+    const right_2 = await factory.createRight(
+      "right-test-2",
+      feature_right_2,
+      "Feature",
+      provider,
+      owner,
+      []
+    );
+    const measurement_right_1_owned_final = await factory.createMeasurement(
+      provider,
+      feature_right_1,
+      device,
+      thing,
+      [],
+      factory.createSamples(1),
+      null,
+      null,
+      null,
+      VisibilityTypes.private,
+      null,
+      null,
+      StageTypes.final
+    );
+    const measurement_right_2_owned_draft  = await factory.createMeasurement(
+      provider,
+      feature_right_1,
+      device,
+      thing,
+      [],
+      factory.createSamples(2),
+      null,
+      null,
+      null,
+      VisibilityTypes.private,
+      null,
+      null,
+      StageTypes.draft
+    );
+    const measurement_right_3_owned_final = await factory.createMeasurement(
+      owner,
+      feature_right_2,
+      device,
+      thing,
+      [],
+      factory.createSamples(3),
+      null,
+      null,
+      null,
+      VisibilityTypes.public,
+      null,
+      null,
+      StageTypes.final
+    );
+    const measurement_right_4_owned_public_draft = await factory.createMeasurement(
+      owner,
+      feature_right_2,
+      device,
+      thing,
+      [],
+      factory.createSamples(4),
+      null,
+      null,
+      null,
+      VisibilityTypes.public,
+      null,
+      null,
+      StageTypes.draft
+    );
+    const measurement_right_5_owned_private_draft = await factory.createMeasurement(
+      owner,
+      feature_right_2,
+      device,
+      thing,
+      [],
+      factory.createSamples(5),
+      null,
+      null,
+      null,
+      VisibilityTypes.private,
+      null,
+      null,
+      StageTypes.draft
+    );
+    const measurement_right_6_owned_private_final = await factory.createMeasurement(
+      owner,
+      feature_right_2,
+      device,
+      thing,
+      [],
+      factory.createSamples(6),
+      null,
+      null,
+      null,
+      VisibilityTypes.private,
+      null,
+      null,
+      StageTypes.final
+    );
+    const measurement_noright_1_noowne_final = await factory.createMeasurement(
+      owner,
+      feature_noright_1,
+      device,
+      thing,
+      [],
+      factory.createSamples(7),
+      null,
+      null,
+      null,
+      VisibilityTypes.public,
+      null,
+      null,
+      StageTypes.final
+    );
+    const measurement_noright_2_noown_draft = await factory.createMeasurement(
+      owner,
+      feature_noright_1,
+      device,
+      thing,
+      [],
+      factory.createSamples(8),
+      null,
+      null,
+      null,
+      VisibilityTypes.public,
+      null,
+      null,
+      StageTypes.draft
+    );
+    const measurement_noright_3_noown_final = await factory.createMeasurement(
+      owner,
+      feature_noright_2,
+      device,
+      thing,
+      [],
+      factory.createSamples(9),
+      null,
+      null,
+      null,
+      VisibilityTypes.private,
+      null,
+      null,
+      StageTypes.final
+    );
+    const measurement_noright_4_noown_draft = await factory.createMeasurement(
+      owner,
+      feature_noright_3,
+      device,
+      thing,
+      [],
+      factory.createSamples(10),
+      null,
+      null,
+      null,
+      VisibilityTypes.private,
+      null,
+      null,
+      StageTypes.draft
     );
     let res = await chai
       .request(server)
