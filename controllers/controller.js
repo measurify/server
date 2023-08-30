@@ -114,7 +114,8 @@ exports.streamResource = async function (req, data, model) {
 
 exports.postResource = async function (req, res, model) {
     try {
-        if (req.user._id) req.body.owner = req.user._id;
+        
+        if (req.user._id&&req.body.owner==undefined) req.body.owner = req.user._id;
         if (!req.query.verbose) req.query.verbose = 'true';
         const results = await persistence.post(req.body, model, req.tenant);
         req.result = results;
