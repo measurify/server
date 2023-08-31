@@ -22,7 +22,10 @@ const init = async function(tenant, username, password) {
     //add default role to backward compatibility
     const Role = mongoose.dbs[tenant.database].model('Role');  
     let adminRole= await Role.findById("admin");
-    if(!adminRole) await factory.createDefaultRoles(tenant);
+    if(!adminRole) {
+        await factory.createDefaultRoles(tenant);
+        adminRole= await Role.findById("admin");}
+    if(!adminRole._doc.isSystemAdministrator) await factory.setAdminRole(tenant);
     //check
     //adminRole= await Role.findById("admin");
     //let providerRole= await Role.findById("provider");

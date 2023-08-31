@@ -26,7 +26,8 @@ const roleSchema = new mongoose.Schema({
     _id: { type: String, required: "Please, supply an _id" },
     description: { type: String },
     default: { type: crudSchema, required: "Please, supply a default action schema"},
-    actions: [actionSchema]
+    actions: [actionSchema],
+    isSystemAdministrator: { type: Boolean, default: false },
 },
 );
 

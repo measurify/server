@@ -160,7 +160,8 @@ exports.createDefaultRoles = async function (tenant) {
       read: RoleCrudTypes.all,
       update: RoleCrudTypes.all,
       delete: RoleCrudTypes.all
-    }
+    },
+    isSystemAdministrator: true
   },
   {
     _id: "provider",
@@ -197,6 +198,13 @@ exports.createDefaultRoles = async function (tenant) {
     roleDocs.push(role._doc)
   };
   return roleDocs;
+};
+
+exports.setAdminRole = async function (tenant) {
+  const Tenant = mongoose.dbs["catalog"].model("Tenant");
+  if (!tenant) tenant = await Tenant.findById(process.env.DEFAULT_TENANT);
+  const Role = mongoose.dbs[tenant.database].model("Role");
+  await Role.findOneAndUpdate({ _id: "admin" }, { isSystemAdministrator: true }, { new: true })
 };
 
 exports.createGroup = async function (

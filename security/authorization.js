@@ -69,9 +69,10 @@ exports.whatCanOperate = function (user, role, method, entity) { //read,delete
     let result = {};
     let roleEntity = role.actions.filter(action => action.entity.toLowerCase() == entity.toLowerCase())
     let permission = undefined;
+    if(role.isSystemAdministrator)return result;
     if (roleEntity.length) { if (roleEntity[0].crud[CrudTypes[method]] !== undefined) permission = roleEntity[0].crud[CrudTypes[method]] };
     if (permission === undefined) permission = role.default[CrudTypes[method]];
-    if (permission == RoleCrudTypes.all) return result;
+    if (permission == RoleCrudTypes.all) return result={ $and: [{ $or:[{stage:StageTypes.final},{stage:undefined}]}]};
     if (permission == RoleCrudTypes.owned) return result = { $and: [{ owner: user._id }] };
     //ADDED 
     if (permission == RoleCrudTypes.public_and_owned&&method=="GET"&&entity.toLowerCase()=="measurement") return result = { $or: [{$and: [{ visibility: VisibilityTypes.public },{ $or:[{stage:StageTypes.final},{stage:undefined}]}]}, { owner: user._id }] };
