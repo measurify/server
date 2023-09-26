@@ -11,6 +11,7 @@ const scriptSchema = new mongoose.Schema({
     visibility: {type: String, enum: VisibilityTypes, default: VisibilityTypes.private },
     stage: { type: String, enum: StageTypes, default: StageTypes.final },
     tags: { type: [String], ref: 'Tag' },
+    description: { type: String },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });

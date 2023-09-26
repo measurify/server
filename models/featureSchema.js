@@ -25,6 +25,7 @@ const featureSchema = new mongoose.Schema({
     description: {type: String},
     visibility: {type: String, default: VisibilityTypes.public },
     stage: { type: String, enum: StageTypes, default: StageTypes.final },
+    description: { type: String },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });

@@ -12,6 +12,7 @@ const thingSchema = new mongoose.Schema({
     tags: { type: [String], ref: 'Tag' },
     metadata: { type: Map, of: String },
     relations: { type: [String], ref: 'Thing' },
+    description: { type: String },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });

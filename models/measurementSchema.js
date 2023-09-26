@@ -29,6 +29,7 @@ const measurementSchema = new mongoose.Schema({
   samples: [sampleSchema],
   visibility: { type: String, enum: VisibilityTypes, default: VisibilityTypes.private },
   stage: { type: String, enum: StageTypes, default: StageTypes.final },
+  description: { type: String },
   tags: { type: [String], ref: "Tag" },
   timestamp: { type: Date, default: Date.now },
   lastmod: { type: Date, default: Date.now, select: false },

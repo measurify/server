@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
     type: { type: String,  required: "Please, supply a user role", ref:'Role' },
     fieldmask: { type: String, ref: 'Fieldmask' },
     status: { type: String, enum: UserStatusTypes, default: UserStatusTypes.enabled },
+    description: { type: String },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });

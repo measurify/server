@@ -25,6 +25,7 @@ const deviceSchema = new mongoose.Schema({
     scriptStatementMaxSize: {type: Number, default: 5 },
     statementBufferSize: {type: Number, default: 10 },
     measurementBufferPolicy: {type: String, enum: MeasurementBufferPolicyTypes, default: MeasurementBufferPolicyTypes.newest },
+    description: { type: String },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });

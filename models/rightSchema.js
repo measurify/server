@@ -12,6 +12,7 @@ const rightSchema = new mongoose.Schema({
     group: { type: [String], ref:'Group' },
     owner: { type: mongoose.Schema.Types.ObjectId, ref:'User', required: true },
     tags: { type: [String], ref: 'Tag' },
+    description: { type: String },
     timestamp: {type: Date, default: Date.now, select: false },
     lastmod: {type: Date, default: Date.now, select: false }
 });
