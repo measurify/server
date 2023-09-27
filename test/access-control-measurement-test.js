@@ -1022,6 +1022,12 @@ describe("Access read a list of measurements", () => {
       "test-password-owner",
       UserRoles.provider
     );
+    const user_provider = await factory.createUser(  
+      "test-username-provider",
+      "test-password-provider",
+      UserRoles.provider
+    );
+
     const feature = await factory.createFeature("test-feature", owner);
     const device = await factory.createDevice("test-device-1", owner, [feature]);
     const thing_1 = await factory.createThing("test-thing-1", owner);
@@ -1064,7 +1070,7 @@ describe("Access read a list of measurements", () => {
       null,
       StageTypes.draft
     );
-    const measurement_public_3_draft = await factory.createMeasurement(
+    const measurement_public_3_issued = await factory.createMeasurement(
       owner,
       feature,
       device,
@@ -1077,7 +1083,7 @@ describe("Access read a list of measurements", () => {
       VisibilityTypes.public,
       null,
       null,
-      StageTypes.draft
+      StageTypes.issued
     );
     const measurement_public_4_final = await factory.createMeasurement(
       owner,
@@ -1094,7 +1100,7 @@ describe("Access read a list of measurements", () => {
       null,
       StageTypes.final
     );
-    const measurement_public_5_draft = await factory.createMeasurement(
+    const measurement_public_5_issued = await factory.createMeasurement(
       owner,
       feature,
       device,
@@ -1107,7 +1113,7 @@ describe("Access read a list of measurements", () => {
       VisibilityTypes.public,
       null,
       null,
-      StageTypes.draft
+      StageTypes.issued
     );
     const measurement_private_1_final = await factory.createMeasurement(
       owner,
@@ -1124,7 +1130,7 @@ describe("Access read a list of measurements", () => {
       null,
       StageTypes.final
     );
-    const measurement_private_2_final = await factory.createMeasurement(
+    const measurement_private_2_issued = await factory.createMeasurement(
       owner,
       feature,
       device,
@@ -1137,7 +1143,7 @@ describe("Access read a list of measurements", () => {
       VisibilityTypes.private,
       null,
       null,
-      StageTypes.final
+      StageTypes.issued
     );
     const measurement_private_3_draft = await factory.createMeasurement(
       owner,
@@ -1154,7 +1160,7 @@ describe("Access read a list of measurements", () => {
       null,
       StageTypes.draft
     );
-    const measurement_private_4_draft = await factory.createMeasurement(
+    const measurement_private_4_issued = await factory.createMeasurement(
       owner,
       feature,
       device,
@@ -1167,7 +1173,7 @@ describe("Access read a list of measurements", () => {
       VisibilityTypes.private,
       null,
       null,
-      StageTypes.draft
+      StageTypes.issued
     );
     const measurement_private_5_final = await factory.createMeasurement(
       owner,
@@ -1191,11 +1197,15 @@ describe("Access read a list of measurements", () => {
     let res2 = await chai.request(server).keepOpen().get("/v1/measurements").set("Authorization", await factory.getUserToken(user_analyst));
     res2.should.have.status(200);
     res2.body.docs.should.be.a("array");
-    res2.body.docs.length.should.be.eql(5);
+    res2.body.docs.length.should.be.eql(8);
     let res3 = await chai.request(server).keepOpen().get("/v1/measurements").set("Authorization", await factory.getUserToken(user_admin));
     res3.should.have.status(200);
     res3.body.docs.should.be.a("array");
     res3.body.docs.length.should.be.eql(10);
+    let res4 = await chai.request(server).keepOpen().get("/v1/measurements").set("Authorization", await factory.getUserToken(user_provider));
+    res4.should.have.status(200);
+    res4.body.docs.should.be.a("array");
+    res4.body.docs.length.should.be.eql(4);
   });
 });
 
