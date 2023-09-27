@@ -72,7 +72,7 @@ exports.whatCanOperate = function (user, role, method, entity) { //read,delete
     if(role.isSystemAdministrator)return result;
     if (roleEntity.length) { if (roleEntity[0].crud[CrudTypes[method]] !== undefined) permission = roleEntity[0].crud[CrudTypes[method]] };
     if (permission === undefined) permission = role.default[CrudTypes[method]];
-    if (permission == RoleCrudTypes.all) return result={ $and: [{ $or:[{stage:StageTypes.final},{stage:undefined}]}]};
+    if (permission == RoleCrudTypes.all) return result={ $and: [{ $or:[{stage:StageTypes.final},{ stage: StageTypes.issued },{stage:undefined}]}]};
     if (permission == RoleCrudTypes.owned) return result = { $and: [{ owner: user._id }] };
     //ADDED 
     if (permission == RoleCrudTypes.public_and_owned&&method=="GET"&&entity.toLowerCase()=="measurement") return result = { $or: [{$and: [{ visibility: VisibilityTypes.public },{ $or:[{stage:StageTypes.final},{ stage: StageTypes.issued },{stage:undefined}]}]}, { owner: user._id }] };
