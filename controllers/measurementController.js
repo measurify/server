@@ -139,7 +139,7 @@ exports.postFile = async (req, res, fileData, descriptionData, filename) => {
   [report,error] = await dataset.dataUpload(req, res, lines, elementsNumber, report, descriptionData, filename, force, header, false);
   if (error != null) return error;
   //console.log(report);
-
+  console.log("time elapsed: "+(Date.now()-time));
   if (report.errors.length === 0) {
     return res.status(200).json(report);
   }
