@@ -20,7 +20,6 @@ function sha(content) {
 
 //extract data when receive a form-data post
 exports.dataExtractor = async function (req, res, next, saveDataset) {
-  time=Date.now();
   if (!req.busboy) { return errors.manage(res, errors.empty_file, "not found any data"); }
   let fileData = "";
   let descriptionData = "";
@@ -401,7 +400,7 @@ exports.dataUpload = async function (req, res, lines, elementsNumber, report, de
   let error = null;
   [descriptionData.commonElements, error, descriptionData.commonElementsData] = await this.checkCommonsResources(req, res, descriptionData.commonElements, descriptionData.tags, models, descriptionData.items, force);
   if (error != null) return [null, error];
-  timestamp=Date.now();
+
   for (let i in lines) {
     if (lines[i] == "") continue;
     if ((i == 0) & (header == true)) continue;
@@ -613,22 +612,31 @@ exports.dataUpload = async function (req, res, lines, elementsNumber, report, de
     let enddate = descriptionData.commonElements.enddate ? descriptionData.commonElements.enddate : (lineResource.enddate ? lineResource.enddate : startdate);
     //create measurement
     body = await createRequestObject(startdate, enddate, thing, feature._id, device, samples, tags, req.user._id);
-    body["timestamp"]=timestamp
-    timestamp+=1;
-    try{
-      result = (new Measurement(body)).save();
+
+    //TEST OPTIMIZATION allMeasurementBody.push(body);
+
+    result = await this.saveModelData(req, body, Measurement);
+    if (result != true) {
+      //error in the post of the value
+      report.errors.push("Index: " + i + " (" + result + ")");
+    } else {
       report.completed.push(i);
     }
-    catch (err) { 
-      report.errors.push("Index: " + i + " (" + err + ")");
-    }  
   }
+  /*TEST OPTIMIZATION
+  result = await this.saveModelData(req, allMeasurementBody, Measurement);
+  if (result != true) {//error in the post of the value
+    report.errors.push('Index: ' + 0 + ' (' + result + ')');
+  }
+  else {
+    report.completed.push(0);
+  }*/
   return [report, null];
 };
 
 exports.saveModelData = async function (req, body, Model) {
   try {
-    await persistence.post(body, Model, req.tenant);
+    const results = await persistence.post(body, Model, req.tenant);
   } catch (err) {
     return err;
     //return errors.manage(res, errors.post_request_error, err);
