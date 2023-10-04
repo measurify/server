@@ -7,3 +7,5 @@ gui/node_modules
 gui/build/
 init/variables.env
 sendmail/
+resources/fullchain.pem
+resources/privkey.pem
