@@ -617,11 +617,11 @@ exports.dataUpload = async function (req, res, lines, elementsNumber, report, de
 
     result = await this.saveModelData(req, body, Measurement);
     if (result != true) {
-      if(result.includes("duplicate key error")){
-        result= "This element already exists in the database";
+      if(result.message.includes("duplicate key error")){
+        result.message= "This element already exists in the database";
       }
       //error in the post of the value
-      report.errors.push("Index: " + i + " (" + result + ")");
+      report.errors.push("Index: " + i + " (" + result.message + ")");
     } else {
       report.completed.push(i);
     }
