@@ -9,3 +9,4 @@ init/variables.env
 sendmail/
 resources/fullchain.pem
 resources/privkey.pem
+resources/*/
