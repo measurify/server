@@ -618,7 +618,6 @@ exports.dataUpload = async function (req, res, lines, elementsNumber, report, de
     allBodies.push(body);
     allIndexes.push(i);
   }
-  time = Date.now();
 
   if (allBodies.length == 0) return [report, null];
   //Bulk open to speed up operations
@@ -645,7 +644,6 @@ exports.dataUpload = async function (req, res, lines, elementsNumber, report, de
     const errorIndexes = errors.map(el => allIndexes[el.idx])
     report.completed = allIndexes.filter(e => !(errorIndexes.includes(e)))
   }
-  console.log(Date.now() - time);
   return [report, null];
 };
 
