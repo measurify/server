@@ -334,7 +334,8 @@ exports.sampleLoop = async function (descriptionData, line, feature) {
             errMessage = "expected string in samples at position " + k;
             return [null, errMessage];
           }
-          if (!feature.items[k].range.includes(str_val)) {
+          if (!feature.items[k].range.includes(str_val) && str_val !== null && str_val !== "") {
+
             errMessage = "the enum " + str_val + " is not in the rage of items " + feature.items[k].name + " in column  " + k;
             return [null, errMessage];
           }
