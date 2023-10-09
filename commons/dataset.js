@@ -395,6 +395,7 @@ exports.dataUpload = async function (req, res, lines, elementsNumber, report, de
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   const Feature = mongoose.dbs[req.tenant.database].model("Feature");
   const models = { feature: Feature, device: Device, thing: Thing, tag: Tag };
+  let allBodies=[];
   //TEST Optimization let allMeasurementBody=[];
   //algorithm to check every line of the csv and save the value inside a measurement
   let error = null;
@@ -612,9 +613,9 @@ exports.dataUpload = async function (req, res, lines, elementsNumber, report, de
     let enddate = descriptionData.commonElements.enddate ? descriptionData.commonElements.enddate : (lineResource.enddate ? lineResource.enddate : startdate);
     //create measurement
     body = await createRequestObject(startdate, enddate, thing, feature._id, device, samples, tags, req.user._id);
-
+    allBodies.push(body);
     //TEST OPTIMIZATION allMeasurementBody.push(body);
-
+    /*
     result = await this.saveModelData(req, body, Measurement);
     if (result != true) {
       if(result.message.includes("duplicate key error")){
@@ -624,16 +625,27 @@ exports.dataUpload = async function (req, res, lines, elementsNumber, report, de
       report.errors.push("Index: " + i + " (" + result.message + ")");
     } else {
       report.completed.push(i);
-    }
+    }*/
   }
-  /*TEST OPTIMIZATION
-  result = await this.saveModelData(req, allMeasurementBody, Measurement);
-  if (result != true) {//error in the post of the value
-    report.errors.push('Index: ' + 0 + ' (' + result + ')');
+  time=Date.now();
+  //Bulk open to speed up operations
+  let bulk = Measurement.collection.initializeUnorderedBulkOp();
+  allBodies.forEach(elem=>bulk.insert(elem));
+  let result;
+  try{
+    result = await bulk.execute();
+    report.completed.push(...Array(allBodies.length).keys());
   }
-  else {
-    report.completed.push(0);
-  }*/
+  catch(error){
+    //error in the post of the value    
+    const errors= bulk.s.bulkResult.writeErrors.map(elem=>{return {idx:elem.index,message:elem.errmsg.includes("duplicate key error")?"This element already exists in the database":elem.errmsg}});
+    errors.forEach(elem=>report.errors.push("Index: " + elem.idx + " (" + elem.message + ")"));
+    report.completed.push([...Array(allBodies.length).keys()].filter(item => !errors.map(e=>e.idx).includes(item))); 
+}
+
+  console.log(Date.now()-time);
+  report.completed.flat();
+  report.errors.flat();
   return [report, null];
 };
 
