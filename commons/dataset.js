@@ -396,6 +396,8 @@ exports.dataUpload = async function (req, res, lines, elementsNumber, report, de
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
   const Feature = mongoose.dbs[req.tenant.database].model("Feature");
   const models = { feature: Feature, device: Device, thing: Thing, tag: Tag };
+  let allBodies = [];
+  let allIndexes = [];
   //TEST Optimization let allMeasurementBody=[];
   //algorithm to check every line of the csv and save the value inside a measurement
   let error = null;
@@ -561,7 +563,7 @@ exports.dataUpload = async function (req, res, lines, elementsNumber, report, de
     errorOccurred = false;
     for (let tag of descriptionData.tags) if (typeof tag == "number") {
       if (errorOccurred) continue;
-      result = await this.checkerIfExist(Tag, line[tag]);
+      let result = await this.checkerIfExist(Tag, line[tag]);
       if (!result) {
         if (force) {
           //save tag on database by default value
@@ -613,28 +615,37 @@ exports.dataUpload = async function (req, res, lines, elementsNumber, report, de
     let enddate = descriptionData.commonElements.enddate ? descriptionData.commonElements.enddate : (lineResource.enddate ? lineResource.enddate : startdate);
     //create measurement
     body = await createRequestObject(startdate, enddate, thing, feature._id, device, samples, tags, req.user._id);
+    allBodies.push(body);
+    allIndexes.push(i);
+  }
+  time = Date.now();
 
-    //TEST OPTIMIZATION allMeasurementBody.push(body);
-
-    result = await this.saveModelData(req, body, Measurement);
-    if (result != true) {
-      if(result.message.includes("duplicate key error")){
-        result.message= "This element already exists in the database";
-      }
-      //error in the post of the value
-      report.errors.push("Index: " + i + " (" + result.message + ")");
-    } else {
-      report.completed.push(i);
+  if (allBodies.length == 0) return [report, null];
+  //Bulk open to speed up operations
+  let bulk = Measurement.collection.initializeUnorderedBulkOp();
+  allBodies.forEach(elem => bulk.insert(elem));
+  let result;
+  try {
+    result = await bulk.execute();
+    //all the elements are inserted
+    report.completed = allIndexes;
+  }
+  catch (error) {
+    //error in the post of the values    
+    let errors = bulk.s.bulkResult.writeErrors.map(elem => { return { idx: elem.index, message: elem.errmsg.includes("duplicate key error") ? "This element already exists in the database" : elem.errmsg } });
+    errors.forEach(elem => report.errors.push("Index: " + allIndexes[elem.idx] + " (" + elem.message + ")"));
+    try {
+      report.errors.sort(function (a, b) {
+        const indexA = parseInt(a.match(/\d+/)[0]); // Extract and parse the numeric part of index
+        const indexB = parseInt(b.match(/\d+/)[0]); // Extract and parse the numeric part of index
+        return indexA - indexB; // Compare numeric indices
+      });
     }
+    catch (err) { } //If some error it will give array not sorted
+    const errorIndexes = errors.map(el => allIndexes[el.idx])
+    report.completed = allIndexes.filter(e => !(errorIndexes.includes(e)))
   }
-  /*TEST OPTIMIZATION
-  result = await this.saveModelData(req, allMeasurementBody, Measurement);
-  if (result != true) {//error in the post of the value
-    report.errors.push('Index: ' + 0 + ' (' + result + ')');
-  }
-  else {
-    report.completed.push(0);
-  }*/
+  console.log(Date.now() - time);
   return [report, null];
 };
 

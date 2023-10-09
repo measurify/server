@@ -1866,8 +1866,8 @@ describe('/POST file CSV route', () => {
     res2.should.have.status(200);
     res2.body.docs.should.be.a("array");
     res2.body.docs.length.should.be.eql(2);    
-    res2.body.docs[0].samples[0].values.should.be.eql([4,5,null,6,null]);
-    res2.body.docs[1].samples[0].values.should.be.eql([1,2,null,3,null]);   
+    res2.body.docs[0].samples[0].values.should.be.eql([1,2,null,3,null]);
+    res2.body.docs[1].samples[0].values.should.be.eql([4,5,null,6,null]);   
   });
 
   it('it should POST measurements from CSV some row correct and some not', async () => {
