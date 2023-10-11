@@ -64,7 +64,8 @@ exports.dataExtractor = async function (req, res, next, modelName) {
                 let transpose = false;
                 if (req.method === 'PUT' && modelName === "Experiment") { transpose = true; }                
                 let fileText = readFile(req, fileData, modelName, transpose);
-                if (req.method === 'PUT' && modelName === "Experiment") { return addHistory(req, res, fileText, modelName) }                
+                if (req.method === 'PUT' && modelName === "Experiment") { return addHistory(req, res, fileText, modelName) }     
+                if (fileText.header.includes("value")){fileText.header[fileText.header.indexOf("value")]="values";}
                 let result = inspector.checkHeader(fileText.schema, fileText.header,modelName);                
                 if (result !== true) return errors.manage(res, errors.wrong_header, result);
                 let body = conversion.csv2json(fileText.userId, fileText.header, fileText.data, fileText.schema, modelName);                
