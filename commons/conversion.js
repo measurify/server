@@ -147,7 +147,7 @@ const saveResult = function (modelName, result, owner) {
     return result;
 }
 
-exports.jsonToCSVPlus = function (jsonData, columnsname) {
+exports.jsonToCSVPlus = function (jsonData, columnsname, query) {
     if (!process.env.CSV_DELIMITER) process.env.CSV_DELIMITER = ',';
     if (!process.env.CSV_VECTOR_START) process.env.CSV_VECTOR_START = '';
     if (!process.env.CSV_VECTOR_END) process.env.CSV_VECTOR_END = '';
@@ -167,6 +167,16 @@ exports.jsonToCSVPlus = function (jsonData, columnsname) {
                 else return `${value}`
             })
             .join(process.env.CSV_DELIMITER)}` + "\n";//removed + process.env.CSV_DELIMITER + deltatime
+    
+    //Rename the fields of the headers with query.rename
+    if(query && query.rename){
+        let rename = JSON.parse(query.rename);
+        if(rename && Object.keys(rename).length>0){
+            for(let key of Object.keys(rename)){
+                str = str.replace(key,rename[key]);
+            }
+        }
+    }    
     currentRow = "\n";//string for samples with more values
     json.docs.forEach(doc => {//loop for each sample
         str +=//single sample
@@ -373,7 +383,7 @@ exports.convertMeasurements = async function (req, res, list, query, model, sele
                 let columnsName = [];
                 item.items.forEach(elem => columnsName.push(elem.name));
                 let tocsvresult = '';
-                tocsvresult = this.jsonToCSVPlus(list, columnsName);
+                tocsvresult = this.jsonToCSVPlus(list, columnsName,req.query);
                 [tocsvresult, result] = this.replaceSeparatorsGet(tocsvresult, query); if (result != null) return result;
                 return res.status(200).send(tocsvresult);
 

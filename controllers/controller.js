@@ -175,6 +175,6 @@ const prepareSelect = function (select, querySelect) {
     querySelect.map((key) => {
         if (select[key] === undefined) object[key] = true;
     });
-    if(object!=={})return object;
+    if(Object.keys(object).length!=0)return object;
     return select;
 }
