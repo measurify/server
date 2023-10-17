@@ -85,7 +85,7 @@ exports.getResourceList = async function (req, res, sort, select, model, restric
         if (model.modelName == "Measurement")return await conversion.convertMeasurements(req, res, list, query, model, select, restriction);
         if (req.headers.accept == 'text/csv') {
             res.header('Content-Type', 'text/csv');
-            csvresultlibrary = conversion.jsonToCSV(list);
+            csvresultlibrary = conversion.jsonToCSV(list,model);
             [csvresultlibrary, result] = conversion.replaceSeparatorsGet(csvresultlibrary, req.query); if (result != null) return result;
             return res.status(200).send(csvresultlibrary);
         }

@@ -272,7 +272,7 @@ describe('/POST and GET file timeserie from a .csv file', () => {
         const res2 = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id + '/timeserie').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv');
         res2.should.have.status(200);
         res2.text.should.be.a('string');
-        res2.text.should.contain('values,_id,timestamp')
+        res2.text.should.contain('values,timestamp')
         res2.text.should.contain('[50;[10;5]],')
         res2.text.should.contain(',"2022-12-25T14:15:29.976Z"')        
     });
@@ -293,7 +293,7 @@ describe('/POST and GET file timeserie from a .csv file', () => {
         const res2 = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id + '/timeserie').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv');
         res2.should.have.status(200);
         res2.text.should.be.a('string');
-        res2.text.should.contain('values,_id,timestamp')
+        res2.text.should.contain('values,timestamp')
         res2.text.should.contain('"abc";[10;5]],')
         res2.text.should.contain('"2022-12-25T14:15:29.976Z"')     
     });
@@ -314,7 +314,7 @@ describe('/POST and GET file timeserie from a .csv file', () => {
         const res2 = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id + '/timeserie?sep=;&sepArray=,').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/csv');
         res2.should.have.status(200);
         res2.text.should.be.a('string');
-        res2.text.should.contain('values;_id;timestamp')
+        res2.text.should.contain('values;timestamp')
         res2.text.should.contain('["abc",[10,5]];')
         res2.text.should.contain('["ab",[10,5]];')        
     });

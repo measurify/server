@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 const controller = require("./controller");
 const checker = require("./checker");
-const { query } = require("express");
 const extractData =require("../commons/extractData.js")
+const conversion = require("../commons/conversion.js");
 
 exports.get = async (req, res) => {
   const Measurement = mongoose.dbs[req.tenant.database].model("Measurement");
@@ -11,8 +11,12 @@ exports.get = async (req, res) => {
   result = await checker.canOperate(req, res,"Measurement"); if (result != true) return result;  
   result = await checker.hasRights(req, res, Measurement); if (result != true) return result;
   await checker.ofResource(req, res, 'measurement');
-  let select = null;
+  let select = null;  
   if(req.headers.accept == 'text/csv'){req.query.limit=1000000;select=["values","timestamp"];}
+  if (req.headers.accept == 'text/dataframe') {
+    try { let list = await conversion.getTimeseriesDataframe(req.query, null, select, null, 100000000, Timesample); return res.status(200).json(list); } 
+    catch (err) { return errors.manage(res, errors.get_request_error, err); }
+  }
   return await controller.getResourceList( req, res, '{ "timestamp": "desc" }', select, Timesample, null);
 };
 
