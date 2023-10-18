@@ -277,6 +277,30 @@ describe('/POST and GET file timeserie from a .csv file', () => {
         res2.text.should.contain(',"2022-12-25T14:15:29.976Z"')        
     });
 
+    it('it should POST and GET a list of timesamples from a .csv file to a Pandas Dataframe', async () => {
+        const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const items =[{ name: "item-name-1", unit: "items-unit-1", type: ItemTypes.number, dimension:0 },{ name: "item-name-2", unit: "items-unit-2", type: ItemTypes.number, dimension:1 }]
+        const feature = await factory.createFeature("test-feature", owner,items);
+        const device = await factory.createDevice("test-device-1", owner, [feature]);
+        const thing = await factory.createThing("test-thing-1", owner);
+        const measurement = await factory.createMeasurement(owner, feature, device, thing, [], []);
+        const testFile = './test/dummies/timeserie_test.csv';        
+        const res = await chai.request(server).keepOpen().post('/v1/measurements/' + measurement._id + '/timeserie/file').attach('file', testFile).set("Authorization", await factory.getUserToken(owner));       
+        
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.timesamples.length.should.be.eql(5);
+
+        const res2 = await chai.request(server).keepOpen().get('/v1/measurements/' + measurement._id + '/timeserie').set("Authorization", await factory.getUserToken(owner)).set('Accept', 'text/dataframe');
+        res2.should.have.status(200);
+        res2.body.should.be.a('object');
+        res2.body.timestamp.length.should.be.eql(5);
+        res2.body.values.length.should.be.eql(5);   
+        res2.body.timestamp[0].should.be.eql("2022-12-21T14:15:29.976Z"); 
+        res2.body.values[0][0].should.be.eql(10); 
+        res2.body.values[0][1].should.be.eql([10,5]); 
+    });
+
     it('it should POST and GET a list of timesamples from a .csv file containing text values', async () => {
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const items =[{ name: "item-name-1", unit: "items-unit-1", type: ItemTypes.text },{ name: "item-name-2", unit: "items-unit-2", type: ItemTypes.number, dimension:1 }]
