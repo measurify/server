@@ -2,12 +2,6 @@ import React, { useEffect, useState } from "react";
 import { viewFields } from "../../configManager";
 import { NavLink } from "react-router-dom";
 
-import fontawesome from "@fortawesome/fontawesome";
-import {
-  faEye,
-  faPencilAlt,
-  faCopy,
-} from "@fortawesome/fontawesome-free-solid";
 import {
   Button,
   OverlayTrigger,
@@ -18,8 +12,6 @@ import {
 
 import { delete_generic } from "../../services/http_operations";
 import { FormatDate } from "../../services/misc_functions";
-
-fontawesome.library.add(faEye, faPencilAlt, faCopy);
 
 function ActionContent(props) {
   const toShow = {};
@@ -180,9 +172,6 @@ function UnrollView(item) {
 
 export default function ActionManager(props) {
   const [res, setRes] = useState(undefined);
-  useEffect(() => {
-    //use effect body
-  }, [props]);
 
   const viewPopover =
     res !== undefined ? (
@@ -251,7 +240,7 @@ export default function ActionManager(props) {
                 props.removeSingle(props.id);
               }
             } catch (error) {
-              console.log(error);
+              console.error(error);
             }
           }
         }}

@@ -11,6 +11,10 @@ import UpdateHistoryForm from "./updateHistoryForm";
 import { get_generic } from "../../../services/http_operations";
 import { maintainEmptyElement } from "../../../services/objects_manipulation";
 import { removeDefaultElements } from "../../../services/misc_functions";
+import {
+  GetPrefixName,
+  prefixFileSeparator,
+} from "../../../services/file_operations";
 const cloneDeep = require("clone-deep");
 
 const ovdRef = React.createRef();
@@ -38,7 +42,7 @@ export default function UpdateHistoryPage() {
   useEffect(() => {
     const getExperiments = async () => {
       try {
-        const res = await get_generic("experiments", {});
+        const res = await get_generic("experiments", { limit: 1000 });
 
         setExperiments(res.docs);
       } catch (error) {
@@ -67,6 +71,20 @@ export default function UpdateHistoryPage() {
     }
     if (file === null || file === undefined) {
       setMsg("Please, choose a file");
+      setIsError(true);
+      return;
+    }
+    if (!file.name.includes(prefixFileSeparator)) {
+      setMsg(
+        "The file does not follow the convention on filename (experiment's name followed by the hash '#'). Please rename your file."
+      );
+      setIsError(true);
+      return;
+    }
+    if (!experiments.map((e) => e._id).includes(GetPrefixName(file))) {
+      setMsg(
+        "The Experiment specified by filename does not exist in the DB. Please check your file (the Experiment name is case sensitive)"
+      );
       setIsError(true);
       return;
     }

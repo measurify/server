@@ -8,7 +8,7 @@ import { languages } from "../../configManager";
 import "./authPage.scss";
 import { LanguageSelector } from "../languageSelector/languageSelector";
 import LogoHolder from "../logoHolder/logoHolder";
-import { Form, Container, Row, Col } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 const userRef = React.createRef();
 const pswRef = React.createRef();
 const tenantRef = React.createRef();
@@ -18,10 +18,9 @@ const AuthPageComp = ({ tenants }) => {
 
   async function submitForm(e) {
     e.preventDefault();
-
     const user = userRef.current.value;
     const psw = pswRef.current.value;
-    const tenant = tenantRef.current.value;
+    const tenant = tenants.length === 1 ? tenants[0] : tenantRef.current.value;
 
     if (user === "") {
       setMsg(locale().missing_username);
@@ -36,7 +35,7 @@ const AuthPageComp = ({ tenants }) => {
       await SetRoleDefinition();
       window.location.replace("/");
     } catch (error) {
-      console.log({ error: error.response.data });
+      console.error({ error: error.response.data });
       setMsg(error.response.data.message + " : " + error.response.data.details);
     }
   }
@@ -74,19 +73,21 @@ const AuthPageComp = ({ tenants }) => {
               placeholder={locale().password_suggestion}
             />
           </Form.Group>
-          <Form.Group className="mb-3" controlId="tenant">
-            <Form.Label>{locale().tenant}</Form.Label>
-            <Form.Select
-              aria-label={locale().tenant_suggestion}
-              ref={tenantRef}
-            >
-              {React.Children.toArray(
-                tenants.map((t) => {
-                  return <option value={t}>{t}</option>;
-                })
-              )}
-            </Form.Select>
-          </Form.Group>
+          {tenants.length > 1 && (
+            <Form.Group className="mb-3" controlId="tenant">
+              <Form.Label>{locale().tenant}</Form.Label>
+              <Form.Select
+                aria-label={locale().tenant_suggestion}
+                ref={tenantRef}
+              >
+                {React.Children.toArray(
+                  tenants.map((t) => {
+                    return <option value={t}>{t}</option>;
+                  })
+                )}
+              </Form.Select>
+            </Form.Group>
+          )}
           <Button variant="success" type="submit">
             {locale().submit}
           </Button>
@@ -102,7 +103,7 @@ const AuthPageComp = ({ tenants }) => {
         <div className="form-row row">
           <NavLink to={`/add/tenants`}>
             <Button variant="outline-success" size="sm">
-              {locale().add_tenant}
+              {locale().add_tenant}&nbsp;&nbsp;
               <i
                 className="fa fa-plus-circle"
                 aria-hidden="true"

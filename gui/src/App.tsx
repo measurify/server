@@ -42,6 +42,7 @@ import DownloadHistoryPage from "./components/OperationalPages/downloadhistory/d
 import RemoveStepsPage from "./components/OperationalPages/removeHistorySteps/removeSteps";
 import UpdateHistoryPage from "./components/OperationalPages/updateHistorySteps/updateHistory";
 import { ResetConfig, LoadConfig, operationPages } from "./configManager";
+import LoadIcons from "./services/icons";
 /*
     notifications follow this schema
 
@@ -70,6 +71,8 @@ function App() {
   let layoutRef = React.useRef<string | null>();
   const tkn = localStorage.getItem("token");
 
+  //load icons
+  LoadIcons();
   //reset the config to define basics variables
   ResetConfig();
 
@@ -225,9 +228,12 @@ function App() {
             <Route path="/" element={<AuthPage tenants={tenants} />} />
             <Route
               path="/passwordrecovery"
-              element={<PasswordRecoveryPage />}
+              element={<PasswordRecoveryPage tenants={tenants} />}
             />
-            <Route path="/passwordreset" element={<PasswordResetPage />} />
+            <Route
+              path="/passwordreset"
+              element={<PasswordResetPage tenants={tenants} />}
+            />
             <Route
               path="/add/tenants"
               element={<AddPage resource={"tenants"} />}
@@ -330,11 +336,23 @@ function App() {
                 />
                 <Route
                   path="/uploadmeasurements"
-                  element={<UploadMeasurementsPage />}
+                  element={
+                    operationPages.includes("uploadmeasurements") ? (
+                      <UploadMeasurementsPage />
+                    ) : (
+                      <Navigate to="/404" replace />
+                    )
+                  }
                 />
                 <Route
                   path="/downloadmeasurements"
-                  element={<DownloadMeasurementsPage />}
+                  element={
+                    operationPages.includes("downloadmeasurements") ? (
+                      <DownloadMeasurementsPage />
+                    ) : (
+                      <Navigate to="/404" replace />
+                    )
+                  }
                 />
                 <Route path="/add/:resource/" element={<AddPage />} />
                 <Route path="/:page" element={<Page res=":page" />} />

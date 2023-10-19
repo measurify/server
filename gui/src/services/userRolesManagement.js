@@ -1,4 +1,11 @@
 import { get_one_generic } from "./http_operations";
+import {
+  ResetConfig,
+  LoadConfig,
+  operationPages,
+  pages,
+  restrictionPages,
+} from "../configManager";
 
 //variable to store role as a simple cache
 let roleCache = undefined;
@@ -12,7 +19,7 @@ export async function SetRoleDefinition() {
     if (response !== undefined)
       localStorage.setItem("role", JSON.stringify(response.response.data));
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 
@@ -31,18 +38,19 @@ export function canDo(userRole, resource, actionCRUD) {
     //if role was found from the localstorage, set the cache-like variable
     roleCache = JSON.parse(tmp);
   }
-
+  if (roleCache.isSystemAdministrator === true) return true;
   //check if action list is not empty
   if (roleCache.actions.length !== 0) {
     //find the corresponding resource in action list
-    const entityDef = roleCache.actions.filter(
-      (el) => el.entity === resource
-    )[0];
+    const entityDef = roleCache.actions.find(
+      (el) => el.entity === resource || el.entity + "s" === resource
+    );
     //check if the action is actually found and if the action has a corresponding in crud object
-    if (entityDef !== undefined && entityDef[actionCRUD] !== undefined) {
+    if (entityDef !== undefined && entityDef.crud[actionCRUD] !== undefined) {
       return (
         //return true when the crud action is not none nor false
-        entityDef[actionCRUD] !== "none" && entityDef[actionCRUD] !== false
+        entityDef.crud[actionCRUD] !== "none" &&
+        entityDef.crud[actionCRUD] !== false
       );
     }
   }
@@ -130,4 +138,32 @@ function canDoDeprecated(userRole, resource, actionCRUD) {
     }
   }
   return false;
+}
+
+export function AccessiblePages() {
+  const role = localStorage.getItem("user-role");
+
+  const accessibleResources = Object.keys(pages).filter(
+    (k) =>
+      canDo(role, k, "read") &&
+      (restrictionPages[k] === undefined || restrictionPages[k].includes(role))
+  );
+  const accessibleOperations = operationPages.filter(
+    (opPage) =>
+      restrictionPages[opPage] === undefined ||
+      restrictionPages[opPage].includes(role)
+  );
+  const accessibleList = accessibleResources.concat(accessibleOperations);
+  const numAccessibleResources = accessibleResources.length;
+  const numAccessibleOperations = accessibleOperations.length;
+  const count = accessibleList.length;
+
+  return {
+    count,
+    numAccessibleResources,
+    numAccessibleOperations,
+    accessibleResources,
+    accessibleOperations,
+    accessibleList,
+  };
 }

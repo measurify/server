@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 const emailRef = React.createRef();
 const tenantRef = React.createRef();
 
-export default function PasswordRecoveryPage() {
+export default function PasswordRecoveryPage({ tenants }) {
   //const { location, replace } = useHistory();
   const [msg, setMsg] = useState("");
 
@@ -27,7 +27,9 @@ export default function PasswordRecoveryPage() {
     e.preventDefault();
 
     const email = emailRef.current.value;
-    const tenant = tenantRef.current.value;
+
+    const tenant = tenants.length === 1 ? tenants[0] : tenantRef.current.value;
+
     if (tenant === "") {
       setMsg(locale().missing_tenant);
       return;
@@ -42,7 +44,7 @@ export default function PasswordRecoveryPage() {
         setMsg(locale().email_sent_successfully);
       else setMsg(locale().email_sent_errors);
     } catch (error) {
-      console.log({ error: error.response.data });
+      console.error({ error: error.response.data });
       setMsg(error.response.data.message + " : " + error.response.data.details);
     }
   }
@@ -69,14 +71,21 @@ export default function PasswordRecoveryPage() {
             </Row>
             <Row>
               <Col>
-                <Form.Group className="mb-3" controlId="tenant">
-                  <Form.Label>{locale().tenant}</Form.Label>
-                  <Form.Control
-                    ref={tenantRef}
-                    type="text"
-                    placeholder={locale().tenant_suggestion}
-                  />
-                </Form.Group>
+                {tenants.length > 1 && (
+                  <Form.Group className="mb-3" controlId="tenant">
+                    <Form.Label>{locale().tenant}</Form.Label>
+                    <Form.Select
+                      aria-label={locale().tenant_suggestion}
+                      ref={tenantRef}
+                    >
+                      {React.Children.toArray(
+                        tenants.map((t) => {
+                          return <option value={t}>{t}</option>;
+                        })
+                      )}
+                    </Form.Select>
+                  </Form.Group>
+                )}
               </Col>
             </Row>
             <Row>

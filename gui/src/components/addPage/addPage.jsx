@@ -6,10 +6,7 @@ import {
   get_generic,
   post_file_generic,
 } from "../../services/http_operations";
-import {
-  isDefault,
-  removeDefaultElements,
-} from "../../services/misc_functions";
+import { removeDefaultElements } from "../../services/misc_functions";
 import { useParams, useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
@@ -23,26 +20,8 @@ import {
   maintainEmptyElements,
 } from "../../services/objects_manipulation";
 import AppContext from "../../context";
-import { fetchedPageTypes, fetchedPageData } from "../../configManager";
+import { fetchedPageData } from "../../configManager";
 const cloneDeep = require("clone-deep");
-
-/*
-APPUNTI FORM
-
- <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label>
-              TEXT
-            </Form.Label>
-            <Form.Control type="text" placeholder="PLACEHOLDER TEXT" />
-            <Form.Text className="text-muted">
-              LABEL
-            </Form.Text>
-          </Form.Group>
-
-tipi consentiti nel form control:
-text | number (verifica del numero automatica) | email (verifica email automatica) | file | checkbox
-
-*/
 
 export default function AddPage(props) {
   //get resource and id from url params
@@ -67,8 +46,7 @@ export default function AddPage(props) {
 
   //file upload state
   const [file, setFile] = useState(undefined);
-  const [contentHeader, setContentHeader] = useState(null);
-  const [contentBody, setContentBody] = useState(null);
+  const [csvContent, setCsvContent] = useState(null);
   const [contentPlain, setContentPlain] = useState(null);
 
   const context = useContext(AppContext);
@@ -79,7 +57,9 @@ export default function AddPage(props) {
   useEffect(() => {
     /////////////FETCH REQUIRED RESOURCES
     const fetchRequiredData = async (res) => {
-      if (myFetched.data[res] !== undefined) return;
+      //if you wanto to not refresh data after the first time, uncomment this line
+      //if (myFetched.data[res] !== undefined) return;
+
       // get the data from the api
       try {
         const response = await get_generic(res, {
@@ -101,7 +81,7 @@ export default function AddPage(props) {
           res
         );
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
     if (fetchedPageData[resource] !== undefined) {
@@ -115,15 +95,19 @@ export default function AddPage(props) {
   useEffect(() => {
     const fetchSingle = async (qs = {}) => {
       // get the data from the api
-      const response = await get_generic(resource, qs);
+      try {
+        const response = await get_generic(resource, qs);
 
-      const data = response.docs[0];
-      let tmpValues = cloneDeep(values);
+        const data = response.docs[0];
+        let tmpValues = cloneDeep(values);
 
-      tmpValues = sortObject(data, tmpValues);
+        tmpValues = sortObject(data, tmpValues);
 
-      tmpValues = maintainEmptyElements(tmpValues, addFields, resource);
-      setValues(tmpValues);
+        tmpValues = maintainEmptyElements(tmpValues, addFields, resource);
+        setValues(tmpValues);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     if (searchParams.get("from") === null || searchParams.get("from") === "")
@@ -214,7 +198,6 @@ export default function AddPage(props) {
     } catch (error) {
       console.error(error);
       res = error.error.response;
-      console.log(res);
 
       let det = "";
       let msg = "";
@@ -267,9 +250,9 @@ export default function AddPage(props) {
         setMsg(res.statusText);
         setIsError(false);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         res = error.error.response;
-        console.log({
+        console.debug({
           message: error.error.response.data.message,
           details: error.error.response.data.details,
         });
@@ -300,9 +283,9 @@ export default function AddPage(props) {
         setMsg(res.statusText);
         setIsError(false);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         res = error.error.response;
-        console.log({
+        console.debug({
           message: error.error.response.data.message,
           details: error.error.response.data.details,
         });
@@ -406,13 +389,11 @@ export default function AddPage(props) {
               <FormFile
                 submitFunction={postFile}
                 backFunction={back}
-                setContentBody={setContentBody}
-                setContentHeader={setContentHeader}
+                setCsvContent={setCsvContent}
                 setContentPlain={setContentPlain}
                 setFile={setFile}
                 contentPlain={contentPlain}
-                contentHeader={contentHeader}
-                contentBody={contentBody}
+                csvContent={csvContent}
                 setMsg={setMsg}
                 setIsError={setIsError}
               />

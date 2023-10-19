@@ -73,7 +73,7 @@ export default function EditContentPage(props) {
         res
       );
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
   useEffect(() => {
@@ -87,103 +87,107 @@ export default function EditContentPage(props) {
   //useeffect to get resource if required
   useEffect(() => {
     const fetchData = async (qs = {}) => {
-      // get the data from the api
-      const response = await get_generic(resource, qs);
+      try {
+        const response = await get_generic(resource, qs);
 
-      const data = response.docs[0];
-      let tmpValues = cloneDeep(values);
+        const data = response.docs[0];
+        let tmpValues = cloneDeep(values);
 
-      tmpValues = sortObject(data, tmpValues);
+        tmpValues = sortObject(data, tmpValues);
 
-      Object.entries(tmpValues).forEach((e) => {
-        if (e[0].toLowerCase().includes("date")) {
-          tmpValues[e[0]] = FormatDate(e[1]);
-        }
-      });
+        Object.entries(tmpValues).forEach((e) => {
+          if (e[0].toLowerCase().includes("date")) {
+            tmpValues[e[0]] = FormatDate(e[1]);
+          }
+        });
 
-      //this function evaluate if a field should be disabled or not
-      const evaluateSpecifiers = async () => {
-        if (editFieldsSpecifier[resource] === undefined) {
-          setDisabledFields({});
+        //this function evaluate if a field should be disabled or not
+        const evaluateSpecifiers = async () => {
+          if (editFieldsSpecifier[resource] === undefined) {
+            setDisabledFields({});
 
+            const keys = Object.keys(tmpValues);
+            for (let i = 0; i < keys.length; i++) {
+              const _key = keys[i];
+
+              tmpValues = maintainEmptyElement(
+                tmpValues,
+                [_key],
+                editFields,
+                resource
+              );
+            }
+
+            setValues(tmpValues);
+            //deep copy and set state
+            setOriginal(cloneDeep(tmpValues));
+            return;
+          }
+
+          let disabled = {};
+          if (disabledFields !== undefined) disabled = disabledFields;
+
+          const specsEntries = Object.entries(editFieldsSpecifier[resource]);
+
+          for (let i = 0; i < specsEntries.length; i++) {
+            const key = specsEntries[i][0]; //key
+            const value = specsEntries[i][1]; //value
+
+            //check if key is in values
+            if (tmpValues[key] === undefined) continue;
+            //check if value contains the type
+            if (value._type !== undefined && value._type === "disable") {
+              const resp = await value.policy(id);
+
+              disabled[key] = resp;
+            }
+            //check if the disable specification is inside the nested object
+            else {
+              const entr = Object.entries(value);
+              for (let j = 0; j < entr.length; j++) {
+                //check if the subkey is in values, in case of array i trust the configuration
+                if (
+                  Array.isArray(tmpValues[key]) === false &&
+                  tmpValues[key][entr[j][0]] === undefined
+                )
+                  continue;
+                if (
+                  entr[j][1]._type !== undefined &&
+                  entr[j][1]._type === "disable"
+                ) {
+                  const resp = await entr[j][1].policy(id);
+
+                  disabled[key] = { [entr[j][0]]: resp };
+                }
+              }
+            }
+          }
           const keys = Object.keys(tmpValues);
           for (let i = 0; i < keys.length; i++) {
             const _key = keys[i];
 
-            tmpValues = maintainEmptyElement(
-              tmpValues,
-              [_key],
-              editFields,
-              resource
-            );
+            if (disabled[_key] === undefined || disabled[_key] === false) {
+              tmpValues = maintainEmptyElement(
+                tmpValues,
+                [_key],
+                editFields,
+                resource
+              );
+            }
           }
+
+          setDisabledFields(disabled);
 
           setValues(tmpValues);
           //deep copy and set state
           setOriginal(cloneDeep(tmpValues));
-          return;
-        }
+        };
 
-        let disabled = {};
-        if (disabledFields !== undefined) disabled = disabledFields;
-
-        const specsEntries = Object.entries(editFieldsSpecifier[resource]);
-
-        for (let i = 0; i < specsEntries.length; i++) {
-          const key = specsEntries[i][0]; //key
-          const value = specsEntries[i][1]; //value
-
-          //check if key is in values
-          if (tmpValues[key] === undefined) continue;
-          //check if value contains the type
-          if (value._type !== undefined && value._type === "disable") {
-            const resp = await value.policy(id);
-
-            disabled[key] = resp;
-          }
-          //check if the disable specification is inside the nested object
-          else {
-            const entr = Object.entries(value);
-            for (let j = 0; j < entr.length; j++) {
-              //check if the subkey is in values, in case of array i trust the configuration
-              if (
-                Array.isArray(tmpValues[key]) === false &&
-                tmpValues[key][entr[j][0]] === undefined
-              )
-                continue;
-              if (
-                entr[j][1]._type !== undefined &&
-                entr[j][1]._type === "disable"
-              ) {
-                const resp = await entr[j][1].policy(id);
-
-                disabled[key] = { [entr[j][0]]: resp };
-              }
-            }
-          }
-        }
-        const keys = Object.keys(tmpValues);
-        for (let i = 0; i < keys.length; i++) {
-          const _key = keys[i];
-
-          if (disabled[_key] === undefined || disabled[_key] === false) {
-            tmpValues = maintainEmptyElement(
-              tmpValues,
-              [_key],
-              editFields,
-              resource
-            );
-          }
-        }
-
-        setDisabledFields(disabled);
-
-        setValues(tmpValues);
-        //deep copy and set state
-        setOriginal(cloneDeep(tmpValues));
-      };
-
-      evaluateSpecifiers();
+        evaluateSpecifiers();
+      } catch (error) {
+        console.error(error);
+      }
+      // get the data from the api
     };
 
     const fst = { _id: id };

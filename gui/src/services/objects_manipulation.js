@@ -1,9 +1,12 @@
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+
 import {
   isDefault,
   removeDefaultElements,
   nonDefaultLength,
 } from "./misc_functions";
-
+const XLSX = require("xlsx");
 const cloneDeep = require("clone-deep");
 
 // this function sort keys of an object and of its array-of-objects values (recursively) based on a template
@@ -120,4 +123,55 @@ export function maintainEmptyElement(
   }
   if (element !== undefined) tmpPtr.push(element);
   return tmp;
+}
+
+export function convertArrayOfObjectsToCSV(data, columnDelimiter = ",") {
+  const keys = Object.keys(data[0]);
+  let csvContent = keys.join(columnDelimiter) + "\n";
+
+  data.forEach((item) => {
+    const row = keys
+      .map((key) =>
+        typeof item[key] === "string"
+          ? item[key].replaceAll(columnDelimiter, "")
+          : item[key]
+      )
+      .join(columnDelimiter);
+    csvContent += row + "\n";
+  });
+
+  return csvContent;
+}
+
+export function convertArrayOfObjectsToPDF(data) {
+  const doc = new jsPDF("landscape");
+  const tableHeaders = Object.keys(data[0]);
+  const tableData = data.map((item) => Object.values(item));
+
+  doc.autoTable({
+    head: [tableHeaders],
+    body: tableData,
+    startY: 10, // Set the starting Y position for the table
+    pageBreak: "auto", // Automatically break pages as needed
+  });
+
+  return doc;
+}
+
+export function convertArrayOfSheetsToXLSX(sheets) {
+  //if sheets list is not empty, the function uses the sheets list to create the xlsx file
+  //otherwise, it creates a single sheet xlsx file
+  const wb = XLSX.utils.book_new();
+  let ws;
+  sheets.forEach((sheet, index) => {
+    ws = XLSX.utils.json_to_sheet(sheet["data"]);
+    XLSX.utils.book_append_sheet(wb, ws, sheet["name"]);
+  });
+  const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+
+  var blob = new Blob([new Uint8Array(wbout)], {
+    type: "application/octet-stream",
+  });
+
+  return blob;
 }

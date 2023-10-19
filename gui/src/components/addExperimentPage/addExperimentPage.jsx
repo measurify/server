@@ -27,23 +27,6 @@ import ImportExportValues from "../importExportValues/importExportValues";
 import { FormatDate } from "../../services/misc_functions";
 
 const cloneDeep = require("clone-deep");
-/*
-APPUNTI FORM
-
- <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label>
-              TEXT
-            </Form.Label>
-            <Form.Control type="text" placeholder="PLACEHOLDER TEXT" />
-            <Form.Text className="text-muted">
-              LABEL
-            </Form.Text>
-          </Form.Group>
-
-tipi consentiti nel form control:
-text | number (verifica del numero automatica) | email (verifica email automatica) | file | checkbox
-
-*/
 
 export default function AddExperimentPage(props) {
   //get resource and id from url params
@@ -73,17 +56,20 @@ export default function AddExperimentPage(props) {
 
   //file upload state
   const [file, setFile] = useState(undefined);
-  const [contentHeader, setContentHeader] = useState(null);
-  const [contentBody, setContentBody] = useState(null);
+  const [csvContent, setCsvContent] = useState(null);
   const [contentPlain, setContentPlain] = useState(null);
 
   //useeffect to get protocols
   useEffect(() => {
     const fetchData = async (qs = {}) => {
-      // get the protocols data from the api
-      const response = await get_generic("protocols", qs);
+      try {
+        // get the protocols data from the api
+        const response = await get_generic("protocols", qs);
 
-      setProtocols(response.docs.map((e) => e._id));
+        setProtocols(response.docs.map((e) => e._id));
+      } catch (error) {
+        console.error(error);
+      }
     };
     const qs = { limit: 100, select: ["_id", "metadata", "topics"] };
     fetchData(qs);
@@ -92,36 +78,40 @@ export default function AddExperimentPage(props) {
   //useeffect to get resource if required (for the "duplicate" actions)
   useEffect(() => {
     const fetchDataDuplicate = async (qs = {}) => {
-      // get the data from the api
-      const response = await get_generic(resource, qs);
+      try {
+        // get the data from the api
+        const response = await get_generic(resource, qs);
 
-      const data = response.docs[0];
-      let tmpValues = cloneDeep(values);
+        const data = response.docs[0];
+        let tmpValues = cloneDeep(values);
 
-      //add metadata and protocol fields
-      tmpValues["protocol"] = "";
-      tmpValues["metadata"] = [{ name: "", value: "" }];
+        //add metadata and protocol fields
+        tmpValues["protocol"] = "";
+        tmpValues["metadata"] = [{ name: "", value: "" }];
 
-      //disable protocol fields
-      const tmpDisabled = cloneDeep(disabledFields);
-      tmpDisabled["protocol"] = true;
+        //disable protocol fields
+        const tmpDisabled = cloneDeep(disabledFields);
+        tmpDisabled["protocol"] = true;
 
-      setDisabledFields(tmpDisabled);
+        setDisabledFields(tmpDisabled);
 
-      tmpValues = sortObject(data, tmpValues);
+        tmpValues = sortObject(data, tmpValues);
 
-      Object.entries(tmpValues).forEach((e) => {
-        if (e[0].toLowerCase().includes("date")) {
-          tmpValues[e[0]] = FormatDate(e[1]);
-        }
-      });
+        Object.entries(tmpValues).forEach((e) => {
+          if (e[0].toLowerCase().includes("date")) {
+            tmpValues[e[0]] = FormatDate(e[1]);
+          }
+        });
 
-      //add "_copy" to id to avoid duplicate key error
+        //add "_copy" to id to avoid duplicate key error
 
-      tmpValues["_id"] = tmpValues["_id"] + "_copy";
+        tmpValues["_id"] = tmpValues["_id"] + "_copy";
 
-      tmpValues = maintainEmptyElements(tmpValues, addFields, resource);
-      setValues(tmpValues);
+        tmpValues = maintainEmptyElements(tmpValues, addFields, resource);
+        setValues(tmpValues);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     if (searchParams.get("from") === null || searchParams.get("from") === "")
@@ -197,44 +187,49 @@ export default function AddExperimentPage(props) {
   //handle changes to selected protocols
   const handleProtocolChange = async (e) => {
     e.preventDefault();
+
     const selectedProtocol = e.target.value;
     const fst = { _id: e.target.value };
     const qs = { filter: JSON.stringify(fst) };
-    const res = await get_generic("protocols", qs);
-    const protocol = res.docs[0];
+    try {
+      const res = await get_generic("protocols", qs);
+      const protocol = res.docs[0];
 
-    const metadata = [];
-    for (let i = 0; i < protocol.metadata.length; i++) {
-      if (protocol.metadata[i].type === "scalar") {
-        metadata.push({
-          name: protocol.metadata[i].name,
-          value: 0,
-        });
+      const metadata = [];
+      for (let i = 0; i < protocol.metadata.length; i++) {
+        if (protocol.metadata[i].type === "scalar") {
+          metadata.push({
+            name: protocol.metadata[i].name,
+            value: 0,
+          });
+        }
+        if (protocol.metadata[i].type === "text") {
+          metadata.push({
+            name: protocol.metadata[i].name,
+            value: protocol.metadata[i].name + "_Name",
+          });
+        }
+        if (protocol.metadata[i].type === "vector") {
+          metadata.push({
+            name: protocol.metadata[i].name,
+            value: [0],
+          });
+        }
       }
-      if (protocol.metadata[i].type === "text") {
-        metadata.push({
-          name: protocol.metadata[i].name,
-          value: protocol.metadata[i].name + "_Name",
-        });
-      }
-      if (protocol.metadata[i].type === "vector") {
-        metadata.push({
-          name: protocol.metadata[i].name,
-          value: [0],
-        });
-      }
+
+      const tmpValues = cloneDeep(values);
+      tmpValues["protocol"] = selectedProtocol;
+      if (metadata.length !== 0) tmpValues["metadata"] = metadata;
+
+      const tmpDisabled = cloneDeep(disabledFields);
+      tmpDisabled["protocol"] = true;
+
+      setDisabledFields(tmpDisabled);
+      //setProtocol(selectedProtocol);
+      setValues(tmpValues);
+    } catch (error) {
+      console.error(error);
     }
-
-    const tmpValues = cloneDeep(values);
-    tmpValues["protocol"] = selectedProtocol;
-    if (metadata.length !== 0) tmpValues["metadata"] = metadata;
-
-    const tmpDisabled = cloneDeep(disabledFields);
-    tmpDisabled["protocol"] = true;
-
-    setDisabledFields(tmpDisabled);
-    //setProtocol(selectedProtocol);
-    setValues(tmpValues);
   };
 
   //post the body for forms
@@ -297,9 +292,9 @@ export default function AddExperimentPage(props) {
       setMsg(res.statusText);
       setIsError(false);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res = error.error.response;
-      console.log({
+      console.debug({
         message: error.error.response.data.message,
         details: error.error.response.data.details,
       });
@@ -365,7 +360,7 @@ export default function AddExperimentPage(props) {
       setDisabledFields(tmpDisabled);
     } catch (error) {
       setImportMsg(locale().error_imported_file);
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -388,9 +383,9 @@ export default function AddExperimentPage(props) {
         setMsg(res.statusText);
         setIsError(false);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         res = error.error.response;
-        console.log({
+        console.debug({
           message: error.error.response.data.message,
           details: error.error.response.data.details,
         });
@@ -421,9 +416,9 @@ export default function AddExperimentPage(props) {
         setMsg(res.statusText);
         setIsError(false);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         res = error.error.response;
-        console.log({
+        console.debug({
           message: error.error.response.data.message,
           details: error.error.response.data.details,
         });
@@ -554,13 +549,11 @@ export default function AddExperimentPage(props) {
               <FormFile
                 submitFunction={postFile}
                 backFunction={back}
-                setContentBody={setContentBody}
-                setContentHeader={setContentHeader}
+                setCsvContent={setCsvContent}
                 setContentPlain={setContentPlain}
                 setFile={setFile}
                 contentPlain={contentPlain}
-                contentHeader={contentHeader}
-                contentBody={contentBody}
+                csvContent={csvContent}
                 setMsg={setMsg}
                 setIsError={setIsError}
               />

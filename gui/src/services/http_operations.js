@@ -19,7 +19,7 @@ export function SetAPIUrl() {
 }
 
 //login
-export function login(username, password, tenant, saveToken = true) {
+export async function login(username, password, tenant, saveToken = true) {
   const body = {
     username: `${username}`,
     password: `${password}`,
@@ -60,7 +60,7 @@ export function login(username, password, tenant, saveToken = true) {
 }
 
 //refresh token
-export function refreshToken() {
+export async function refreshToken() {
   const options = {
     headers: {
       "Content-Type": "application/json",
@@ -98,7 +98,7 @@ export async function post_file_generic(
   if (token === undefined) token = GetToken();
   const url_string = api_url + "/" + resource_type + "/file";
 
-  console.log("POST file:" + url_string);
+  console.debug("POST file:" + url_string);
 
   const tempH = {
     "Content-Type": "multipart/form-data",
@@ -140,7 +140,7 @@ export async function post_generic(resource_type, body, token = undefined) {
   if (token === undefined) token = GetToken();
   const url_string = api_url + "/" + resource_type + "/";
 
-  console.log("POST :" + url_string);
+  console.debug("POST :" + url_string);
 
   const options = {
     headers: {
@@ -176,7 +176,7 @@ export async function put_generic(resource_type, body, id, token = undefined) {
   const url_string = api_url + "/" + resource_type + "/" + id;
   if (token === undefined) token = GetToken();
 
-  console.log("PUT :" + url_string);
+  console.debug("PUT :" + url_string);
 
   const options = {
     headers: {
@@ -237,7 +237,7 @@ export async function delete_generic(resource_type, id, token = undefined) {
   if (id !== undefined) {
     url_string += "/" + id;
   }
-  console.log("DELETE :" + url_string);
+  console.debug("DELETE :" + url_string);
 
   //url: url_string;
   let options = {
@@ -313,8 +313,11 @@ export async function get_generic(resource_type, qs = {}, token) {
   if (qs.select !== undefined && qs.length !== 0) {
     url = url.concat('&select=["' + qs.select.join('","') + '"]');
   }
+  if (qs.sort !== undefined) {
+    url = url.concat("&sort=" + qs.sort);
+  }
 
-  console.log("GET :" + url);
+  console.debug("GET :" + url);
 
   let options = {
     headers: {
@@ -325,6 +328,7 @@ export async function get_generic(resource_type, qs = {}, token) {
 
     json: true,
   };
+
   return new Promise((resolve, reject) => {
     instance
       .get(url, options)
@@ -353,7 +357,7 @@ export async function get_one_generic(resource_type, id, token) {
   let url = api_url + "/" + resource_type + "/" + id;
   if (token === undefined) token = GetToken();
 
-  console.log("GET ONE:" + url);
+  console.debug("GET ONE:" + url);
 
   let options = {
     headers: {
@@ -382,7 +386,7 @@ export async function get_one_generic(resource_type, id, token) {
 export async function requestPasswordReset(tenant, email) {
   const url_string = api_url + "/self/reset?tenant=" + tenant;
   const body = JSON.stringify({ email: email });
-  console.log("POST password reset request:" + url_string);
+  console.debug("POST password reset request:" + url_string);
   const options = {
     headers: {
       "Content-Type": "application/json",
@@ -404,7 +408,7 @@ export async function requestPasswordReset(tenant, email) {
 //function to reset the password from token
 export async function resetPassword(tenant, token, password) {
   const url_string = api_url + "/self";
-  console.log("PUT password reset:" + url_string);
+  console.debug("PUT password reset:" + url_string);
   const body = JSON.stringify({
     reset: token,
     password: password,
@@ -431,7 +435,7 @@ export async function resetPassword(tenant, token, password) {
 //get required password strength from the API
 export async function getPasswordStrength() {
   const url_string = api_url + "/types/passwordStrength";
-  console.log("GET password strength:" + url_string);
+  console.debug("GET password strength:" + url_string);
 
   const options = {
     headers: {
@@ -439,16 +443,21 @@ export async function getPasswordStrength() {
       "Cache-Control": "no-cache",
     },
   };
-  return new Promise((resolve, reject) => {
-    instance
-      .get(url_string, options)
-      .then((response) => {
-        resolve({ response: response }); //true;
-      })
-      .catch((error) => {
-        reject({ error: error }); //false;
-      });
-  });
+  try {
+    return new Promise((resolve, reject) => {
+      instance
+        .get(url_string, options)
+        .then((response) => {
+          resolve({ response: response }); //true;
+        })
+        .catch((error) => {
+          reject({ error: error }); //false;
+        });
+    });
+  } catch (error) {
+    console.debug(error);
+    return { error: error };
+  }
 }
 //return the login token from the localstorage
 export function GetToken() {
@@ -456,7 +465,61 @@ export function GetToken() {
 }
 
 //post measurements csv file with the description file
-export async function postCsvFile(file, description, force = true) {
+export async function postCsvFile(file, csvDescription, force = true) {
+  const descFile = new File(
+    [JSON.stringify(csvDescription, null, 4)],
+    "description.json",
+    {
+      type: "application/json",
+    }
+  );
+  console.log(descFile);
+  const data = new FormData();
+  data.append("file", file);
+  data.append("description", descFile);
+
+  let url = api_url + "/measurements/file";
+  if (force === true) url += "?force=true";
+  const tempH = {
+    "Content-Type": "multipart/form-data",
+    "Cache-Control": "no-cache",
+    Authorization: GetToken(),
+  };
+  const options = {
+    headers: tempH,
+  };
+
+  try {
+    const response = await instance.post(url, data, options);
+
+    logsManager.PushLog({
+      type: "info",
+      msg:
+        file.name +
+        ", successfully posted " +
+        response.data.completed.length +
+        " rows, with " +
+        response.data.errors.length +
+        " errors\n",
+    });
+    return response;
+  } catch (error) {
+    console.debug(error);
+
+    logsManager.PushLog({
+      type: "error",
+      msg: "Failed to post: " + file.name + "\n",
+    });
+    return error.response;
+  }
+}
+
+//post measurements csv file with the description file
+export async function postCsvFileWithDescriptionFile(
+  file,
+  description,
+  force = true
+) {
   const data = new FormData();
   data.append("file", file);
   data.append("description", description);
@@ -492,6 +555,7 @@ export async function postCsvFile(file, description, force = true) {
         });
       });
     }
+    return response;
   } catch (error) {
     console.log(error);
 
@@ -501,11 +565,12 @@ export async function postCsvFile(file, description, force = true) {
     });
     logsManager.PushLog({
       type: "error",
-      msg: "Message: "+error.response.data.message + " \n",
+      msg: "Message: " + error.response.data.message + " \n",
     });
     logsManager.PushLog({
       type: "error",
-      msg: "Details: "+error.response.data.details + " \n",
+      msg: "Details: " + error.response.data.details + " \n",
     });
+    return error.response;
   }
 }

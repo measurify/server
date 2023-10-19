@@ -13,7 +13,7 @@ import {
 import AppContext from "../../../context";
 import "../../page/page.scss";
 import UploadMeasurementsFileForm from "./uploadMeasurementsFileForm";
-import { postCsvFile } from "../../../services/http_operations";
+import { postCsvFileWithDescriptionFile } from "../../../services/http_operations";
 import { csv_build_description } from "../../../services/file_operations";
 
 const arraySepRef = React.createRef();
@@ -30,6 +30,7 @@ export default function UploadMeasurementsPage() {
   //message for user
   const [msg, setMsg] = useState("");
   const [isError, setIsError] = useState(false);
+  const [operationFailed, setOperationFailed] = useState(false);
 
   const [csvSep, setCsvSep] = useState(",");
 
@@ -71,6 +72,7 @@ export default function UploadMeasurementsPage() {
       msg: "-------Begin Upload Operation " + operationindex + "-------\n",
     });
 
+    setOperationFailed(false);
     console.log("Begin upload: " + Date.now());
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
@@ -78,7 +80,15 @@ export default function UploadMeasurementsPage() {
         type: "info",
         msg: "Uploading file " + file.name + "\n",
       });
-      await postCsvFile(file, description);
+      const response = await postCsvFileWithDescriptionFile(file, description);
+      if (response.status !== 200) {
+        if (response?.data?.message !== undefined)
+          myLogs.PushLog({
+            type: "error",
+            msg: "Error: " + response?.data?.message + "\n",
+          });
+        setOperationFailed(true);
+      }
       setNow((100 * (i + 1)) / files.length);
     }
 
@@ -129,7 +139,13 @@ export default function UploadMeasurementsPage() {
               <ProgressBar
                 now={now}
                 label={`${now}%`}
-                variant={now === 100 ? "success" : "info"}
+                variant={
+                  operationFailed === true
+                    ? "danger"
+                    : now === 100
+                    ? "success"
+                    : "info"
+                }
               />
             </Col>
           </Row>

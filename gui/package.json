@@ -1,43 +1,47 @@
 {
   "name": "measurify-dashboard",
   "description": "Measurify Dashboard is Graphical User Interface (GUI) is developed to support a Measurify instance. This GUI can be installed within the Measurify source code (to run on the same machine) or be configured to communicate with a remote Measurify instance.",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "private": true,
   "dependencies": {
-    "@emotion/react": "^11.10.6",
-    "@emotion/styled": "^11.10.6",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
     "@fortawesome/fontawesome": "^1.1.8",
-    "@fortawesome/fontawesome-free-solid": "^5.0.13",
+    "@fortawesome/fontawesome-free": "^6.4.2",
+    "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
-    "@mui/material": "^5.12.1",
-    "@testing-library/jest-dom": "^5.16.5",
+    "@mui/material": "^5.14.13",
+    "@testing-library/jest-dom": "^6.1.3",
     "@testing-library/react": "^14.0.0",
-    "@testing-library/user-event": "^14.4.3",
-    "@types/react-dom": "^18.0.11",
+    "@testing-library/user-event": "^14.5.1",
+    "@types/react-dom": "^18.2.13",
     "@types/react-router-dom": "^5.3.3",
-    "@types/react-vis": "^1.11.11",
+    "@types/react-vis": "^1.11.12",
     "ajv": "^8.12.0",
-    "axios": "^1.3.6",
-    "bootstrap": "^5.2.3",
+    "axios": "^1.5.1",
+    "bootstrap": "^5.3.2",
     "check-password-strength": "^2.0.7",
-    "client-zip": "^2.3.1",
+    "client-zip": "^2.4.4",
     "clone-deep": "^4.0.1",
     "file-saver": "^2.0.5",
-    "flat": "^5.0.2",
+    "flat": "^6.0.1",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.7.0",
     "lodash": "^4.17.21",
     "natural-orderby": "^3.0.2",
     "papaparse": "^5.4.1",
     "query-string": "^8.1.0",
     "react": "^18.2.0",
-    "react-bootstrap": "^2.7.4",
+    "react-bootstrap": "^2.9.0",
     "react-dom": "^18.2.0",
     "react-infinite-scroll-component": "^6.1.0",
-    "react-loading-skeleton": "^3.2.1",
-    "react-router-dom": "^6.10.0",
+    "react-loading-skeleton": "^3.3.1",
+    "react-router-dom": "^6.16.0",
     "react-scripts": "5.0.1",
     "request-promise": "^4.2.6",
-    "sass": "^1.62.0",
-    "typescript": "^3.7.4"
+    "sass": "^1.69.2",
+    "typescript": "^5.2.2",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -51,17 +55,7 @@
     "extends": [
       "react-app",
       "react-app/jest"
-    ],
-    "rules": {
-      "eqeqeq": "off",
-      "no-unused-vars": "off",
-      "array-callback-return": "off",
-      "react-hook/exhaustive-deps": "off",
-      "@typescript-eslint/no-unused-vars": "off",
-      "react/jsx-no-target-blank": "off",
-      "no-redeclare": "off",
-      "react-hooks/exhaustive-deps": "off"
-    }
+    ]
   },
   "browserslist": {
     "production": [
@@ -76,11 +70,10 @@
     ]
   },
   "devDependencies": {
-    "@types/babel__core": "^7.20.0",
-    "@types/clone-deep": "^4.0.1",
+    "@types/clone-deep": "^4.0.2",
     "@types/file-saver": "^2.0.5",
-    "@types/papaparse": "^5.3.7",
-    "@types/react": "^18.0.37",
-    "cypress": "^12.10.0"
+    "@types/papaparse": "^5.3.9",
+    "@types/react": "^18.2.28",
+    "cypress": "^13.3.0"
   }
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, Container, Row, Col } from "react-bootstrap";
 import locale from "../../common/locale";
+import IconRole from "../iconRole/iconRole";
 import {
   put_generic,
   login,
@@ -23,34 +24,6 @@ export default function ProfilePage(params) {
   const [msgPass, setMsgPass] = useState("");
   const [msgEmail, setMsgEmail] = useState("");
   const [isError, setisError] = useState(false);
-
-  function renderIconRole() {
-    if (role === "admin") {
-      return (
-        <i className="fa fa-user-tie" aria-hidden="true" title="Admin"></i>
-      );
-    } else if (role === "provider") {
-      return (
-        <i
-          className="fa fa-user-graduate"
-          aria-hidden="true"
-          title="Provider"
-        ></i>
-      );
-    } else if (role === "analyst") {
-      return (
-        <i className="fa fa-user-cog" aria-hidden="true" title="Analyst"></i>
-      );
-    } else if (role === "supplier") {
-      return (
-        <i className="fa fa-user-tag" aria-hidden="true" title="Supplier"></i>
-      );
-    } else {
-      return (
-        <i className="fa fa-user" aria-hidden="true" aria-label="User"></i>
-      );
-    }
-  }
 
   useEffect(() => {
     const username = localStorage.getItem("username");
@@ -94,7 +67,7 @@ export default function ProfilePage(params) {
         return;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       //Required password strength cannot be acquired from the server, use the default
       requiredStr = 1;
     }
@@ -123,7 +96,7 @@ export default function ProfilePage(params) {
           setMsgPass(locale().password_changed);
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
   };
@@ -162,7 +135,7 @@ export default function ProfilePage(params) {
           setMsgEmail(locale().email_changed);
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
   };
@@ -185,7 +158,7 @@ export default function ProfilePage(params) {
             <Col xs={1}>{locale().role}</Col>
             <Col>
               {role}&nbsp;
-              {renderIconRole()}
+              <IconRole role={role} />
             </Col>
           </Row>
           <Row>
@@ -205,67 +178,7 @@ export default function ProfilePage(params) {
         <Container fluid>
           <Col>
             <Row>
-              <b>Edit email</b>
-            </Row>
-          </Col>
-
-          <Row>
-            <Col>
-              <Form onSubmit={submitEmail}>
-                <Row>
-                  <Form.Group className="mb-3">
-                    <Form.Control
-                      type="email"
-                      onChange={(e) => {
-                        e.preventDefault();
-                        setEmail(e.target.value);
-                      }}
-                      value={email}
-                      placeholder={locale().enter + " new email"}
-                    />
-                  </Form.Group>
-                </Row>
-                <Row>
-                  <Form.Group className="mb-3">
-                    <Form.Control
-                      type="email"
-                      onChange={(e) => {
-                        e.preventDefault();
-                        setEmailConfirm(e.target.value);
-                      }}
-                      value={emailConfirm}
-                      placeholder={locale().repeat + " new email"}
-                    />
-                  </Form.Group>
-                </Row>
-                <Row>
-                  <Col>
-                    <font
-                      style={{
-                        marginLeft: 5 + "px",
-                        color: isError ? "red" : "black",
-                      }}
-                    >
-                      {msgEmail}
-                    </font>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col>
-                    <Button variant="primary" type="submit">
-                      {locale().submit}
-                    </Button>
-                  </Col>
-                </Row>
-              </Form>
-            </Col>
-          </Row>
-        </Container>
-        <hr />
-        <Container fluid>
-          <Col>
-            <Row>
-              <b>Edit password</b>
+              <b>Change password</b>
             </Row>
           </Col>
 
@@ -327,6 +240,66 @@ export default function ProfilePage(params) {
                     </font>
                   </Col>
                 </Row>{" "}
+                <Row>
+                  <Col>
+                    <Button variant="primary" type="submit">
+                      {locale().submit}
+                    </Button>
+                  </Col>
+                </Row>
+              </Form>
+            </Col>
+          </Row>
+        </Container>
+        <hr />
+        <Container fluid>
+          <Col>
+            <Row>
+              <b>Change email associated to the account</b>
+            </Row>
+          </Col>
+
+          <Row>
+            <Col>
+              <Form onSubmit={submitEmail}>
+                <Row>
+                  <Form.Group className="mb-3">
+                    <Form.Control
+                      type="email"
+                      onChange={(e) => {
+                        e.preventDefault();
+                        setEmail(e.target.value);
+                      }}
+                      value={email}
+                      placeholder={locale().enter + " new email"}
+                    />
+                  </Form.Group>
+                </Row>
+                <Row>
+                  <Form.Group className="mb-3">
+                    <Form.Control
+                      type="email"
+                      onChange={(e) => {
+                        e.preventDefault();
+                        setEmailConfirm(e.target.value);
+                      }}
+                      value={emailConfirm}
+                      placeholder={locale().repeat + " new email"}
+                    />
+                  </Form.Group>
+                </Row>
+                <Row>
+                  <Col>
+                    <font
+                      style={{
+                        marginLeft: 5 + "px",
+                        color: isError ? "red" : "black",
+                      }}
+                    >
+                      {msgEmail}
+                    </font>
+                  </Col>
+                </Row>
                 <Row>
                   <Col>
                     <Button variant="primary" type="submit">

@@ -2,15 +2,19 @@
 import { isFeatureInUse, alwaysTrue } from "../services/validations";
 
 export default function Complete_configuration() {
-  const base_api_url = undefined;
+  const base_api_url = "https://localhost/v1";
+  const website_name = "Measurify Dashboard";
+  const show_notification_bar = true;
+  const show_left_bar_details = true;
   //operation pages
-  // which are: "uploadmeasurements", "downloadmeasurements"
+  //those are the pages of operations performed on experiments,
+  // which are: updatehistory, downloadexperiment, removesteps
   const operationPages = [
-    "uploadmeasurements",
-    "downloadmeasurements",
     "updatehistory",
     "downloadexperiment",
     "removesteps",
+    "uploadmeasurements",
+    "downloadmeasurements",
   ];
 
   //dictionary of pages: key is the route for the API REST, value is an array that contains the fields shown to users
@@ -51,12 +55,6 @@ export default function Complete_configuration() {
   restrictionPages["users"] = ["admin"];
   restrictionPages["roles"] = ["admin"];
   restrictionPages["protocols"] = ["admin"];
-  restrictionPages["experiments"] = ["admin"];
-  /*restrictionPages["tags"] = ["admin"];
-  restrictionPages["features"] = ["admin"];
-  restrictionPages["things"] = ["admin"];
-  restrictionPages["devices"] = ["admin"];  
-  restrictionPages["measurements"] = ["admin"];*/
 
   //actions dictionary: key is the page, value is an array that contains actions || working actions arae "view" | "edit" | "delete" | "duplicate"
   const pageActions = {};
@@ -329,7 +327,8 @@ export default function Complete_configuration() {
     _id: "Please, enter experiment's name (N.B. don't use the # character in experiment's name).",
     state: "Please, enter 0 for ongoing experiment, 1 for finished experiment.",
     description: "Please, enter a short experiment's description.",
-    manager: "Please, enter the experiment's manager name.",
+    manager:
+      "Please, enter the experiment's company name (as a short Acronym).",
     startDate: "Please, use yyyy/mm/dd format.",
     endDate: "Please, use yyyy/mm/dd format.",
   };
@@ -339,6 +338,9 @@ export default function Complete_configuration() {
   };
   return {
     base_api_url,
+    website_name,
+    show_notification_bar,
+    show_left_bar_details,
     operationPages,
     pages,
     aliasPages,

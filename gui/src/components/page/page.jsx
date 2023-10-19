@@ -5,14 +5,11 @@ import { pages, pageActions, addFields } from "../../configManager";
 import { get_generic } from "../../services/http_operations";
 import ContentTable from "../contentTable/contentTable";
 import { useParams, useSearchParams } from "react-router-dom";
-import { Pagination } from "react-bootstrap";
 import "./page.scss";
 import { Capitalize } from "../../services/misc_functions";
 import { canDo } from "../../services/userRolesManagement";
-import fontawesome from "@fortawesome/fontawesome";
-import { faPlusCircle } from "@fortawesome/fontawesome-free-solid";
 import AppContext from "../../context";
-fontawesome.library.add(faPlusCircle);
+import RenderPagination from "../pagination/renderPagination";
 
 let role = React.createRef();
 
@@ -23,16 +20,7 @@ export default function Page(params) {
   const [header, setHeader] = useState(undefined);
   const [_actions, set_Actions] = useState(undefined);
 
-  const [pageNum, setPageNum] = useState(1);
-  const [pageLimit, setPageLimit] = useState(1);
-
-  const [hasNext, setHasNext] = useState();
-  const [hasPrev, setHasPrev] = useState();
-
-  const [prevPage, setPrevPage] = useState();
-  const [nextPage, setNextPage] = useState();
-
-  const [totalPages, setTotalPages] = useState();
+  const [paginationInfos, setPaginationInfos] = useState(undefined);
 
   const rl = localStorage.getItem("user-role");
 
@@ -48,41 +36,31 @@ export default function Page(params) {
     const fetchData = async (qs = {}) => {
       // get the data from the api
       try {
-        const response = await get_generic(page, qs);
+        const res = await get_generic(page, qs);
 
         // set state with the result
         setHeader(pages[page]);
-        setResource(response.docs);
+        setResource(res.docs);
         if (pageActions[page] !== undefined) set_Actions(pageActions[page]);
 
-        setHasNext(response.hasNextPage);
-        setHasPrev(response.hasPrevPage);
+        delete res.docs;
+        delete res.response;
 
-        setTotalPages(response.totalPages);
-
-        setPrevPage(response.prevPage);
-        setNextPage(response.nextPage);
+        setPaginationInfos(res);
       } catch (error) {
-        console.log(error);
+        console.error(error);
 
         setHeader(undefined);
         setResource(undefined);
-        setHasNext(undefined);
-        setHasPrev(undefined);
-        setTotalPages(undefined);
-        setPrevPage(undefined);
-        setNextPage(undefined);
       }
     };
 
     //get params for pagination
     const num =
       searchParams.get("page") !== null ? searchParams.get("page") : 1;
-    setPageNum(num);
 
     const limit =
       searchParams.get("limit") !== null ? searchParams.get("limit") : 10;
-    setPageLimit(limit);
 
     const qs = { page: num, limit: limit };
 
@@ -104,75 +82,6 @@ export default function Page(params) {
     setResource(tmp);
   };
 
-  const RenderPagination = () => {
-    const prevEllipsis = parseInt(pageNum, 10) - 2 > 0;
-    const nextEllipsis = parseInt(pageNum, 10) + 2 < totalPages;
-
-    return (
-      <div style={{ display: "inline-flex", width: 100 + "%" }}>
-        <Pagination
-          style={{
-            alignSelf: "center",
-            marginLeft: "auto",
-            marginRight: "auto",
-          }}
-        >
-          <Pagination.First
-            disabled={pageNum === 1}
-            onClick={() => setSearchParams({ page: 1, limit: pageLimit })}
-          />
-          <Pagination.Prev
-            disabled={!hasPrev}
-            onClick={() =>
-              setSearchParams({ page: prevPage, limit: pageLimit })
-            }
-          />
-          {prevEllipsis && <Pagination.Ellipsis />}
-          {parseInt(pageNum, 10) - 1 > 0 && (
-            <Pagination.Item
-              onClick={() =>
-                setSearchParams({
-                  page: parseInt(pageNum, 10) - 1,
-                  limit: pageLimit,
-                })
-              }
-            >
-              {parseInt(pageNum, 10) - 1}
-            </Pagination.Item>
-          )}
-          <Pagination.Item>
-            <b>{pageNum}</b>
-          </Pagination.Item>
-          {parseInt(pageNum, 10) + 1 <= totalPages && (
-            <Pagination.Item
-              onClick={() =>
-                setSearchParams({
-                  page: parseInt(pageNum, 10) + 1,
-                  limit: pageLimit,
-                })
-              }
-            >
-              {parseInt(pageNum, 10) + 1}
-            </Pagination.Item>
-          )}
-          {nextEllipsis && <Pagination.Ellipsis />}
-
-          <Pagination.Next
-            disabled={!hasNext}
-            onClick={() =>
-              setSearchParams({ page: nextPage, limit: pageLimit })
-            }
-          />
-          <Pagination.Last
-            disabled={pageNum === totalPages}
-            onClick={() =>
-              setSearchParams({ page: totalPages, limit: pageLimit })
-            }
-          />
-        </Pagination>
-      </div>
-    );
-  };
   return (
     <div className="page">
       <header className="page-header">
@@ -208,7 +117,10 @@ export default function Page(params) {
           takeSingle={takeSingle}
           removeSingle={removeSingle}
         />
-        <RenderPagination />
+        <RenderPagination
+          setSearchParams={setSearchParams}
+          paginationInfos={paginationInfos}
+        />
       </main>
     </div>
   );

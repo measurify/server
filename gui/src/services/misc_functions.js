@@ -146,6 +146,12 @@ export function Capitalize(s) {
   return s && s[0].toUpperCase() + s.slice(1);
 }
 
+//Replace underscores with white spaces
+export function ReplaceUnderscores(s) {
+  if (s === undefined || s === null) return "";
+  return s.replaceAll("_", " ");
+}
+
 //format string date into yyyy/mm/dd
 export function FormatDate(dt) {
   return dt.slice(0, 10).replaceAll("-", "/");

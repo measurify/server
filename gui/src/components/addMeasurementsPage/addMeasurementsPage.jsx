@@ -6,10 +6,7 @@ import {
   get_generic,
   post_file_generic,
 } from "../../services/http_operations";
-import {
-  isDefault,
-  removeDefaultElements,
-} from "../../services/misc_functions";
+import { removeDefaultElements } from "../../services/misc_functions";
 import { useSearchParams } from "react-router-dom";
 
 import { useNavigate } from "react-router-dom";
@@ -28,11 +25,7 @@ import { FormFile } from "../formFileComp/formFile";
 
 import AppContext from "../../context";
 import { fetchedPageData } from "../../configManager";
-import {
-  sortObject,
-  maintainEmptyElement,
-  maintainEmptyElements,
-} from "../../services/objects_manipulation";
+import { maintainEmptyElement } from "../../services/objects_manipulation";
 
 const cloneDeep = require("clone-deep");
 /*
@@ -111,7 +104,7 @@ export default function AddMeasurementsPage(props) {
         res
       );
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
   useEffect(() => {
@@ -131,7 +124,7 @@ export default function AddMeasurementsPage(props) {
 
         setFeatures(response.docs.map((e) => e._id));
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
     const qs = { limit: 100, select: ["_id", "items"] };
@@ -205,17 +198,21 @@ export default function AddMeasurementsPage(props) {
     const selectedFeature = e.target.value;
     const fst = { _id: selectedFeature };
     const qs = { filter: JSON.stringify(fst) };
-    const res = await get_generic("features", qs);
-    const feature = res.docs[0];
+    try {
+      const res = await get_generic("features", qs);
+      const feature = res.docs[0];
 
-    const items = feature.items;
+      const items = feature.items;
 
-    const samples = [];
-    const tmp = addSample(samples, items);
-    setSamples(tmp);
-    setItems(items);
-    setFeature(selectedFeature);
-    return;
+      const samples = [];
+      const tmp = addSample(samples, items);
+      setSamples(tmp);
+      setItems(items);
+      setFeature(selectedFeature);
+      return;
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const addSample = (samples, items) => {
@@ -278,7 +275,7 @@ export default function AddMeasurementsPage(props) {
       setMsg(res.statusText);
       setIsError(false);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res = error.error.response;
       //add details
       setMsg(
@@ -319,7 +316,7 @@ export default function AddMeasurementsPage(props) {
         setMsg(res.statusText);
         setIsError(false);
       } catch (error) {
-        console.log(error);
+        console.error(error);
 
         res = error.error.response;
         //add details
@@ -338,7 +335,7 @@ export default function AddMeasurementsPage(props) {
         setMsg(res.statusText);
         setIsError(false);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         res = error.error.response;
         //add details
         setMsg(

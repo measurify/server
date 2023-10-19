@@ -5,46 +5,47 @@ import Papa from "papaparse";
 export const prefixFileSeparator = "#";
 
 //return the prefix of the filename considering the defined separator
-export function GetPrefixFilename(file) {
+export function GetPrefixName(file) {
   return file.name.split(prefixFileSeparator)[0];
 }
 
 //this function build the description json item for the CSV file
 //this function use birthtime ad startdate and enddate for measurements contained in the csv file
-export async function csv_build_description(
-  file,
-  thing = undefined,
-  device = undefined
-) {
-  const featureName = GetPrefixFilename(file);
-  const qs = {
+export async function csv_build_description(file) {
+  const featureName = GetPrefixName(file);
+  let qs = {
     filter: JSON.stringify({
       features: featureName,
     }),
     select: ["_id"],
   };
-  let _device;
-  let _feature;
+  let device;
+  let feature;
+  let thingColumnName;
   try {
     let res = await get_one_generic("features", featureName);
-    _feature = res.response.data;
+    feature = res.response.data;
 
-    if (device === undefined) {
-      //get the device corresponsing to the selected feature
-      res = await get_generic("devices", qs);
-      _device = res.docs[0];
-      if (res.docs.length === 0)
-        return { error: "Device associated with the feature not found" };
-    } else {
-      _device = { _id: device };
-    }
+    //get the device corresponsing to the selected feature
+    res = await get_generic("devices", qs);
+    device = res.docs[0];
+    if (res.docs.length === 0)
+      return { error: "Device associated with the feature not found" };
+
+    //get the thing column name
+    qs = {
+      filter: JSON.stringify({ tags: "contextual" }),
+      select: ["_id"],
+    };
+    res = await get_generic("tags", qs);
+    thingColumnName = res.docs[0]._id;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return { error: "Feature not found, please check the filename" };
   }
 
   //get feature components
-  const itemlist = _feature.items.map((e) => e.name);
+  const itemlist = feature.items.map((e) => e.name);
 
   let header;
   const parseData = (_file) => {
@@ -65,22 +66,38 @@ export async function csv_build_description(
   let items = [];
   let tags = [];
   let warnings = [];
+  let errors = [];
+  let thingColumnIndex = -1;
 
   //check if header only contains tags or feature items
   //add tags index to tags array
-  header.map((e) => {
-    if (e.endsWith("_Tag")) {
+  header.forEach((e) => {
+    //check if the thing column is present
+    if (e === thingColumnName) {
+      thingColumnIndex = header.indexOf(e) + 1;
+    } else if (e.endsWith("_Tag")) {
       tags.push(header.indexOf(e) + 1);
     } else {
-      if (itemlist.indexOf(e) < 0)
-        return {
-          error: "File header contains unknown fields, please check it",
-        };
+      if (itemlist.indexOf(e) < 0) {
+        errors.push(
+          e +
+            " File header contains unknown fields (" +
+            e +
+            "), please check it\n"
+        );
+      }
     }
   });
+  //if thing column is not present, return an error
+  if (thingColumnIndex === -1)
+    errors.push("Thing column not found, please check the filename\n");
+
+  //in case of errors, return the error array
+  if (errors.length !== 0) return { errors: errors };
+
   //also check if all feature items are in header
   //add items indexes to items array
-  itemlist.map((item) => {
+  itemlist.forEach((item) => {
     let idx = header.indexOf(item);
     if (idx >= 0) {
       //1-indexed for description file
@@ -94,15 +111,15 @@ export async function csv_build_description(
           featureName +
           "\n"
       );
+      //add a placeholder for the missing item
       items.push("_");
     }
   });
-
-  const birthdate = Date(file.lastModified); // check if the format is okay
+  const birthdate = new Date(file.lastModified); // check if the format is okay
   //build description object
   let description = {
-    thing: thing, // i suppose that the thing name is on the first column
-    device: _device["_id"],
+    thing: thingColumnIndex, // i suppose that the thing name is on the first column
+    device: device["_id"],
     items: {},
     tags: tags,
     startdate: birthdate,

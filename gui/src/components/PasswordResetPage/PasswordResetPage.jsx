@@ -18,7 +18,7 @@ const tenantRef = React.createRef();
 const pswRef = React.createRef();
 const pswConfirmRef = React.createRef();
 
-export default function PasswordResetPage() {
+export default function PasswordResetPage({ tenants }) {
   //const { location, replace } = useHistory();
   const [msg, setMsg] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
@@ -39,12 +39,12 @@ export default function PasswordResetPage() {
       const res = await getPasswordStrength();
       requiredStr = res.response.data.passwordStrength;
     } catch (error) {
-      console.log(error);
+      console.error(error);
       //Required password strength cannot be acquired from the server, use the default
       requiredStr = 1;
     }
 
-    const tenant = tenantRef.current.value;
+    const tenant = tenants.length === 1 ? tenants[0] : tenantRef.current.value;
     const psw = pswRef.current.value;
     const pswConfirm = pswConfirmRef.current.value;
 
@@ -77,7 +77,7 @@ export default function PasswordResetPage() {
       if (resp.response.status === 200) setMsg(locale().password_changed);
       else setMsg(locale().password_not_changed_errors);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       if (error.error.message === "Network Error") {
         setMsg(locale().network_error);
         return;
@@ -108,14 +108,21 @@ export default function PasswordResetPage() {
             </Row>
             <Row>
               <Col>
-                <Form.Group className="mb-3" controlId="tenant">
-                  <Form.Label>{locale().tenant}</Form.Label>
-                  <Form.Control
-                    ref={tenantRef}
-                    type="text"
-                    placeholder={locale().tenant_suggestion}
-                  />
-                </Form.Group>
+                {tenants.length > 1 && (
+                  <Form.Group className="mb-3" controlId="tenant">
+                    <Form.Label>{locale().tenant}</Form.Label>
+                    <Form.Select
+                      aria-label={locale().tenant_suggestion}
+                      ref={tenantRef}
+                    >
+                      {React.Children.toArray(
+                        tenants.map((t) => {
+                          return <option value={t}>{t}</option>;
+                        })
+                      )}
+                    </Form.Select>
+                  </Form.Group>
+                )}
               </Col>
             </Row>{" "}
             {(searchParams.get("token") === null ||

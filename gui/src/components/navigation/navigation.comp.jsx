@@ -8,17 +8,6 @@ import "./navigation.scss";
 import locale from "../../common/locale";
 import { refreshToken } from "../../services/http_operations";
 import { LogOut } from "../../services/misc_functions";
-import fontawesome from "@fortawesome/fontawesome";
-import {
-  faTimes,
-  faBars,
-  faUserTie,
-  faUserGraduate,
-  faUserCog,
-  faUserTag,
-  faUser,
-  faCheck,
-} from "@fortawesome/fontawesome-free-solid";
 
 import {
   pages,
@@ -30,16 +19,6 @@ import {
 import { LanguageSelector } from "../languageSelector/languageSelector";
 import { canDo } from "../../services/userRolesManagement";
 import { Capitalize } from "../../services/misc_functions";
-fontawesome.library.add(
-  faTimes,
-  faBars,
-  faUserTie,
-  faUserGraduate,
-  faUserCog,
-  faUserTag,
-  faUser,
-  faCheck
-);
 
 let intervalRef = React.createRef();
 let loginTime = React.createRef();
@@ -304,36 +283,7 @@ export default function Navigation() {
                 Remove History Steps
               </NavLink>
             )}
-          {operationPages.includes("uploadquestionnaire") &&
-            canDo(role.current, "measurements", "create") &&
-            (restrictionPages["uploadquestionnaire"] === undefined ||
-              restrictionPages["uploadquestionnaire"].includes(
-                role.current
-              )) && (
-              <NavLink
-                to={`/uploadquestionnaire`}
-                className={(navData) => (navData.isActive ? "active" : "")}
-                //activeClassName="active"}
-                onClick={() => setIsOpened(false)}
-              >
-                Upload Questionnaires
-              </NavLink>
-            )}
-          {operationPages.includes("downloadquestionnaire") &&
-            canDo(role.current, "measurements", "get") &&
-            (restrictionPages["downloadquestionnaire"] === undefined ||
-              restrictionPages["downloadquestionnaire"].includes(
-                role.current
-              )) && (
-              <NavLink
-                to={`/downloadquestionnaire`}
-                className={(navData) => (navData.isActive ? "active" : "")}
-                //activeClassName="active"}
-                onClick={() => setIsOpened(false)}
-              >
-                Download Questionnaires
-              </NavLink>
-            )}
+
           {operationPages.includes("uploadmeasurements") &&
             canDo(role.current, "measurements", "create") &&
             (restrictionPages["uploadmeasurements"] === undefined ||

@@ -1,34 +1,66 @@
 import React from "react";
 import locale from "../../common/locale";
 import { Button, Form, Accordion, Table } from "react-bootstrap";
+import Papa from "papaparse";
 
 export const FormFile = (props) => {
-  //return "loading" if something is undefined
-  /*console.log({
-    submit: props.submitFunction,
-    back: props.backFunction,
-    setContHead: props.setContentHeader,
-    setContBdy: props.setContentBody,
-    setContPln: props.setContentPlain,
-    setFl: props.setFile,
-    contBod: props.contentBody,
-    contPln: props.contentPlain,
-    contHdr: props.contentHeader,
-  });*/
   if (
     props.submitFunction === undefined ||
     props.backFunction === undefined ||
-    props.setContentHeader === undefined ||
     props.setContentPlain === undefined ||
-    props.setContentBody === undefined ||
-    props.setFile === undefined ||
-    props.contentBody === undefined ||
+    props.setCsvContent === undefined ||
+    props.csvContent === undefined ||
     props.contentPlain === undefined ||
-    props.contentHeader === undefined ||
     props.setMsg === undefined ||
     props.setIsError === undefined
   )
     return "Loading";
+
+  const fileSubmitHandle = (e) => {
+    if (
+      e.target.files === null ||
+      e.target.files === undefined ||
+      e.target.files === "" ||
+      e.target.files[0] === undefined
+    ) {
+      props.setFile(null);
+      props.setCsvContent(null);
+      return;
+    }
+    const _file = e.target.files[0];
+    props.setFile(_file);
+    const fileReader = new FileReader();
+
+    fileReader.onloadend = () => {
+      const content = fileReader.result;
+
+      if (_file.name.endsWith(".csv")) {
+        const _file = e.target.files[0];
+        Papa.parse(_file, {
+          preview: 11,
+          complete: function (results) {
+            props.setCsvContent(results.data);
+            props.setContentPlain(null);
+          },
+        });
+      }
+      if (_file.name.endsWith(".json")) {
+        try {
+          const contentPlain = JSON.stringify(JSON.parse(content), null, 4);
+          props.setCsvContent(null);
+          props.setContentPlain(contentPlain);
+          props.setMsg("");
+          props.setIsError(false);
+        } catch (error) {
+          props.setMsg(
+            "The selected file cannot be parsed as JSON because it contains errors. Please select another file or fix it before uploading"
+          );
+          props.setIsError(true);
+        }
+      }
+    };
+    fileReader.readAsText(_file);
+  };
 
   return (
     <Form onSubmit={props.submitFunction}>
@@ -40,46 +72,9 @@ export const FormFile = (props) => {
         type="file"
         accept=".csv, .json"
         label="File"
-        onChange={(e) => {
-          const file = e.target.files[0];
-          props.setFile(file);
-          const fileReader = new FileReader();
-
-          fileReader.onloadend = () => {
-            const content = fileReader.result;
-            if (file.name.endsWith(".csv")) {
-              const regex = new RegExp("\\r", "g");
-              let splitted = content.replace(regex, "").split("\n");
-
-              props.setContentHeader(splitted[0]);
-              splitted.splice(0, 1);
-              props.setContentBody(splitted);
-              props.setContentPlain(null);
-            }
-            if (file.name.endsWith(".json")) {
-              try {
-                const contentPlain = JSON.stringify(
-                  JSON.parse(content),
-                  null,
-                  4
-                );
-                props.setContentHeader(null);
-                props.setContentBody(null);
-                props.setContentPlain(contentPlain);
-                props.setMsg("");
-                props.setIsError(false);
-              } catch (error) {
-                props.setMsg(
-                  "The selected file cannot be parsed as JSON because it contains errors. Please select another file or fix it before uploading"
-                );
-                props.setIsError(true);
-              }
-            }
-          };
-          fileReader.readAsText(file);
-        }}
+        onChange={fileSubmitHandle}
       />
-      {props.contentBody !== null && props.contentHeader !== null && (
+      {props.csvContent !== null && props.contentPlain === null && (
         <Accordion>
           <Accordion.Item eventKey="0">
             <Accordion.Header>{locale().file_content}</Accordion.Header>
@@ -94,7 +89,7 @@ export const FormFile = (props) => {
                 <thead>
                   <tr>
                     {React.Children.toArray(
-                      props.contentHeader.split(",").map((h) => {
+                      props.csvContent[0].map((h) => {
                         return <th>{h}</th>;
                       })
                     )}
@@ -102,11 +97,11 @@ export const FormFile = (props) => {
                 </thead>
                 <tbody>
                   {React.Children.toArray(
-                    props.contentBody.map((e) => {
+                    props.csvContent.slice(1).map((e) => {
                       return (
                         <tr>
                           {React.Children.toArray(
-                            e.split(",").map((h) => {
+                            e.map((h) => {
                               return <td>{h}</td>;
                             })
                           )}
@@ -120,7 +115,7 @@ export const FormFile = (props) => {
           </Accordion.Item>
         </Accordion>
       )}
-      {props.contentPlain !== null && (
+      {props.contentPlain !== null && props.csvContent === null && (
         <Accordion>
           <Accordion.Item eventKey="0">
             <Accordion.Header>{locale().file_content}</Accordion.Header>

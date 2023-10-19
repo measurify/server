@@ -1,6 +1,6 @@
 import { GetToken, api_url } from "./http_operations";
 import { instance } from "./http_operations";
-import { GetPrefixFilename, prefixFileSeparator } from "./file_operations";
+import { GetPrefixName, prefixFileSeparator } from "./file_operations";
 import { saveAs } from "file-saver";
 export let logsManager = {
   PushLog: (obj) => {},
@@ -26,7 +26,7 @@ export function testLogger() {
 //upload file containing history steps
 export async function postHistoryFile(file, ovd, csvSep, arrSep, floatSep) {
   const filename = file.name;
-  const expName = GetPrefixFilename(file);
+  const expName = GetPrefixName(file);
 
   const data = new FormData();
   data.append("file", file);
@@ -78,7 +78,6 @@ export async function postHistoryFile(file, ovd, csvSep, arrSep, floatSep) {
         " ]\n",
     });
   } catch (error) {
-    console.log("error in response");
     logsManager.PushLog({
       type: "error",
       msg:
@@ -125,7 +124,6 @@ export async function postHistoryStep(expName, body, ovd) {
         " ]\n",
     });
   } catch (error) {
-    console.log("error in response");
     logsManager.PushLog({
       type: "error",
       msg:
@@ -175,7 +173,7 @@ export async function downloadHistory(
     });
     return file;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 
@@ -193,8 +191,7 @@ export async function getCSV(resource_path, headers = {}) {
     response = await instance(config);
     return response.data;
   } catch (error) {
-    console.log("error in response");
-    console.log(error);
+    console.error(error);
     logsManager.PushLog({
       type: "error",
       msg:
@@ -227,8 +224,7 @@ export async function deleteHistorySteps(selected, toDelete) {
       msg: "Successfully deleted steps with id: " + toDelete.join(" - ") + "\n",
     });
   } catch (error) {
-    console.log("error in response");
-    console.log(error);
+    console.error(error);
     logsManager.PushLog({
       type: "error",
       msg:
@@ -247,13 +243,17 @@ export async function downloadMeasurements(
   arrSep,
   floatSep,
   limit = -1,
+  rename = undefined,
   select = [],
   compress = undefined
 ) {
-  console.log({ feature, csvSep, arrSep, floatSep, limit, select, compress });
+  console.log({ feature, csvSep, arrSep, floatSep, limit, rename, select });
   let url = 'measurements/?filter={"feature":"' + feature + '"}&limit=' + limit;
   if (select.length !== 0) {
     url = url + '&select=["' + select.join('","') + '"]';
+  }
+  if (rename !== undefined) {
+    url = url + "&rename=" + JSON.stringify(rename);
   }
 
   url =
@@ -277,6 +277,58 @@ export async function downloadMeasurements(
     });
     return file;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
+}
+
+export function calculateAggregatedKPI(
+  measurements,
+  devices,
+  device,
+  deviceFeatures = undefined
+) {
+  const _measurements = measurements.filter(
+    (m) => !m.feature.includes("_description") && m.device === device
+  );
+  const _aggregated = [];
+  const _device = devices.find((d) => d._id === device);
+  _device.features
+    .filter((f) => !f.includes("_description"))
+    .forEach((f) => {
+      if (_measurements.filter((m) => m.feature === f).length === 0) return;
+      const _measValues = _measurements
+        .filter((m) => m.feature === f)
+        .map((m) => m.samples[0].values);
+      const feat = deviceFeatures.find((df) => df._id === f);
+      const l = _measValues[0].length;
+      const _maxs = Array(l).fill(0);
+      const _mins = Array(l).fill(0);
+      const _means = Array(l).fill(0);
+      const _stds = Array(l).fill(0);
+      for (let i = 0; i < l; i++) {
+        _maxs[i] = Math.max(..._measValues.map((v) => v[i]));
+        _mins[i] = Math.min(..._measValues.map((v) => v[i]));
+        _means[i] =
+          _measValues.map((v) => v[i]).reduce((a, b) => a + b, 0) /
+          _measValues.length;
+        _stds[i] = Math.sqrt(
+          _measValues.map((v) => v[i]).reduce((a, b) => a + b, 0) /
+            _measValues.length
+        );
+      }
+      _aggregated.push({
+        device: device,
+        feature: f,
+        techRQs: feat.description,
+        techKpi: feat.items.map((i) => i.name),
+        techLoggingReqs: feat.items.map((i) => i.description),
+        kpiIndex: f.split("_")[1],
+        maxs: _maxs,
+        mins: _mins,
+        means: _means,
+        stds: _stds,
+      });
+    });
+
+  return _aggregated;
 }
