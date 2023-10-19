@@ -13,7 +13,7 @@ services:
         - ./resources:/resources   
     restart: always
   database:
-    image: mongo
+    image: mongo:5.0
     container_name: database
     volumes:
         - ./data:/data/db

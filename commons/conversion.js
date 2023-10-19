@@ -213,13 +213,14 @@ exports.jsonToCSVPlus = function (jsonData, columnsname, query) {
     return str;
 }
 
-exports.jsonToCSV = function (jsonData) {
+exports.jsonToCSV = function (jsonData, model) {
     if (!process.env.CSV_DELIMITER) process.env.CSV_DELIMITER = ',';
     if (!process.env.CSV_VECTOR_DELIMITER) process.env.CSV_VECTOR_DELIMITER = ';';
     jsonData = JSON.stringify(jsonData.docs);
     jsonData = typeof jsonData !== "object" ? JSON.parse(jsonData) : jsonData;
     if (!jsonData.length) throw new Error('Not found any element')
-    const keys = Object.keys(jsonData[0]);
+    let keys = Object.keys(jsonData[0]);
+    if(model && model.modelName=="Timesample"){keys= keys.filter(function(key) {return key !== "_id";});}
     let csv = keys.join(process.env.CSV_DELIMITER) + "\n";//header
     jsonData.forEach(doc => {
         let arr = [];
@@ -295,6 +296,39 @@ exports.getInPdDataframe = async function (filter, sort, select, page, limit, mo
         ]
     ).option(options);
     //list.push({"page":page,"limit":limit}); //for the pagination    
+    return list;
+}
+
+exports.getTimeseriesDataframe = async function (query, sort, select, page, limit, model, restrictions) {
+    if (!query.sort) query.sort = sort;
+    if(query.select) select = prepareSelect(select, query.select);
+    if (!page) page = '1';
+    if (!limit) limit = '10';
+    let filter = '{}';
+    if (!sort) sort = '{ "timestamp": "desc" }';
+    if (!select) select = {};
+    filter = prepareFilter(filter, restrictions);
+    const options = {
+        select: select,
+        sort: JSON.parse(sort),
+        page: parseInt(page),
+        limit: parseInt(limit)
+    }
+    let list = await model.aggregate(
+        [
+            //{ $match: filter },
+            { $skip: (parseInt(page) - 1) * parseInt(limit) },
+            { $limit: parseInt(limit) },
+            {
+                $group: {
+                    _id: null,"values": { $push: "$values" }, "timestamp": { $push: "$timestamp" }
+                }
+            }
+        ]
+    ).option(options);
+    //list.push({"page":page,"limit":limit}); //for the pagination  
+    list=list[0];
+    delete list._id;
     return list;
 }
 
