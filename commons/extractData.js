@@ -124,27 +124,34 @@ exports.transposeCsv = function (text) {
 }
 
 const addHistory = function (req, res, fileText, modelName) {
-    if (!fileText.header.includes("step") && !fileText.header.includes("Step")) return errors.manage(res, errors.wrong_header, "Needed step row in the csv");
-    let body = {
-        "history": { "add": [] }
-    }
-    let data = fileText.data;
-    for (let element of data) {
-        let obj = { "fields": [] };
-        arr = element.split(process.env.CSV_DELIMITER).map(el => el.replace(/^\s+|\s+$/g, ""));
-        if (arr[fileText.header.indexOf("step")].replace(/\s/g, '')) {
-            for (let el in arr) {
-                if (fileText.header[el].toLowerCase() === "step" || fileText.header[el].toLowerCase() === "timestamp") { obj[fileText.header[el].toLowerCase()] = arr[el] }
-                else { if (arr[el]&&arr[el]!=="[]") { obj.fields.push({ "name": fileText.header[el], "value": arr[el] }) } }
-            }
-            body.history.add.push(obj);
+    try{
+        let headerLength=fileText.header.length;
+        if (!fileText.header.includes("step") && !fileText.header.includes("Step")) return errors.manage(res, errors.wrong_header, "Needed step row in the csv");
+        fileText.header.includes("Step") ? fileText.header[fileText.header.indexOf("Step")] = "step" : null;
+        let body = {
+            "history": { "add": [] }
         }
+        let data = fileText.data;
+        for (let element of data) {
+            let obj = { "fields": [] };
+            arr = element.split(process.env.CSV_DELIMITER).map(el => el.replace(/^\s+|\s+$/g, ""));
+            if (arr[fileText.header.indexOf("step")].replace(/\s/g, '')) {
+                if(arr.length>headerLength)return errors.manage(res, errors.file_history_error, "The step "+arr[fileText.header.indexOf("step")]+" contains too many elements. Expected: equal or less than "+headerLength+" , got "+arr.length+" . Please check that the separators are correct (Possible error: Check for array separators and decimal separators)");
+                for (let el in arr) {
+                    if (fileText.header[el].toLowerCase() === "step" || fileText.header[el].toLowerCase() === "timestamp") { obj[fileText.header[el].toLowerCase()] = arr[el] }
+                    else { if (arr[el]&&arr[el]!=="[]") { obj.fields.push({ "name": fileText.header[el], "value": arr[el] }) } }
+                }
+                body.history.add.push(obj);
+            }
+        }
+        if(body.history.add.length==0)return errors.manage(res, errors.file_history_empty); 
+        req.body = body;
+        let controllerName = modelName.toLowerCase();
+        const controller = require('../controllers/' + controllerName + 'Controller');
+        return controller.put(req, res);
     }
-    if(body.history.add.length==0)return errors.manage(res, errors.file_history_empty); 
-    req.body = body;
-    let controllerName = modelName.toLowerCase();
-    const controller = require('../controllers/' + controllerName + 'Controller');
-    return controller.put(req, res);
+    catch(err){return errors.manage(res, errors.file_history_error, err);}
+    
 }
 
 const replaceSeparator = function (fileData, query) {    

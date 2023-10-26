@@ -53,6 +53,7 @@ exports.file_history_empty                   = { status: 400, value: 50, message
 exports.restricted_access_operation          = { status: 403, value: 51, message: 'You cannot do this operation on the resource' };
 exports.separatorError                       = { status: 403, value: 52, message: 'Problem with selected separators' };
 exports.demo_tenant_required                 = { status: 403, value: 53, message: 'Demo routes only work in the demo tenant: '+process.env.DEFAULT_TENANT_DEMO };
+exports.file_history_error                   = { status: 400, value: 54, message: 'Error in file history'}; 
 
 
 exports.manage = function(res, error, more) {
