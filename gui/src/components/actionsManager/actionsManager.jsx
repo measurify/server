@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { viewFields } from "../../configManager";
 import { NavLink } from "react-router-dom";
 
@@ -180,7 +180,9 @@ export default function ActionManager(props) {
         style={{
           width: 20 + "vw",
           minWidth:
-            /Mobi/i.test(window.navigator.userAgent) == true ? 250 : 400 + "px",
+            /Mobi/i.test(window.navigator.userAgent) === true
+              ? 250
+              : 400 + "px",
         }}
       >
         <Popover.Header as="h3">View Resource</Popover.Header>

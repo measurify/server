@@ -6,10 +6,7 @@ import {
   get_generic,
   post_file_generic,
 } from "../../services/http_operations";
-import {
-  isDefault,
-  removeDefaultElements,
-} from "../../services/misc_functions";
+import { removeDefaultElements } from "../../services/misc_functions";
 import { useSearchParams } from "react-router-dom";
 
 import { useNavigate } from "react-router-dom";
@@ -267,12 +264,12 @@ export default function AddExperimentPage(props) {
         tmpValues["startDate"] !== ""
       ) {
         const dt = new Date(tmpValues["startDate"]);
-        var timestamp = dt.getTime() - dt.getTimezoneOffset() * 60000;
+        const timestamp = dt.getTime() - dt.getTimezoneOffset() * 60000;
         tmpValues["startDate"] = new Date(timestamp).toISOString();
       }
       if (tmpValues["endDate"] !== undefined && tmpValues["endDate"] !== "") {
         const dt = new Date(tmpValues["endDate"]);
-        var timestamp = dt.getTime() - dt.getTimezoneOffset() * 60000;
+        const timestamp = dt.getTime() - dt.getTimezoneOffset() * 60000;
         tmpValues["endDate"] = new Date(timestamp).toISOString();
       }
     } catch (error) {

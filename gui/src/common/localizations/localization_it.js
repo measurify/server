@@ -30,7 +30,7 @@ const localization_it = {
   add_tenant: "Aggiungi organizzazione",
 
   //Homepage
-  welcome_hp: "Benvenuto nel pannello di controllo di Measurify!",
+  welcome_hp: "Benvenuto!",
   left_bar_descr_hp:
     "Nella barra a sinistra sono presenti le informazioni relative al tuo account e i collegamenti alle pagine.",
   right_bar_descr_hp:

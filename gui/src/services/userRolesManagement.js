@@ -1,11 +1,5 @@
 import { get_one_generic } from "./http_operations";
-import {
-  ResetConfig,
-  LoadConfig,
-  operationPages,
-  pages,
-  restrictionPages,
-} from "../configManager";
+import { operationPages, pages, restrictionPages } from "../configManager";
 
 //variable to store role as a simple cache
 let roleCache = undefined;

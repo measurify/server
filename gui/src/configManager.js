@@ -1,4 +1,5 @@
-import Complete_configuration from "./configs/complete_config";
+import Development_config from "./configs/complete_config";
+import Students_configuration from "./configs/students";
 
 //this script manages several configuration according to the tenant name
 //config dictionaries are imported into variables exportedwithin this script once the login has been successful
@@ -13,7 +14,13 @@ export let base_api_url = undefined;
 //export const base_api_url = undefined;
 
 //name of this dashboard, shown to users
-export const website_name = "Measurify Dashboard";
+export let website_name = undefined;
+
+//show the details in the left bar
+export let show_left_bar_details = undefined;
+
+//show the right bar with the notification bell
+export let show_notification_bar = undefined;
 
 //languages enabled for this GUI, only english "en" and italian "it" are supported with this version
 //if no languages are enabled, the GUI will be localized in english
@@ -86,6 +93,8 @@ export function ResetConfig() {
   //clear all the fields from objects and empty arrays while keeping references
   operationPages.length = 0;
   base_api_url = undefined;
+  website_name = undefined;
+  show_notification_bar = undefined;
   Object.keys(pages).forEach((key) => delete pages[key]);
   Object.keys(aliasPages).forEach((key) => delete aliasPages[key]);
   Object.keys(restrictionPages).forEach((key) => delete restrictionPages[key]);
@@ -121,11 +130,26 @@ export function LoadConfig() {
   const type = WhatAmI();
   let conf;
   switch (type) {
+    case "STUDENTS":
+      conf = Students_configuration();
+      break;
     case "unknown":
     default:
-      conf = Complete_configuration();
+      //demo kpi configuration
+      //conf = QS_configuration();
+      conf = Development_config();
       break;
   }
+
+  base_api_url = conf.base_api_url;
+
+  if (localStorage.getItem("overrideConfig") !== null) {
+    conf = Development_config(false);
+  }
+
+  website_name = conf.website_name;
+  show_notification_bar = conf.show_notification_bar;
+  show_left_bar_details = conf.show_left_bar_details;
 
   Object.assign(operationPages, conf.operationPages);
   Object.assign(pages, conf.pages);
@@ -142,13 +166,18 @@ export function LoadConfig() {
   Object.assign(fetchedPageData, conf.fetchedPageData);
   Object.assign(guidelines, conf.guidelines);
 
-  base_api_url = conf.base_api_url;
-
   return;
 }
 
 //this function return the type of database "EM","QS", etc, according to host name
 export function WhatAmI() {
+  const { hostname } = window.location; //, href, origin, pathname, port, protocol, search  host,
+
+  const splitted = hostname.split(".");
+  const secondaryDomain = splitted[0];
+
+  if (secondaryDomain.startsWith("students")) return "STUDENTS";
+
   return "unknown";
 }
 
@@ -156,6 +185,7 @@ export function WhatAmI() {
 export function FilterTenantNames(tenants) {
   const type = WhatAmI();
   switch (type) {
+    case "unknown":
     default:
       return tenants;
   }

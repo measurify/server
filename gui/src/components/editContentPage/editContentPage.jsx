@@ -22,7 +22,6 @@ import AppContext from "../../context";
 import {
   sortObject,
   maintainEmptyElement,
-  maintainEmptyElements,
 } from "../../services/objects_manipulation";
 import locale from "../../common/locale";
 
@@ -353,14 +352,12 @@ export default function EditContentPage(props) {
       setMsg(locale().no_changes_found);
       return;
     }
-    let res;
+
     try {
       const resp = await put_generic(resource, toSend, id);
-      res = resp.response;
       window.alert(locale().resource_successfully_edited);
       navigate("/" + resource);
     } catch (error) {
-      res = error.error.response;
       //add details
       setMsg(
         error.error.response.data.message +

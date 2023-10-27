@@ -18,7 +18,7 @@ let username = React.createRef();
 let tenant = React.createRef();
 
 export default function HorizontalNavigationBar() {
-  const [isOpened, setIsOpened] = useState(false);
+  //const [isOpened, setIsOpened] = useState(false);
 
   const usr = localStorage.getItem("username");
   const rl = localStorage.getItem("user-role");
@@ -128,7 +128,7 @@ export default function HorizontalNavigationBar() {
                         }
                         //activeClassName="active"
                         key={k}
-                        onClick={() => setIsOpened(false)}
+                        //onClick={() => setIsOpened(false)}
                       >
                         {Capitalize(k)}
                       </NavLink>

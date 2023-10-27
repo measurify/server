@@ -165,5 +165,6 @@ export function LogOut() {
   localStorage.removeItem("user-email");
   localStorage.removeItem("user-role");
   localStorage.removeItem("username");
+  localStorage.removeItem("overrideConfig");
   document.location.replace("/");
 }

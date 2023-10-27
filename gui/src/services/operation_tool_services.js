@@ -216,9 +216,8 @@ export async function deleteHistorySteps(selected, toDelete) {
     data: { history: { remove: toDelete } },
   };
 
-  let response;
   try {
-    response = await instance(config);
+    await instance(config);
     logsManager.PushLog({
       type: "info",
       msg: "Successfully deleted steps with id: " + toDelete.join(" - ") + "\n",
@@ -247,7 +246,6 @@ export async function downloadMeasurements(
   select = [],
   compress = undefined
 ) {
-  console.log({ feature, csvSep, arrSep, floatSep, limit, rename, select });
   let url = 'measurements/?filter={"feature":"' + feature + '"}&limit=' + limit;
   if (select.length !== 0) {
     url = url + '&select=["' + select.join('","') + '"]';
@@ -270,6 +268,30 @@ export async function downloadMeasurements(
     } else {
       file = new File([blob], fileName);
     }
+
+    logsManager.PushLog({
+      type: "info",
+      msg: fileName + " successfully downloaded.\n",
+    });
+    return file;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+//download questionnaires/measurements
+export async function downloadTimeserie(measurement, csvSep, arrSep, floatSep) {
+  let url = "measurements/" + measurement + "/timeserie";
+
+  url =
+    url + "?sep=" + csvSep + "&sepArray=" + arrSep + "&sepFloat=" + floatSep;
+  const fileName = measurement + prefixFileSeparator + ".csv";
+
+  try {
+    const data = await getCSV(url, { Accept: "text/csv" });
+    const blob = new Blob([data]);
+    let file = null;
+    saveAs(blob, fileName);
 
     logsManager.PushLog({
       type: "info",

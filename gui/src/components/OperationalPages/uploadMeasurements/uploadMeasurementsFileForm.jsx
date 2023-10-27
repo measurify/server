@@ -1,15 +1,5 @@
-import React, { useEffect, useState, useContext } from "react";
-import {
-  Button,
-  Form,
-  Container,
-  Row,
-  Col,
-  Accordion,
-  Table,
-  ProgressBar,
-  Nav,
-} from "react-bootstrap";
+import React, { useState } from "react";
+import { Button, Form, Row, Col, Accordion, Table } from "react-bootstrap";
 import locale from "../../../common/locale";
 import Papa from "papaparse";
 export default function UploadMeasurementsFileForm(props) {

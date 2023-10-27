@@ -1,25 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import locale from "../../common/locale";
-import {
-  post_generic,
-  get_generic,
-  post_file_generic,
-} from "../../services/http_operations";
-import { useSearchParams } from "react-router-dom";
 
-import { useNavigate } from "react-router-dom";
-
-import {
-  Form,
-  Nav,
-  Accordion,
-  Container,
-  Row,
-  Col,
-  Button,
-} from "react-bootstrap";
-import { FormManager } from "../formManager/formManager";
-import { FormFile } from "../formFileComp/formFile";
+import { Form, Accordion, Container, Row, Col, Button } from "react-bootstrap";
 
 import { saveAs } from "file-saver";
 
@@ -39,7 +21,7 @@ export default function ImportExportValues(props) {
           <Container>
             <Row>
               <Col sm={6}>
-                <Form onSubmit={() => props.importValues(content)}>
+                <Form>
                   <Row>
                     <b>Import configuration from json file</b>
                   </Row>
@@ -82,7 +64,13 @@ export default function ImportExportValues(props) {
                   </Row>
                   <Row>
                     <Col>
-                      <Button type="submit" variant="success">
+                      <Button
+                        variant="success"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          props.importValues(content);
+                        }}
+                      >
                         Load
                       </Button>
                     </Col>

@@ -1,11 +1,7 @@
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
-import {
-  isDefault,
-  removeDefaultElements,
-  nonDefaultLength,
-} from "./misc_functions";
+import { nonDefaultLength } from "./misc_functions";
 const XLSX = require("xlsx");
 const cloneDeep = require("clone-deep");
 

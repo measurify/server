@@ -70,6 +70,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.16.7",
     "@types/clone-deep": "^4.0.2",
     "@types/file-saver": "^2.0.5",
     "@types/papaparse": "^5.3.9",

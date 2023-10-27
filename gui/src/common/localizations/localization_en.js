@@ -30,7 +30,7 @@ const localization_en = {
   add_tenant: "Add tenant",
 
   //Homepage
-  welcome_hp: "Welcome to the Administration dashboard!",
+  welcome_hp: "Welcome!",
   left_bar_descr_hp:
     "The left bar contains the information about your account and  the list of tabs",
   right_bar_descr_hp:

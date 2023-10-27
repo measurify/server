@@ -1,9 +1,9 @@
-//the exported configuration for EM database
 import { isFeatureInUse, alwaysTrue } from "../services/validations";
 
-export default function Complete_configuration() {
-  const base_api_url = "https://localhost/v1";
-  const website_name = "Measurify Dashboard";
+export default function Development_config(overrideUrl = true) {
+  const base_api_url =
+    overrideUrl === true ? "https://localhost/v1" : undefined;
+  const website_name = "Database";
   const show_notification_bar = true;
   const show_left_bar_details = true;
   //operation pages
@@ -15,6 +15,7 @@ export default function Complete_configuration() {
     "removesteps",
     "uploadmeasurements",
     "downloadmeasurements",
+    "downloadtimeseries",
   ];
 
   //dictionary of pages: key is the route for the API REST, value is an array that contains the fields shown to users
