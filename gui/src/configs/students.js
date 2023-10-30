@@ -64,6 +64,7 @@ export default function Students_configuration() {
   restrictionPages["updatehistory"] = ["admin"];
   restrictionPages["downloadexperiment"] = ["admin"];
   restrictionPages["removesteps"] = ["admin"];
+  restrictionPages["downloadtimeseries"] = ["admin"];
 
   //actions dictionary: key is the page, value is an array that contains actions || working actions arae "view" | "edit" | "delete" | "duplicate"
   const pageActions = {};
