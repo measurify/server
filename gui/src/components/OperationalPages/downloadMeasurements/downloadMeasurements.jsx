@@ -5,10 +5,7 @@ import {
   Container,
   Row,
   Col,
-  Accordion,
-  Table,
   ProgressBar,
-  Nav,
 } from "react-bootstrap";
 import locale from "../../../common/locale";
 import { downloadMeasurements } from "../../../services/operation_tool_services";
@@ -17,7 +14,6 @@ import "../../page/page.scss";
 import { get_generic } from "../../../services/http_operations";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
-const cloneDeep = require("clone-deep");
 
 const questionnaireSelectRef = React.createRef();
 const csvSepRef = React.createRef();

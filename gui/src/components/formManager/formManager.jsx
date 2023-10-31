@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import locale from "../../common/locale";
 import { nonDefaultLength, Capitalize } from "../../services/misc_functions";
 import { Button, Form, Accordion, Container, Row, Col } from "react-bootstrap";

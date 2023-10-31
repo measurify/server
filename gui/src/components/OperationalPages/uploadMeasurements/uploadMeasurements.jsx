@@ -1,20 +1,9 @@
-import React, { useEffect, useState, useContext } from "react";
-import {
-  Button,
-  Form,
-  Container,
-  Row,
-  Col,
-  Accordion,
-  Table,
-  ProgressBar,
-  Nav,
-} from "react-bootstrap";
+import React, { useState, useContext } from "react";
+import { Container, Row, Col, ProgressBar } from "react-bootstrap";
 import AppContext from "../../../context";
 import "../../page/page.scss";
 import UploadMeasurementsFileForm from "./uploadMeasurementsFileForm";
 import { postCsvFileWithDescriptionFile } from "../../../services/http_operations";
-import { csv_build_description } from "../../../services/file_operations";
 
 const arraySepRef = React.createRef();
 const floatSepRef = React.createRef();
@@ -80,7 +69,9 @@ export default function UploadMeasurementsPage() {
         type: "info",
         msg: "Uploading file " + file.name + "\n",
       });
+      console.log({ file, description });
       const response = await postCsvFileWithDescriptionFile(file, description);
+      console.log(response);
       if (response.status !== 200) {
         if (response?.data?.message !== undefined)
           myLogs.PushLog({

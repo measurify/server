@@ -6,7 +6,6 @@ import {
   Row,
   Col,
   ProgressBar,
-  Nav,
 } from "react-bootstrap";
 import locale from "../../../common/locale";
 import { deleteHistorySteps } from "../../../services/operation_tool_services";
@@ -24,7 +23,6 @@ export default function RemoveStepsPage() {
   const [experiments, setExperiments] = useState([]);
   const [experiment, setExperiment] = useState();
   const [steps, setSteps] = useState();
-  const [experimentIndex, setExperimentIndex] = useState();
   //message for user
   const [msg, setMsg] = useState("");
   const [isError, setIsError] = useState(false);
@@ -46,6 +44,8 @@ export default function RemoveStepsPage() {
   //handle changes on select experiment
   const handleExperimentChange = (e) => {
     const selected = e.target.value;
+    setMsg("");
+    setIsError(false);
     if (e.target.selectedIndex === 0) {
       setExperiment(undefined);
       setSteps(undefined);
@@ -60,12 +60,6 @@ export default function RemoveStepsPage() {
 
   //download history as CSV fules
   const deleteStepsHandler = async () => {
-    if (experimentIndex === 0) {
-      setMsg("Please, select one or All experiment");
-      setIsError(true);
-      return;
-    }
-
     let toRemove = [];
     let newSteps = [...steps];
     let definedSteps;
@@ -84,7 +78,7 @@ export default function RemoveStepsPage() {
     else {
       definedSteps = stepsString.replace(/\s/g, "").split(",");
       definedSteps.forEach((e) => {
-        if (e.includes("/")) {
+        if (e.includes("-")) {
           const interval = e.split("-");
           //search for the begin and end into step array
           const begin = steps.indexOf(parseInt(interval[0]));

@@ -159,17 +159,18 @@ export default function UpdateHistoryFileForm(props) {
         </Row>
       )}
       {csvSepGot !== undefined && csvSepGot !== props.csvSep && (
-        <Row>
+        <Row style={{ padding: 5 + "px" }}>
           <Col>
             <font
               style={{
                 marginLeft: 5 + "px",
-                color: "black",
+                color: "red",
               }}
             >
-              Warning: the selected separator '{props.csvSep}' is different from
-              the one detected in file '{csvSepGot}'. Please check if everything
-              is correct than submit the operation.
+              Warning: the selected separator '<b>{props.csvSep}</b>' is
+              different from the one detected in file '<b>{csvSepGot}</b>'.
+              Please check if all separators are correct, than submit the
+              operation.
             </font>
           </Col>
         </Row>

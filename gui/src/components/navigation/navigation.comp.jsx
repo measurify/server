@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 
 import { Button } from "react-bootstrap";
@@ -6,26 +6,17 @@ import { Button } from "react-bootstrap";
 import "./navigation.scss";
 
 import locale from "../../common/locale";
-import { refreshToken } from "../../services/http_operations";
 import { LogOut } from "../../services/misc_functions";
 
 import {
-  pages,
   languages,
   website_name,
-  operationPages,
-  restrictionPages,
+  show_left_bar_details,
 } from "../../configManager";
 import { LanguageSelector } from "../languageSelector/languageSelector";
 import { canDo } from "../../services/userRolesManagement";
 import { Capitalize } from "../../services/misc_functions";
-
-let intervalRef = React.createRef();
-let loginTime = React.createRef();
-
-let remainingSeconds = React.createRef();
-let duration = React.createRef();
-
+import { AccessiblePages } from "../../services/userRolesManagement";
 let role = React.createRef();
 let username = React.createRef();
 let tenant = React.createRef();
@@ -36,124 +27,59 @@ export default function Navigation() {
   const usr = localStorage.getItem("username");
   const rl = localStorage.getItem("user-role");
   const tn = localStorage.getItem("user-tenant");
-
   username.current = usr !== null ? usr : "";
   role.current = rl !== null ? rl : "";
   tenant.current = tn !== null && tn !== "" ? tn : "-";
 
-  //useeffect on change time
-  useEffect(() => {
-    //convert duration time in string format to milliseconds
-    function DurationToMilliSeconds() {
-      let exp = localStorage.getItem("token-expiration-time");
-
-      if (exp === null) return 300;
-      if (exp.endsWith("h")) {
-        return parseInt(exp.slice(0, -1)) * 60 * 60 * 1000;
-      } else if (exp.endsWith("m")) {
-        return parseInt(exp.slice(0, -1)) * 60 * 1000;
-      } else if (exp.endsWith("s")) {
-        return parseInt(exp.slice(0, -1)) * 1000;
-      }
-      //default case, right now the same as seconds
-      else {
-        return parseInt(exp.slice(0, -1)) * 1000;
-      }
-    }
-
-    //calculate remaining seconds and refresh token if required
-    function CalcEnding() {
-      let t0;
-      let remainingSec;
-      //if remaining time is already calculated, just decrement that number by 1
-      if (remainingSeconds.current !== null) {
-        remainingSec = remainingSeconds.current - 1;
-      }
-      //otherwise, calculate remaining seconds
-      else {
-        //check if login time is already defined, if it's null get it from localstorage or current time (refresh case)
-        if (loginTime.current === null) {
-          const retryLoginTime = localStorage.getItem("login-time");
-          //if localstorage containst login time, use it and store it into state
-          if (retryLoginTime !== null) {
-            loginTime.current = retryLoginTime;
-            t0 = parseInt(retryLoginTime, 10);
-          }
-          //otherwise get it from current time and store it into state
-          else {
-            t0 = Date.now();
-            loginTime.current = t0;
-          }
-        }
-        //use logintime stored into state
-        else {
-          t0 = parseInt(loginTime.current, 10);
-        }
-        if (duration.current === null)
-          duration.current = DurationToMilliSeconds();
-        const endTime = t0 + duration.current;
-
-        remainingSec = (endTime - Date.now()) / 1000;
-      }
-
-      if (remainingSec < 60) {
-        clearInterval(intervalRef.current);
-        refreshToken().then(() => {
-          remainingSeconds.current = null;
-          loginTime.current = null;
-
-          intervalRef.current = setInterval(() => {
-            CalcEnding();
-          }, 1000);
-          return;
-        });
-      }
-      if (remainingSec <= 0) {
-        LogOut();
-        //session expired, automatically logout
-        window.location.replace("/");
-        return;
-      }
-
-      //const mins = Math.floor(remainingSec / 60);
-      //const secs = Math.floor(remainingSec % 60);
-
-      remainingSeconds.current = parseInt(remainingSec, 10);
-    }
-
-    intervalRef.current = setInterval(() => {
-      CalcEnding();
-    }, 1000);
-  }, []);
-
   function renderIconRole() {
     if (role.current === "admin") {
       return (
-        <i className="fa fa-user-tie" aria-hidden="true" title="Admin"></i>
+        <React.Fragment>
+          {Capitalize(role.current)}{" "}
+          <i className="fa fa-user-tie" aria-hidden="true" title="Admin"></i>
+        </React.Fragment>
       );
     } else if (role.current === "provider") {
       return (
-        <i
-          className="fa fa-user-graduate"
-          aria-hidden="true"
-          title="Provider"
-        ></i>
+        <React.Fragment>
+          {Capitalize(role.current)}{" "}
+          <i
+            className="fa fa-user-graduate"
+            aria-hidden="true"
+            title="Provider"
+          ></i>
+        </React.Fragment>
       );
     } else if (role.current === "analyst") {
       return (
-        <i className="fa fa-user-cog" aria-hidden="true" title="Analyst"></i>
+        <React.Fragment>
+          {Capitalize(role.current)}{" "}
+          <i className="fa fa-user-cog" aria-hidden="true" title="Analyst"></i>
+        </React.Fragment>
       );
     } else if (role.current === "supplier") {
       return (
-        <i className="fa fa-user-tag" aria-hidden="true" title="Supplier"></i>
+        <React.Fragment>
+          {Capitalize(role.current)}{" "}
+          <i className="fa fa-user-tag" aria-hidden="true" title="Supplier"></i>
+        </React.Fragment>
       );
     } else {
       return (
-        <i className="fa fa-user" aria-hidden="true" aria-label="User"></i>
+        <React.Fragment>
+          {Capitalize(role.current)}{" "}
+          <i className="fa fa-user" aria-hidden="true" aria-label="User"></i>
+        </React.Fragment>
       );
     }
   }
-
+  const {
+    count,
+    numAccessibleResources,
+    accessibleResources,
+    numAccessibleOperations,
+    accessibleOperations,
+  } = AccessiblePages();
   return (
     <nav className="app-nav">
       <Button className="app-nav-opener" onClick={() => setIsOpened(!isOpened)}>
@@ -175,18 +101,22 @@ export default function Navigation() {
               {locale().welcome + " "}
               <b>{username.current}</b>
             </NavLink>
-            <div style={{ paddingLeft: 10 + "px" }}>
-              <h3>
-                {locale().role + " "}
-                {renderIconRole()}
-              </h3>
-            </div>
-            <div style={{ paddingLeft: 10 + "px" }}>
-              <h3>
-                {locale().tenant + " "}
-                <b>{tenant.current}</b>
-              </h3>
-            </div>
+            {show_left_bar_details === true && (
+              <React.Fragment>
+                <div style={{ paddingLeft: 10 + "px" }}>
+                  <h3>
+                    {locale().role + ": "}
+                    {renderIconRole()}
+                  </h3>
+                </div>
+                <div style={{ paddingLeft: 10 + "px" }}>
+                  <h3>
+                    {locale().tenant + " "}
+                    <b>{tenant.current}</b>
+                  </h3>
+                </div>
+              </React.Fragment>
+            )}
             <br />
             <div style={{ paddingLeft: 20 + "px", paddingBottom: 20 + "px" }}>
               <Button variant="outline-danger" onClick={() => LogOut()}>
@@ -202,12 +132,7 @@ export default function Navigation() {
               </React.Fragment>
             )}
           </div>
-          {Object.keys(pages).filter(
-            (k) =>
-              canDo(role.current, k, "read") &&
-              (restrictionPages[k] === undefined ||
-                restrictionPages[k].includes(role.current))
-          ).length !== 0 && (
+          {count !== 1 && numAccessibleResources !== 0 && (
             <React.Fragment>
               <hr />
               <div className="app-nav-text">{locale().resources}</div>
@@ -215,52 +140,41 @@ export default function Navigation() {
             </React.Fragment>
           )}
 
-          {Object.keys(pages)
-            .filter(
-              (k) =>
-                canDo(role.current, k, "read") &&
-                (restrictionPages[k] === undefined ||
-                  restrictionPages[k].includes(role.current))
-            )
-            .map((k) => {
-              return (
-                <NavLink
-                  to={`/` + k}
-                  className={(navData) => (navData.isActive ? "active" : "")}
-                  //activeClassName="active"
-                  key={k}
-                  onClick={() => setIsOpened(false)}
-                >
-                  {Capitalize(k)}
-                </NavLink>
-              );
-            })}
-          {operationPages.length !== 0 && (
+          {accessibleResources.map((k) => {
+            return (
+              <NavLink
+                to={`/` + k}
+                className={(navData) => (navData.isActive ? "active" : "")}
+                //activeClassName="active"
+                key={k}
+                onClick={() => setIsOpened(false)}
+              >
+                {Capitalize(k)}
+              </NavLink>
+            );
+          })}
+          {count !== 1 && numAccessibleOperations !== 0 && (
             <React.Fragment>
               <hr />
               <div className="app-nav-text">{locale().tools}</div> <hr />
             </React.Fragment>
           )}
 
-          {operationPages.includes("updatehistory") &&
-            canDo(role.current, "experiments", "update") &&
-            (restrictionPages["updatehistory"] === undefined ||
-              restrictionPages["updatehistory"].includes(role.current)) && (
+          {count !== 1 &&
+            accessibleOperations.includes("updatehistory") &&
+            canDo(role.current, "experiments", "update") && (
               <NavLink
                 to={`/updatehistory`}
                 className={(navData) => (navData.isActive ? "active" : "")}
                 //activeClassName="active"}
                 onClick={() => setIsOpened(false)}
               >
-                Update Experiments History
+                Update Experiment History
               </NavLink>
             )}
-          {operationPages.includes("downloadexperiment") &&
-            canDo(role.current, "experiments", "read") &&
-            (restrictionPages["downloadexperiments"] === undefined ||
-              restrictionPages["downloadexperiments"].includes(
-                role.current
-              )) && (
+          {count !== 1 &&
+            accessibleOperations.includes("downloadexperiment") &&
+            canDo(role.current, "experiments", "read") && (
               <NavLink
                 to={`/downloadexperiment`}
                 className={(navData) => (navData.isActive ? "active" : "")}
@@ -270,10 +184,9 @@ export default function Navigation() {
                 Download Experiments Data
               </NavLink>
             )}
-          {operationPages.includes("removesteps") &&
-            canDo(role.current, "experiments", "update") &&
-            (restrictionPages["removesteps"] === undefined ||
-              restrictionPages["removesteps"].includes(role.current)) && (
+          {count !== 1 &&
+            accessibleOperations.includes("removesteps") &&
+            canDo(role.current, "experiments", "update") && (
               <NavLink
                 to={`/removesteps`}
                 className={(navData) => (navData.isActive ? "active" : "")}
@@ -283,13 +196,83 @@ export default function Navigation() {
                 Remove History Steps
               </NavLink>
             )}
+          {count !== 1 &&
+            accessibleOperations.includes("uploadquestionnaire") &&
+            canDo(role.current, "measurements", "create") && (
+              <NavLink
+                to={`/uploadquestionnaire`}
+                className={(navData) => (navData.isActive ? "active" : "")}
+                //activeClassName="active"}
+                onClick={() => setIsOpened(false)}
+              >
+                Upload Questionnaires
+              </NavLink>
+            )}
+          {count !== 1 &&
+            accessibleOperations.includes("downloadquestionnaire") &&
+            canDo(role.current, "measurements", "get") && (
+              <NavLink
+                to={`/downloadquestionnaire`}
+                className={(navData) => (navData.isActive ? "active" : "")}
+                //activeClassName="active"}
+                onClick={() => setIsOpened(false)}
+              >
+                Download Questionnaires
+              </NavLink>
+            )}
+          {count !== 1 &&
+            accessibleOperations.includes("kpi") &&
+            canDo(role.current, "measurements", "create") && (
+              <NavLink
+                to={`/kpi`}
+                className={(navData) => (navData.isActive ? "active" : "")}
+                //activeClassName="active"}
+                onClick={() => setIsOpened(false)}
+              >
+                KPI
+              </NavLink>
+            )}
 
-          {operationPages.includes("uploadmeasurements") &&
-            canDo(role.current, "measurements", "create") &&
-            (restrictionPages["uploadmeasurements"] === undefined ||
-              restrictionPages["uploadmeasurements"].includes(
-                role.current
-              )) && (
+          {count !== 1 &&
+            accessibleOperations.includes("viewkpis") &&
+            canDo(role.current, "measurements", "read") &&
+            canDo(role.current, "measurements", "update") && (
+              <NavLink
+                to={`/viewkpis`}
+                className={(navData) => (navData.isActive ? "active" : "")}
+                //activeClassName="active"}
+                onClick={() => setIsOpened(false)}
+              >
+                View KPIs
+              </NavLink>
+            )}
+          {count !== 1 &&
+            accessibleOperations.includes("viewaggregatedkpis") &&
+            canDo(role.current, "measurements", "read") && (
+              <NavLink
+                to={`/viewaggregatedkpis`}
+                className={(navData) => (navData.isActive ? "active" : "")}
+                //activeClassName="active"}
+                onClick={() => setIsOpened(false)}
+              >
+                View Aggregated KPIs
+              </NavLink>
+            )}
+          {count !== 1 &&
+            accessibleOperations.includes("downloadkpis") &&
+            canDo(role.current, "measurements", "read") && (
+              <NavLink
+                to={`/downloadkpis`}
+                className={(navData) => (navData.isActive ? "active" : "")}
+                //activeClassName="active"}
+                onClick={() => setIsOpened(false)}
+              >
+                Download KPIs
+              </NavLink>
+            )}
+          {count !== 1 &&
+            accessibleOperations.includes("uploadmeasurements") &&
+            canDo(role.current, "measurements", "create") && (
               <NavLink
                 to={`/uploadmeasurements`}
                 className={(navData) => (navData.isActive ? "active" : "")}
@@ -299,12 +282,9 @@ export default function Navigation() {
                 Upload Measurements
               </NavLink>
             )}
-          {operationPages.includes("downloadmeasurements") &&
-            canDo(role.current, "measurements", "get") &&
-            (restrictionPages["downloadmeasurements"] === undefined ||
-              restrictionPages["downloadmeasurements"].includes(
-                role.current
-              )) && (
+          {count !== 1 &&
+            accessibleOperations.includes("downloadmeasurements") &&
+            canDo(role.current, "measurements", "read") && (
               <NavLink
                 to={`/downloadmeasurements`}
                 className={(navData) => (navData.isActive ? "active" : "")}
@@ -312,6 +292,18 @@ export default function Navigation() {
                 onClick={() => setIsOpened(false)}
               >
                 Download Measurements
+              </NavLink>
+            )}
+          {count !== 1 &&
+            accessibleOperations.includes("downloadtimeseries") &&
+            canDo(role.current, "measurements", "read") && (
+              <NavLink
+                to={`/downloadtimeseries`}
+                className={(navData) => (navData.isActive ? "active" : "")}
+                //activeClassName="active"}
+                onClick={() => setIsOpened(false)}
+              >
+                Download Timeseries
               </NavLink>
             )}
         </div>

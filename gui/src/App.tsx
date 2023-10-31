@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   HashRouter as Router,
   Route,
-  NavLink,
   Routes,
   Navigate,
 } from "react-router-dom";
@@ -27,22 +26,28 @@ import {
   SetAPIUrl,
 } from "./services/http_operations";
 import { logsManager } from "./services/operation_tool_services";
-import MobilePlaceholderPage from "./components/mobilePlaceholderPage/mobilePlaceholderPage";
 import EditContentPage from "./components/editContentPage/editContentPage";
 import AddPage from "./components/addPage/addPage";
 import AddExperimentPage from "./components/addExperimentPage/addExperimentPage";
 import { layout } from "./configManager";
 import AddMeasurementsPage from "./components/addMeasurementsPage/addMeasurementsPage";
-import DownloadMeasurementsPage from "./components/OperationalPages/downloadMeasurements/downloadMeasurements";
-import cloneDeep from "clone-deep";
+import UpdateHistoryPage from "./components/OperationalPages/updateHistorySteps/updateHistory";
+import DownloadPage from "./components/OperationalPages/downloadhistory/downloadExperiment";
+import RemoveStepsPage from "./components/OperationalPages/removeHistorySteps/removeSteps";
 import PasswordRecoveryPage from "./components/passwordRecoveryPage/PasswordRecoveryPage";
 import PasswordResetPage from "./components/PasswordResetPage/PasswordResetPage";
 import UploadMeasurementsPage from "./components/OperationalPages/uploadMeasurements/uploadMeasurements";
-import DownloadHistoryPage from "./components/OperationalPages/downloadhistory/downloadExperiment";
-import RemoveStepsPage from "./components/OperationalPages/removeHistorySteps/removeSteps";
-import UpdateHistoryPage from "./components/OperationalPages/updateHistorySteps/updateHistory";
-import { ResetConfig, LoadConfig, operationPages } from "./configManager";
+import DownloadMeasurementsPage from "./components/OperationalPages/downloadMeasurements/downloadMeasurements";
+import DownloadTimeseriesPage from "./components/OperationalPages/downloadTimeseries/DownloadTimeseriesPage";
+import { AutorefreshToken } from "./services/token_time_operations";
+
+import {
+  ResetConfig,
+  LoadConfig,
+  show_notification_bar,
+} from "./configManager";
 import LoadIcons from "./services/icons";
+import { AccessiblePages } from "./services/userRolesManagement";
 /*
     notifications follow this schema
 
@@ -69,10 +74,12 @@ function App() {
   const [data, setData] = useState<Object>({});
 
   let layoutRef = React.useRef<string | null>();
+  let intervalRef = React.useRef<any>(null);
   const tkn = localStorage.getItem("token");
 
   //load icons
   LoadIcons();
+
   //reset the config to define basics variables
   ResetConfig();
 
@@ -138,9 +145,7 @@ function App() {
         const response = await get_generic("types", {}, "");
 
         setTypes(response.response.data);
-      } catch (error) {
-        console.log(error);
-      }
+      } catch (error) {}
     };
 
     const fetchTenants = async () => {
@@ -156,7 +161,7 @@ function App() {
 
         setTenants(filtered);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
 
@@ -167,7 +172,7 @@ function App() {
       fetchTypes();
       fetchTenants();
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
     // make sure to catch any error
   }, []);
@@ -220,6 +225,7 @@ function App() {
   }
 
   //not logged => show auth page
+  //grant tenant route when not logged
   if (tkn === null)
     return (
       <div className="app">
@@ -243,7 +249,19 @@ function App() {
         </Router>
       </div>
     );
+  if (tkn !== null && intervalRef.current === null) {
+    intervalRef.current = AutorefreshToken();
+  }
 
+  //get accessible pages
+  const {
+    count,
+    numAccessibleResources,
+    accessibleOperations,
+    accessibleList,
+  } = AccessiblePages();
+
+  //if logged => show home page
   return (
     <AppContext.Provider
       value={{
@@ -256,10 +274,10 @@ function App() {
         <Container
           fluid
           style={{
-            paddingLeft: 0,
-            paddingRight: 0,
+            padding: 0,
+            margin: 0 + "px",
             height: 100 + "vh",
-            width: 99 + "vw",
+            //width: 99 + "vw",
           }}
         >
           {layoutRef.current === "horizontal" ? (
@@ -271,7 +289,9 @@ function App() {
           )}
           <Row
             style={{
-              padding: 0,
+              padding: 0 + "px",
+              height: 100 + "%",
+              margin: 0 + "px",
             }}
           >
             {layoutRef.current === "vertical" ? (
@@ -288,8 +308,26 @@ function App() {
             )}
             <Col style={{ paddingLeft: 0, paddingRight: 0 }}>
               <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/home" element={<HomePage />} />
+                <Route
+                  path="/"
+                  element={
+                    count === 1 ? (
+                      <Navigate to={"/" + accessibleList[0]} replace />
+                    ) : (
+                      <HomePage />
+                    )
+                  }
+                />
+                <Route
+                  path="/home"
+                  element={
+                    count === 1 ? (
+                      <Navigate to={"/" + accessibleList[0]} replace />
+                    ) : (
+                      <HomePage />
+                    )
+                  }
+                />
                 <Route path="/viewProfile" element={<ProfilePage />} />
                 <Route
                   path="/add/experiments/"
@@ -307,8 +345,8 @@ function App() {
                 <Route
                   path="/downloadexperiment"
                   element={
-                    operationPages.includes("downloadexperiment") ? (
-                      <DownloadHistoryPage />
+                    accessibleOperations.includes("downloadexperiment") ? (
+                      <DownloadPage />
                     ) : (
                       <Navigate to="/404" replace />
                     )
@@ -317,7 +355,7 @@ function App() {
                 <Route
                   path="/updatehistory"
                   element={
-                    operationPages.includes("updatehistory") ? (
+                    accessibleOperations.includes("updatehistory") ? (
                       <UpdateHistoryPage />
                     ) : (
                       <Navigate to="/404" replace />
@@ -327,7 +365,7 @@ function App() {
                 <Route
                   path="/removesteps"
                   element={
-                    operationPages.includes("removesteps") ? (
+                    accessibleOperations.includes("removesteps") ? (
                       <RemoveStepsPage />
                     ) : (
                       <Navigate to="/404" replace />
@@ -337,7 +375,7 @@ function App() {
                 <Route
                   path="/uploadmeasurements"
                   element={
-                    operationPages.includes("uploadmeasurements") ? (
+                    accessibleOperations.includes("uploadmeasurements") ? (
                       <UploadMeasurementsPage />
                     ) : (
                       <Navigate to="/404" replace />
@@ -347,15 +385,34 @@ function App() {
                 <Route
                   path="/downloadmeasurements"
                   element={
-                    operationPages.includes("downloadmeasurements") ? (
+                    accessibleOperations.includes("downloadmeasurements") ? (
                       <DownloadMeasurementsPage />
                     ) : (
                       <Navigate to="/404" replace />
                     )
                   }
                 />
+                <Route
+                  path="/downloadtimeseries"
+                  element={
+                    accessibleOperations.includes("downloadtimeseries") ? (
+                      <DownloadTimeseriesPage />
+                    ) : (
+                      <Navigate to="/404" replace />
+                    )
+                  }
+                />
                 <Route path="/add/:resource/" element={<AddPage />} />
-                <Route path="/:page" element={<Page res=":page" />} />
+                <Route
+                  path="/:page"
+                  element={
+                    numAccessibleResources !== 0 ? (
+                      <Page res=":page" />
+                    ) : (
+                      <Navigate to="/404" replace />
+                    )
+                  }
+                />
 
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />
                 <Route path="/404" element={<NotFoundPage />} />
@@ -363,7 +420,8 @@ function App() {
                 <Route path="*" element={<Navigate to="/404" replace />} />
               </Routes>
             </Col>
-            {layoutRef.current === "vertical" &&
+            {show_notification_bar === true &&
+              layoutRef.current === "vertical" &&
               /Mobi/i.test(window.navigator.userAgent) === false && (
                 <Col md="auto" style={{ paddingLeft: 0, paddingRight: 0 }}>
                   <NotificationBar />

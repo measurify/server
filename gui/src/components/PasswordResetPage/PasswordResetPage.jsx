@@ -5,14 +5,12 @@ import {
   resetPassword,
   getPasswordStrength,
 } from "../../services/http_operations";
-import { SetRoleDefinition } from "../../services/userRolesManagement";
-import { NavLink } from "react-router-dom";
 import { languages } from "../../configManager";
 import "../authPage/authPage.scss";
 import { LanguageSelector } from "../languageSelector/languageSelector";
 import { Form, Container, Row, Col } from "react-bootstrap";
 import LogoHolder from "../logoHolder/logoHolder";
-import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { passwordStrength } from "check-password-strength";
 const tenantRef = React.createRef();
 const pswRef = React.createRef();
@@ -61,7 +59,7 @@ export default function PasswordResetPage({ tenants }) {
       setMsg(locale().missing_email);
       return;
     }
-    if (token === "" || token == undefined) {
+    if (token === "" || token === undefined) {
       setMsg(locale().missing_token);
       return;
     }
