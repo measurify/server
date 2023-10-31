@@ -77,10 +77,8 @@ exports.getResourceList = async function (req, res, sort, select, model, restric
         const query = req.query;
         if (!query.sort) query.sort = sort;
         if(query.select) select = prepareSelect(select, query.select);
-        if (model.modelName == "Measurement") {
-            if (!query.page) query.page = 1;                       
-            if (query.limit==-1) query.limit = await model.countDocuments(query.filter);
-        }
+        if (!query.page) query.page = 1;                       
+        if (query.limit&&query.limit==-1) query.limit = await model.countDocuments(query.filter);
         let list = await persistence.getList(query.filter, query.sort, select, query.page, query.limit, restriction, model);
         if (model.modelName == "Measurement")return await conversion.convertMeasurements(req, res, list, query, model, select, restriction);
         if (req.headers.accept == 'text/csv') {
