@@ -35,7 +35,7 @@ export default function DownloadMeasurementsPage() {
   useEffect(() => {
     const getFeatures = async () => {
       const res = await get_generic("features", {
-        limit: 100,
+        limit: -1,
         select: ["_id"],
       });
 
@@ -100,6 +100,7 @@ export default function DownloadMeasurementsPage() {
           arrSep,
           floatSep,
           -1,
+          undefined,
           ["thing", "device", "feature", "samples"],
           compress
         );
