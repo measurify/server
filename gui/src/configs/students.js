@@ -15,6 +15,7 @@ export default function Students_configuration() {
     "uploadmeasurements",
     "downloadmeasurements",
     "downloadtimeseries",
+    "visualizetimeseries",
   ];
 
   //dictionary of pages: key is the route for the API REST, value is an array that contains the fields shown to users
@@ -64,7 +65,6 @@ export default function Students_configuration() {
   restrictionPages["updatehistory"] = ["admin"];
   restrictionPages["downloadexperiment"] = ["admin"];
   restrictionPages["removesteps"] = ["admin"];
-  restrictionPages["downloadtimeseries"] = ["admin"];
 
   //actions dictionary: key is the page, value is an array that contains actions || working actions arae "view" | "edit" | "delete" | "duplicate"
   const pageActions = {};

@@ -7,15 +7,20 @@ import {
   Col,
   ProgressBar,
 } from "react-bootstrap";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import Box from "@mui/material/Box";
 import locale from "../../../common/locale";
 import { downloadHistory } from "../../../services/operation_tool_services";
 import AppContext from "../../../context";
 import "../../page/page.scss";
-import { get_generic } from "../../../services/http_operations";
+import {
+  get_generic,
+  get_one_generic,
+} from "../../../services/http_operations";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
 
-const experimentSelectRef = React.createRef();
 const csvSepRef = React.createRef();
 const arraySepRef = React.createRef();
 const floatSepRef = React.createRef();
@@ -26,15 +31,20 @@ export default function DownloadHistoryPage() {
   const [now, setNow] = useState(0);
 
   const [operationindex, setOperationIndex] = useState(0);
-  const [experiments, setExperiments] = useState([]);
+  const [experiments, setExperiments] = useState(null);
+  //selected experiment
+  const [experiment, setExperiment] = useState(null);
   //message for user
   const [msg, setMsg] = useState("");
   const [isError, setIsError] = useState(false);
 
-  //fetch experiments (limit 100) on load
+  //fetch experimentson load
   useEffect(() => {
     const getExperiments = async () => {
-      const res = await get_generic("experiments", { limit: 100 });
+      const res = await get_generic("experiments", {
+        limit: -1,
+        select: ["_id"],
+      });
 
       setExperiments(res.docs);
     };
@@ -46,11 +56,10 @@ export default function DownloadHistoryPage() {
     const csvSep = csvSepRef.current.value;
     const arrSep = arraySepRef.current.value;
     const floatSep = floatSepRef.current.value;
-    const exp = experimentSelectRef.current.value;
-    const expIndex = experimentSelectRef.current.selectedIndex;
+    const exp = experiment;
     const compress = compressRef.current.checked;
 
-    if (expIndex === 0) {
+    if (exp === null) {
       setMsg("Please, select one or All experiment");
       setIsError(true);
       return;
@@ -124,11 +133,9 @@ export default function DownloadHistoryPage() {
 
   //download experiments (already fetched from DB) as json files
   const downloadDataHandler = async () => {
-    const exp = experimentSelectRef.current.value;
-    const expIndex = experimentSelectRef.current.selectedIndex;
     const compress = compressRef.current.checked;
 
-    if (expIndex === 0) {
+    if (experiment === null) {
       setMsg("Please, select one or All experiment");
       setIsError(true);
       return;
@@ -142,42 +149,48 @@ export default function DownloadHistoryPage() {
     });
 
     const files = [];
-    if (exp === "All") {
+    if (experiment === "All") {
       for (let i = 0; i < experiments.length; i++) {
-        const blob = new Blob([JSON.stringify(experiments[i], null, 4)]);
-        const fileName = experiments[i]._id + ".json";
-
+        try {
+          const res = await get_one_generic("experiments", experiments[i]._id);
+          const blob = new Blob([JSON.stringify(res.response.data, null, 4)]);
+          const fileName = experiments[i]._id + ".json";
+          let file = null;
+          if (compress === undefined || compress === false) {
+            saveAs(blob, fileName);
+          } else {
+            file = new File([blob], fileName);
+          }
+          files.push(file);
+          myLogs.PushLog({
+            type: "info",
+            msg: fileName + " successfully downloaded.\n",
+          });
+          setNow(((i + 1) / experiments.length) * 100);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    } else {
+      try {
+        const res = await get_one_generic("experiments", experiment);
+        const blob = new Blob([JSON.stringify(res.response.data, null, 4)]);
+        const fileName = experiment + ".json";
         let file = null;
         if (compress === undefined || compress === false) {
           saveAs(blob, fileName);
         } else {
           file = new File([blob], fileName);
         }
-
         files.push(file);
-
         myLogs.PushLog({
           type: "info",
           msg: fileName + " successfully downloaded.\n",
         });
-        setNow(((i + 1) / experiments.length) * 100);
+        setNow(100);
+      } catch (error) {
+        console.error(error);
       }
-    } else {
-      const experiment = experiments.filter((ex) => ex._id === exp)[0];
-      const blob = new Blob([JSON.stringify(experiment, null, 4)]);
-      const fileName = exp + ".json";
-
-      let file = null;
-      if (compress === undefined || compress === false) {
-        saveAs(blob, fileName);
-      } else {
-        file = new File([blob], fileName);
-      }
-      files.push(file);
-      myLogs.PushLog({
-        type: "info",
-        msg: fileName + " successfully downloaded.\n",
-      });
     }
     if (compress === true) {
       const content = await downloadZip(files).blob();
@@ -202,32 +215,41 @@ export default function DownloadHistoryPage() {
         <Container fluid>
           <Row>
             <Col>
-              <b>Select experiment</b>
+              <b>Select experiment to download</b>
             </Col>
           </Row>
-          <Row>
+          <Row style={{ paddingTop: 5 + "px" }}>
             <Col sm={3}>
-              {experiments.length === 0 && "No experiments present in database"}
-              {experiments.length !== 0 && (
-                <Form.Select
-                  aria-label={locale().select + " experiment"}
-                  ref={experimentSelectRef}
-                >
-                  <option>{locale().select} experiment</option>
-                  <option>All</option>
-                  {React.Children.toArray(
-                    experiments.map((e) => {
-                      return <option value={e["_id"]}>{e["_id"]}</option>;
-                    })
+              {experiments !== null && experiments.length !== 0 && (
+                <Autocomplete
+                  disableClearable
+                  onChange={(e, newValue) => {
+                    e.preventDefault();
+                    setExperiment(newValue);
+                  }}
+                  value={experiment}
+                  disabled={false}
+                  options={["All"].concat(experiments.map((e) => e._id))}
+                  renderOption={(props, option) => (
+                    <Box
+                      component="li"
+                      sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                      {...props}
+                    >
+                      {option}
+                    </Box>
                   )}
-                </Form.Select>
+                  renderInput={(params) => (
+                    <TextField {...params} label={"Select Experiment"} />
+                  )}
+                />
               )}
             </Col>
           </Row>
 
           <Row>
             <Col>
-              {experiments.length !== 0 && (
+              {experiments !== null && experiments.length !== 0 && (
                 <Form.Group className="mb-3">
                   <Form.Check
                     type="checkbox"
@@ -243,12 +265,14 @@ export default function DownloadHistoryPage() {
             <Col>
               <Row>
                 <Col>
-                  {experiments.length !== 0 && <b>Download history as csv</b>}
+                  {experiments !== null && experiments.length !== 0 && (
+                    <b>Download history as csv</b>
+                  )}
                 </Col>
               </Row>{" "}
-              {experiments.length !== 0 && (
+              {experiments !== null && experiments.length !== 0 && (
                 <Row style={{ paddingTop: 10 + "px" }}>
-                  <Col sm={2}>
+                  <Col xxl={2} xl={4} lg={10} md={8} sm={6}>
                     <Form.Group className="mb-3">
                       <Form.Select
                         aria-label="CSV Column Separator"
@@ -264,7 +288,7 @@ export default function DownloadHistoryPage() {
                       </Form.Text>
                     </Form.Group>
                   </Col>
-                  <Col sm={2}>
+                  <Col xxl={2} xl={4} lg={10} md={8} sm={6}>
                     <Form.Group className="mb-3">
                       <Form.Select
                         aria-label="CSV Array separator"
@@ -280,7 +304,7 @@ export default function DownloadHistoryPage() {
                       </Form.Text>
                     </Form.Group>
                   </Col>
-                  <Col sm={2}>
+                  <Col xxl={2} xl={4} lg={10} md={8} sm={6}>
                     <Form.Group className="mb-3">
                       <Form.Select
                         aria-label="CSV Floating Point separator"
@@ -298,7 +322,7 @@ export default function DownloadHistoryPage() {
               )}
               <Row>
                 <Col>
-                  {experiments.length !== 0 && (
+                  {experiments !== null && experiments.length !== 0 && (
                     <Button variant="primary" onClick={downloadHistoryHandler}>
                       Download History
                     </Button>
@@ -309,14 +333,14 @@ export default function DownloadHistoryPage() {
             <Col>
               <Row>
                 <Col>
-                  {experiments.length !== 0 && (
+                  {experiments !== null && experiments.length !== 0 && (
                     <b>Download experiment data as json</b>
                   )}
                 </Col>
               </Row>
               <Row>
                 <Col>
-                  {experiments.length !== 0 && (
+                  {experiments !== null && experiments.length !== 0 && (
                     <Button variant="primary" onClick={downloadDataHandler}>
                       Download Data
                     </Button>

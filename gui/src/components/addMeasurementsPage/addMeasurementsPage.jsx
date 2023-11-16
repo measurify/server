@@ -86,7 +86,7 @@ export default function AddMeasurementsPage(props) {
     // get the data from the api
     try {
       const response = await get_generic(res, {
-        limit: 100,
+        limit: -1,
         select: ["_id", "username", "name"],
       });
       myFetched.UpdateData(
@@ -127,7 +127,7 @@ export default function AddMeasurementsPage(props) {
         console.error(error);
       }
     };
-    const qs = { limit: 100, select: ["_id", "items"] };
+    const qs = { limit: -1, select: ["_id", "items"] };
     fetchData(qs);
   }, [props, searchParams]);
 

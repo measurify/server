@@ -118,7 +118,7 @@ export const FormManager = (props) => {
               }
 
               //input field is an object
-              if (value.constructor === Object) {
+              if (value?.constructor === Object) {
                 return ObjectFormRow(props, myFetched, key);
               }
               //default return

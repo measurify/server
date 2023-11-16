@@ -39,6 +39,7 @@ import PasswordResetPage from "./components/PasswordResetPage/PasswordResetPage"
 import UploadMeasurementsPage from "./components/OperationalPages/uploadMeasurements/uploadMeasurements";
 import DownloadMeasurementsPage from "./components/OperationalPages/downloadMeasurements/downloadMeasurements";
 import DownloadTimeseriesPage from "./components/OperationalPages/downloadTimeseries/DownloadTimeseriesPage";
+import VisualizeTimeseriesPage from "./components/OperationalPages/visualizeTimeseries/VisualizeTimeseriesPage";
 import { AutorefreshToken } from "./services/token_time_operations";
 
 import {
@@ -402,6 +403,17 @@ function App() {
                     )
                   }
                 />
+                <Route
+                  path="/visualizetimeseries"
+                  element={
+                    accessibleOperations.includes("visualizetimeseries") ? (
+                      <VisualizeTimeseriesPage />
+                    ) : (
+                      <Navigate to="/404" replace />
+                    )
+                  }
+                />
+
                 <Route path="/add/:resource/" element={<AddPage />} />
                 <Route
                   path="/:page"

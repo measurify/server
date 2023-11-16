@@ -54,7 +54,7 @@ export default function EditContentPage(props) {
     // get the data from the api
     try {
       const response = await get_generic(res, {
-        limit: 100,
+        limit: -1,
         select: ["_id", "username", "name"],
       });
       myFetched.UpdateData(
@@ -337,7 +337,7 @@ export default function EditContentPage(props) {
           delete toSend[k];
       }
       //value is obj
-      else if (v.constructor === Object) {
+      else if (v?.constructor === Object) {
         //compare both obj
       }
       //single valued prop

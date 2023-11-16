@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { NavLink } from "react-router-dom";
 import { Button } from "react-bootstrap";
-import { pages, pageActions, addFields } from "../../configManager";
+import { pages, pageActions, addFields, viewFields } from "../../configManager";
 import { get_generic } from "../../services/http_operations";
 import ContentTable from "../contentTable/contentTable";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -62,7 +62,7 @@ export default function Page(params) {
     const limit =
       searchParams.get("limit") !== null ? searchParams.get("limit") : 10;
 
-    const qs = { page: num, limit: limit };
+    const qs = { page: num, limit: limit, select: viewFields[page] };
 
     // call the function
     fetchData(qs)

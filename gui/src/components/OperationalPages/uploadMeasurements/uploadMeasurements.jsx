@@ -49,6 +49,7 @@ export default function UploadMeasurementsPage() {
       setIsError(true);
       return;
     }
+
     setMsg("");
     setIsError(false);
     // begin loop on files
@@ -97,21 +98,19 @@ export default function UploadMeasurementsPage() {
       <header className="page-header">Upload Measurements</header>
       <main className="page-content">
         <Container fluid>
-          <Row>
-            <UploadMeasurementsFileForm
-              postHistory={postHistory}
-              arraySepRef={arraySepRef}
-              csvSep={csvSep}
-              setCsvSep={setCsvSep}
-              floatSepRef={floatSepRef}
-              setCsvContent={setCsvContent}
-              setFiles={setFiles}
-              files={files}
-              setDescription={setDescription}
-              description={description}
-              csvContent={csvContent}
-            />
-          </Row>
+          <UploadMeasurementsFileForm
+            postHistory={postHistory}
+            arraySepRef={arraySepRef}
+            csvSep={csvSep}
+            setCsvSep={setCsvSep}
+            floatSepRef={floatSepRef}
+            setCsvContent={setCsvContent}
+            setFiles={setFiles}
+            files={files}
+            setDescription={setDescription}
+            description={description}
+            csvContent={csvContent}
+          />
 
           <Row>
             <Col>

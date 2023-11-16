@@ -127,17 +127,19 @@ export function ResetConfig() {
 }
 
 export function LoadConfig() {
-  const type = WhatAmI();
+  let type = WhatAmI();
+
+  //only enable debug mode when running locally
+  if (window.location.host === "localhost:3000") type = "DEBUG";
+
   let conf;
   switch (type) {
-    case "STUDENTS":
-      conf = Students_configuration();
+    case "DEBUG":
+      conf = Development_config();
       break;
     case "unknown":
     default:
-      //demo kpi configuration
-      //conf = QS_configuration();
-      conf = Development_config();
+      conf = Students_configuration();
       break;
   }
 
@@ -175,8 +177,6 @@ export function WhatAmI() {
 
   const splitted = hostname.split(".");
   const secondaryDomain = splitted[0];
-
-  if (secondaryDomain.startsWith("students")) return "STUDENTS";
 
   return "unknown";
 }

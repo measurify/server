@@ -31,7 +31,7 @@ export default function RemoveStepsPage() {
   useEffect(() => {
     const getExperiments = async () => {
       try {
-        const res = await get_generic("experiments", { limit: 100 });
+        const res = await get_generic("experiments", { limit: -1 });
 
         setExperiments(res.docs);
       } catch (error) {

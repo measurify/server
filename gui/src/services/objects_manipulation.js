@@ -73,6 +73,7 @@ export function maintainEmptyElement(
     tmpPtr = tmpPtr[path[i]];
   }
   const nonDefLen = nonDefaultLength(tmpPtr);
+  if (tmpPtr === undefined || tmpPtr === null) return tmp;
   const len = tmpPtr.length;
 
   //if at least one element is non default, can return

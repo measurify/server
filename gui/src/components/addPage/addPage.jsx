@@ -63,7 +63,7 @@ export default function AddPage(props) {
       // get the data from the api
       try {
         const response = await get_generic(res, {
-          limit: 100,
+          limit: -1,
           select: ["_id", "username", "name"],
         });
         myFetched.UpdateData(

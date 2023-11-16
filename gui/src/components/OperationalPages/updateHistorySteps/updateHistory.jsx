@@ -42,7 +42,7 @@ export default function UpdateHistoryPage() {
   useEffect(() => {
     const getExperiments = async () => {
       try {
-        const res = await get_generic("experiments", { limit: 1000 });
+        const res = await get_generic("experiments", { limit: -1 });
 
         setExperiments(res.docs);
       } catch (error) {

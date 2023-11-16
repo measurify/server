@@ -16,6 +16,7 @@ export default function Development_config(overrideUrl = true) {
     "uploadmeasurements",
     "downloadmeasurements",
     "downloadtimeseries",
+    "visualizetimeseries",
   ];
 
   //dictionary of pages: key is the route for the API REST, value is an array that contains the fields shown to users
@@ -91,7 +92,6 @@ export default function Development_config(overrideUrl = true) {
     "place",
     "protocol",
     "metadata",
-    "history",
   ];
   viewFields["measurements"] = [
     "_id",

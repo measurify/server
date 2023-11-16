@@ -65,7 +65,7 @@ export default function UploadMeasurementsFileForm(props) {
         </Col>
       </Row>
       <Row style={{ paddingTop: 10 + "px" }}>
-        <Col sm={1}>
+        <Col xxl={1} xl={2} lg={4} sm={3}>
           <Form.Group className="mb-3">
             <Form.Select
               aria-label="CSV Column Separator"
@@ -83,7 +83,7 @@ export default function UploadMeasurementsFileForm(props) {
             <Form.Text className="text-muted">Column separator</Form.Text>
           </Form.Group>
         </Col>
-        <Col sm={1}>
+        <Col xxl={1} xl={2} lg={4} sm={3}>
           <Form.Group className="mb-3">
             <Form.Select
               aria-label="CSV Array separator"
@@ -97,7 +97,7 @@ export default function UploadMeasurementsFileForm(props) {
             <Form.Text className="text-muted">Array separator</Form.Text>
           </Form.Group>
         </Col>
-        <Col sm={1}>
+        <Col xxl={1} xl={2} lg={4} sm={3}>
           <Form.Group className="mb-3">
             <Form.Select
               aria-label="CSV Floating Point separator"

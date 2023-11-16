@@ -73,7 +73,7 @@ export const removeDefaultElements = (obj) => {
         }
       }
       //check if value is an Object
-      if (entr[i][1].constructor === Object) {
+      if (entr[i][1]?.constructor === Object) {
         const subEntr = Object.entries(entr[i][1]);
         for (let j = 0; j < subEntr.length; j++) {
           if (
@@ -154,6 +154,7 @@ export function ReplaceUnderscores(s) {
 
 //format string date into yyyy/mm/dd
 export function FormatDate(dt) {
+  if (dt === undefined || dt === null) return "";
   return dt.slice(0, 10).replaceAll("-", "/");
 }
 

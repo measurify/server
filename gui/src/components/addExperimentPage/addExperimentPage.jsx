@@ -68,7 +68,7 @@ export default function AddExperimentPage(props) {
         console.error(error);
       }
     };
-    const qs = { limit: 100, select: ["_id", "metadata", "topics"] };
+    const qs = { limit: -1, select: ["_id", "metadata", "topics"] };
     fetchData(qs);
   }, [props, searchParams]);
 
@@ -252,6 +252,11 @@ export default function AddExperimentPage(props) {
       setIsError(true);
       return;
     }
+    if (tmpValues["_id"].includes("#")) {
+      setMsg("Please, does not include an '#' in the _id");
+      setIsError(true);
+      return;
+    }
     if (tmpValues["state"] === "") {
       setMsg("Please, select a state");
       setIsError(true);
@@ -407,6 +412,11 @@ export default function AddExperimentPage(props) {
       }
     }
     if (file.name.endsWith(".json")) {
+      if (JSON.parse(contentPlain)._id.includes("#")) {
+        setMsg("Please, does not include an '#' in the _id");
+        setIsError(true);
+        return;
+      }
       try {
         const resp = await post_generic(resource, contentPlain, undefined);
         res = resp.response;

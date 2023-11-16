@@ -23,7 +23,7 @@ export default function UpdateHistoryFileForm(props) {
   return (
     <Form onSubmit={props.postHistory}>
       <Row style={{ paddingTop: 10 + "px" }}>
-        <Col sm={1}>
+        <Col xxl={1} xl={2} lg={4} sm={3}>
           <Form.Group className="mb-3">
             <Form.Select
               aria-label="CSV Column Separator"
@@ -41,7 +41,7 @@ export default function UpdateHistoryFileForm(props) {
             <Form.Text className="text-muted">Column separator</Form.Text>
           </Form.Group>
         </Col>
-        <Col sm={1}>
+        <Col xxl={1} xl={2} lg={4} sm={3}>
           <Form.Group className="mb-3">
             <Form.Select
               aria-label="CSV Array separator"
@@ -55,7 +55,7 @@ export default function UpdateHistoryFileForm(props) {
             <Form.Text className="text-muted">Array separator</Form.Text>
           </Form.Group>
         </Col>
-        <Col sm={1}>
+        <Col xxl={1} xl={2} lg={4} sm={3}>
           <Form.Group className="mb-3">
             <Form.Select
               aria-label="CSV Floating Point separator"
@@ -71,7 +71,7 @@ export default function UpdateHistoryFileForm(props) {
         </Col>
       </Row>
       <Row>
-        <Col sm={3}>
+        <Col xxl={3} xl={6} lg={8} sm={8}>
           <Form.Control
             className="mb-3"
             type="file"

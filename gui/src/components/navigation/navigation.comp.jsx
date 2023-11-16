@@ -306,6 +306,18 @@ export default function Navigation() {
                 Download Timeseries
               </NavLink>
             )}
+          {count !== 1 &&
+            accessibleOperations.includes("visualizetimeseries") &&
+            canDo(role.current, "measurements", "read") && (
+              <NavLink
+                to={`/visualizetimeseries`}
+                className={(navData) => (navData.isActive ? "active" : "")}
+                //activeClassName="active"}
+                onClick={() => setIsOpened(false)}
+              >
+                Visualize Timeseries
+              </NavLink>
+            )}
         </div>
       </div>
     </nav>
