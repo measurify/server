@@ -56,12 +56,7 @@ export default function Students_configuration() {
   restrictionPages["users"] = ["admin"];
   restrictionPages["roles"] = ["admin"];
   restrictionPages["protocols"] = ["admin"];
-  restrictionPages["features"] = ["admin"];
-  restrictionPages["tags"] = ["admin"];
-  restrictionPages["devices"] = ["admin"];
-  restrictionPages["things"] = ["admin"];
   restrictionPages["experiments"] = ["admin"];
-  restrictionPages["measurements"] = ["admin"];
   restrictionPages["updatehistory"] = ["admin"];
   restrictionPages["downloadexperiment"] = ["admin"];
   restrictionPages["removesteps"] = ["admin"];
