@@ -152,7 +152,15 @@ function aggregateHistories(jsonData) {
                   }
                   aggregatedHistories[field.name].push(field.value);
               } else if (Array.isArray(field.value)) {
-                aggregatedHistories[field.name] = aggregatedHistories[field.name].map((val, idx) => val + field.value[idx]);
+                if (!Array.isArray(aggregatedHistories[field.name])) {
+                  aggregatedHistories[field.name] = Array(field.value.length).fill(0);
+                }
+                  // Adjust the lengths of arrays before addition
+                const maxLength = Math.max(aggregatedHistories[field.name].length, field.value.length);
+                const aggregatedArr = aggregatedHistories[field.name].concat(Array(maxLength - aggregatedHistories[field.name].length).fill(0));
+                const fieldValueArr = field.value.concat(Array(maxLength - field.value.length).fill(0));
+
+                aggregatedHistories[field.name] = aggregatedArr.map((val, idx) => val + fieldValueArr[idx]);
               }
             }
           });
