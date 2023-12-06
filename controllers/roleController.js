@@ -47,7 +47,7 @@ exports.put = async (req, res) => {
     let result = await checker.isAvailable(req, res, Role); if (result != true) return result;
     result = await checker.isAdminitrator(req, res); if (result != true) return result;
     result = await checker.isFilled(req, res, fields); if (result != true) return result;
-    result = await checker.isNotUsed(req, res, User, 'type'); if (result != true) return result; 
+    //result = await checker.isNotUsed(req, res, User, 'type'); if (result != true) return result; 
     return await controller.updateResource(req, res, fields, Role);
 };  
 

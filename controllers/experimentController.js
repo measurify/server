@@ -9,6 +9,7 @@ const conversion = require("../commons/conversion.js");
 exports.get = async (req, res) => {
     const Experiment = mongoose.dbs[req.tenant.database].model('Experiment');
     const select = await checker.whatCanSee(req, res, Experiment);
+    delete select['owner'];
     const restriction_1 = await checker.whatCanOperate(req, res,"Experiment");
     const restriction_2 = await checker.whichRights(req, res, Experiment);
     const restrictions = { ...restriction_1, ...restriction_2 };
@@ -92,3 +93,72 @@ exports.delete = async (req, res) => {
     result = await checker.hasRights(req, res, Experiment); if (result != true) return result;
     return await controller.deleteResource(req, res, Experiment);
 };
+
+exports.getAggregates = async (req, res) => {
+    try{
+        const Experiment = mongoose.dbs[req.tenant.database].model('Experiment');
+        let select = await checker.whatCanSee(req, res, Experiment);
+        const restriction_1 = await checker.whatCanOperate(req, res,"Experiment");
+        const restriction_2 = await checker.whichRights(req, res, Experiment);
+        const restrictions = { ...restriction_1, ...restriction_2 };
+        let sort = '{ "timestamp": "desc" }';    
+        const query = req.query;
+        if (!query.sort) query.sort = sort;
+        if (!query.filter) query.filter = '{}';
+        query.select ='["_id","history"]'
+        select = prepareSelect(select, query.select);
+        if (!query.page) query.page = 1;                       
+        if (query.limit&&query.limit==-1) query.limit = await model.countDocuments(query.filter);
+        let list = JSON.stringify(await persistence.getList(query.filter, query.sort, select, query.page, query.limit, restrictions, Experiment));
+        const result = aggregateHistories(list);
+        return res.status(200).json(result);
+    }
+    catch (err) { return errors.manage(res, errors.get_request_error, err); }
+};
+
+//local function
+const prepareSelect = function (select, querySelect) {
+    try {
+        querySelect=JSON.parse(querySelect);
+    } catch (e) {
+        return select;
+    }
+    let object={};
+    querySelect.map((key) => {
+        if (select[key] === undefined) object[key] = true;
+    });
+    if(Object.keys(object).length!=0)return object;
+    return select;
+}
+
+function aggregateHistories(jsonData) {
+    let data = JSON.parse(jsonData);
+    data=data["docs"]
+    const ids = data.map(entry => entry._id);
+    const aggregatedHistories = {};
+  
+    data.forEach(entry => {
+      entry.history.forEach(hist => {
+        if (hist.fields && hist.fields.length > 0) {
+          hist.fields.forEach(field => {
+            if (!aggregatedHistories[field.name]) {
+              aggregatedHistories[field.name] = field.value;
+            } else {
+              if (typeof field.value === 'number') {
+                aggregatedHistories[field.name] += field.value;
+              } else if (typeof field.value === 'string') {
+                if (!Array.isArray(aggregatedHistories[field.name])) {
+                    aggregatedHistories[field.name] = [aggregatedHistories[field.name]];
+                  }
+                  aggregatedHistories[field.name].push(field.value);
+              } else if (Array.isArray(field.value)) {
+                aggregatedHistories[field.name] = aggregatedHistories[field.name].map((val, idx) => val + field.value[idx]);
+              }
+            }
+          });
+        }
+      });
+    });  
+    return { _ids: ids, aggregated_histories: aggregatedHistories };
+  }
+  

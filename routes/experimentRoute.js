@@ -7,6 +7,7 @@ const extractData = require('../commons/extractData.js');
 
 router.get('/', catchErrors(experimentController.get));
 router.get('/pipe', catchErrors(experimentController.pipe));
+router.get('/aggregated_experiments', catchErrors(experimentController.getAggregates));
 router.get('/:id', catchErrors(experimentController.getone));
 router.get('/:id/history', catchErrors(experimentController.gethistory));
 router.get('/:id/group', catchErrors(experimentController.getgroup));
