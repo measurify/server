@@ -647,6 +647,178 @@ describe('/GET experiment group', () => {
     });
 });
 
+// Test the /GET aggregated route
+describe('/GET experiment aggregated', () => {
+    it('it should GET all or filtered aggregated', async () => {        
+        const user = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
+        const metadata = []
+        const topics = [
+            {
+                "name": "topic name 1",
+                "description": "topic description 1",
+                "fields": [
+                    { "name": "field-1", "description": "field description 1", "type": "scalar"},
+                    { "name": "field-2", "description": "field description 2", "type": "text"},
+                    { "name": "field-3", "description": "field description 3", "type": "vector"}
+                ]
+            },
+            {
+                "name": "topic name 2",
+                "description": "topic description 2",
+                "fields": [
+                    { "name": "field-4", "description": "field description 4", "type": "scalar"},
+                    { "name": "field-5", "description": "field description 5", "type": "text"},
+                    { "name": "field-6", "description": "field description 6", "type": "vector"}
+                ]
+            }
+        ] 
+        const protocol = await factory.createProtocol("test-protocol-1", "test-protocol-description-1", user, metadata, topics);
+        const experiment1 = {
+            "_id": "experiment_id1",
+            "description": "experiment description",
+            "anonymization": true,
+            "state": 1,
+            "startDate": "2022-05-30T07:15:17.396Z",
+            "endDate": "2022-09-15T18:15:17.396Z",
+            "protocol": "test-protocol-1",
+            "metadata": [],
+            "history": [
+                {
+                    "step": 1,
+                    "timestamp": "2022-09-15T18:15:17.396Z",
+                    "fields": [
+                        { "name": "field-1", "value": 1 },
+                        { "name": "field-2", "value": "text value" },
+                        { "name": "field-3", "value": [1, 1, 1] },
+                        { "name": "field-4", "value": 1 },
+                        { "name": "field-5", "value": "another text value" },
+                        { "name": "field-6", "value": [1, 1, 1]  }
+                    ]
+                },
+                {
+                    "step": 2,
+                    "timestamp": "2022-12-15T18:15:17.396Z",
+                    "fields": [
+                        { "name": "field-1", "value": 1 },
+                        { "name": "field-2", "value": "text value 2" },
+                        { "name": "field-3", "value": [1, 1] },
+                        { "name": "field-4", "value": 1 },
+                        { "name": "field-5", "value": "another text value 2" },
+                        { "name": "field-6", "value": [1, 1, 1]  }
+                    ]
+                }
+            ]
+        }
+        const experiment2 = {
+            "_id": "experiment_id2",
+            "description": "experiment description",
+            "anonymization": true,
+            "state": 1,
+            "startDate": "2022-05-30T07:15:17.396Z",
+            "endDate": "2022-09-15T18:15:17.396Z",
+            "protocol": "test-protocol-1",
+            "metadata": [],
+            "history": [
+                {
+                    "step": 1,
+                    "timestamp": "2022-09-15T18:15:17.396Z",
+                    "fields": [
+                        { "name": "field-1", "value": 2 },
+                        { "name": "field-2", "value": "text value 3" },
+                        { "name": "field-3", "value": [2, 2, 2] },
+                        { "name": "field-4", "value": 2 },
+                        { "name": "field-5", "value": "another text value 3" },
+                        { "name": "field-6", "value": [2, 2, 2]  }
+                    ]
+                }
+            ]
+        }
+        const experiment3 = {
+            "_id": "experiment_id3",
+            "description": "experiment description",
+            "anonymization": true,
+            "state": 1,
+            "startDate": "2022-05-30T07:15:17.396Z",
+            "endDate": "2022-09-15T18:15:17.396Z",
+            "protocol": "test-protocol-1",
+            "metadata": [],
+            "history": [
+                {
+                    "step": 1,
+                    "timestamp": "2022-09-15T18:15:17.396Z",
+                    "fields": [
+                        { "name": "field-1", "value": 3 },
+                        { "name": "field-2", "value": "text value 4" },
+                        { "name": "field-3", "value": [3, 3, 3] },
+                        { "name": "field-4", "value": 3 },
+                        { "name": "field-5", "value": "another text value 4" },
+                        { "name": "field-6", "value": [3, 3, 3]  }
+                    ]
+                }
+            ]
+        }
+        const experiment4 = {
+            "_id": "experiment_id4",
+            "description": "experiment description",
+            "anonymization": true,
+            "state": 1,
+            "startDate": "2022-05-30T07:15:17.396Z",
+            "endDate": "2022-09-15T18:15:17.396Z",
+            "protocol": "test-protocol-1",
+            "metadata": [],
+            "history": []
+        }
+        const res0 = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user)).send(experiment1)
+        res0.should.have.status(200);
+        const res1 = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user)).send(experiment2)
+        res1.should.have.status(200);
+        const res2 = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user)).send(experiment3)
+        res2.should.have.status(200);
+        const res3 = await chai.request(server).keepOpen().post('/v1/experiments').set("Authorization", await factory.getUserToken(user)).send(experiment4)
+        res3.should.have.status(200);
+
+
+        const res = await chai.request(server).keepOpen().get('/v1/experiments/aggregated_experiments').set("Authorization", await factory.getUserToken(user));
+        res.should.have.status(200);  
+        res.body.should.be.a('object');
+        res.body.should.have.property('_ids');
+        res.body.should.have.property('aggregated_histories');
+        res.body._ids.should.be.an('array').that.includes('experiment_id1', 'experiment_id2', 'experiment_id3');
+        res.body.aggregated_histories.should.have.property('field-1');
+        res.body.aggregated_histories.should.have.property('field-2');
+        res.body.aggregated_histories.should.have.property('field-3');
+        res.body.aggregated_histories.should.have.property('field-4');
+        res.body.aggregated_histories.should.have.property('field-5');
+        res.body.aggregated_histories.should.have.property('field-6');
+        res.body.aggregated_histories['field-1'].should.be.an('number').deep.equal(7);
+        res.body.aggregated_histories['field-2'].should.be.an('array').that.includes('text value', 'text value 2', 'text value 3', 'text value 4');
+        res.body.aggregated_histories['field-3'].should.be.an('array').deep.equal([7, 7, 6]);
+        res.body.aggregated_histories['field-4'].should.be.an('number').deep.equal(7);
+        res.body.aggregated_histories['field-5'].should.be.an('array').that.includes('another text value', 'another text value 2', 'another text value 3', 'another text value 4');
+        res.body.aggregated_histories['field-6'].should.be.an('array').deep.equal([7, 7, 7]);
+
+        const resB = await chai.request(server).keepOpen().get('/v1/experiments/aggregated_experiments?filter={"$or":[{"_id":"experiment_id2"},{"_id":"experiment_id3"}]}').set("Authorization", await factory.getUserToken(user));
+        resB.should.have.status(200);  
+        resB.body.should.be.a('object');
+        resB.body.should.have.property('_ids');
+        resB.body.should.have.property('aggregated_histories');
+        resB.body._ids.should.be.an('array').that.includes('experiment_id2', 'experiment_id3');
+        resB.body.aggregated_histories.should.have.property('field-1');
+        resB.body.aggregated_histories.should.have.property('field-2');
+        resB.body.aggregated_histories.should.have.property('field-3');
+        resB.body.aggregated_histories.should.have.property('field-4');
+        resB.body.aggregated_histories.should.have.property('field-5');
+        resB.body.aggregated_histories.should.have.property('field-6');
+        resB.body.aggregated_histories['field-1'].should.be.an('number').deep.equal(5);
+        resB.body.aggregated_histories['field-2'].should.be.an('array').that.includes('text value 3', 'text value 4');
+        resB.body.aggregated_histories['field-3'].should.be.an('array').deep.equal([5, 5, 5]);
+        resB.body.aggregated_histories['field-4'].should.be.an('number').deep.equal(5);
+        resB.body.aggregated_histories['field-5'].should.be.an('array').that.includes('another text value 3', 'another text value 4');
+        resB.body.aggregated_histories['field-6'].should.be.an('array').deep.equal([5, 5, 5]);
+     });
+});
+    
+
 // Test the /POST route
 describe('/POST experiment', () => {
     it('it should not POST a experiment without _id field', async () => {
