@@ -108,7 +108,7 @@ exports.getAggregates = async (req, res) => {
         query.select ='["_id","history"]'
         select = prepareSelect(select, query.select);
         if (!query.page) query.page = 1;                       
-        if (query.limit&&query.limit==-1) query.limit = await model.countDocuments(query.filter);
+        if (query.limit&&query.limit==-1) query.limit = await Experiment.countDocuments(query.filter);
         let list = JSON.stringify(await persistence.getList(query.filter, query.sort, select, query.page, query.limit, restrictions, Experiment));
         const result = aggregateHistories(list);
         return res.status(200).json(result);
