@@ -124,7 +124,7 @@ exports.postFile = async (req, res, fileData, descriptionData, filename) => {
   //control number of element in the description    
   const elementsNumber = await dataset.elementsCount(descriptionData);
 
-  fileData = fileData.replace(/(\r)/gm, "");//.replace(/['"]+/g, "");
+  fileData = fileData.replace(/\r\n/g,"\n").replace(/\r/g,"\n")//.replace(/['"]+/g, "");
   var lines = fileData.split("\n");
 
   //check for force save object on database by default value if it is false or undefined
