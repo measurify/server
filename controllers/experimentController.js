@@ -105,12 +105,14 @@ exports.getAggregates = async (req, res) => {
         const query = req.query;
         if (!query.sort) query.sort = sort;
         if (!query.filter) query.filter = '{}';
-        query.select ='["_id","history"]'
+        query.select ='["_id","history","protocol"]'
         select = prepareSelect(select, query.select);
         if (!query.page) query.page = 1;                       
         query.limit = await Experiment.countDocuments(query.filter);
         let list = JSON.stringify(await persistence.getList(query.filter, query.sort, select, query.page, query.limit, restrictions, Experiment));
-        const result = aggregateHistories(list);
+        let result = await conversion.aggregateHistories(list);
+        let protocolName = JSON.parse(list)["docs"][0]["protocol"];
+        if(query.groups)result=await conversion.toGroups(req,result,protocolName);
         return res.status(200).json(result);
     }
     catch (err) { return errors.manage(res, errors.get_request_error, err); }
@@ -131,42 +133,3 @@ const prepareSelect = function (select, querySelect) {
     return select;
 }
 
-function aggregateHistories(jsonData) {
-    let data = JSON.parse(jsonData);
-    data=data["docs"]
-    const ids = data.map(entry => entry._id);
-    const aggregatedHistories = {};
-  
-    data.forEach(entry => {
-      entry.history.forEach(hist => {
-        if (hist.fields && hist.fields.length > 0) {
-          hist.fields.forEach(field => {
-            if (!aggregatedHistories[field.name]) {
-              aggregatedHistories[field.name] = field.value;
-            } else {
-              if (typeof field.value === 'number') {
-                aggregatedHistories[field.name] += field.value;
-              } else if (typeof field.value === 'string') {
-                if (!Array.isArray(aggregatedHistories[field.name])) {
-                    aggregatedHistories[field.name] = [aggregatedHistories[field.name]];
-                  }
-                  aggregatedHistories[field.name].push(field.value);
-              } else if (Array.isArray(field.value)) {
-                if (!Array.isArray(aggregatedHistories[field.name])) {
-                  aggregatedHistories[field.name] = Array(field.value.length).fill(0);
-                }
-                  // Adjust the lengths of arrays before addition
-                const maxLength = Math.max(aggregatedHistories[field.name].length, field.value.length);
-                const aggregatedArr = aggregatedHistories[field.name].concat(Array(maxLength - aggregatedHistories[field.name].length).fill(0));
-                const fieldValueArr = field.value.concat(Array(maxLength - field.value.length).fill(0));
-
-                aggregatedHistories[field.name] = aggregatedArr.map((val, idx) => val + fieldValueArr[idx]);
-              }
-            }
-          });
-        }
-      });
-    });  
-    return { _ids: ids, aggregated_histories: aggregatedHistories };
-  }
-  

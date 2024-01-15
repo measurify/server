@@ -167,16 +167,16 @@ exports.jsonToCSVPlus = function (jsonData, columnsname, query) {
                 else return `${value}`
             })
             .join(process.env.CSV_DELIMITER)}` + "\n";//removed + process.env.CSV_DELIMITER + deltatime
-    
+
     //Rename the fields of the headers with query.rename
-    if(query && query.rename){
+    if (query && query.rename) {
         let rename = JSON.parse(query.rename);
-        if(rename && Object.keys(rename).length>0){
-            for(let key of Object.keys(rename)){
-                str = str.replace(key,rename[key]);
+        if (rename && Object.keys(rename).length > 0) {
+            for (let key of Object.keys(rename)) {
+                str = str.replace(key, rename[key]);
             }
         }
-    }    
+    }
     currentRow = "\n";//string for samples with more values
     json.docs.forEach(doc => {//loop for each sample
         str +=//single sample
@@ -193,7 +193,7 @@ exports.jsonToCSVPlus = function (jsonData, columnsname, query) {
                                 delta = 0;//inizialization and default = 0
                                 if (x.delta != null) delta = x.delta;  //add as a column                            
                                 // if it's an object containing values:
-                                return x.values.map(x => { if (isArray(x)) { return "[" + x.join(process.env.CSV_VECTOR_DELIMITER) + "]" } else { return x!==null?x.toString():"" } }).join(process.env.CSV_DELIMITER);//map values of values and separe it with a comma.  removed + process.env.CSV_DELIMITER + delta
+                                return x.values.map(x => { if (isArray(x)) { return "[" + x.join(process.env.CSV_VECTOR_DELIMITER) + "]" } else { return x !== null ? x.toString() : "" } }).join(process.env.CSV_DELIMITER);//map values of values and separe it with a comma.  removed + process.env.CSV_DELIMITER + delta
                             }
                             ).join(currentRow);
                         }
@@ -220,7 +220,7 @@ exports.jsonToCSV = function (jsonData, model) {
     jsonData = typeof jsonData !== "object" ? JSON.parse(jsonData) : jsonData;
     if (!jsonData.length) throw new Error('Not found any element')
     let keys = Object.keys(jsonData[0]);
-    if(model && model.modelName=="Timesample"){keys= keys.filter(function(key) {return key !== "_id";});}
+    if (model && model.modelName == "Timesample") { keys = keys.filter(function (key) { return key !== "_id"; }); }
     let csv = keys.join(process.env.CSV_DELIMITER) + "\n";//header
     jsonData.forEach(doc => {
         let arr = [];
@@ -236,7 +236,7 @@ exports.jsonToCSV = function (jsonData, model) {
 
 const sampleValues = function (sample) {
     let sampleText = "[";
-    sampleText += sample.values!==null?sample.values.toString():"";
+    sampleText += sample.values !== null ? sample.values.toString() : "";
     sampleText += "]";
     return sampleText;
 }
@@ -301,7 +301,7 @@ exports.getInPdDataframe = async function (filter, sort, select, page, limit, mo
 
 exports.getTimeseriesDataframe = async function (query, sort, select, page, limit, model, restrictions) {
     if (!query.sort) query.sort = sort;
-    if(query.select) select = prepareSelect(select, query.select);
+    if (query.select) select = prepareSelect(select, query.select);
     if (!page) page = '1';
     if (!limit) limit = '10';
     let filter = '{}';
@@ -321,13 +321,13 @@ exports.getTimeseriesDataframe = async function (query, sort, select, page, limi
             { $limit: parseInt(limit) },
             {
                 $group: {
-                    _id: null,"values": { $push: "$values" }, "timestamp": { $push: "$timestamp" }
+                    _id: null, "values": { $push: "$values" }, "timestamp": { $push: "$timestamp" }
                 }
             }
         ]
     ).option(options);
     //list.push({"page":page,"limit":limit}); //for the pagination  
-    list=list[0];
+    list = list[0];
     delete list._id;
     return list;
 }
@@ -401,7 +401,7 @@ exports.getGroups = function (experiment, protocol, query) {
 
 exports.convertMeasurements = async function (req, res, list, query, model, select, restriction) {
     if (req.headers.accept === 'text/csv+' || req.headers.accept === 'text/dataframe') {
-        if (query.filter)query.filter=JSON.parse(query.filter);
+        if (query.filter) query.filter = JSON.parse(query.filter);
         if (!query.filter || !query.filter.feature) return errors.manage(res, errors.get_request_error, "csv+ and dataframe formats need the feature declared, ex. url?filter={\"feature\":\"name\"}");
         else featureId = query.filter.feature;
     };
@@ -410,14 +410,14 @@ exports.convertMeasurements = async function (req, res, list, query, model, sele
             case 'text/csv+'://only with feature specified
                 list = JSON.stringify(list);
                 list = typeof list !== "object" ? JSON.parse(list) : list;
-                if(req.query&&req.query.select&&!req.query.select.includes("_id"))list.docs.forEach(e=> delete e._id);
+                if (req.query && req.query.select && !req.query.select.includes("_id")) list.docs.forEach(e => delete e._id);
                 const Feature = mongoose.dbs[req.tenant.database].model('Feature');
                 const item = await Feature.findById(featureId).select("items");
                 res.header('Content-Type', 'text/csv+');
                 let columnsName = [];
                 item.items.forEach(elem => columnsName.push(elem.name));
                 let tocsvresult = '';
-                tocsvresult = this.jsonToCSVPlus(list, columnsName,req.query);
+                tocsvresult = this.jsonToCSVPlus(list, columnsName, req.query);
                 [tocsvresult, result] = this.replaceSeparatorsGet(tocsvresult, query); if (result != null) return result;
                 return res.status(200).send(tocsvresult);
 
@@ -443,4 +443,60 @@ exports.convertMeasurements = async function (req, res, list, query, model, sele
         if (err.name == 'CastError') return errors.manage(res, errors.resource_not_found);
         else return errors.manage(res, errors.get_request_error, err);
     }
+}
+
+exports.aggregateHistories = async function (jsonData) {
+    let data = JSON.parse(jsonData);
+    data = data["docs"]
+    const ids = data.map(entry => entry._id);
+    const aggregatedHistories = {};
+
+    data.forEach(entry => {
+        entry.history.forEach(hist => {
+            if (hist.fields && hist.fields.length > 0) {
+                hist.fields.forEach(field => {
+                    if (!aggregatedHistories[field.name]) {
+                        aggregatedHistories[field.name] = field.value;
+                    } else {
+                        if (typeof field.value === 'number') {
+                            aggregatedHistories[field.name] += field.value;
+                        } else if (typeof field.value === 'string') {
+                            if (!Array.isArray(aggregatedHistories[field.name])) {
+                                aggregatedHistories[field.name] = [aggregatedHistories[field.name]];
+                            }
+                            aggregatedHistories[field.name].push(field.value);
+                        } else if (Array.isArray(field.value)) {
+                            if (!Array.isArray(aggregatedHistories[field.name])) {
+                                aggregatedHistories[field.name] = Array(field.value.length).fill(0);
+                            }
+                            // Adjust the lengths of arrays before addition
+                            const maxLength = Math.max(aggregatedHistories[field.name].length, field.value.length);
+                            const aggregatedArr = aggregatedHistories[field.name].concat(Array(maxLength - aggregatedHistories[field.name].length).fill(0));
+                            const fieldValueArr = field.value.concat(Array(maxLength - field.value.length).fill(0));
+
+                            aggregatedHistories[field.name] = aggregatedArr.map((val, idx) => val + fieldValueArr[idx]);
+                        }
+                    }
+                });
+            }
+        });
+    });
+    return { _ids: ids, aggregated_histories: aggregatedHistories };
+}
+
+
+exports.toGroups = async function (req, result, protocolName) {
+    const Protocol = mongoose.dbs[req.tenant.database].model('Protocol');
+    let ids=result._ids;
+    let aggregatedHistories=result.aggregated_histories;
+    let protocol = await Protocol.findById(protocolName).select("topics").lean();
+    let topics = protocol.topics;
+    let extractedData = topics.reduce((acc, topic) => {
+        acc[topic.name] = topic.fields.reduce((fieldAcc, field) => {
+            fieldAcc[field.name] = aggregatedHistories[field.name];
+            return fieldAcc;
+        }, {});
+        return acc;
+    }, {});   
+    return { _ids: ids, aggregated_histories: extractedData };
 }
