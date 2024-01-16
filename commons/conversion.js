@@ -493,7 +493,8 @@ exports.toGroups = async function (req, result, protocolName) {
     let topics = protocol.topics;
     let extractedData = topics.reduce((acc, topic) => {
         acc[topic.name] = topic.fields.reduce((fieldAcc, field) => {
-            fieldAcc[field.name] = aggregatedHistories[field.name];
+            if(aggregatedHistories[field.name]){fieldAcc[field.name] = aggregatedHistories[field.name];}
+            else {fieldAcc[field.name]=null}
             return fieldAcc;
         }, {});
         return acc;
