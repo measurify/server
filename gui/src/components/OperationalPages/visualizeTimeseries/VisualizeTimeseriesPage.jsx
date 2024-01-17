@@ -41,25 +41,23 @@ export default function VisualizeTimeseriesPage() {
   }, []);
 
   function transformData(inputData, names = undefined) {
-    const timestamps = inputData.map((item) => item.timestamp).reverse();
+    const timestamps = inputData.map((item) => item.timestamp);
 
-    const values = inputData
-      .reduce((acc, curr) => {
-        curr.values.forEach((val, index) => {
-          if (!acc[index]) {
-            acc[index] = {
-              label:
-                names !== undefined && names[index] !== undefined
-                  ? names[index]
-                  : `Value ${index + 1}`,
-              data: [],
-            };
-          }
-          acc[index].data.push(val);
-        });
-        return acc;
-      }, [])
-      .reverse();
+    const values = inputData.reduce((acc, curr) => {
+      curr.values.forEach((val, index) => {
+        if (!acc[index]) {
+          acc[index] = {
+            label:
+              names !== undefined && names[index] !== undefined
+                ? names[index]
+                : `Value ${index + 1}`,
+            data: [],
+          };
+        }
+        acc[index].data.push(val);
+      });
+      return acc;
+    }, []);
 
     return { timestamps, values };
   }
@@ -96,9 +94,11 @@ export default function VisualizeTimeseriesPage() {
 
     resp = await get_one_generic(
       "measurements",
-      _measurement + "/timeserie?limit=" + _samplesNumber
+      _measurement +
+        "/timeserie?limit=" +
+        _samplesNumber +
+        '&sort={"timestamp":"asc"}'
     );
-
     const { timestamps, values } = transformData(
       resp?.response?.data?.docs.map((e) => {
         return { timestamp: e.timestamp, values: e.values };
