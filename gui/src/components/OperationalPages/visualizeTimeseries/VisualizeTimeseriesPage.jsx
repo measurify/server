@@ -29,7 +29,7 @@ export default function VisualizeTimeseriesPage() {
         const res = await get_generic("measurements", {
           limit: -1,
           select: ["_id"],
-          sort: JSON.stringify({ timestamp: "asc" }),
+          //sort: JSON.stringify({ timestamp: "asc" }),
         });
 
         setMeasurements(res.docs.map((m) => m._id));
@@ -41,23 +41,25 @@ export default function VisualizeTimeseriesPage() {
   }, []);
 
   function transformData(inputData, names = undefined) {
-    const timestamps = inputData.map((item) => item.timestamp);
+    const timestamps = inputData.map((item) => item.timestamp).reverse();
 
-    const values = inputData.reduce((acc, curr) => {
-      curr.values.forEach((val, index) => {
-        if (!acc[index]) {
-          acc[index] = {
-            label:
-              names !== undefined && names[index] !== undefined
-                ? names[index]
-                : `Value ${index + 1}`,
-            data: [],
-          };
-        }
-        acc[index].data.push(val);
-      });
-      return acc;
-    }, []);
+    const values = inputData
+      .reduce((acc, curr) => {
+        curr.values.forEach((val, index) => {
+          if (!acc[index]) {
+            acc[index] = {
+              label:
+                names !== undefined && names[index] !== undefined
+                  ? names[index]
+                  : `Value ${index + 1}`,
+              data: [],
+            };
+          }
+          acc[index].data.push(val);
+        });
+        return acc;
+      }, [])
+      .reverse();
 
     return { timestamps, values };
   }
