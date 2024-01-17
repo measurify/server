@@ -1,5 +1,4 @@
 import React from "react";
-import { ReactComponent as Logo } from "../../resources/Hi_Drive_Logo_Claim_rgb.svg";
 import "../authPage/authPage.scss";
 import { website_name } from "../../configManager";
 
@@ -7,9 +6,7 @@ import { website_name } from "../../configManager";
 export default function LogoHolder() {
   return (
     <React.Fragment>
-      <div className="logo-section">
-        <Logo />
-      </div>
+      <div className="logo-section"></div>
       <div className="title-section">{website_name}</div>
       <br />
       <div className="subtitle-section">

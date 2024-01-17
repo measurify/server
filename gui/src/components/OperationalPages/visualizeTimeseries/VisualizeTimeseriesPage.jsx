@@ -29,6 +29,7 @@ export default function VisualizeTimeseriesPage() {
         const res = await get_generic("measurements", {
           limit: -1,
           select: ["_id"],
+          sort: JSON.stringify({ timestamp: "asc" }),
         });
 
         setMeasurements(res.docs.map((m) => m._id));
