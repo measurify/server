@@ -824,6 +824,7 @@ describe('/GET experiment aggregated', () => {
             {
                 "name": "topic name 1",
                 "description": "topic description 1",
+                "unit":"unit1",
                 "fields": [
                     { "name": "field-1", "description": "field description 1", "type": "scalar"},
                     { "name": "field-2", "description": "field description 2", "type": "text"},
@@ -833,6 +834,7 @@ describe('/GET experiment aggregated', () => {
             {
                 "name": "topic name 2",
                 "description": "topic description 2",
+                "unit":"unit2",
                 "fields": [
                     { "name": "field-4", "description": "field description 4", "type": "scalar"},
                     { "name": "field-5", "description": "field description 5", "type": "text"},
@@ -954,18 +956,20 @@ describe('/GET experiment aggregated', () => {
         res.body._ids.should.be.an('array').that.includes('experiment_id1', 'experiment_id2', 'experiment_id3');
         res.body.aggregated_histories.should.have.property('topic name 1');
         res.body.aggregated_histories.should.have.property('topic name 2');
-        res.body.aggregated_histories["topic name 1"].should.have.property('field-1');
-        res.body.aggregated_histories["topic name 1"].should.have.property('field-2');
-        res.body.aggregated_histories["topic name 1"].should.have.property('field-3');
-        res.body.aggregated_histories["topic name 2"].should.have.property('field-4');
-        res.body.aggregated_histories["topic name 2"].should.have.property('field-5');
-        res.body.aggregated_histories["topic name 2"].should.have.property('field-6');
-        res.body.aggregated_histories["topic name 1"]['field-1'].should.be.an('number').deep.equal(7);
-        res.body.aggregated_histories["topic name 1"]['field-2'].should.be.an('array').that.includes('text value', 'text value 2', 'text value 3', 'text value 4');
-        res.body.aggregated_histories["topic name 1"]['field-3'].should.be.an('array').deep.equal([7, 7, 6]);
-        res.body.aggregated_histories["topic name 2"]['field-4'].should.be.an('number').deep.equal(7);
-        res.body.aggregated_histories["topic name 2"]['field-5'].should.be.an('array').that.includes('another text value', 'another text value 2', 'another text value 3', 'another text value 4');
-        res.body.aggregated_histories["topic name 2"]['field-6'].should.be.an('array').deep.equal([7, 7, 7]);
+        res.body.aggregated_histories["topic name 1"].unit.should.be.an('string').deep.equal('unit1');
+        res.body.aggregated_histories["topic name 2"].unit.should.be.an('string').deep.equal('unit2');
+        res.body.aggregated_histories["topic name 1"].values.should.have.property('field-1');
+        res.body.aggregated_histories["topic name 1"].values.should.have.property('field-2');
+        res.body.aggregated_histories["topic name 1"].values.should.have.property('field-3');
+        res.body.aggregated_histories["topic name 2"].values.should.have.property('field-4');
+        res.body.aggregated_histories["topic name 2"].values.should.have.property('field-5');
+        res.body.aggregated_histories["topic name 2"].values.should.have.property('field-6');
+        res.body.aggregated_histories["topic name 1"].values['field-1'].should.be.an('number').deep.equal(7);
+        res.body.aggregated_histories["topic name 1"].values['field-2'].should.be.an('array').that.includes('text value', 'text value 2', 'text value 3', 'text value 4');
+        res.body.aggregated_histories["topic name 1"].values['field-3'].should.be.an('array').deep.equal([7, 7, 6]);
+        res.body.aggregated_histories["topic name 2"].values['field-4'].should.be.an('number').deep.equal(7);
+        res.body.aggregated_histories["topic name 2"].values['field-5'].should.be.an('array').that.includes('another text value', 'another text value 2', 'another text value 3', 'another text value 4');
+        res.body.aggregated_histories["topic name 2"].values['field-6'].should.be.an('array').deep.equal([7, 7, 7]);
 
         const resB = await chai.request(server).keepOpen().get('/v1/experiments/aggregated_experiments?filter={"$or":[{"_id":"experiment_id2"},{"_id":"experiment_id3"}]}').set("Authorization", await factory.getUserToken(user));
         resB.should.have.status(200);  

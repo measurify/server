@@ -492,11 +492,11 @@ exports.toGroups = async function (req, result, protocolName) {
     let protocol = await Protocol.findById(protocolName).select("topics").lean();
     let topics = protocol.topics;
     let extractedData = topics.reduce((acc, topic) => {
-        acc[topic.name] = topic.fields.reduce((fieldAcc, field) => {
+        acc[topic.name] = {"unit":topic.unit?topic.unit:null,"values":topic.fields.reduce((fieldAcc, field) => {
             if(aggregatedHistories[field.name]){fieldAcc[field.name] = aggregatedHistories[field.name];}
             else {fieldAcc[field.name]=null}
             return fieldAcc;
-        }, {});
+        }, {})};
         return acc;
     }, {});   
     return { _ids: ids, aggregated_histories: extractedData };
