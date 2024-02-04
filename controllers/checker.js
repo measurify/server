@@ -97,7 +97,7 @@ exports.canOperate = async function(req, res, entity,method) {
 exports.whatCanOperate = async function(req, res, entity) {
     const Role = mongoose.dbs[req.tenant.database].model('Role');
     const role = await Role.findById(req.user.type);
-    if(req.device){if(entity=="Tag"){return {}}return { $and: [  { owner: req.user._id }, { visibility: VisibilityTypes.public },{ visibility: VisibilityTypes.private } ] }}//impossible solution   //device cannot do get, pipe, delete requests //Device can get Tags
+    if(req.device){if(entity=="Tag"){return {}}if(entity=="Measurement"){return {owner: req.user._id }}return { $and: [  { owner: req.user._id }, { visibility: VisibilityTypes.public },{ visibility: VisibilityTypes.private } ] }}//impossible solution   //device cannot do get, pipe, delete requests //Device can get Tags
     return authorizator.whatCanOperate(req.user,role,req.method,entity);    
 }
 

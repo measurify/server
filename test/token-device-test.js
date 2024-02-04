@@ -17,7 +17,9 @@ const VisibilityTypes = require('../types/visibilityTypes.js');
 
 // Test the /GET route
 describe("/GET measurements", () => {    
-    it("it should NOT GET measurements with a device token", async () => {
+    it("it should GET only owned measurements with a device token", async () => {
+        const user = await factory.createUser("test-username-0","test-password-0",UserRoles.provider
+        );
         const owner = await factory.createUser("test-username-1", "test-password-1", UserRoles.provider);
         const feature1 = await factory.createFeature("test-feature-1", owner);
         const feature2 = await factory.createFeature("test-feature-2", owner);
@@ -26,7 +28,7 @@ describe("/GET measurements", () => {
         const device = await factory.createDevice("test-device-1", owner, [feature1, feature2,]);
         const thing = await factory.createThing("test-thing-1", owner);
         const measurement1 = await factory.createMeasurement(
-            owner,
+            user,
             feature1,
             device,
             thing,
@@ -34,7 +36,7 @@ describe("/GET measurements", () => {
             factory.createSamples(1)
         );
         const measurement2 = await factory.createMeasurement(
-            owner,
+            user,
             feature1,
             device,
             thing,
@@ -42,7 +44,7 @@ describe("/GET measurements", () => {
             factory.createSamples(2)
         );
         const measurement3 = await factory.createMeasurement(
-            owner,
+            user,
             feature2,
             device,
             thing,
@@ -68,7 +70,7 @@ describe("/GET measurements", () => {
         let res = await chai.request(server).keepOpen().get('/v1/measurements?filter={"$or":[{"feature":"test-feature-1"}, {"tags":"test-tag-1"}]}').set("Authorization", await factory.getDeviceToken(device));
         res.should.have.status(200);
         res.body.docs.should.be.a("array");
-        res.body.docs.length.should.be.eql(0);
+        res.body.docs.length.should.be.eql(2);
     });
 });
 
