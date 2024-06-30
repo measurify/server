@@ -36,6 +36,7 @@ export default function Development_config(overrideUrl = true) {
     "device",
     "startDate",
     "tags",
+    "_id",
     "_actions",
   ];
 
