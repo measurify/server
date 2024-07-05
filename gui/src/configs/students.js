@@ -35,6 +35,7 @@ export default function Students_configuration() {
     "device",
     "startDate",
     "tags",
+    "_id",
     "_actions",
   ];
 
