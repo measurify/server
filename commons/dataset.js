@@ -294,7 +294,7 @@ exports.sampleLoop = async function (descriptionData, line, feature) {
           }
         } else {
           //expected an array but is a Number
-          errMessage = "expected array in samples at position " + k;
+          errMessage = "expected array in samples at position " + k + " but found " + str_val;
           return [null, errMessage];
         }
       } else {
@@ -317,7 +317,7 @@ exports.sampleLoop = async function (descriptionData, line, feature) {
           } else {
             if (isNaN(str_val)) {
               //not a number
-              errMessage = "expected number in samples at position " + k;
+              errMessage = "expected number in samples at position " + k + " but found " + str_val;
               return [null, errMessage];
             } else {
               samples.push(Number(str_val));
@@ -326,12 +326,12 @@ exports.sampleLoop = async function (descriptionData, line, feature) {
           }
         } else if (feature.items[k].type == "text") {
           if (typeof str_val != "string") {
-            errMessage = "expected string in samples at position " + k;
+            errMessage = "expected string in samples at position " + k + " but found " + str_val;
             return [null, errMessage];
           }
         } else if (feature.items[k].type == "enum") {
           if (typeof str_val != "string") {
-            errMessage = "expected string in samples at position " + k;
+            errMessage = "expected string in samples at position " + k + " but found " + str_val;
             return [null, errMessage];
           }
           if (!feature.items[k].range.includes(str_val) && str_val !== null && str_val !== "") {
