@@ -92,9 +92,9 @@ describe("/GET measurements", () => {
     res.should.have.status(200);
     res.text.should.be.a("string");
     res.text.should.contain('visibility,stage,tags,_id,startDate,endDate,location,thing,feature,device,item-name-1,item-name-2,item-name-3\n');
-    res.text.should.contain('private,final,[test-tag-1,test-tag-2],'+measurement2._id+','+measurement2.startDate.toJSON()+','+measurement2.endDate.toJSON()+',[object Object],test-thing-1,test-feature,test-device-1,4.4,7.3,3.6');
-    res.text.should.contain('private,final,[test-tag-1,test-tag-2],'+measurement1._id+','+measurement1.startDate.toJSON()+','+measurement1.endDate.toJSON()+',[object Object],test-thing-1,test-feature,test-device-1,1.8,5.3,6.2');
-    res.text.should.contain('private,final,[test-tag-1,test-tag-2],'+measurement1._id+','+measurement1.startDate.toJSON()+','+measurement1.endDate.toJSON()+',[object Object],test-thing-1,test-feature,test-device-1,9.7,2.1,5.2');
+    res.text.should.contain('private,final,[test-tag-1;test-tag-2],'+measurement2._id+','+measurement2.startDate.toJSON()+','+measurement2.endDate.toJSON()+',[object Object],test-thing-1,test-feature,test-device-1,4.4,7.3,3.6');
+    res.text.should.contain('private,final,[test-tag-1;test-tag-2],'+measurement1._id+','+measurement1.startDate.toJSON()+','+measurement1.endDate.toJSON()+',[object Object],test-thing-1,test-feature,test-device-1,1.8,5.3,6.2');
+    res.text.should.contain('private,final,[test-tag-1;test-tag-2],'+measurement1._id+','+measurement1.startDate.toJSON()+','+measurement1.endDate.toJSON()+',[object Object],test-thing-1,test-feature,test-device-1,9.7,2.1,5.2');
   
   });
 

@@ -198,8 +198,8 @@ exports.jsonToCSVPlus = function (jsonData, columnsname, query) {
                             ).join(currentRow);
                         }
                         else {
-                            currentRow += "[" + value + "]" + process.env.CSV_DELIMITER;
-                            return "[" + value + "]";
+                            currentRow += "[" + value.join(process.env.CSV_VECTOR_DELIMITER) + "]" + process.env.CSV_DELIMITER;
+                            return "[" + value.join(process.env.CSV_VECTOR_DELIMITER) + "]";
                         }//for tags
                     }
                     else {
